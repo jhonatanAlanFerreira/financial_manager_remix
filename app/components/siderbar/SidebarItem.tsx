@@ -17,18 +17,19 @@ export default function SidebarItem({ item }: { item: SidebarItemType }) {
             {item.title}
           </span>
           <span
-            className={
-              open
-                ? "cursor-pointer rotate-180 transition duration-500 ease-in-out"
-                : "cursor-pointer transition duration-500 ease-in-out"
-            }
+            className={`cursor-pointer transition duration-500 ease-in-out ${
+              open ? "rotate-180" : ""
+            }`}
           >
             <Icon name="ArrowDown" width="1rem"></Icon>
           </span>
         </div>
         <div className={open ? "height-auto" : "h-0 overflow-hidden"}>
           {item.childrens.map((child, index) => (
-            <div className="px-3 py-1 rounded transition duration-500 ease-in-out hover:bg-gray-900 hover:bg-opacity-30" key={index}>
+            <div
+              className="px-3 py-1 rounded transition duration-500 ease-in-out hover:bg-gray-900 hover:bg-opacity-30"
+              key={index}
+            >
               <SidebarItem key={index} item={child} />
             </div>
           ))}

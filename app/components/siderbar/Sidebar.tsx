@@ -12,11 +12,9 @@ export default function Sidebar({
 }) {
   return (
     <div
-      className={
-        sidebarOpen
-          ? "absolute text-white h-screen overflow-auto bg-black transition-all duration-500 ease-in-out opacity-1 w-60"
-          : "absolute text-white h-screen overflow-auto bg-black transition-all duration-500 ease-in-out opacity-0 w-0"
-      }
+      className={`absolute text-white h-screen overflow-auto bg-black transition-all duration-500 ease-in-out ${
+        sidebarOpen ? "opacity-1 w-60" : "opacity-0 w-0"
+      }`}
     >
       <div className="text-right cursor-pointer">
         <span className="inline-block">
