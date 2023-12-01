@@ -6,7 +6,7 @@ export function TopBar({
   updateSidebarOpen: (value: boolean) => void;
 }) {
   return (
-    <div className="bg-black w-full h-16 text-white flex items-center pl-4">
+    <div className="bg-violet-950 w-full h-16 text-white flex items-center pl-4">
       <Icon
         className="cursor-pointer"
         name="Menu"

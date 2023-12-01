@@ -27,7 +27,7 @@ export default function SidebarItem({ item }: { item: SidebarItemType }) {
         <div className={open ? "height-auto" : "h-0 overflow-hidden"}>
           {item.childrens.map((child, index) => (
             <div
-              className="px-3 py-1 rounded transition duration-500 ease-in-out hover:bg-gray-900 hover:bg-opacity-30"
+              className="px-3 py-1 rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40"
               key={index}
             >
               <SidebarItem key={index} item={child} />
