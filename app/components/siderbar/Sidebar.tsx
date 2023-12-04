@@ -16,10 +16,9 @@ export default function Sidebar({
         sidebarOpen ? "opacity-1 w-60" : "opacity-0 w-0"
       }`}
     >
-      <div className="text-right cursor-pointer">
-        <span className="inline-block p-2">
+      <div className="text-right">
+        <span className="inline-block m-1 p-2 cursor-pointer rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40">
           <Icon
-            className="mr-1"
             name="X"
             width="1rem"
             onClick={() => updateSidebarOpen(false)}
