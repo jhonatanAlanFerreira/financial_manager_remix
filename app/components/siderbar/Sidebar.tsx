@@ -17,11 +17,10 @@ export default function Sidebar({
       }`}
     >
       <div className="text-right">
-        <span className="inline-block m-1 p-2 cursor-pointer rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40">
+        <span  onClick={() => updateSidebarOpen(false)} className="inline-block m-1 p-2 cursor-pointer rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40">
           <Icon
             name="X"
             width="1rem"
-            onClick={() => updateSidebarOpen(false)}
           ></Icon>
         </span>
       </div>
