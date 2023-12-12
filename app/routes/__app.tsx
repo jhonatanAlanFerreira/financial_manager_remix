@@ -1,8 +1,9 @@
-import { ReactNode, useState } from "react";
+import { Outlet } from "@remix-run/react";
+import { useState } from "react";
 import Sidebar from "~/components/siderbar/Sidebar";
-import { TopBar } from "./components/topBar/TopBat";
+import TopBar from "~/components/topBar/TopBar";
 
-export function Layout({ children }: { children: ReactNode }) {
+export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const updateSidebarOpen = (value: boolean) => {
@@ -16,7 +17,9 @@ export function Layout({ children }: { children: ReactNode }) {
         sidebarOpen={sidebarOpen}
         updateSidebarOpen={updateSidebarOpen}
       ></Sidebar>
-      <div>{children}</div>
+      <div>
+        <Outlet></Outlet>
+      </div>
     </div>
   );
 }

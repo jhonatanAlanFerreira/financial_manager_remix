@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon } from "../icon/Icon";
+import Icon from "../icon/Icon";
 import { SidebarItemType } from "~/types/SidebarItemType";
 
 export default function SidebarItem({ item }: { item: SidebarItemType }) {

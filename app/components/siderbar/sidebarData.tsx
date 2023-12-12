@@ -10,5 +10,5 @@ export const items: SidebarItemType[] = [
     title: "Expenses",
     icon: "DollarSign",
     path: "/expenses",
-  }
+  },
 ];
