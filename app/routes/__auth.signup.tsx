@@ -1,3 +1,3 @@
 export default function Signup() {
-    return "Signup";
-  }
+  return <span>Signup</span>;
+}

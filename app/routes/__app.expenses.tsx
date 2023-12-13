@@ -1,3 +1,3 @@
 export default function Expenses() {
-  return "Expenses";
+  return <span>Expenses</span>;
 }
