@@ -29,7 +29,11 @@ export default function Sidebar({
           key={index}
           className="px-4 py-1 rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40"
         >
-          <SidebarItem key={index} item={item} />
+          <SidebarItem
+            updateSidebarOpen={updateSidebarOpen}
+            key={index}
+            item={item}
+          />
         </div>
       ))}
     </div>

@@ -1,8 +1,15 @@
 import { useState } from "react";
 import Icon from "../icon/Icon";
 import { SidebarItemType } from "~/types/SidebarItemType";
+import { Link } from "@remix-run/react";
 
-export default function SidebarItem({ item }: { item: SidebarItemType }) {
+export default function SidebarItem({
+  item,
+  updateSidebarOpen,
+}: {
+  item: SidebarItemType;
+  updateSidebarOpen: (value: boolean) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   if (item.childrens) {
@@ -30,7 +37,11 @@ export default function SidebarItem({ item }: { item: SidebarItemType }) {
               className="px-3 py-1 rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40"
               key={index}
             >
-              <SidebarItem key={index} item={child} />
+              <SidebarItem
+                updateSidebarOpen={updateSidebarOpen}
+                key={index}
+                item={child}
+              />
             </div>
           ))}
         </div>
@@ -38,13 +49,14 @@ export default function SidebarItem({ item }: { item: SidebarItemType }) {
     );
   } else {
     return (
-      <a
-        href={item.path || "#"}
+      <Link
+        onClick={() => updateSidebarOpen(false)}
+        to={item.path}
         className="flex gap-2 rounded transition duration-500 ease-in-out hover:underline"
       >
         {item.icon && <Icon name={item.icon} width="1.2rem"></Icon>}
         {item.title}
-      </a>
+      </Link>
     );
   }
 }
