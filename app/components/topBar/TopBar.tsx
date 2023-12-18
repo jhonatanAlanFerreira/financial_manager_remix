@@ -1,10 +1,7 @@
 import Icon from "~/components/icon/Icon";
+import TopBarProps from "~/interfaces/componentsProps/TopBarProps";
 
-export default function TopBar({
-  updateSidebarOpen,
-}: {
-  updateSidebarOpen: (value: boolean) => void;
-}) {
+export default function TopBar({ updateSidebarOpen }: TopBarProps) {
   return (
     <div className="bg-violet-950 w-full h-16 text-white flex items-center pl-1">
       <span

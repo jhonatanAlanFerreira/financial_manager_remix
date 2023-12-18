@@ -1,15 +1,12 @@
 import { useState } from "react";
 import Icon from "../icon/Icon";
-import { SidebarItemType } from "~/types/SidebarItemType";
 import { Link } from "@remix-run/react";
+import SidebarItemProps from "~/interfaces/componentsProps/SidebarItemProps";
 
 export default function SidebarItem({
   item,
   updateSidebarOpen,
-}: {
-  item: SidebarItemType;
-  updateSidebarOpen: (value: boolean) => void;
-}) {
+}: SidebarItemProps) {
   const [open, setOpen] = useState(false);
 
   if (item.childrens) {

@@ -2,14 +2,12 @@ import SidebarItem from "~/components/siderbar/SidebarItem";
 import { items } from "~/components/siderbar/sidebarData";
 import Icon from "~/components/icon/Icon";
 import { SidebarItemType } from "~/types/SidebarItemType";
+import SidebarProps from "~/interfaces/componentsProps/SidebarProps";
 
 export default function Sidebar({
   sidebarOpen,
   updateSidebarOpen,
-}: {
-  sidebarOpen: boolean;
-  updateSidebarOpen: (value: boolean) => void;
-}) {
+}: SidebarProps) {
   return (
     <div
       className={`absolute text-white h-screen overflow-auto bg-violet-950 shadow-xl shadow-black transition-all duration-500 ease-in-out ${
