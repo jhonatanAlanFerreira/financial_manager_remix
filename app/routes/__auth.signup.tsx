@@ -3,8 +3,8 @@ import InputText from "~/components/inputText/InputText";
 export default function Signup() {
   return (
     <div className="h-screen bg-violet-950 flex justify-center items-center">
-      <div className="bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 px-5">
-        <h1 className="text-center mt-3 text-2xl font-bold text-violet-950">
+      <div className="bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
+        <h1 className="text-center text-2xl font-bold text-violet-950">
           Sign Up
         </h1>
 
