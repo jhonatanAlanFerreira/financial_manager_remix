@@ -36,3 +36,18 @@ Make sure to deploy the output of `remix build`
 
 - `build/`
 - `public/build/`
+
+
+## Prisma Commands
+
+Run seeders:
+
+```sh
+npx prisma db seed
+```
+
+Sync database schema:
+
+```sh
+npx prisma db push
+```
