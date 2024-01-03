@@ -1,4 +1,8 @@
+import { ActionFunctionArgs } from "@remix-run/node";
+import { Form } from "@remix-run/react";
+import { redirect } from "react-router";
 import InputText from "~/components/inputText/InputText";
+import { prisma } from "~/data/database.server";
 
 export default function Signup() {
   return (
@@ -8,19 +12,46 @@ export default function Signup() {
           Sign Up
         </h1>
 
-        <div>
-          <InputText label="Name"></InputText>
-          <InputText label="Login"></InputText>
-          <InputText label="Password" type="password"></InputText>
-          <InputText label="Repeat Password" type="password"></InputText>
-        </div>
+        <Form method="post" id="signup-form">
+          <InputText label="Name" name="name" required></InputText>
+          <InputText label="Login" name="login" required></InputText>
+          <InputText
+            label="Password"
+            name="password"
+            type="password"
+            required
+          ></InputText>
+          <InputText
+            label="Repeat Password"
+            name="passwordRepeat"
+            type="password"
+            required
+          ></InputText>
+        </Form>
 
         <div className="text-right">
-          <button className="bg-violet-950 text-white rounded-lg px-10 py-1">
+          <button
+            form="signup-form"
+            type="submit"
+            className="bg-violet-950 text-white rounded-lg px-10 py-1"
+          >
             Sign Up
           </button>
         </div>
       </div>
     </div>
   );
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const body = await request.formData();
+
+  const user = await prisma.user.create({
+    data: {
+      name: String(body.get('name')),
+      login: String(body.get('login')),
+      password: String(body.get('password')),
+    },
+  });
+  return redirect("/");
 }
