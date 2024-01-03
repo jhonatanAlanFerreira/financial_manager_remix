@@ -15,7 +15,7 @@ model User {
   name                String
   login               String                  @unique
   password            String
-  accountant_balance  Float
+  accountant_balance  Float                   @default(0)
   companies           Company[]
   expenses            Expense[]
   common_transactions CommonUserTransaction[]
