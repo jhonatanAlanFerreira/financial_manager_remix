@@ -1,6 +1,6 @@
 import { ActionFunctionArgs } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-import { redirect } from "react-router";
+import { parseJsonOrNull } from "utilities";
 import InputText from "~/components/inputText/InputText";
 import { signup } from "~/data/auth.server";
 import { getError } from "~/data/requestValidators/authValidator";
@@ -8,9 +8,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 
 export default function Signup() {
-  const actionData: ServerResponse = JSON.parse(
-    useActionData() ?? "{}"
-  ) as ServerResponse;
+  const actionData: ServerResponse = parseJsonOrNull(useActionData() as string);
 
   return (
     <div className="h-screen bg-violet-950 flex justify-center items-center">
