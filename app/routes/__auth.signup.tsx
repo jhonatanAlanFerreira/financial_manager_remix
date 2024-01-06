@@ -1,10 +1,17 @@
 import { ActionFunctionArgs } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import { redirect } from "react-router";
 import InputText from "~/components/inputText/InputText";
-import { prisma } from "~/data/database.server";
+import { signup } from "~/data/auth.server";
+import { getError } from "~/data/requestValidators/authValidator";
+import ServerResponse from "~/interfaces/ServerResponse";
+import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 
 export default function Signup() {
+  const actionData: ServerResponse = JSON.parse(
+    useActionData() ?? "{}"
+  ) as ServerResponse;
+
   return (
     <div className="h-screen bg-violet-950 flex justify-center items-center">
       <div className="bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
@@ -20,12 +27,14 @@ export default function Signup() {
             name="password"
             type="password"
             required
+            errorMessage={getError(actionData?.data, "password")}
           ></InputText>
           <InputText
             label="Repeat Password"
             name="passwordRepeat"
             type="password"
             required
+            errorMessage={getError(actionData?.data, "password")}
           ></InputText>
         </Form>
 
@@ -46,12 +55,16 @@ export default function Signup() {
 export async function action({ request }: ActionFunctionArgs) {
   const body = await request.formData();
 
-  const user = await prisma.user.create({
-    data: {
-      name: String(body.get('name')),
-      login: String(body.get('login')),
-      password: String(body.get('password')),
-    },
-  });
-  return redirect("/");
+  const data: SignupRequest = {
+    name: String(body.get("name")),
+    login: String(body.get("login")),
+    password: String(body.get("password")),
+    passwordRepeat: String(body.get("passwordRepeat")),
+  };
+
+  const res = await signup(data);
+
+  const status = res.error ? 400 : 201;
+
+  return new Response(JSON.stringify(res), { status });
 }
