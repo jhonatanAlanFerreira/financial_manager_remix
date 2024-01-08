@@ -11,6 +11,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Toaster } from "react-hot-toast";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -32,6 +33,18 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          gutter={8}
+          toastOptions={{
+            duration: 5000,
+            style: {
+              background: "white",
+              color: "#2e1065",
+            },
+          }}
+        />
       </body>
     </html>
   );
