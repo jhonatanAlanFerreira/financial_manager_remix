@@ -1,14 +1,37 @@
-import { ActionFunctionArgs } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-import { parseJsonOrNull } from "utilities";
+import { Form } from "@remix-run/react";
+import axios, { AxiosResponse, isAxiosError } from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import InputText from "~/components/inputText/InputText";
-import { signup } from "~/data/auth.server";
 import { getError } from "~/data/requestValidators/authValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
-import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 
 export default function Signup() {
-  const actionData: ServerResponse = parseJsonOrNull(useActionData() as string);
+  const [responseErrors, setResponseErrors] = useState<ServerResponse>({});
+
+  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    toast.promise(axios.post("/api/auth", formData), {
+      loading: "Creating new user",
+      success: (res: AxiosResponse<ServerResponse>) => {
+        setResponseErrors({});
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          setResponseErrors(error.response?.data);
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
+        }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    });
+  };
 
   return (
     <div className="h-screen bg-violet-950 flex justify-center items-center">
@@ -17,7 +40,7 @@ export default function Signup() {
           Sign Up
         </h1>
 
-        <Form method="post" id="signup-form">
+        <Form method="post" id="signup-form" onSubmit={formSubmit}>
           <InputText label="Name" name="name" required></InputText>
           <InputText label="Login" name="login" required></InputText>
           <InputText
@@ -25,14 +48,14 @@ export default function Signup() {
             name="password"
             type="password"
             required
-            errorMessage={getError(actionData?.data, "password")}
+            errorMessage={getError(responseErrors?.data, "password")}
           ></InputText>
           <InputText
             label="Repeat Password"
             name="passwordRepeat"
             type="password"
             required
-            errorMessage={getError(actionData?.data, "password")}
+            errorMessage={getError(responseErrors?.data, "password")}
           ></InputText>
         </Form>
 
@@ -48,21 +71,4 @@ export default function Signup() {
       </div>
     </div>
   );
-}
-
-export async function action({ request }: ActionFunctionArgs) {
-  const body = await request.formData();
-
-  const data: SignupRequest = {
-    name: String(body.get("name")),
-    login: String(body.get("login")),
-    password: String(body.get("password")),
-    passwordRepeat: String(body.get("passwordRepeat")),
-  };
-
-  const res = await signup(data);
-
-  const status = res.error ? 400 : 201;
-
-  return new Response(JSON.stringify(res), { status });
 }
