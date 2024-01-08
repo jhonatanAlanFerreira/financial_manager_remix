@@ -2,8 +2,8 @@ import { Form } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { getError } from "utilities";
 import InputText from "~/components/inputText/InputText";
-import { getError } from "~/data/requestValidators/authValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
 
 export default function Signup() {
