@@ -2,7 +2,6 @@ import { Form } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { getError } from "utilities";
 import InputText from "~/components/inputText/InputText";
 import ServerResponse from "~/interfaces/ServerResponse";
 
@@ -46,21 +45,21 @@ export default function Signup() {
             label="Login"
             name="login"
             required
-            errorMessage={getError(responseErrors?.data, "login")}
+            errorMessage={responseErrors?.data?.errors?.["login"]}
           ></InputText>
           <InputText
             label="Password"
             name="password"
             type="password"
             required
-            errorMessage={getError(responseErrors?.data, "password")}
+            errorMessage={responseErrors?.data?.errors?.["password"]}
           ></InputText>
           <InputText
             label="Repeat Password"
             name="passwordRepeat"
             type="password"
             required
-            errorMessage={getError(responseErrors?.data, "password")}
+            errorMessage={responseErrors?.data?.errors?.["password"]}
           ></InputText>
         </Form>
 

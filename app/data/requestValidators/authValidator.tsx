@@ -8,12 +8,9 @@ export async function signupValidator(
   if (data.password != data.passwordRepeat) {
     return {
       isValid: false,
-      errors: [
-        {
-          name: "password",
-          error: "You sent two different passwords",
-        },
-      ],
+      errors: {
+        password: "You sent two different passwords",
+      },
     };
   }
 
@@ -26,12 +23,9 @@ export async function signupValidator(
   if (loginExists !== null) {
     return {
       isValid: false,
-      errors: [
-        {
-          name: "login",
-          error: "The login you sent already exists",
-        },
-      ],
+      errors: {
+        login: "The login you sent already exists",
+      },
     };
   }
 
