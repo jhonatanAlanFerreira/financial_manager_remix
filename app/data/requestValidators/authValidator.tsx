@@ -29,6 +29,15 @@ export async function signupValidator(
     };
   }
 
+  if (!data.login || !data.name || !data.password) {
+    return {
+      isValid: false,
+      errors: {
+        empty: "There are empty fields",
+      },
+    };
+  }
+
   return {
     isValid: true,
   };
