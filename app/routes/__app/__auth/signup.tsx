@@ -42,7 +42,12 @@ export default function Signup() {
 
         <Form method="post" id="signup-form" onSubmit={formSubmit}>
           <InputText label="Name" name="name" required></InputText>
-          <InputText label="Login" name="login" required></InputText>
+          <InputText
+            label="Login"
+            name="login"
+            required
+            errorMessage={getError(responseErrors?.data, "login")}
+          ></InputText>
           <InputText
             label="Password"
             name="password"

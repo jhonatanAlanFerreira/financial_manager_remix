@@ -5,7 +5,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import { hash } from "bcrypt";
 
 export async function signup(data: SignupRequest): Promise<ServerResponse> {
-  const dataIsValid = signupValidator(data);
+  const dataIsValid = await signupValidator(data);
 
   if (!dataIsValid.isValid) {
     return {
