@@ -7,29 +7,34 @@ import ServerResponse from "~/interfaces/ServerResponse";
 
 export default function Signup() {
   const [responseErrors, setResponseErrors] = useState<ServerResponse>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
 
-    toast.promise(axios.post("/api/auth", formData), {
-      loading: "Creating new user",
-      success: (res: AxiosResponse<ServerResponse>) => {
-        setResponseErrors({});
-        return res.data.message as string;
-      },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setResponseErrors(error.response?.data);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
-      },
-    });
+    setIsSubmitting(true);
+
+    toast
+      .promise(axios.post("/api/auth", formData), {
+        loading: "Creating new user",
+        success: (res: AxiosResponse<ServerResponse>) => {
+          setResponseErrors({});
+          return res.data.message as string;
+        },
+        error: (error) => {
+          if (isAxiosError(error)) {
+            setResponseErrors(error.response?.data);
+            return (
+              error.response?.data.message ||
+              "Sorry, unexpected error. Be back soon"
+            );
+          }
+          return "Sorry, unexpected error. Be back soon";
+        },
+      })
+      .finally(() => setIsSubmitting(false));
   };
 
   return (
@@ -67,7 +72,10 @@ export default function Signup() {
           <button
             form="signup-form"
             type="submit"
-            className="bg-violet-950 text-white rounded-lg px-10 py-1"
+            className={`text-white rounded-lg px-10 py-1 ${
+              isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
+            }`}
+            disabled={isSubmitting}
           >
             Sign Up
           </button>
