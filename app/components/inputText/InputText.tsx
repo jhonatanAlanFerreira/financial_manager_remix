@@ -1,9 +1,12 @@
 import { useId } from "react";
 import InputTextProps from "~/interfaces/componentsProps/InputTextProps";
+import Icon from "../icon/Icon";
 
 export default function InputText({
   label,
   errorMessage,
+  icon,
+  onIconClicked,
   ...rest
 }: InputTextProps) {
   const inputId = useId();
@@ -27,6 +30,13 @@ export default function InputText({
       >
         {label}
       </label>
+      {icon && (
+        <Icon
+          name={icon}
+          className="absolute top-3 right-4 text-violet-950 cursor-pointer"
+          onClick={onIconClicked}
+        ></Icon>
+      )}
       {errorMessage && <p className="text-rose-500">* {errorMessage}</p>}
     </div>
   );
