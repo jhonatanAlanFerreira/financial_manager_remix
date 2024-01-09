@@ -3,6 +3,7 @@ import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 import { signupValidator } from "~/data/requestValidators/authValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { hash } from "bcrypt";
+import { exclude } from "utilities";
 
 export async function signup(data: SignupRequest): Promise<ServerResponse> {
   const dataIsValid = await signupValidator(data);
@@ -25,8 +26,10 @@ export async function signup(data: SignupRequest): Promise<ServerResponse> {
     },
   });
 
+  const userWithoutPass = exclude(user, ["password"]);
+
   return {
-    data: user,
+    data: userWithoutPass,
     message: "Your user was created successfully",
   };
 }
