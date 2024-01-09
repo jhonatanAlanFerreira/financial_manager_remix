@@ -38,6 +38,20 @@ export async function signupValidator(
     };
   }
 
+  if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+      data.password
+    )
+  ) {
+    return {
+      isValid: false,
+      errors: {
+        password:
+          "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character",
+      },
+    };
+  }
+
   return {
     isValid: true,
   };
