@@ -18,7 +18,7 @@ export default function Signup() {
     setIsSubmitting(true);
 
     toast
-      .promise(axios.post("/api/auth", formData), {
+      .promise(axios.post("/api/signup", formData), {
         loading: "Creating new user",
         success: (res: AxiosResponse<ServerResponse>) => {
           setResponseErrors({});
