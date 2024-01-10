@@ -1,7 +1,8 @@
+import { ActionFunctionArgs } from "@remix-run/node";
 import { signup } from "~/data/auth.server";
 import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 
-export let action = async ({ request }: any) => {
+export let action = async ({ request }: ActionFunctionArgs) => {
   const body = await request.formData();
 
   const data: SignupRequest = {
