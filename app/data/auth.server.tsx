@@ -3,9 +3,32 @@ import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 import { signupValidator } from "~/data/requestValidators/authValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { hash, compare } from "bcrypt";
-import { exclude } from "utilities";
+import { exclude } from "~/utilities";
 import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
 import { loginValidator } from "./requestValidators/loginValidator";
+import { createCookieSessionStorage } from "@remix-run/node";
+
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+if (!SESSION_SECRET) {
+  throw new Error("SESSION_SECRET not found");
+}
+
+const sessionStorage = createCookieSessionStorage({
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    secrets: [SESSION_SECRET],
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60,
+    httpOnly: true,
+  },
+});
+
+export async function createUserSession(userId: string) {
+  const session = await sessionStorage.getSession();
+  session.set("userId", userId);
+  return sessionStorage.commitSession(session);
+}
 
 export async function signup(data: SignupRequest): Promise<ServerResponse> {
   const dataIsValid = await signupValidator(data);
