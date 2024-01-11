@@ -6,7 +6,11 @@ import { hash, compare } from "bcrypt";
 import { exclude } from "~/utilities";
 import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
 import { loginValidator } from "./requestValidators/loginValidator";
-import { createCookieSessionStorage } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  createCookieSessionStorage,
+  redirect,
+} from "@remix-run/node";
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
@@ -28,6 +32,34 @@ export async function createUserSession(userId: string) {
   const session = await sessionStorage.getSession();
   session.set("userId", userId);
   return sessionStorage.commitSession(session);
+}
+
+export async function getUserFromSession(request: Request) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+
+  const userId = session.get("userId");
+
+  if (!userId) {
+    return null;
+  }
+
+  return await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+}
+
+export async function requireUserSession(request: Request) {
+  const user = await getUserFromSession(request);
+
+  if (!user) {
+    throw redirect("/login");
+  }
+
+  return user;
 }
 
 export async function signup(data: SignupRequest): Promise<ServerResponse> {
