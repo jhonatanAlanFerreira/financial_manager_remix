@@ -43,6 +43,12 @@ export default function App() {
               background: "white",
               color: "#2e1065",
             },
+            success: {
+              iconTheme: {
+                primary: "#2e1065",
+                secondary: "white",
+              },
+            },
           }}
         />
       </body>
