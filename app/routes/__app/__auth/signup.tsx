@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -9,6 +9,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 export default function Signup() {
   const [responseErrors, setResponseErrors] = useState<ServerResponse>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -21,7 +22,7 @@ export default function Signup() {
       .promise(axios.post("/api/signup", formData), {
         loading: "Creating new user",
         success: (res: AxiosResponse<ServerResponse>) => {
-          setResponseErrors({});
+          navigate("/");
           return res.data.message as string;
         },
         error: (error) => {

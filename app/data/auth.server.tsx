@@ -69,7 +69,10 @@ export async function login(data: LoginRequest): Promise<ServerResponse> {
     };
   }
 
+  const userWithoutPass = exclude(user, ["password"]);
+
   return {
-    message: "WIP",
+    data: userWithoutPass,
+    message: "OK",
   };
 }
