@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import InputPassword from "~/components/inputPassword/InputPassword";
 import InputText from "~/components/inputText/InputText";
+import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
 import ServerResponse from "~/interfaces/ServerResponse";
 
 export default function Signup() {
@@ -40,60 +41,62 @@ export default function Signup() {
   };
 
   return (
-    <div className="h-screen bg-violet-950 flex justify-center items-center">
-      <div className="overflow-auto bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
-        <h1 className="text-center text-2xl font-bold text-violet-950">
-          Sign Up
-        </h1>
+    <NavigationLoader>
+      <div className="h-screen bg-violet-950 flex justify-center items-center">
+        <div className="overflow-auto bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
+          <h1 className="text-center text-2xl font-bold text-violet-950">
+            Sign Up
+          </h1>
 
-        <div>
-          <Form method="post" id="signup-form" onSubmit={formSubmit}>
-            <InputText label="Name" name="name" required></InputText>
-            <InputText
-              label="Login"
-              name="login"
-              required
-              errorMessage={responseErrors?.data?.errors?.["login"]}
-            ></InputText>
-            <InputPassword
-              showEyeIcon={true}
-              label="Password"
-              name="password"
-              required
-              errorMessage={responseErrors?.data?.errors?.["password"]}
-            ></InputPassword>
-            <InputPassword
-              showEyeIcon={true}
-              label="Repeat Password"
-              name="passwordRepeat"
-              required
-              errorMessage={responseErrors?.data?.errors?.["password"]}
-            ></InputPassword>
-          </Form>
+          <div>
+            <Form method="post" id="signup-form" onSubmit={formSubmit}>
+              <InputText label="Name" name="name" required></InputText>
+              <InputText
+                label="Login"
+                name="login"
+                required
+                errorMessage={responseErrors?.data?.errors?.["login"]}
+              ></InputText>
+              <InputPassword
+                showEyeIcon={true}
+                label="Password"
+                name="password"
+                required
+                errorMessage={responseErrors?.data?.errors?.["password"]}
+              ></InputPassword>
+              <InputPassword
+                showEyeIcon={true}
+                label="Repeat Password"
+                name="passwordRepeat"
+                required
+                errorMessage={responseErrors?.data?.errors?.["password"]}
+              ></InputPassword>
+            </Form>
+            <div className="text-right">
+              <span className="text-violet-950">
+                Go to{" "}
+                <Link className="underline" to="/login">
+                  <b>login</b>
+                </Link>{" "}
+                if you already have an account
+              </span>
+            </div>
+          </div>
+
           <div className="text-right">
-            <span className="text-violet-950">
-              Go to{" "}
-              <Link className="underline" to="/login">
-                <b>login</b>
-              </Link>{" "}
-              if you already have an account
-            </span>
+            <button
+              form="signup-form"
+              type="submit"
+              className={`text-white rounded-lg px-10 py-1 ${
+                isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
+              }`}
+              disabled={isSubmitting}
+            >
+              Sign Up
+            </button>
           </div>
         </div>
-
-        <div className="text-right">
-          <button
-            form="signup-form"
-            type="submit"
-            className={`text-white rounded-lg px-10 py-1 ${
-              isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
-            }`}
-            disabled={isSubmitting}
-          >
-            Sign Up
-          </button>
-        </div>
       </div>
-    </div>
+    </NavigationLoader>
   );
 }
