@@ -1,4 +1,4 @@
-import { Form, useNavigate } from "@remix-run/react";
+import { Form, Link, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -46,21 +46,31 @@ export default function Login() {
           Login In
         </h1>
 
-        <Form method="post" id="login-form" onSubmit={formSubmit}>
-          <InputText
-            label="Login"
-            name="login"
-            required
-            errorMessage={responseErrors?.data?.errors?.["login"]}
-          ></InputText>
-          <InputPassword
-            showEyeIcon={true}
-            label="Password"
-            name="password"
-            required
-            errorMessage={responseErrors?.data?.errors?.["password"]}
-          ></InputPassword>
-        </Form>
+        <div>
+          <Form method="post" id="login-form" onSubmit={formSubmit}>
+            <InputText
+              label="Login"
+              name="login"
+              required
+              errorMessage={responseErrors?.data?.errors?.["login"]}
+            ></InputText>
+            <InputPassword
+              showEyeIcon={true}
+              label="Password"
+              name="password"
+              required
+              errorMessage={responseErrors?.data?.errors?.["password"]}
+            ></InputPassword>
+          </Form>
+          <div className="text-right">
+            <span className="text-violet-950">
+              <Link className="underline" to="/signup">
+                <b>Create your account</b>
+              </Link>{" "}
+              if you do not have it yet
+            </span>
+          </div>
+        </div>
 
         <div className="text-right">
           <button
