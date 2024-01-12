@@ -11,4 +11,16 @@ export const items: SidebarItemType[] = [
     icon: "DollarSign",
     path: "/expenses",
   },
+  {
+    title: "Settings",
+    icon: "Settings",
+    path: "",
+    childrens: [
+      {
+        title: "Logout",
+        icon: "LogOut",
+        path: "/api/logout",
+      },
+    ],
+  },
 ];

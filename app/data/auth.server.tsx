@@ -91,6 +91,18 @@ export async function signup(data: SignupRequest): Promise<ServerResponse> {
   };
 }
 
+export async function destroyUserSession(request: Request) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+
+  return redirect("/login", {
+    headers: {
+      "Set-Cookie": await sessionStorage.destroySession(session),
+    },
+  });
+}
+
 export async function login(data: LoginRequest): Promise<ServerResponse> {
   const dataIsValid = await loginValidator(data);
 
