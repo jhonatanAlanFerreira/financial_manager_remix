@@ -1,8 +1,12 @@
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, json } from "@remix-run/node";
 import { createUserSession, signup } from "~/data/auth.server";
 import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
+  if (request.method !== "POST") {
+    throw json({ message: "Invalid request method" }, { status: 400 });
+  }
+
   const body = await request.formData();
 
   const data: SignupRequest = {
