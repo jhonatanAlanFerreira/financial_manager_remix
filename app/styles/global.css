@@ -1,9 +1,13 @@
+:root {
+  --primary-color: #2e1065;
+}
+
 .float-label-input {
-    margin: 32px 0;
+  margin: 32px 0;
 }
 
 .float-label-input:focus-within label,
-.float-label-input input:not(:placeholder-shown)+label {
-    transform: translateY(-1.5rem) scale(0.75);
-    background-color: white;
+.float-label-input input:not(:placeholder-shown) + label {
+  transform: translateY(-1.5rem) scale(0.75);
+  background-color: white;
 }

@@ -41,11 +41,11 @@ export default function App() {
             duration: 5000,
             style: {
               background: "white",
-              color: "#2e1065",
+              color: "var(--primary-color)",
             },
             success: {
               iconTheme: {
-                primary: "#2e1065",
+                primary: "var(--primary-color)",
                 secondary: "white",
               },
             },
