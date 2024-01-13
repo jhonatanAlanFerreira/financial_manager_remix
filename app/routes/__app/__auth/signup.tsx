@@ -2,6 +2,7 @@ import { Form, Link, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Icon from "~/components/icon/Icon";
 import InputPassword from "~/components/inputPassword/InputPassword";
 import InputText from "~/components/inputText/InputText";
 import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
@@ -44,11 +45,21 @@ export default function Signup() {
     <NavigationLoader>
       <div className="h-screen bg-violet-950 flex justify-center items-center">
         <div className="overflow-auto bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
-          <h1 className="text-center text-2xl font-bold text-violet-950">
-            Sign Up
-          </h1>
+          <div className="h-1/2 flex flex-col items-center place-content-center gap-5">
+            <h1 className="text-2xl font-bold text-violet-950">Sign Up</h1>
 
-          <div>
+            <div className="rounded-full h-28 w-28 flex bg-violet-950">
+              <Icon
+                color="white"
+                height="50%"
+                width="50%"
+                className="m-auto"
+                name="UserPlus"
+              ></Icon>
+            </div>
+          </div>
+
+          <div className="h-full">
             <Form method="post" id="signup-form" onSubmit={formSubmit}>
               <InputText label="Name" name="name" required></InputText>
               <InputText

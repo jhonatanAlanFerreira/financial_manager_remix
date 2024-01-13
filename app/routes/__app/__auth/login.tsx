@@ -2,6 +2,7 @@ import { Form, Link, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Icon from "~/components/icon/Icon";
 import InputPassword from "~/components/inputPassword/InputPassword";
 import InputText from "~/components/inputText/InputText";
 import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
@@ -43,11 +44,20 @@ export default function Login() {
   return (
     <NavigationLoader>
       <div className="h-screen bg-violet-950 flex justify-center items-center">
-        <div className="overflow-auto bg-white rounded-lg h-1/2 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
-          <h1 className="text-center text-2xl font-bold text-violet-950">
-            Login In
-          </h1>
+        <div className="overflow-auto bg-white rounded-lg h-4/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
+          <div className="h-1/2 flex flex-col items-center place-content-center gap-5">
+            <h1 className="text-2xl font-bold text-violet-950">Log In</h1>
 
+            <div className="rounded-full h-28 w-28 flex bg-violet-950">
+              <Icon
+                color="white"
+                height="50%"
+                width="50%"
+                className="m-auto"
+                name="Lock"
+              ></Icon>
+            </div>
+          </div>
           <div>
             <Form method="post" id="login-form" onSubmit={formSubmit}>
               <InputText
