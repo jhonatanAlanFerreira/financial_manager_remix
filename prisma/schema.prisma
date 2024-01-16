@@ -11,68 +11,66 @@ datasource db {
 }
 
 model User {
-  id                  String                  @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  login               String                  @unique
-  password            String
-  accountant_balance  Float                   @default(0)
-  companies           Company[]
-  expenses            Expense[]
-  common_transactions CommonUserTransaction[]
-  transactions        Transaction[]
-  logs                Log[]
-  transaction_types   TransactionType[]
+  id                          String                      @id @default(auto()) @map("_id") @db.ObjectId
+  name                        String
+  login                       String                      @unique
+  password                    String
+  accountant_balance          Float                       @default(0)
+  companies                   Company[]
+  expenses                    Expense[]
+  transactions                Transaction[]
+  logs                        Log[]
+  transaction_classifications TransactionClassification[]
 }
 
 model Company {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  name            String        @unique
-  working_capital Float
-  user_id         String        @db.ObjectId
-  user            User          @relation(fields: [user_id], references: [id])
-  expense_ids     String[]      @db.ObjectId
-  expenses        Expense[]     @relation(fields: [expense_ids], references: [id])
-  transactions    Transaction[]
+  id                         String                      @id @default(auto()) @map("_id") @db.ObjectId
+  name                       String                      @unique
+  working_capital            Float                       @default(0)
+  user_id                    String                      @db.ObjectId
+  user                       User                        @relation(fields: [user_id], references: [id])
+  expense_ids                String[]                    @db.ObjectId
+  expenses                   Expense[]                   @relation(fields: [expense_ids], references: [id])
+  transactions               Transaction[]
+  transactionClassifications TransactionClassification[]
 }
 
 model Expense {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String    @unique
-  amount      Float
-  user_id     String    @db.ObjectId
-  user        User      @relation(fields: [user_id], references: [id])
-  company_ids String[]  @db.ObjectId
-  companies   Company[] @relation(fields: [company_ids], references: [id])
-}
-
-model CommonUserTransaction {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  name    String @unique
-  user_id String @db.ObjectId
-  user    User   @relation(fields: [user_id], references: [id])
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String    @unique
+  amount              Float?
+  user_id             String    @db.ObjectId
+  is_personal_expense Boolean   @default(false)
+  user                User      @relation(fields: [user_id], references: [id])
+  company_ids         String[]  @db.ObjectId
+  companies           Company[] @relation(fields: [company_ids], references: [id])
 }
 
 model Transaction {
-  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
-  name                String           @unique
-  amount              Float
-  transaction_date    DateTime
-  created_at          DateTime         @default(now())
-  user_id             String           @db.ObjectId
-  user                User             @relation(fields: [user_id], references: [id])
-  company_id          String?          @db.ObjectId
-  company             Company?         @relation(fields: [company_id], references: [id])
-  file                File?
-  transaction_type_id String?          @db.ObjectId
-  transactionType     TransactionType? @relation(fields: [transaction_type_id], references: [id])
+  id                            String                     @id @default(auto()) @map("_id") @db.ObjectId
+  name                          String                     @unique
+  amount                        Float
+  transaction_date              DateTime
+  created_at                    DateTime                   @default(now())
+  user_id                       String                     @db.ObjectId
+  user                          User                       @relation(fields: [user_id], references: [id])
+  company_id                    String?                    @db.ObjectId
+  company                       Company?                   @relation(fields: [company_id], references: [id])
+  file                          File?
+  transaction_classification_id String?                    @db.ObjectId
+  transaction_classification    TransactionClassification? @relation(fields: [transaction_classification_id], references: [id])
 }
 
-model TransactionType {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  name         String        @unique
-  transactions Transaction[]
-  user_id      String        @db.ObjectId
-  user         User          @relation(fields: [user_id], references: [id])
+model TransactionClassification {
+  id                                     String        @id @default(auto()) @map("_id") @db.ObjectId
+  name                                   String        @unique
+  transactions                           Transaction[]
+  user_id                                String        @db.ObjectId
+  user                                   User          @relation(fields: [user_id], references: [id])
+  amount                                 Float?
+  is_personal_transaction_classification Boolean       @default(false)
+  company                                Company?      @relation(fields: [company_id], references: [id])
+  company_id                             String?       @db.ObjectId
 }
 
 model File {
