@@ -13,13 +13,13 @@ export default function App() {
 
   return (
     <NavigationLoader>
-      <div className="flex flex-col">
+      <div className="flex flex-col h-screen">
         <TopBar updateSidebarOpen={updateSidebarOpen}></TopBar>
         <Sidebar
           sidebarOpen={sidebarOpen}
           updateSidebarOpen={updateSidebarOpen}
         ></Sidebar>
-        <div>
+        <div className="bg-violet-200 h-full">
           <Outlet></Outlet>
         </div>
       </div>
