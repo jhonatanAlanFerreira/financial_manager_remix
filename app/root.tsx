@@ -2,6 +2,7 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import tailwindStyles from "~/styles/tailwind.css";
 import globalStyles from "~/styles/global.css";
+import "react-responsive-modal/styles.css";
 
 import {
   Links,
