@@ -51,3 +51,9 @@ Sync database schema:
 ```sh
 npx prisma db push
 ```
+
+Generate Prisma Client:
+
+```sh
+npx prisma generate
+```
