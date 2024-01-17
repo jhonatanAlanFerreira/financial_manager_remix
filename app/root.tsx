@@ -41,7 +41,6 @@ export default function App() {
           toastOptions={{
             duration: 5000,
             style: {
-              background: "white",
               color: "var(--primary-color)",
             },
             success: {
