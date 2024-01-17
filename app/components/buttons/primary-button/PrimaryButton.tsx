@@ -4,13 +4,15 @@ import PrimaryButtonProps from "~/interfaces/componentsProps/PrimaryButtonProps"
 export default function PrimaryButton({
   text,
   iconName,
+  className,
   ...rest
 }: PrimaryButtonProps) {
+  const existingClasses =
+    "flex justify-center gap-3 text-white bg-violet-950 py-2 px-5 m-2 rounded";
+  const combinedClasses = `${existingClasses} ${className}`;
+
   return (
-    <button
-      className="flex gap-3 text-white bg-violet-950 py-2 px-5 m-2 rounded"
-      {...rest}
-    >
+    <button className={combinedClasses} style={{ minWidth: "7rem" }} {...rest}>
       {text} {iconName && <Icon name={iconName}></Icon>}
     </button>
   );
