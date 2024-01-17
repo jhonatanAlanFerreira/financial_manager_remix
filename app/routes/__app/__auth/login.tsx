@@ -3,8 +3,8 @@ import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Icon from "~/components/icon/Icon";
-import InputPassword from "~/components/inputPassword/InputPassword";
-import InputText from "~/components/inputText/InputText";
+import InputPassword from "~/components/inputs/inputPassword/InputPassword";
+import InputText from "~/components/inputs/inputText/InputText";
 import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
 import ServerResponse from "~/interfaces/ServerResponse";
 

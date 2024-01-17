@@ -1,6 +1,6 @@
 import { useId } from "react";
 import InputTextProps from "~/interfaces/componentsProps/InputTextProps";
-import Icon from "../icon/Icon";
+import Icon from "../../icon/Icon";
 
 export default function InputText({
   label,
