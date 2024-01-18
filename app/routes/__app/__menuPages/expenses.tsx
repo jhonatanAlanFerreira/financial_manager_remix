@@ -86,7 +86,7 @@ export default function Expenses() {
 
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end p-3">
+      <div className="flex justify-end mb-2">
         <PrimaryButton
           onClick={onOpenAddModal}
           text="Add"

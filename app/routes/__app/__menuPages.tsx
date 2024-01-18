@@ -19,7 +19,7 @@ export default function App() {
           sidebarOpen={sidebarOpen}
           updateSidebarOpen={updateSidebarOpen}
         ></Sidebar>
-        <div className="bg-violet-200 h-full">
+        <div className="bg-violet-200 h-full overflow-auto p-3">
           <Outlet></Outlet>
         </div>
       </div>
