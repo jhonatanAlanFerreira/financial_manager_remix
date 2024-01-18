@@ -7,9 +7,12 @@ import InputPassword from "~/components/inputs/inputPassword/InputPassword";
 import InputText from "~/components/inputs/inputText/InputText";
 import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
 import ServerResponse from "~/interfaces/ServerResponse";
+import ValidatedData from "~/interfaces/ValidatedData";
 
 export default function Signup() {
-  const [responseErrors, setResponseErrors] = useState<ServerResponse>({});
+  const [responseErrors, setResponseErrors] = useState<
+    ServerResponse<ValidatedData>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
