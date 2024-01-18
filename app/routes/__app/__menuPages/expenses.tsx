@@ -67,6 +67,7 @@ export default function Expenses() {
         success: (res: AxiosResponse<ServerResponse>) => {
           setOpenAddModal(false);
           loadExpenses();
+          setResponseErrors({});
           return res.data.message as string;
         },
         error: (error) => {
