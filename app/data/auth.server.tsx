@@ -1,16 +1,13 @@
 import { prisma } from "~/data/database.server";
 import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
-import { signupValidator } from "~/data/requestValidators/authValidator";
+import { signupValidator } from "~/data/requestValidators/signupValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { hash, compare } from "bcrypt";
 import { exclude } from "~/utilities";
 import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
 import { loginValidator } from "./requestValidators/loginValidator";
-import {
-  ActionFunctionArgs,
-  createCookieSessionStorage,
-  redirect,
-} from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { User } from "@prisma/client";
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
@@ -34,7 +31,9 @@ export async function createUserSession(userId: string) {
   return sessionStorage.commitSession(session);
 }
 
-export async function getUserFromSession(request: Request) {
+export async function getUserFromSession(
+  request: Request
+): Promise<User | null> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
@@ -52,7 +51,7 @@ export async function getUserFromSession(request: Request) {
   });
 }
 
-export async function requireUserSession(request: Request) {
+export async function requireUserSession(request: Request): Promise<User> {
   const user = await getUserFromSession(request);
 
   if (!user) {
