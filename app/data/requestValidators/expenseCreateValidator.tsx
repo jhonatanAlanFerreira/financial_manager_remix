@@ -18,8 +18,10 @@ export async function expenseCreateValidator(
 
   const expenseExists = await prisma.expense.findUnique({
     where: {
-      name: data.name,
-      user_id: user.id,
+      user_id_name: {
+        name: data.name,
+        user_id: user.id,
+      },
     },
   });
 
