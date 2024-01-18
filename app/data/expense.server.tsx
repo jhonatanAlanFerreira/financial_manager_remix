@@ -1,11 +1,14 @@
 import ServerResponse from "~/interfaces/ServerResponse";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
-import { ExpenseCreateValidator } from "./requestValidators/expenseCreateValidator";
+import { expenseCreateValidator } from "./requestValidators/expenseCreateValidator";
+import { prisma } from "~/data/database.server";
+import { Expense, User } from "@prisma/client";
 
 export async function create(
-  data: ExpenseCreateRequest
+  data: ExpenseCreateRequest,
+  user: User
 ): Promise<ServerResponse> {
-  const dataIsValid = await ExpenseCreateValidator(data);
+  const dataIsValid = await expenseCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
     return {
@@ -15,5 +18,29 @@ export async function create(
     };
   }
 
-  return {};
+  const expense = await prisma.expense.create({
+    data: {
+      name: data.name,
+      amount: data.amount,
+      is_personal_expense: data.is_personal_expense,
+      user_id: user.id,
+    },
+  });
+
+  return {
+    data: expense,
+    message: "Expense was created successfully",
+  };
+}
+
+export async function list(user: User): Promise<ServerResponse<Expense[]>> {
+  const expenses = await prisma.expense.findMany({
+    where: {
+      user_id: user.id,
+    },
+  });
+
+  return {
+    data: expenses,
+  };
 }

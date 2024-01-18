@@ -1,22 +1,58 @@
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import { requireUserSession } from "~/data/auth.server";
 import { Modal } from "react-responsive-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import toast from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import ServerResponse from "~/interfaces/ServerResponse";
 import InputText from "~/components/inputs/inputText/InputText";
 import Checkbox from "~/components/inputs/checkbox/Checkbox";
+import { loader as expenseLoader } from "~/routes/api/expense/index";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import Loader from "~/components/loader/Loader";
+import { Expense } from "@prisma/client";
+import ValidatedData from "~/interfaces/ValidatedData";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [responseErrors, setResponseErrors] = useState<
+    ServerResponse<ValidatedData>
+  >({});
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const expenseData = useLoaderData<ServerResponse<Expense[]>>();
 
   const onOpenAddModal = () => setOpenAddModal(true);
   const onCloseAddModal = () => setOpenAddModal(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [responseErrors, setResponseErrors] = useState<ServerResponse>({});
+
+  useEffect(() => {
+    if (expenseData) {
+      setExpenses(expenseData);
+      setLoading(false);
+    }
+  }, [expenseData]);
+
+  const loadExpenses = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/expense");
+      setExpenses(res.data);
+      setLoading(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+        );
+      } else {
+        toast.error("Sorry, unexpected error. Be back soon");
+      }
+      setLoading(false);
+    }
+  };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,6 +66,7 @@ export default function Expenses() {
         loading: "Creating expense",
         success: (res: AxiosResponse<ServerResponse>) => {
           setOpenAddModal(false);
+          loadExpenses();
           return res.data.message as string;
         },
         error: (error) => {
@@ -43,18 +80,43 @@ export default function Expenses() {
           return "Sorry, unexpected error. Be back soon";
         },
       })
-      .finally(() => setIsSubmitting(false));
+      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
   return (
-    <div>
-      <div className="flex justify-end">
+    <Loader loading={loading}>
+      <div className="flex justify-end p-3">
         <PrimaryButton
           onClick={onOpenAddModal}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
       </div>
+      <div className="overflow-x-auto px-10">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="py-2 px-4 border-b border-r">Name</th>
+              <th className="py-2 px-4 border-b border-r">Amount</th>
+              <th className="py-2 px-4 border-b">Personal Expense</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expenses.data?.map((expense, index) => (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="py-2 px-4 border-b border-r">{expense.name}</td>
+                <td className="py-2 px-4 border-b border-r">
+                  {expense.amount}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {expense.is_personal_expense ? "Yes" : "No"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <Modal
         classNames={{
           modal: "p-0 m-0 w-3/4",
@@ -106,11 +168,10 @@ export default function Expenses() {
           </div>
         </div>
       </Modal>
-    </div>
+    </Loader>
   );
 }
 
-export async function loader({ request }: { request: Request }) {
-  await requireUserSession(request);
-  return null;
+export async function loader(request: LoaderFunctionArgs) {
+  return expenseLoader(request);
 }

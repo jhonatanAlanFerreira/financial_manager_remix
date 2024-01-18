@@ -1,5 +1,6 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
-import { create } from "~/data/expense.server";
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import { requireUserSession } from "~/data/auth.server";
+import { create, list } from "~/data/expense.server";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -7,6 +8,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     throw json({ message: "Invalid request method" }, { status: 400 });
   }
 
+  const user = await requireUserSession(request);
   const body = await request.formData();
 
   const data: ExpenseCreateRequest = {
@@ -15,5 +17,20 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     is_personal_expense: !!body.get("is_personal_expense"),
   };
 
-  const res = await create(data);
+  const res = await create(data, user);
+
+  let status: number;
+
+  if (res.error) {
+    status = 400;
+  } else {
+    status = 201;
+  }
+
+  return new Response(JSON.stringify(res), { status });
+};
+
+export let loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await requireUserSession(request);
+  return list(user);
 };
