@@ -117,6 +117,11 @@ export default function Expenses() {
             </tr>
           </thead>
           <tbody>
+            {!expenses.data?.length && (
+              <tr>
+                <td className="py-2 px-4">There are no data yet</td>
+              </tr>
+            )}
             {expenses.data?.map((expense, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{expense.name}</td>
