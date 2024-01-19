@@ -15,6 +15,7 @@ import ValidatedData from "~/interfaces/ValidatedData";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { Company } from "@prisma/client";
+import Icon from "~/components/icon/Icon";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -121,7 +122,8 @@ export default function Expenses() {
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
               <th className="py-2 px-4 border-b border-r">Amount</th>
-              <th className="py-2 px-4 border-b">Type</th>
+              <th className="py-2 px-4 border-b border-r">Type</th>
+              <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -136,8 +138,16 @@ export default function Expenses() {
                 <td className="py-2 px-4 border-b border-r">
                   {expense.amount || "Not Set"}
                 </td>
-                <td className="py-2 px-4 border-b">
+                <td className="py-2 px-4 border-b border-r">
                   {getExpenseType(expense)}
+                </td>
+                <td className="flex justify-center gap-5 py-2 px-4 border-b">
+                  <Icon name="Edit" className="cursor-pointer"></Icon>{" "}
+                  <Icon
+                    name="Trash"
+                    className="cursor-pointer"
+                    color="red"
+                  ></Icon>
                 </td>
               </tr>
             ))}
