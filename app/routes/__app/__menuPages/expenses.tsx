@@ -11,22 +11,27 @@ import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import Loader from "~/components/loader/Loader";
-import { Expense } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
+import { loader as companyLoader } from "~/routes/api/company/index";
+import { Company } from "@prisma/client";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [expenses, setExpenses] = useState<
     ServerResponse<ExpenseWithCompanies[]>
   >({});
+  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
 
-  const expenseData = useLoaderData<ServerResponse<ExpenseWithCompanies[]>>();
+  const { expenseData, companyData } = useLoaderData<{
+    expenseData: ServerResponse<ExpenseWithCompanies[]>;
+    companyData: ServerResponse<Company[]>;
+  }>();
 
   const onOpenAddModal = () => setOpenAddModal(true);
   const onCloseAddModal = () => setOpenAddModal(false);
@@ -34,9 +39,12 @@ export default function Expenses() {
   useEffect(() => {
     if (expenseData) {
       setExpenses(expenseData);
-      setLoading(false);
     }
-  }, [expenseData]);
+    if (companyData) {
+      setCompanies(companyData);
+    }
+    setLoading(false);
+  }, [expenseData, companyData]);
 
   const loadExpenses = async () => {
     try {
@@ -193,5 +201,13 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  return expenseLoader(request, true);
+  const res = await Promise.all([
+    expenseLoader(request, true),
+    companyLoader(request),
+  ]);
+
+  return {
+    expenseData: res[0],
+    companyData: res[1],
+  };
 }
