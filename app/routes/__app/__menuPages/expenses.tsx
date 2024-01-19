@@ -13,17 +13,20 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import Loader from "~/components/loader/Loader";
 import { Expense } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
+import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
+  const [expenses, setExpenses] = useState<
+    ServerResponse<ExpenseWithCompanies[]>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
 
-  const expenseData = useLoaderData<ServerResponse<Expense[]>>();
+  const expenseData = useLoaderData<ServerResponse<ExpenseWithCompanies[]>>();
 
   const onOpenAddModal = () => setOpenAddModal(true);
   const onCloseAddModal = () => setOpenAddModal(false);
@@ -38,7 +41,7 @@ export default function Expenses() {
   const loadExpenses = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/expense");
+      const res = await axios.get("/api/expense?includeCompanies=true");
       setExpenses(res.data);
       setLoading(false);
     } catch (error) {
@@ -84,6 +87,17 @@ export default function Expenses() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
+  const getExpenseType = (expense: ExpenseWithCompanies) => {
+    if (expense.companies.length) {
+      return expense.is_personal_expense
+        ? "Company and Personal Expense"
+        : "Company Expense";
+    } else {
+      if (expense.is_personal_expense) return "Personal Expense";
+      return "Not set";
+    }
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
@@ -94,12 +108,12 @@ export default function Expenses() {
         ></PrimaryButton>
       </div>
       <div className="overflow-x-auto px-10">
-        <table className="min-w-full bg-white border border-gray-300">
+        <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
               <th className="py-2 px-4 border-b border-r">Amount</th>
-              <th className="py-2 px-4 border-b">Personal Expense</th>
+              <th className="py-2 px-4 border-b">Type</th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +124,7 @@ export default function Expenses() {
                   {expense.amount}
                 </td>
                 <td className="py-2 px-4 border-b">
-                  {expense.is_personal_expense ? "Yes" : "No"}
+                  {getExpenseType(expense)}
                 </td>
               </tr>
             ))}
@@ -174,5 +188,5 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  return expenseLoader(request);
+  return expenseLoader(request, true);
 }
