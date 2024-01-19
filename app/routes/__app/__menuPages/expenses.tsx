@@ -126,7 +126,7 @@ export default function Expenses() {
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{expense.name}</td>
                 <td className="py-2 px-4 border-b border-r">
-                  {expense.amount}
+                  {expense.amount || "Not Set"}
                 </td>
                 <td className="py-2 px-4 border-b">
                   {getExpenseType(expense)}
