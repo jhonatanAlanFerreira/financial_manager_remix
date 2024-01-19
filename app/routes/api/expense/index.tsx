@@ -30,7 +30,14 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   return new Response(JSON.stringify(res), { status });
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  includeCompanies = false
+) => {
   const user = await requireUserSession(request);
-  return list(user);
+  if (request.url.includes("includeCompanies=true")) {
+    includeCompanies = true;
+  }
+
+  return list(user, includeCompanies);
 };

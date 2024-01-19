@@ -3,6 +3,7 @@ import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest
 import { expenseCreateValidator } from "./requestValidators/expenseCreateValidator";
 import { prisma } from "~/data/database.server";
 import { Expense, User } from "@prisma/client";
+import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 
 export async function create(
   data: ExpenseCreateRequest,
@@ -33,11 +34,15 @@ export async function create(
   };
 }
 
-export async function list(user: User): Promise<ServerResponse<Expense[]>> {
+export async function list(
+  user: User,
+  includeCompanies: boolean
+): Promise<ServerResponse<Expense[] | ExpenseWithCompanies[]>> {
   const expenses = await prisma.expense.findMany({
     where: {
       user_id: user.id,
     },
+    include: includeCompanies ? { companies: true } : undefined,
   });
 
   return {
