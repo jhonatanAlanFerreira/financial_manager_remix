@@ -29,15 +29,13 @@ export default function Expenses() {
     ServerResponse<ValidatedData>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
-  const [expenseSelected, setExpenseSelected] = useState<Expense>();
+  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>();
+  const [expenseToUpdate, setExpenseToUpdate] = useState<Expense | null>();
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponse<ExpenseWithCompanies[]>;
     companyData: ServerResponse<Company[]>;
   }>();
-
-  const onOpenAddModal = () => setOpenAddModal(true);
-  const onCloseAddModal = () => setOpenAddModal(false);
 
   useEffect(() => {
     if (expenseData) {
@@ -72,6 +70,9 @@ export default function Expenses() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+
+    if (formData.get("id"))
+      return alert(`Update ${expenseToUpdate?.id} - NOT IMPLEMENTED`);
 
     setIsSubmitting(true);
 
@@ -110,12 +111,12 @@ export default function Expenses() {
   };
 
   const removeExpense = async () => {
-    if (expenseSelected) {
+    if (expenseToDelete) {
       setOpenRemoveModal(false);
       setLoading(true);
 
       toast.promise(
-        axios.delete(`/api/expense?expenseId=${expenseSelected.id}`),
+        axios.delete(`/api/expense?expenseId=${expenseToDelete.id}`),
         {
           loading: "Deleting expense",
           success: (res: AxiosResponse<ServerResponse>) => {
@@ -141,7 +142,10 @@ export default function Expenses() {
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={onOpenAddModal}
+          onClick={() => {
+            setExpenseToUpdate(null);
+            setOpenAddModal(true);
+          }}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -172,10 +176,17 @@ export default function Expenses() {
                   {getExpenseType(expense)}
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                  <Icon name="Edit" className="cursor-pointer"></Icon>{" "}
                   <Icon
                     onClick={() => {
-                      setExpenseSelected(expense);
+                      setExpenseToUpdate(expense);
+                      setOpenAddModal(true);
+                    }}
+                    name="Edit"
+                    className="cursor-pointer"
+                  ></Icon>{" "}
+                  <Icon
+                    onClick={() => {
+                      setExpenseToDelete(expense);
                       setOpenRemoveModal(true);
                     }}
                     name="Trash"
@@ -225,25 +236,38 @@ export default function Expenses() {
         closeOnOverlayClick={false}
         showCloseIcon={false}
         open={openAddModal}
-        onClose={onCloseAddModal}
+        onClose={() => setOpenAddModal(false)}
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          Add new expense
+          {expenseToUpdate ? "Update expense" : "Add new expense"}
         </h2>
         <div className="overflow-auto">
           <div className="p-4">
             <Form method="post" id="expense-form" onSubmit={formSubmit}>
+              <input
+                type="text"
+                name="id"
+                hidden
+                defaultValue={expenseToUpdate?.id}
+              />
               <InputText
                 label="Name"
                 name="name"
                 required
+                defaultValue={expenseToUpdate?.name}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
-              <InputText label="Amount" name="amount" type="number"></InputText>
+              <InputText
+                label="Amount"
+                name="amount"
+                type="number"
+                defaultValue={expenseToUpdate?.amount || 0}
+              ></InputText>
               <Checkbox
                 name="is_personal_expense"
                 id="is_personal_expense"
+                defaultChecked={expenseToUpdate?.is_personal_expense}
               ></Checkbox>
               <label
                 className="pl-3 text-violet-950"
