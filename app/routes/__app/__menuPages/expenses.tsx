@@ -191,13 +191,16 @@ export default function Expenses() {
 
       <Modal
         classNames={{
-          modal: "p-2 m-0 w-full sm:w-1/3",
+          modal: "p-0 m-0 w-full sm:w-1/3",
         }}
         center
         showCloseIcon={false}
         open={openRemoveModal}
         onClose={() => setOpenAddModal(false)}
       >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Atention
+        </h2>
         <p className="text-center text-violet-950 text-xl">
           Do you really want to remove this expense?
         </p>
