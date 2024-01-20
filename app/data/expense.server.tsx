@@ -4,6 +4,7 @@ import { expenseCreateValidator } from "./requestValidators/expenseCreateValidat
 import { prisma } from "~/data/database.server";
 import { Expense, User } from "@prisma/client";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
+import expenseDeleteValidator from "./requestValidators/expenseDeleteValidator";
 
 export async function create(
   data: ExpenseCreateRequest,
@@ -47,5 +48,30 @@ export async function list(
 
   return {
     data: expenses,
+  };
+}
+
+export async function remove(
+  expenseId: string,
+  user: User
+): Promise<ServerResponse> {
+  const dataIsValid = await expenseDeleteValidator(user, expenseId);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "Expense not found",
+      data: dataIsValid,
+    };
+  }
+
+  await prisma.expense.delete({
+    where: {
+      id: expenseId,
+    },
+  });
+
+  return {
+    message: "Expense removed successfully",
   };
 }

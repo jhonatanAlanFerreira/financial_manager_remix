@@ -1,13 +1,30 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth.server";
-import { create, list } from "~/data/expense.server";
+import { create, list, remove } from "~/data/expense.server";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
-  if (request.method !== "POST") {
-    throw json({ message: "Invalid request method" }, { status: 400 });
+  switch (request.method) {
+    case "POST":
+      return createExpense(request);
+    case "DELETE":
+      return removeExpense(request);
+  }
+};
+
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  includeCompanies = false
+) => {
+  const user = await requireUserSession(request);
+  if (request.url.includes("includeCompanies=true")) {
+    includeCompanies = true;
   }
 
+  return list(user, includeCompanies);
+};
+
+let createExpense = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
@@ -30,14 +47,19 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   return new Response(JSON.stringify(res), { status });
 };
 
-export let loader = async (
-  { request }: LoaderFunctionArgs,
-  includeCompanies = false
-) => {
+let removeExpense = async (request: Request) => {
   const user = await requireUserSession(request);
-  if (request.url.includes("includeCompanies=true")) {
-    includeCompanies = true;
+  const expenseId = String(new URL(request.url).searchParams.get("expenseId"));
+
+  const res = await remove(expenseId, user);
+
+  let status: number;
+
+  if (res.error) {
+    status = 404;
+  } else {
+    status = 200;
   }
 
-  return list(user, includeCompanies);
+  return new Response(JSON.stringify(res), { status });
 };

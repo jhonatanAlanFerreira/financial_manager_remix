@@ -14,11 +14,12 @@ import Loader from "~/components/loader/Loader";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import { loader as companyLoader } from "~/routes/api/company/index";
-import { Company } from "@prisma/client";
+import { Company, Expense } from "@prisma/client";
 import Icon from "~/components/icon/Icon";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [expenses, setExpenses] = useState<
     ServerResponse<ExpenseWithCompanies[]>
   >({});
@@ -28,6 +29,7 @@ export default function Expenses() {
     ServerResponse<ValidatedData>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [expenseSelected, setExpenseSelected] = useState<Expense>();
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponse<ExpenseWithCompanies[]>;
@@ -107,6 +109,34 @@ export default function Expenses() {
     }
   };
 
+  const removeExpense = async () => {
+    if (expenseSelected) {
+      setOpenRemoveModal(false);
+      setLoading(true);
+
+      toast.promise(
+        axios.delete(`/api/expense?expenseId=${expenseSelected.id}`),
+        {
+          loading: "Deleting expense",
+          success: (res: AxiosResponse<ServerResponse>) => {
+            loadExpenses();
+            return res.data.message as string;
+          },
+          error: (error) => {
+            if (isAxiosError(error)) {
+              setLoading(false);
+              return (
+                error.response?.data.message ||
+                "Sorry, unexpected error. Be back soon"
+              );
+            }
+            return "Sorry, unexpected error. Be back soon";
+          },
+        }
+      );
+    }
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
@@ -144,6 +174,10 @@ export default function Expenses() {
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon name="Edit" className="cursor-pointer"></Icon>{" "}
                   <Icon
+                    onClick={() => {
+                      setExpenseSelected(expense);
+                      setOpenRemoveModal(true);
+                    }}
                     name="Trash"
                     className="cursor-pointer"
                     color="red"
@@ -157,7 +191,32 @@ export default function Expenses() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-3/4",
+          modal: "p-2 m-0 w-full sm:w-1/3",
+        }}
+        center
+        showCloseIcon={false}
+        open={openRemoveModal}
+        onClose={() => setOpenAddModal(false)}
+      >
+        <p className="text-center text-violet-950 text-xl">
+          Do you really want to remove this expense?
+        </p>
+        <div className="flex justify-between p-2 mt-10">
+          <PrimaryButton
+            text="Cancel"
+            onClick={() => setOpenRemoveModal(false)}
+          ></PrimaryButton>
+          <DangerButton
+            disabled={loading}
+            text="Remove"
+            onClick={() => removeExpense()}
+          ></DangerButton>
+        </div>
+      </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-3/4",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
