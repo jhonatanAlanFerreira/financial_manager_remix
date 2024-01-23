@@ -47,7 +47,7 @@ export default function Login() {
   return (
     <NavigationLoader>
       <div className="h-screen bg-violet-950 flex justify-center items-center">
-        <div className="overflow-auto bg-white rounded-lg h-4/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
+        <div className="overflow-auto bg-white rounded-lg h-5/6 w-full mx-4 md:w-3/5 p-5 flex flex-col justify-between">
           <div className="h-1/2 flex flex-col items-center place-content-center gap-5">
             <h1 className="text-2xl font-bold text-violet-950">Log In</h1>
 
