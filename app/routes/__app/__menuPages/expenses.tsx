@@ -270,7 +270,7 @@ export default function Expenses() {
                 defaultChecked={expenseToUpdate?.is_personal_expense}
               ></Checkbox>
               <label
-                className="pl-3 text-violet-950"
+                className="pl-3 text-violet-950 cursor-pointer"
                 htmlFor="is_personal_expense"
               >
                 Use as personal expense
