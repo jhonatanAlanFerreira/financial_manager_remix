@@ -5,6 +5,8 @@ import { prisma } from "~/data/database.server";
 import { Expense, User } from "@prisma/client";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import expenseDeleteValidator from "./requestValidators/expenseDeleteValidator";
+import ExpenseUpdateRequest from "~/interfaces/bodyRequests/ExpenseUpdateRequest";
+import { expenseUpdateValidator } from "./requestValidators/expenseUpdateValidator";
 
 export async function create(
   data: ExpenseCreateRequest,
@@ -73,5 +75,33 @@ export async function remove(
 
   return {
     message: "Expense removed successfully",
+  };
+}
+
+export async function update(
+  expenseId: string,
+  user: User,
+  data: ExpenseUpdateRequest
+) {
+  const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "There are some errors in your form",
+      data: dataIsValid,
+    };
+  }
+
+  const res = await prisma.expense.update({
+    data,
+    where: {
+      id: expenseId,
+    },
+  });
+
+  return {
+    data: res,
+    message: "Expense was updated successfully",
   };
 }

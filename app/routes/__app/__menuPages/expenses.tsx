@@ -70,15 +70,25 @@ export default function Expenses() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+    let axiosRequest;
+    let loadingMessage;
 
-    if (formData.get("id"))
-      return alert(`Update ${expenseToUpdate?.id} - NOT IMPLEMENTED`);
+    if (formData.get("id")) {
+      axiosRequest = axios.patch(
+        `/api/expense?expenseId=${expenseToUpdate?.id}`,
+        formData
+      );
+      loadingMessage = "Updating expense";
+    } else {
+      axiosRequest = axios.post("/api/expense", formData);
+      loadingMessage = "Creating expense";
+    }
 
     setIsSubmitting(true);
 
     toast
-      .promise(axios.post("/api/expense", formData), {
-        loading: "Creating expense",
+      .promise(axiosRequest, {
+        loading: loadingMessage,
         success: (res: AxiosResponse<ServerResponse>) => {
           setOpenAddModal(false);
           loadExpenses();

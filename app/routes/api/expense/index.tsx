@@ -1,7 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove } from "~/data/expense.server";
+import { create, list, remove, update } from "~/data/expense.server";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
+import ExpenseUpdateRequest from "~/interfaces/bodyRequests/ExpenseUpdateRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -9,6 +10,8 @@ export let action = async ({ request }: ActionFunctionArgs) => {
       return createExpense(request);
     case "DELETE":
       return removeExpense(request);
+    case "PATCH":
+      return updateExpense(request);
   }
 };
 
@@ -57,6 +60,32 @@ let removeExpense = async (request: Request) => {
 
   if (res.error) {
     status = 404;
+  } else {
+    status = 200;
+  }
+
+  return new Response(JSON.stringify(res), { status });
+};
+
+let updateExpense = async (request: Request) => {
+  const user = await requireUserSession(request);
+  const expenseId = String(new URL(request.url).searchParams.get("expenseId"));
+  const body = await request.formData();
+
+  const data: ExpenseUpdateRequest = {
+    name: String(body.get("name") || ""),
+    amount: +(body.get("amount") || 0),
+    is_personal_expense: !!body.get("is_personal_expense"),
+  };
+
+  console.log(data);
+
+  const res = await update(expenseId, user, data);
+
+  let status: number;
+
+  if (res.error) {
+    status = 400;
   } else {
     status = 200;
   }
