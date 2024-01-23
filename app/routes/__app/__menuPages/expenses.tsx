@@ -222,7 +222,7 @@ export default function Expenses() {
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
         </h2>
-        <p className="text-center text-violet-950 text-xl">
+        <p className="text-center text-violet-950 text-xl pt-2">
           Do you really want to remove this expense?
         </p>
         <div className="flex justify-between p-2 mt-10">
