@@ -100,6 +100,34 @@ export default function Companies() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
+  const removeCompany = async () => {
+    if (companyToDelete) {
+      setOpenRemoveModal(false);
+      setLoading(true);
+
+      toast.promise(
+        axios.delete(`/api/company?companyId=${companyToDelete.id}`),
+        {
+          loading: "Deleting company",
+          success: (res: AxiosResponse<ServerResponse>) => {
+            loadCompanies();
+            return res.data.message as string;
+          },
+          error: (error) => {
+            if (isAxiosError(error)) {
+              setLoading(false);
+              return (
+                error.response?.data.message ||
+                "Sorry, unexpected error. Be back soon"
+              );
+            }
+            return "Sorry, unexpected error. Be back soon";
+          },
+        }
+      );
+    }
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
@@ -157,6 +185,34 @@ export default function Companies() {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        showCloseIcon={false}
+        open={openRemoveModal}
+        onClose={() => setOpenAddModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Atention
+        </h2>
+        <p className="text-center text-violet-950 text-xl pt-2">
+          Do you really want to remove this company?
+        </p>
+        <div className="flex justify-between p-2 mt-10">
+          <PrimaryButton
+            text="Cancel"
+            onClick={() => setOpenRemoveModal(false)}
+          ></PrimaryButton>
+          <DangerButton
+            disabled={loading}
+            text="Remove"
+            onClick={() => removeCompany()}
+          ></DangerButton>
+        </div>
+      </Modal>
 
       <Modal
         classNames={{
