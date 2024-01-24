@@ -78,8 +78,6 @@ let updateExpense = async (request: Request) => {
     is_personal_expense: !!body.get("is_personal_expense"),
   };
 
-  console.log(data);
-
   const res = await update(expenseId, user, data);
 
   let status: number;
