@@ -35,6 +35,9 @@ let createExpense = async (request: Request) => {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_expense: !!body.get("is_personal_expense"),
+    company_ids: body.get("companies")
+      ? (body.getAll("companies") as string[])
+      : [],
   };
 
   const res = await create(data, user);
@@ -76,6 +79,9 @@ let updateExpense = async (request: Request) => {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_expense: !!body.get("is_personal_expense"),
+    company_ids: body.get("companies")
+      ? (body.getAll("companies") as string[])
+      : [],
   };
 
   const res = await update(expenseId, user, data);

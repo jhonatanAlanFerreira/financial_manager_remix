@@ -16,6 +16,7 @@ import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { Company, Expense } from "@prisma/client";
 import Icon from "~/components/icon/Icon";
+import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -36,6 +37,9 @@ export default function Expenses() {
     expenseData: ServerResponse<ExpenseWithCompanies[]>;
     companyData: ServerResponse<Company[]>;
   }>();
+
+  const getSelectCompanyOptionValue = (option: Company) => option.id;
+  const getSelectCompanyOptionLabel = (option: Company) => option.name;
 
   useEffect(() => {
     if (expenseData) {
@@ -276,6 +280,19 @@ export default function Expenses() {
                 type="number"
                 defaultValue={expenseToUpdate?.amount || 0}
               ></InputText>
+              <InputSelect
+                isMulti
+                isClearable
+                className="mb-8"
+                placeholder="Company"
+                options={companies?.data}
+                getOptionLabel={getSelectCompanyOptionLabel as any}
+                getOptionValue={getSelectCompanyOptionValue as any}
+                name="companies"
+                defaultValue={companies?.data?.filter((company) =>
+                  expenseToUpdate?.company_ids.includes(company.id)
+                )}
+              ></InputSelect>
               <Checkbox
                 name="is_personal_expense"
                 id="is_personal_expense"

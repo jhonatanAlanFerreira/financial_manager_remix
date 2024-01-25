@@ -28,6 +28,7 @@ export async function create(
       amount: data.amount,
       is_personal_expense: data.is_personal_expense,
       user_id: user.id,
+      company_ids: data.company_ids,
     },
   });
 
