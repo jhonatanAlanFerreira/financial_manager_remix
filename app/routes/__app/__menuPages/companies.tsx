@@ -152,7 +152,9 @@ export default function Companies() {
           <tbody>
             {!companies.data?.length && (
               <tr>
-                <td className="py-2 px-4">There are no data yet</td>
+                <td className="py-2 px-4" colSpan={3}>
+                  There are no data yet
+                </td>
               </tr>
             )}
             {companies.data?.map((company, index) => (
@@ -238,7 +240,7 @@ export default function Companies() {
                 defaultValue={companyToUpdate?.id}
               />
               <InputText
-                label="Name"
+                label="Name *"
                 name="name"
                 required
                 defaultValue={companyToUpdate?.name}

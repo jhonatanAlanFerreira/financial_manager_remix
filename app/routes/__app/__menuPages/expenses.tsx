@@ -173,7 +173,9 @@ export default function Expenses() {
           <tbody>
             {!expenses.data?.length && (
               <tr>
-                <td className="py-2 px-4">There are no data yet</td>
+                <td className="py-2 px-4" colSpan={4}>
+                  There are no data yet
+                </td>
               </tr>
             )}
             {expenses.data?.map((expense, index) => (
@@ -262,7 +264,7 @@ export default function Expenses() {
                 defaultValue={expenseToUpdate?.id}
               />
               <InputText
-                label="Name"
+                label="Name *"
                 name="name"
                 required
                 defaultValue={expenseToUpdate?.name}
