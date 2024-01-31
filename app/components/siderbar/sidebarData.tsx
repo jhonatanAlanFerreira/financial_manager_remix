@@ -8,13 +8,18 @@ export const items: SidebarItemType[] = [
   },
   {
     title: "Companies",
-    icon: "Clipboard",
+    icon: "Briefcase",
     path: "/companies",
   },
   {
     title: "Expenses",
     icon: "DollarSign",
     path: "/expenses",
+  },
+  {
+    title: "Classifications",
+    icon: "List",
+    path: "/classifications",
   },
   {
     title: "Settings",
