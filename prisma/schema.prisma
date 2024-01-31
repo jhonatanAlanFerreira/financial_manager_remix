@@ -25,7 +25,7 @@ model User {
 
 model Company {
   id                         String                      @id @default(auto()) @map("_id") @db.ObjectId
-  name                       String                      
+  name                       String
   working_capital            Float                       @default(0)
   user_id                    String                      @db.ObjectId
   user                       User                        @relation(fields: [user_id], references: [id])
@@ -33,24 +33,26 @@ model Company {
   expenses                   Expense[]                   @relation(fields: [expense_ids], references: [id])
   transactions               Transaction[]
   transactionClassifications TransactionClassification[]
+
   @@unique([user_id, name])
 }
 
 model Expense {
   id                  String    @id @default(auto()) @map("_id") @db.ObjectId
-  name                String    
+  name                String
   amount              Float?
   user_id             String    @db.ObjectId
   is_personal_expense Boolean   @default(false)
   user                User      @relation(fields: [user_id], references: [id])
   company_ids         String[]  @db.ObjectId
   companies           Company[] @relation(fields: [company_ids], references: [id])
+
   @@unique([user_id, name])
 }
 
 model Transaction {
   id                            String                     @id @default(auto()) @map("_id") @db.ObjectId
-  name                          String                     
+  name                          String
   amount                        Float
   transaction_date              DateTime
   created_at                    DateTime                   @default(now())
@@ -65,14 +67,14 @@ model Transaction {
 
 model TransactionClassification {
   id                                     String        @id @default(auto()) @map("_id") @db.ObjectId
-  name                                   String        
+  name                                   String
   transactions                           Transaction[]
   user_id                                String        @db.ObjectId
   user                                   User          @relation(fields: [user_id], references: [id])
-  amount                                 Float?
   is_personal_transaction_classification Boolean       @default(false)
   company                                Company?      @relation(fields: [company_id], references: [id])
   company_id                             String?       @db.ObjectId
+
   @@unique([user_id, name])
 }
 
