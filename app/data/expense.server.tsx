@@ -83,7 +83,7 @@ export async function update(
   expenseId: string,
   user: User,
   data: ExpenseUpdateRequest
-) {
+): Promise<ServerResponse> {
   const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
 
   if (!dataIsValid.isValid) {
