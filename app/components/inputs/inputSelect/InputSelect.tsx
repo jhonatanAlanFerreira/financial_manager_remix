@@ -7,6 +7,10 @@ export default function InputSelect({ ...rest }: SelectProps) {
       border: "1px solid var(--primary-color) !important",
       height: "3rem",
     }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: "var(--primary-color)",
+    }),
     dropdownIndicator: (styles) => ({
       ...styles,
       color: "var(--primary-color)",
