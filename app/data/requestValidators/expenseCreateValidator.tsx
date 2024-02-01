@@ -34,6 +34,25 @@ export async function expenseCreateValidator(
     };
   }
 
+  if (data.company_ids?.length) {
+    const companiesFromSameUser = await prisma.company.findMany({
+      where: {
+        id: {
+          in: data.company_ids,
+        },
+        user_id: user.id,
+      },
+    });
+    if (companiesFromSameUser.length != data.company_ids.length) {
+      return {
+        isValid: false,
+        errors: {
+          company_ids: "There are some invalid companies",
+        },
+      };
+    }
+  }
+
   return {
     isValid: true,
   };

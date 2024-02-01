@@ -33,6 +33,23 @@ export default async function classificationUpdateValidator(
     };
   }
 
+  if (data.company_id) {
+    const companyFromSameUser = await prisma.company.findFirst({
+      where: {
+        id: data.company_id,
+        user_id: user.id,
+      },
+    });
+    if (!companyFromSameUser) {
+      return {
+        isValid: false,
+        errors: {
+          company_id: "Company does not exist",
+        },
+      };
+    }
+  }
+
   return {
     isValid: true,
   };
