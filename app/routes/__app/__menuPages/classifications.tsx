@@ -123,7 +123,7 @@ export default function Classifications() {
     } else {
       if (classification.is_personal_transaction_classification)
         return "Personal Transaction Classification";
-      return "Not set";
+      return null;
     }
   };
 
@@ -192,11 +192,19 @@ export default function Classifications() {
                 <td className="py-2 px-4 border-b border-r">
                   {classification.name}
                 </td>
-                <td className="py-2 px-4 border-b border-r">
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    classification.company?.name ? "" : "opacity-50"
+                  }`}
+                >
                   {classification.company?.name || "Not set"}
                 </td>
-                <td className="py-2 px-4 border-b border-r">
-                  {getClassificationType(classification)}
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getClassificationType(classification) ? "" : "opacity-50"
+                  }`}
+                >
+                  {getClassificationType(classification) || "Not set"}
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon

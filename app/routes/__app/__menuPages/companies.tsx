@@ -160,7 +160,11 @@ export default function Companies() {
             {companies.data?.map((company, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{company.name}</td>
-                <td className="py-2 px-4 border-b border-r">
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    company.working_capital ? "" : "opacity-50"
+                  }`}
+                >
                   {company.working_capital || "Not Set"}
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">

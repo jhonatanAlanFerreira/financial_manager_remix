@@ -120,7 +120,7 @@ export default function Expenses() {
         : "Company Expense";
     } else {
       if (expense.is_personal_expense) return "Personal Expense";
-      return "Not set";
+      return null;
     }
   };
 
@@ -185,11 +185,19 @@ export default function Expenses() {
             {expenses.data?.map((expense, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{expense.name}</td>
-                <td className="py-2 px-4 border-b border-r">
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    expense.amount ? "" : "opacity-50"
+                  }`}
+                >
                   {expense.amount || "Not Set"}
                 </td>
-                <td className="py-2 px-4 border-b border-r">
-                  {getExpenseType(expense)}
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getExpenseType(expense) ? "" : "opacity-50"
+                  }`}
+                >
+                  {getExpenseType(expense) || "Not set"}
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
