@@ -21,6 +21,7 @@ model User {
   transactions                Transaction[]
   logs                        Log[]
   transaction_classifications TransactionClassification[]
+  incomes                     Income[]
 }
 
 model Company {
@@ -33,6 +34,7 @@ model Company {
   expenses                   Expense[]                   @relation(fields: [expense_ids], references: [id])
   transactions               Transaction[]
   transactionClassifications TransactionClassification[]
+  incomes                    Income[]
 
   @@unique([user_id, name])
 }
@@ -65,6 +67,8 @@ model Transaction {
   transaction_classification    TransactionClassification? @relation(fields: [transaction_classification_id], references: [id])
   expense_id                    String?                    @db.ObjectId
   expense                       Expense?                   @relation(fields: [expense_id], references: [id])
+  income                        Income?                    @relation(fields: [income_id], references: [id])
+  income_id                     String?                    @db.ObjectId
 }
 
 model TransactionClassification {
@@ -76,6 +80,7 @@ model TransactionClassification {
   is_personal_transaction_classification Boolean       @default(false)
   company                                Company?      @relation(fields: [company_id], references: [id])
   company_id                             String?       @db.ObjectId
+  is_income                              Boolean
 
   @@unique([user_id, name])
 }
@@ -104,4 +109,14 @@ model LogOperationType {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
   log  Log[]
+}
+
+model Income {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  user_id      String        @db.ObjectId
+  user         User          @relation(fields: [user_id], references: [id])
+  company      Company       @relation(fields: [company_id], references: [id])
+  company_id   String        @db.ObjectId
+  transactions Transaction[]
 }
