@@ -38,14 +38,15 @@ model Company {
 }
 
 model Expense {
-  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
   name                String
   amount              Float?
-  user_id             String    @db.ObjectId
-  is_personal_expense Boolean   @default(false)
-  user                User      @relation(fields: [user_id], references: [id])
-  company_ids         String[]  @db.ObjectId
-  companies           Company[] @relation(fields: [company_ids], references: [id])
+  user_id             String        @db.ObjectId
+  is_personal_expense Boolean       @default(false)
+  user                User          @relation(fields: [user_id], references: [id])
+  company_ids         String[]      @db.ObjectId
+  companies           Company[]     @relation(fields: [company_ids], references: [id])
+  transactions        Transaction[]
 
   @@unique([user_id, name])
 }
@@ -54,8 +55,7 @@ model Transaction {
   id                            String                     @id @default(auto()) @map("_id") @db.ObjectId
   name                          String
   amount                        Float
-  transaction_date              DateTime
-  created_at                    DateTime                   @default(now())
+  transaction_date              String
   user_id                       String                     @db.ObjectId
   user                          User                       @relation(fields: [user_id], references: [id])
   company_id                    String?                    @db.ObjectId
@@ -63,6 +63,8 @@ model Transaction {
   file                          File?
   transaction_classification_id String?                    @db.ObjectId
   transaction_classification    TransactionClassification? @relation(fields: [transaction_classification_id], references: [id])
+  expense_id                    String?                    @db.ObjectId
+  expense                       Expense?                   @relation(fields: [expense_id], references: [id])
 }
 
 model TransactionClassification {

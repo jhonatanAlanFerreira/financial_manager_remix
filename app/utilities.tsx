@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function parseJsonOrNull(data: string) {
   try {
     return JSON.parse(data);
@@ -15,4 +17,13 @@ export function exclude<T, Key extends keyof T>(
       ([key]) => !keys.includes(key as Key)
     )
   ) as Omit<T, Key>;
+}
+
+export function formatDate(dateString: string) {
+  if (!dateString) return null;
+  return moment(dateString).format("YYYY/MM/DD");
+}
+
+export function todayFormatedDate() {
+  return moment().format("YYYY-MM-DD");
 }
