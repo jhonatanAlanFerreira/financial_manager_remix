@@ -80,9 +80,9 @@ model TransactionClassification {
   is_personal_transaction_classification Boolean       @default(false)
   company                                Company?      @relation(fields: [company_id], references: [id])
   company_id                             String?       @db.ObjectId
-  is_income                              Boolean
+  is_income                              Boolean       @default(false)
 
-  @@unique([user_id, name])
+  @@unique([user_id, name, company_id])
 }
 
 model File {
@@ -119,4 +119,6 @@ model Income {
   company      Company       @relation(fields: [company_id], references: [id])
   company_id   String        @db.ObjectId
   transactions Transaction[]
+
+  @@unique([user_id, name, company_id])
 }

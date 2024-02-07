@@ -17,11 +17,14 @@ export default async function classificationCreateValidator(
   }
 
   const classificationsExists =
-    await prisma.transactionClassification.findUnique({
+    await prisma.transactionClassification.findFirst({
       where: {
-        user_id_name: {
+        AND: {
           name: data.name,
           user_id: user.id,
+          company_id: data.company_id,
+          is_personal_transaction_classification:
+            data.is_personal_transaction_classification,
         },
       },
     });
