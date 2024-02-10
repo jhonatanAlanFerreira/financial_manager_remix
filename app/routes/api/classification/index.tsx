@@ -24,7 +24,9 @@ let createClassification = async (request: Request) => {
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),
-    company_id: body.get("company") ? String(body.get("company")) : null,
+    company_ids: body.get("companies")
+      ? (body.getAll("companies") as string[])
+      : [],
   };
 
   const res = await create(data, user);
@@ -71,7 +73,9 @@ let updateClassification = async (request: Request) => {
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),
-    company_id: body.get("company") ? String(body.get("company")) : null,
+    company_ids: body.get("companies")
+      ? (body.getAll("companies") as string[])
+      : [],
   };
 
   const res = await update(classificationId, user, data);

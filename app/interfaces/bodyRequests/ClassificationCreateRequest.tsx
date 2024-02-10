@@ -1,5 +1,5 @@
 export default interface ClassificationCreateRequest {
   name: string;
-  company_id?: string | null;
+  company_ids?: string[];
   is_personal_transaction_classification: boolean;
 }

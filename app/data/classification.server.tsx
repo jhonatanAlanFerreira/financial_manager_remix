@@ -28,7 +28,7 @@ export async function create(
       user_id: user.id,
       is_personal_transaction_classification:
         data.is_personal_transaction_classification,
-      company_id: data.company_id,
+      company_ids: data.company_ids,
     },
   });
 
@@ -108,7 +108,7 @@ export async function list(
     where: {
       user_id: user.id,
     },
-    include: includeCompany ? { company: true } : undefined,
+    include: includeCompany ? { companies: true } : undefined,
   });
 
   return {

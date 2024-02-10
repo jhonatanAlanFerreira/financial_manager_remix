@@ -1,10 +1,10 @@
-import ValidatedData from "~/interfaces/ValidatedData";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
-import { prisma } from "~/data/database.server";
 import { User } from "@prisma/client";
+import ValidatedData from "~/interfaces/ValidatedData";
+import IncomeCreateRequest from "~/interfaces/bodyRequests/IncomeCreateRequest";
+import { prisma } from "~/data/database.server";
 
-export async function expenseCreateValidator(
-  data: ExpenseCreateRequest,
+export async function incomeCreateValidator(
+  data: IncomeCreateRequest,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -12,25 +12,6 @@ export async function expenseCreateValidator(
       isValid: false,
       errors: {
         empty: "Name can not be empty",
-      },
-    };
-  }
-
-  const expenseExists = await prisma.expense.findUnique({
-    where: {
-      user_id_name_is_personal_expense: {
-        name: data.name,
-        user_id: user.id,
-        is_personal_expense: data.is_personal_expense,
-      },
-    },
-  });
-
-  if (expenseExists !== null) {
-    return {
-      isValid: false,
-      errors: {
-        name: "This expense already exists",
       },
     };
   }
@@ -52,6 +33,24 @@ export async function expenseCreateValidator(
         },
       };
     }
+  }
+
+  const incomeExists = await prisma.income.findUnique({
+    where: {
+      user_id_name: {
+        name: data.name,
+        user_id: user.id,
+      },
+    },
+  });
+
+  if (incomeExists !== null) {
+    return {
+      isValid: false,
+      errors: {
+        name: "This income already exists",
+      },
+    };
   }
 
   return {

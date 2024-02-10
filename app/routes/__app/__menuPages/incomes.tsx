@@ -1,4 +1,4 @@
-import { Company, TransactionClassification } from "@prisma/client";
+import { Company, Income } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
@@ -7,70 +7,46 @@ import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import Checkbox from "~/components/inputs/checkbox/Checkbox";
+import Icon from "~/components/icon/Icon";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
+import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
-import { loader as classificationLoader } from "~/routes/api/classification/index";
-import Icon from "~/components/icon/Icon";
-import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
+import { loader as incomeLoader } from "~/routes/api/income/index";
 
-export default function Classifications() {
-  const [loading, setLoading] = useState<boolean>(true);
+export default function Incomes() {
+  const [loading, setLoading] = useState<boolean>(false); //true
+  const [incomeToDelete, setIncomeToDelete] = useState<Income | null>();
+  const [incomeToUpdate, setIncomeToUpdate] = useState<Income | null>();
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [classificationToDelete, setClassificationToDelete] =
-    useState<TransactionClassification | null>();
-  const [classificationToUpdate, setClassificationToUpdate] =
-    useState<TransactionClassification | null>();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [classifications, setClassifications] = useState<
-    ServerResponse<ClassificationWithCompany[]>
-  >({});
-
-  const { companyData, classificationData } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
-    classificationData: ServerResponse<ClassificationWithCompany[]>;
-  }>();
+  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
+
+  const { companyData, incomeData } = useLoaderData<{
+    companyData: ServerResponse<Company[]>;
+    incomeData: ServerResponse<IncomeWithCompanies[]>;
+  }>();
 
   useEffect(() => {
     if (companyData) {
       setCompanies(companyData);
     }
-    if (classificationData) {
-      setClassifications(classificationData);
+    if (incomeData) {
+      setIncomes(incomeData);
     }
     setLoading(false);
-  }, [companyData, classificationData]);
-
-  const loadClassifications = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("/api/classification?includeCompany=true");
-      setClassifications(res.data);
-      setLoading(false);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
-  };
+  }, [companyData, incomeData]);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,13 +57,13 @@ export default function Classifications() {
 
     if (formData.get("id")) {
       axiosRequest = axios.patch(
-        `/api/classification?classificationId=${classificationToUpdate?.id}`,
+        `/api/income?incomeId=${incomeToUpdate?.id}`,
         formData
       );
-      loadingMessage = "Updating classification";
+      loadingMessage = "Updating income";
     } else {
-      axiosRequest = axios.post("/api/classification", formData);
-      loadingMessage = "Creating classification";
+      axiosRequest = axios.post("/api/income", formData);
+      loadingMessage = "Creating income";
     }
 
     setIsSubmitting(true);
@@ -97,7 +73,7 @@ export default function Classifications() {
         loading: loadingMessage,
         success: (res: AxiosResponse<ServerResponse>) => {
           setOpenAddModal(false);
-          loadClassifications();
+          loadIncomes();
           setResponseErrors({});
           return res.data.message as string;
         },
@@ -115,45 +91,47 @@ export default function Classifications() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
-  const getClassificationType = (classification: ClassificationWithCompany) => {
-    if (classification.companies.length) {
-      return classification.is_personal_transaction_classification
-        ? "Company and Personal Transaction Classification"
-        : "Company Transaction Classification";
-    } else {
-      if (classification.is_personal_transaction_classification)
-        return "Personal Transaction Classification";
-      return null;
+  const loadIncomes = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/income");
+      setIncomes(res.data);
+      setLoading(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+        );
+      } else {
+        toast.error("Sorry, unexpected error. Be back soon");
+      }
+      setLoading(false);
     }
   };
 
-  const removeClassification = async () => {
-    if (classificationToDelete) {
+  const removeIncome = async () => {
+    if (incomeToDelete) {
       setOpenRemoveModal(false);
       setLoading(true);
 
-      toast.promise(
-        axios.delete(
-          `/api/classification?classificationId=${classificationToDelete.id}`
-        ),
-        {
-          loading: "Deleting classification",
-          success: (res: AxiosResponse<ServerResponse>) => {
-            loadClassifications();
-            return res.data.message as string;
-          },
-          error: (error) => {
-            if (isAxiosError(error)) {
-              setLoading(false);
-              return (
-                error.response?.data.message ||
-                "Sorry, unexpected error. Be back soon"
-              );
-            }
-            return "Sorry, unexpected error. Be back soon";
-          },
-        }
-      );
+      toast.promise(axios.delete(`/api/income?incomeId=${incomeToDelete.id}`), {
+        loading: "Deleting income",
+        success: (res: AxiosResponse<ServerResponse>) => {
+          loadIncomes();
+          return res.data.message as string;
+        },
+        error: (error) => {
+          if (isAxiosError(error)) {
+            setLoading(false);
+            return (
+              error.response?.data.message ||
+              "Sorry, unexpected error. Be back soon"
+            );
+          }
+          return "Sorry, unexpected error. Be back soon";
+        },
+      });
     }
   };
 
@@ -162,7 +140,7 @@ export default function Classifications() {
       <div className="flex justify-end mb-2">
         <PrimaryButton
           onClick={() => {
-            setClassificationToUpdate(null);
+            setIncomeToUpdate(null);
             setOpenAddModal(true);
           }}
           text="Add"
@@ -174,34 +152,24 @@ export default function Classifications() {
           <thead>
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Type</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {!classifications.data?.length && (
+            {!incomes.data?.length && (
               <tr>
-                <td className="py-2 px-4" colSpan={3}>
+                <td className="py-2 px-4" colSpan={4}>
                   There are no data yet
                 </td>
               </tr>
             )}
-            {classifications.data?.map((classification, index) => (
+            {incomes.data?.map((income, index) => (
               <tr key={index} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border-b border-r">
-                  {classification.name}
-                </td>
-                <td
-                  className={`py-2 px-4 border-b border-r ${
-                    getClassificationType(classification) ? "" : "opacity-50"
-                  }`}
-                >
-                  {getClassificationType(classification) || "Not set"}
-                </td>
+                <td className="py-2 px-4 border-b border-r">{income.name}</td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
-                      setClassificationToUpdate(classification);
+                      setIncomeToUpdate(income);
                       setOpenAddModal(true);
                     }}
                     name="Edit"
@@ -209,7 +177,7 @@ export default function Classifications() {
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
-                      setClassificationToDelete(classification);
+                      setIncomeToDelete(income);
                       setOpenRemoveModal(true);
                     }}
                     name="Trash"
@@ -236,7 +204,7 @@ export default function Classifications() {
           Atention
         </h2>
         <p className="text-center text-violet-950 text-xl pt-2">
-          Do you really want to remove this classification?
+          Do you really want to remove this income?
         </p>
         <div className="flex justify-between p-2 mt-10">
           <PrimaryButton
@@ -246,7 +214,7 @@ export default function Classifications() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeClassification()}
+            onClick={() => removeIncome()}
           ></DangerButton>
         </div>
       </Modal>
@@ -263,29 +231,27 @@ export default function Classifications() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {classificationToUpdate
-            ? "Update classification"
-            : "Add new classification"}
+          {incomeToUpdate ? "Update income" : "Add new income"}
         </h2>
         <div className="overflow-auto">
           <div className="p-4">
-            <Form method="post" id="classification-form" onSubmit={formSubmit}>
+            <Form method="post" id="income-form" onSubmit={formSubmit}>
               <input
                 type="text"
                 name="id"
                 hidden
-                defaultValue={classificationToUpdate?.id}
+                defaultValue={incomeToUpdate?.id}
               />
               <InputText
                 label="Name *"
                 name="name"
                 required
-                defaultValue={classificationToUpdate?.name}
+                defaultValue={incomeToUpdate?.name}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
               <InputSelect
-                isClearable
                 isMulti
+                isClearable
                 className="mb-8"
                 placeholder="Company"
                 options={companies?.data}
@@ -293,22 +259,9 @@ export default function Classifications() {
                 getOptionValue={getSelectCompanyOptionValue as any}
                 name="companies"
                 defaultValue={companies?.data?.filter((company) =>
-                  classificationToUpdate?.company_ids.includes(company.id)
+                  incomeToUpdate?.company_ids.includes(company.id)
                 )}
               ></InputSelect>
-              <Checkbox
-                name="is_personal_transaction_classification"
-                id="is_personal_transaction_classification"
-                defaultChecked={
-                  classificationToUpdate?.is_personal_transaction_classification
-                }
-              ></Checkbox>
-              <label
-                className="pl-3 text-violet-950 cursor-pointer"
-                htmlFor="is_personal_transaction_classification"
-              >
-                Use as personal classification
-              </label>
             </Form>
           </div>
           <div className="flex justify-between p-2">
@@ -319,7 +272,7 @@ export default function Classifications() {
             <PrimaryButton
               text="Save"
               disabled={isSubmitting}
-              form="classification-form"
+              form="income-form"
               type="submit"
               className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
             ></PrimaryButton>
@@ -333,11 +286,10 @@ export default function Classifications() {
 export async function loader(request: LoaderFunctionArgs) {
   const res = await Promise.all([
     companyLoader(request),
-    classificationLoader(request, true),
+    incomeLoader(request, true),
   ]);
-
   return {
     companyData: res[0],
-    classificationData: res[1],
+    incomeData: res[1],
   };
 }
