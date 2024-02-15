@@ -305,7 +305,7 @@ export default function Transactions() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-3/4",
+          modal: "p-0 m-0 w-full sm:w-3/4 overflow-visible",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
@@ -317,7 +317,7 @@ export default function Transactions() {
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           {transactionToUpdate ? "Update transaction" : "Add new transaction"}
         </h2>
-        <div className="overflow-auto">
+        <div>
           <div className="p-4">
             <Form method="post" id="classification-form" onSubmit={formSubmit}>
               <input

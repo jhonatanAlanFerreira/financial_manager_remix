@@ -253,7 +253,7 @@ export default function Classifications() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-3/4",
+          modal: "p-0 m-0 w-full sm:w-3/4 overflow-visible",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
@@ -267,7 +267,7 @@ export default function Classifications() {
             ? "Update classification"
             : "Add new classification"}
         </h2>
-        <div className="overflow-auto">
+        <div>
           <div className="p-4">
             <Form method="post" id="classification-form" onSubmit={formSubmit}>
               <input

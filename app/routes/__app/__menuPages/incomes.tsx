@@ -221,7 +221,7 @@ export default function Incomes() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-3/4",
+          modal: "p-0 m-0 w-full sm:w-3/4 overflow-visible",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
@@ -233,7 +233,7 @@ export default function Incomes() {
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           {incomeToUpdate ? "Update income" : "Add new income"}
         </h2>
-        <div className="overflow-auto">
+        <div>
           <div className="p-4">
             <Form method="post" id="income-form" onSubmit={formSubmit}>
               <input

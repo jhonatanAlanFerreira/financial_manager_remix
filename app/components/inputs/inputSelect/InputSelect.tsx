@@ -31,7 +31,6 @@ export default function InputSelect({ ...rest }: SelectProps) {
     menu: (styles) => ({
       ...styles,
       border: "1px solid var(--primary-color)",
-      position: "relative",
     }),
   };
 
