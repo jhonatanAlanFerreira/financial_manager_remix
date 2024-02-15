@@ -4,6 +4,9 @@ import IncomeCreateRequest from "~/interfaces/bodyRequests/IncomeCreateRequest";
 import { prisma } from "~/data/database.server";
 import { incomeCreateValidator } from "./requestValidators/incomeCreateValidator";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
+import incomeDeleteValidator from "./requestValidators/incomeDeleteValidator";
+import IncomeUpdateRequest from "~/interfaces/bodyRequests/IncomeUpdateRequest";
+import incomeUpdateValidator from "./requestValidators/incomeUpdateValidator";
 
 export async function create(
   data: IncomeCreateRequest,
@@ -46,5 +49,58 @@ export async function list(
 
   return {
     data: expenses,
+  };
+}
+
+export async function remove(
+  incomeId: string,
+  user: User
+): Promise<ServerResponse> {
+  const dataIsValid = await incomeDeleteValidator(user, incomeId);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "Income not found",
+      data: dataIsValid,
+    };
+  }
+
+  await prisma.income.delete({
+    where: {
+      id: incomeId,
+    },
+  });
+
+  return {
+    message: "Income removed successfully",
+  };
+}
+
+export async function update(
+  incomeId: string,
+  user: User,
+  data: IncomeUpdateRequest
+): Promise<ServerResponse> {
+  const dataIsValid = await incomeUpdateValidator(data, user, incomeId);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "There are some errors in your form",
+      data: dataIsValid,
+    };
+  }
+
+  const res = await prisma.income.update({
+    data,
+    where: {
+      id: incomeId,
+    },
+  });
+
+  return {
+    data: res,
+    message: "Income was updated successfully",
   };
 }
