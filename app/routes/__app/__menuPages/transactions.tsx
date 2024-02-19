@@ -169,6 +169,9 @@ export default function Transactions() {
       (c) => c.id == transaction.transaction_classification_id
     )?.name;
   };
+  const getIncomeNameFromTransaction = (transaction: Transaction) => {
+    return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
+  };
 
   const removeTransaction = async () => {
     if (transactionToDelete) {
@@ -218,6 +221,7 @@ export default function Transactions() {
             <th className="py-2 px-4 border-b border-r">Name</th>
             <th className="py-2 px-4 border-b border-r">Company</th>
             <th className="py-2 px-4 border-b border-r">Expense</th>
+            <th className="py-2 px-4 border-b border-r">Income</th>
             <th className="py-2 px-4 border-b border-r">Classification</th>
             <th className="py-2 px-4 border-b border-r">Date</th>
             <th className="py-2 px-4 border-b border-r">Amount</th>
@@ -250,6 +254,13 @@ export default function Transactions() {
                 }`}
               >
                 {getExpenseNameFromTransaction(transaction) || "Not set"}
+              </td>
+              <td
+                className={`py-2 px-4 border-b border-r ${
+                  getIncomeNameFromTransaction(transaction) ? "" : "opacity-50"
+                }`}
+              >
+                {getIncomeNameFromTransaction(transaction) || "Not set"}
               </td>
               <td
                 className={`py-2 px-4 border-b border-r ${
@@ -341,6 +352,7 @@ export default function Transactions() {
                     !!transactionToUpdate && !!transactionToUpdate?.income_id
                   }
                   selectedClassName="bg-violet-900 text-white"
+                  disabledClassName="opacity-50 pointer-events-none"
                   className="w-full text-center cursor-pointer p-2 text-violet-950"
                 >
                   Expense Transaction
@@ -351,6 +363,7 @@ export default function Transactions() {
                     !!transactionToUpdate && !!transactionToUpdate?.expense_id
                   }
                   selectedClassName="bg-violet-900 text-white"
+                  disabledClassName="opacity-50 pointer-events-none"
                   className="w-full text-center cursor-pointer p-2 text-violet-950"
                 >
                   Income Transaction
