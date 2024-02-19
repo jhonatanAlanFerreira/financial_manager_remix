@@ -33,21 +33,13 @@ export async function create(
     };
   }
 
-  const expense = await prisma.transaction.create({
-    data: {
-      name: data.name,
-      amount: data.amount,
-      user_id: user.id,
-      transaction_date: data.transaction_date,
-      company_id: data.company_id,
-      transaction_classification_id: data.transaction_classification_id,
-      expense_id: data.expense_id,
-    },
+  const transaction = await prisma.transaction.create({
+    data,
   });
 
   return {
-    data: expense,
-    message: "Expense was created successfully",
+    data: transaction,
+    message: "Transaction was created successfully",
   };
 }
 

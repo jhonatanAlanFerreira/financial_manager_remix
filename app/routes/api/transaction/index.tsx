@@ -24,6 +24,7 @@ let createTransaction = async (request: Request) => {
     amount: +(body.get("amount") || 0),
     company_id: body.get("company") ? String(body.get("company")) : null,
     expense_id: body.get("expense") ? String(body.get("expense")) : null,
+    income_id: body.get("income_id") ? String(body.get("income_id")) : null,
     transaction_classification_id: body.get("classification")
       ? String(body.get("classification"))
       : null,
@@ -75,6 +76,7 @@ let updateTransaction = async (request: Request) => {
     amount: +(body.get("amount") || 0),
     company_id: body.get("company") ? String(body.get("company")) : null,
     expense_id: body.get("expense") ? String(body.get("expense")) : null,
+    income_id: body.get("income_id") ? String(body.get("income_id")) : null,
     transaction_classification_id: body.get("classification")
       ? String(body.get("classification"))
       : null,

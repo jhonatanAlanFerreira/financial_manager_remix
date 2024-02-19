@@ -27,7 +27,8 @@
     "react-feather": "^2.0.10",
     "react-hot-toast": "^2.4.1",
     "react-responsive-modal": "^6.4.2",
-    "react-select": "^5.8.0"
+    "react-select": "^5.8.0",
+    "react-tabs": "^6.0.2"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.1.0",

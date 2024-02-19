@@ -1,6 +1,7 @@
 import {
   Company,
   Expense,
+  Income,
   Transaction,
   TransactionClassification,
 } from "@prisma/client";
@@ -21,14 +22,17 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as transactionLoader } from "~/routes/api/transaction/index";
+import { loader as incomeLoader } from "~/routes/api/income/index";
 import Icon from "~/components/icon/Icon";
 import { formatDate, todayFormatedDate } from "~/utilities";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 export default function Transactions() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
@@ -45,18 +49,26 @@ export default function Transactions() {
   const [transactionToUpdate, setTransactionToUpdate] =
     useState<Transaction | null>();
 
-  const { companyData, transactionData, expenseData, classificationData } =
-    useLoaderData<{
-      companyData: ServerResponse<Company[]>;
-      transactionData: ServerResponse<Transaction[]>;
-      expenseData: ServerResponse<Expense[]>;
-      classificationData: ServerResponse<TransactionClassification[]>;
-    }>();
+  const {
+    companyData,
+    transactionData,
+    expenseData,
+    classificationData,
+    incomeData,
+  } = useLoaderData<{
+    companyData: ServerResponse<Company[]>;
+    transactionData: ServerResponse<Transaction[]>;
+    expenseData: ServerResponse<Expense[]>;
+    classificationData: ServerResponse<TransactionClassification[]>;
+    incomeData: ServerResponse<Income[]>;
+  }>();
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
   const getSelectExpenseOptionValue = (option: Expense) => option.id;
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
+  const getSelectIncomeOptionValue = (option: Income) => option.id;
+  const getSelectIncomeOptionLabel = (option: Income) => option.name;
   const getSelectClassificationOptionValue = (
     option: TransactionClassification
   ) => option.id;
@@ -76,6 +88,9 @@ export default function Transactions() {
     }
     if (transactionData) {
       setTransactions(transactionData);
+    }
+    if (incomeData) {
+      setIncomes(incomeData);
     }
 
     setLoading(false);
@@ -318,77 +333,187 @@ export default function Transactions() {
           {transactionToUpdate ? "Update transaction" : "Add new transaction"}
         </h2>
         <div>
-          <div className="p-4">
-            <Form method="post" id="classification-form" onSubmit={formSubmit}>
-              <input
-                type="text"
-                name="id"
-                hidden
-                defaultValue={transactionToUpdate?.id}
-              />
-              <InputText
-                label="Name *"
-                name="name"
-                required
-                defaultValue={transactionToUpdate?.name}
-              ></InputText>
-              <InputText
-                label="Date *"
-                name="transaction_date"
-                type="date"
-                required
-                defaultValue={
-                  transactionToUpdate?.transaction_date || todayFormatedDate()
-                }
-              ></InputText>
-              <InputText
-                label="Amount *"
-                name="amount"
-                type="number"
-                required
-                defaultValue={transactionToUpdate?.amount || 0}
-                errorMessage={responseErrors?.data?.errors?.["amount"]}
-              ></InputText>
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Company"
-                options={companies?.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
-                name="company"
-                defaultValue={companies.data?.find(
-                  (company) => company.id == transactionToUpdate?.company_id
-                )}
-              ></InputSelect>
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Expense"
-                options={expenses?.data}
-                getOptionLabel={getSelectExpenseOptionLabel as any}
-                getOptionValue={getSelectExpenseOptionValue as any}
-                name="expense"
-                defaultValue={expenses.data?.find(
-                  (expense) => expense.id == transactionToUpdate?.expense_id
-                )}
-              ></InputSelect>
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Classification"
-                options={classifications?.data}
-                getOptionLabel={getSelectClassificationOptionLabel as any}
-                getOptionValue={getSelectClassificationOptionValue as any}
-                name="classification"
-                defaultValue={classifications.data?.find(
-                  (classification) =>
-                    classification.id ==
-                    transactionToUpdate?.transaction_classification_id
-                )}
-              ></InputSelect>
-            </Form>
-          </div>
+          <Tabs defaultIndex={!!transactionToUpdate?.income_id ? 1 : 0}>
+            <TabList>
+              <div className="flex justify-around">
+                <Tab
+                  disabled={
+                    !!transactionToUpdate && !!transactionToUpdate?.income_id
+                  }
+                  selectedClassName="bg-violet-900 text-white"
+                  className="w-full text-center cursor-pointer p-2 text-violet-950"
+                >
+                  Expense Transaction
+                </Tab>
+                <div className="border-r-2"></div>
+                <Tab
+                  disabled={
+                    !!transactionToUpdate && !!transactionToUpdate?.expense_id
+                  }
+                  selectedClassName="bg-violet-900 text-white"
+                  className="w-full text-center cursor-pointer p-2 text-violet-950"
+                >
+                  Income Transaction
+                </Tab>
+              </div>
+            </TabList>
+            <TabPanel>
+              <div className="p-4">
+                <Form
+                  method="post"
+                  id="classification-form"
+                  onSubmit={formSubmit}
+                >
+                  <input
+                    type="text"
+                    name="id"
+                    hidden
+                    defaultValue={transactionToUpdate?.id}
+                  />
+                  <InputText
+                    label="Name *"
+                    name="name"
+                    required
+                    defaultValue={transactionToUpdate?.name}
+                  ></InputText>
+                  <InputText
+                    label="Date *"
+                    name="transaction_date"
+                    type="date"
+                    required
+                    defaultValue={
+                      transactionToUpdate?.transaction_date ||
+                      todayFormatedDate()
+                    }
+                  ></InputText>
+                  <InputText
+                    label="Amount *"
+                    name="amount"
+                    type="number"
+                    required
+                    defaultValue={transactionToUpdate?.amount || 0}
+                    errorMessage={responseErrors?.data?.errors?.["amount"]}
+                  ></InputText>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Company"
+                    options={companies?.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    name="company"
+                    defaultValue={companies.data?.find(
+                      (company) => company.id == transactionToUpdate?.company_id
+                    )}
+                  ></InputSelect>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Expense"
+                    options={expenses?.data}
+                    getOptionLabel={getSelectExpenseOptionLabel as any}
+                    getOptionValue={getSelectExpenseOptionValue as any}
+                    name="expense"
+                    defaultValue={expenses.data?.find(
+                      (expense) => expense.id == transactionToUpdate?.expense_id
+                    )}
+                  ></InputSelect>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Classification"
+                    options={classifications?.data}
+                    getOptionLabel={getSelectClassificationOptionLabel as any}
+                    getOptionValue={getSelectClassificationOptionValue as any}
+                    name="classification"
+                    defaultValue={classifications.data?.find(
+                      (classification) =>
+                        classification.id ==
+                        transactionToUpdate?.transaction_classification_id
+                    )}
+                  ></InputSelect>
+                </Form>
+              </div>
+            </TabPanel>
+            <TabPanel>
+              <div className="p-4">
+                <Form
+                  method="post"
+                  id="classification-form"
+                  onSubmit={formSubmit}
+                >
+                  <input
+                    type="text"
+                    name="id"
+                    hidden
+                    defaultValue={transactionToUpdate?.id}
+                  />
+                  <InputText
+                    label="Name *"
+                    name="name"
+                    required
+                    defaultValue={transactionToUpdate?.name}
+                  ></InputText>
+                  <InputText
+                    label="Date *"
+                    name="transaction_date"
+                    type="date"
+                    required
+                    defaultValue={
+                      transactionToUpdate?.transaction_date ||
+                      todayFormatedDate()
+                    }
+                  ></InputText>
+                  <InputText
+                    label="Amount *"
+                    name="amount"
+                    type="number"
+                    required
+                    defaultValue={transactionToUpdate?.amount || 0}
+                    errorMessage={responseErrors?.data?.errors?.["amount"]}
+                  ></InputText>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Company"
+                    options={companies?.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    name="company"
+                    defaultValue={companies.data?.find(
+                      (company) => company.id == transactionToUpdate?.company_id
+                    )}
+                  ></InputSelect>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Income"
+                    options={incomes?.data}
+                    getOptionLabel={getSelectIncomeOptionLabel as any}
+                    getOptionValue={getSelectIncomeOptionValue as any}
+                    name="income_id"
+                    defaultValue={incomes.data?.find(
+                      (income) => income.id == transactionToUpdate?.income_id
+                    )}
+                  ></InputSelect>
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Classification"
+                    options={classifications?.data}
+                    getOptionLabel={getSelectClassificationOptionLabel as any}
+                    getOptionValue={getSelectClassificationOptionValue as any}
+                    name="classification"
+                    defaultValue={classifications.data?.find(
+                      (classification) =>
+                        classification.id ==
+                        transactionToUpdate?.transaction_classification_id
+                    )}
+                  ></InputSelect>
+                </Form>
+              </div>
+            </TabPanel>
+          </Tabs>
           <div className="flex justify-between p-2">
             <DangerButton
               text="Cancel"
@@ -414,6 +539,7 @@ export async function loader(request: LoaderFunctionArgs) {
     expenseLoader(request),
     classificationLoader(request),
     transactionLoader(request),
+    incomeLoader(request),
   ]);
 
   return {
@@ -421,5 +547,6 @@ export async function loader(request: LoaderFunctionArgs) {
     expenseData: res[1],
     classificationData: res[2],
     transactionData: res[3],
+    incomeData: res[4],
   };
 }
