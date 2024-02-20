@@ -8,14 +8,14 @@ import TransactionUpdateRequest from "~/interfaces/bodyRequests/TransactionUpdat
 import transactionUpdateValidator from "./requestValidators/transactionUpdateValidator";
 
 export async function list(user: User): Promise<ServerResponse<Transaction[]>> {
-  const classifications = await prisma.transaction.findMany({
+  const transactions = await prisma.transaction.findMany({
     where: {
       user_id: user.id,
     },
   });
 
   return {
-    data: classifications,
+    data: transactions,
   };
 }
 

@@ -50,7 +50,7 @@ export async function remove(
   if (!dataIsValid.isValid) {
     return {
       error: true,
-      message: "Expense not found",
+      message: "Classification not found",
       data: dataIsValid,
     };
   }

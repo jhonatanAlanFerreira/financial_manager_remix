@@ -40,7 +40,7 @@ export async function list(
   user: User,
   includeCompanies: boolean
 ): Promise<ServerResponse<Income[] | IncomeWithCompanies[]>> {
-  const expenses = await prisma.income.findMany({
+  const incomes = await prisma.income.findMany({
     where: {
       user_id: user.id,
     },
@@ -48,7 +48,7 @@ export async function list(
   });
 
   return {
-    data: expenses,
+    data: incomes,
   };
 }
 
