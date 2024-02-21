@@ -434,6 +434,8 @@ export default function Transactions() {
                     label="Amount *"
                     name="amount"
                     type="number"
+                    step={0.01}
+                    min={0.01}
                     required
                     defaultValue={transactionToUpdate?.amount || 0}
                     errorMessage={responseErrors?.data?.errors?.["amount"]}
@@ -539,6 +541,8 @@ export default function Transactions() {
                     label="Amount *"
                     name="amount"
                     type="number"
+                    step={0.01}
+                    min={0.01}
                     required
                     defaultValue={transactionToUpdate?.amount || 0}
                     errorMessage={responseErrors?.data?.errors?.["amount"]}

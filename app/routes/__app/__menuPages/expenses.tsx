@@ -286,6 +286,8 @@ export default function Expenses() {
                 label="Amount"
                 name="amount"
                 type="number"
+                step={0.01}
+                min={0.01}
                 defaultValue={expenseToUpdate?.amount || 0}
               ></InputText>
               <InputSelect

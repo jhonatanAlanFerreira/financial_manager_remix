@@ -254,6 +254,8 @@ export default function Companies() {
                 label="Working Capital"
                 name="working_capital"
                 type="number"
+                step={0.01}
+                min={0.01}
                 defaultValue={companyToUpdate?.working_capital || 0}
               ></InputText>
             </Form>
