@@ -26,6 +26,7 @@ import { loader as incomeLoader } from "~/routes/api/income/index";
 import Icon from "~/components/icon/Icon";
 import { formatDate, todayFormatedDate } from "~/utilities";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import Checkbox from "~/components/inputs/checkbox/Checkbox";
 
 export default function Transactions() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,6 +35,7 @@ export default function Transactions() {
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [isPersonalTransaction, setIsPersonalTransaction] = useState(false);
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
   >({});
@@ -139,6 +141,22 @@ export default function Transactions() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
+  const onClickAdd = () => {
+    setTransactionToUpdate(null);
+    setIsPersonalTransaction(false);
+    setOpenAddModal(true);
+  };
+
+  const onClickUpdate = (transaction: Transaction) => {
+    setTransactionToUpdate(transaction);
+    setIsPersonalTransaction(transaction.is_personal_transaction);
+    setOpenAddModal(true);
+  };
+
+  const onTabSelect = () => {
+    setIsPersonalTransaction(!!transactionToUpdate?.is_personal_transaction);
+  };
+
   const loadTransactions = async () => {
     try {
       setLoading(true);
@@ -171,6 +189,12 @@ export default function Transactions() {
   };
   const getIncomeNameFromTransaction = (transaction: Transaction) => {
     return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
+  };
+
+  const getTransactionType = (transaction: Transaction) => {
+    return transaction.is_personal_transaction
+      ? "Personal Transaction"
+      : "Company Transaction";
   };
 
   const removeTransaction = async () => {
@@ -207,10 +231,7 @@ export default function Transactions() {
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={() => {
-            setTransactionToUpdate(null);
-            setOpenAddModal(true);
-          }}
+          onClick={onClickAdd}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -219,6 +240,7 @@ export default function Transactions() {
         <thead>
           <tr className="bg-gray-100">
             <th className="py-2 px-4 border-b border-r">Name</th>
+            <th className="py-2 px-4 border-b border-r">Type</th>
             <th className="py-2 px-4 border-b border-r">Company</th>
             <th className="py-2 px-4 border-b border-r">Expense</th>
             <th className="py-2 px-4 border-b border-r">Income</th>
@@ -240,6 +262,9 @@ export default function Transactions() {
             <tr key={index} className="hover:bg-gray-50">
               <td className="py-2 px-4 border-b border-r">
                 {transaction.name}
+              </td>
+              <td className="py-2 px-4 border-b border-r">
+                {getTransactionType(transaction)}
               </td>
               <td
                 className={`py-2 px-4 border-b border-r ${
@@ -279,10 +304,7 @@ export default function Transactions() {
               </td>
               <td className="flex justify-center gap-5 py-2 px-4 border-b">
                 <Icon
-                  onClick={() => {
-                    setTransactionToUpdate(transaction);
-                    setOpenAddModal(true);
-                  }}
+                  onClick={() => onClickUpdate(transaction)}
                   name="Edit"
                   className="cursor-pointer"
                 ></Icon>{" "}
@@ -344,7 +366,10 @@ export default function Transactions() {
           {transactionToUpdate ? "Update transaction" : "Add new transaction"}
         </h2>
         <div>
-          <Tabs defaultIndex={!!transactionToUpdate?.income_id ? 1 : 0}>
+          <Tabs
+            onSelect={onTabSelect}
+            defaultIndex={!!transactionToUpdate?.income_id ? 1 : 0}
+          >
             <TabList>
               <div className="flex justify-around">
                 <Tab
@@ -407,18 +432,39 @@ export default function Transactions() {
                     defaultValue={transactionToUpdate?.amount || 0}
                     errorMessage={responseErrors?.data?.errors?.["amount"]}
                   ></InputText>
-                  <InputSelect
-                    isClearable
-                    className="mb-8"
-                    placeholder="Company"
-                    options={companies?.data}
-                    getOptionLabel={getSelectCompanyOptionLabel as any}
-                    getOptionValue={getSelectCompanyOptionValue as any}
-                    name="company"
-                    defaultValue={companies.data?.find(
-                      (company) => company.id == transactionToUpdate?.company_id
-                    )}
-                  ></InputSelect>
+                  <div className="mb-6">
+                    <Checkbox
+                      onChange={(event) =>
+                        setIsPersonalTransaction(event.target.checked)
+                      }
+                      name="is_personal_transaction"
+                      id="is_personal_transaction"
+                      defaultChecked={
+                        transactionToUpdate?.is_personal_transaction
+                      }
+                    ></Checkbox>
+                    <label
+                      className="pl-3 text-violet-950 cursor-pointer"
+                      htmlFor="is_personal_transaction"
+                    >
+                      Personal transaction
+                    </label>
+                  </div>
+                  {!isPersonalTransaction && (
+                    <InputSelect
+                      isClearable
+                      className="mb-8"
+                      placeholder="Company"
+                      options={companies?.data}
+                      getOptionLabel={getSelectCompanyOptionLabel as any}
+                      getOptionValue={getSelectCompanyOptionValue as any}
+                      name="company"
+                      defaultValue={companies.data?.find(
+                        (company) =>
+                          company.id == transactionToUpdate?.company_id
+                      )}
+                    ></InputSelect>
+                  )}
                   <InputSelect
                     isClearable
                     className="mb-8"
@@ -485,18 +531,39 @@ export default function Transactions() {
                     defaultValue={transactionToUpdate?.amount || 0}
                     errorMessage={responseErrors?.data?.errors?.["amount"]}
                   ></InputText>
-                  <InputSelect
-                    isClearable
-                    className="mb-8"
-                    placeholder="Company"
-                    options={companies?.data}
-                    getOptionLabel={getSelectCompanyOptionLabel as any}
-                    getOptionValue={getSelectCompanyOptionValue as any}
-                    name="company"
-                    defaultValue={companies.data?.find(
-                      (company) => company.id == transactionToUpdate?.company_id
-                    )}
-                  ></InputSelect>
+                  <div className="mb-6">
+                    <Checkbox
+                      onChange={(event) =>
+                        setIsPersonalTransaction(event.target.checked)
+                      }
+                      name="is_personal_transaction"
+                      id="is_personal_transaction"
+                      defaultChecked={
+                        transactionToUpdate?.is_personal_transaction
+                      }
+                    ></Checkbox>
+                    <label
+                      className="pl-3 text-violet-950 cursor-pointer"
+                      htmlFor="is_personal_transaction"
+                    >
+                      Personal transaction
+                    </label>
+                  </div>
+                  {!isPersonalTransaction && (
+                    <InputSelect
+                      isClearable
+                      className="mb-8"
+                      placeholder="Company"
+                      options={companies?.data}
+                      getOptionLabel={getSelectCompanyOptionLabel as any}
+                      getOptionValue={getSelectCompanyOptionValue as any}
+                      name="company"
+                      defaultValue={companies.data?.find(
+                        (company) =>
+                          company.id == transactionToUpdate?.company_id
+                      )}
+                    ></InputSelect>
+                  )}
                   <InputSelect
                     isClearable
                     className="mb-8"

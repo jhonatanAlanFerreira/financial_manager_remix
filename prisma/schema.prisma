@@ -71,6 +71,7 @@ model Transaction {
   expense                       Expense?                   @relation(fields: [expense_id], references: [id])
   income                        Income?                    @relation(fields: [income_id], references: [id])
   income_id                     String?                    @db.ObjectId
+  is_personal_transaction       Boolean                    @default(false)
 }
 
 model TransactionClassification {

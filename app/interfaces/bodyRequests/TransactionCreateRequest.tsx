@@ -7,4 +7,5 @@ export default interface TransactionCreateRequest {
   transaction_classification_id: string | null;
   user_id: string;
   transaction_date: string;
+  is_personal_transaction: boolean;
 }
