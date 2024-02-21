@@ -123,6 +123,7 @@ model Income {
   company_ids  String[]      @db.ObjectId
   companies    Company[]     @relation(fields: [company_ids], references: [id])
   transactions Transaction[]
+  amount       Float?
 
   @@unique([user_id, name])
 }

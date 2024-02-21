@@ -152,6 +152,7 @@ export default function Incomes() {
           <thead>
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
+              <th className="py-2 px-4 border-b border-r">Amount</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
@@ -166,6 +167,7 @@ export default function Incomes() {
             {incomes.data?.map((income, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{income.name}</td>
+                <td className="py-2 px-4 border-b border-r">{income.amount}</td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
@@ -248,6 +250,14 @@ export default function Incomes() {
                 required
                 defaultValue={incomeToUpdate?.name}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
+              ></InputText>
+              <InputText
+                label="Amount"
+                name="amount"
+                type="number"
+                step={0.01}
+                min={0.01}
+                defaultValue={incomeToUpdate?.amount || 0}
               ></InputText>
               <InputSelect
                 isMulti

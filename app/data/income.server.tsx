@@ -27,6 +27,7 @@ export async function create(
       name: data.name,
       user_id: user.id,
       company_ids: data.company_ids,
+      amount: data.amount,
     },
   });
 
