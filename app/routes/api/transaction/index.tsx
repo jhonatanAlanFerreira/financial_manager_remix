@@ -31,6 +31,7 @@ let createTransaction = async (request: Request) => {
     user_id: user.id,
     transaction_date: String(body.get("transaction_date") || ""),
     is_personal_transaction: !!body.get("is_personal_transaction"),
+    is_income: !!body.get("is_income"),
   };
 
   const res = await create(data, user);
@@ -84,6 +85,7 @@ let updateTransaction = async (request: Request) => {
     user_id: user.id,
     transaction_date: String(body.get("transaction_date") || ""),
     is_personal_transaction: !!body.get("is_personal_transaction"),
+    is_income: !!body.get("is_income"),
   };
 
   const res = await update(transactionId, user, data);

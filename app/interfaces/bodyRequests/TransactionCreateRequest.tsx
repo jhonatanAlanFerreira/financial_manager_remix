@@ -8,4 +8,5 @@ export default interface TransactionCreateRequest {
   user_id: string;
   transaction_date: string;
   is_personal_transaction: boolean;
+  is_income: boolean;
 }

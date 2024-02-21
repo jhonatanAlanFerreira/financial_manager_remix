@@ -368,13 +368,13 @@ export default function Transactions() {
         <div>
           <Tabs
             onSelect={onTabSelect}
-            defaultIndex={!!transactionToUpdate?.income_id ? 1 : 0}
+            defaultIndex={!!transactionToUpdate?.is_income ? 1 : 0}
           >
             <TabList>
               <div className="flex justify-around">
                 <Tab
                   disabled={
-                    !!transactionToUpdate && !!transactionToUpdate?.income_id
+                    !!transactionToUpdate && !!transactionToUpdate?.is_income
                   }
                   selectedClassName="bg-violet-900 text-white"
                   disabledClassName="opacity-50 pointer-events-none"
@@ -385,7 +385,7 @@ export default function Transactions() {
                 <div className="border-r-2"></div>
                 <Tab
                   disabled={
-                    !!transactionToUpdate && !!transactionToUpdate?.expense_id
+                    !!transactionToUpdate && !transactionToUpdate?.is_income
                   }
                   selectedClassName="bg-violet-900 text-white"
                   disabledClassName="opacity-50 pointer-events-none"
@@ -407,6 +407,12 @@ export default function Transactions() {
                     name="id"
                     hidden
                     defaultValue={transactionToUpdate?.id}
+                  />
+                  <input
+                    type="checkbox"
+                    name="is_income"
+                    hidden
+                    checked={false}
                   />
                   <InputText
                     label="Name *"
@@ -506,6 +512,12 @@ export default function Transactions() {
                     name="id"
                     hidden
                     defaultValue={transactionToUpdate?.id}
+                  />
+                  <input
+                    type="checkbox"
+                    name="is_income"
+                    hidden
+                    checked={true}
                   />
                   <InputText
                     label="Name *"
