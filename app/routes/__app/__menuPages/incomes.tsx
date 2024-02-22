@@ -256,7 +256,7 @@ export default function Incomes() {
                 name="amount"
                 type="number"
                 step={0.01}
-                min={0.01}
+                min={0}
                 defaultValue={incomeToUpdate?.amount || 0}
               ></InputText>
               <InputSelect
