@@ -8,7 +8,7 @@ import {
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
@@ -36,10 +36,13 @@ export default function Transactions() {
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [isPersonalTransaction, setIsPersonalTransaction] = useState(false);
+  const [companySelectedId, setCompanySelectedId] = useState<string | null>();
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
   >({});
   const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
@@ -98,6 +101,14 @@ export default function Transactions() {
     setLoading(false);
   }, [companyData, transactionData, expenseData, classificationData]);
 
+  useEffect(() => {
+    filterExpenses();
+  }, [isPersonalTransaction, expenses, companySelectedId]);
+
+  useEffect(() => {
+    setCompanySelectedId(transactionToUpdate?.company_id);
+  }, [transactionToUpdate]);
+
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -155,6 +166,15 @@ export default function Transactions() {
 
   const onTabSelect = () => {
     setIsPersonalTransaction(!!transactionToUpdate?.is_personal_transaction);
+  };
+
+  const onIsPersonalTransactionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setIsPersonalTransaction(event.target.checked);
+    setCompanySelectedId(
+      event.target.checked ? null : transactionToUpdate?.company_id
+    );
   };
 
   const loadTransactions = async () => {
@@ -223,6 +243,24 @@ export default function Transactions() {
             return "Sorry, unexpected error. Be back soon";
           },
         }
+      );
+    }
+  };
+
+  const filterExpenses = () => {
+    if (expenses.data) {
+      setFilteredExpenses(
+        expenses.data.filter((expense) => {
+          const expenseTypeFilter = isPersonalTransaction
+            ? expense.is_personal_expense
+            : !expense.is_personal_expense;
+
+          const companyFilter =
+            !companySelectedId ||
+            expense.company_ids.includes(companySelectedId);
+
+          return expenseTypeFilter && companyFilter;
+        })
       );
     }
   };
@@ -442,9 +480,7 @@ export default function Transactions() {
                   ></InputText>
                   <div className="mb-6">
                     <Checkbox
-                      onChange={(event) =>
-                        setIsPersonalTransaction(event.target.checked)
-                      }
+                      onChange={(event) => onIsPersonalTransactionChange(event)}
                       name="is_personal_transaction"
                       id="is_personal_transaction"
                       defaultChecked={
@@ -460,6 +496,9 @@ export default function Transactions() {
                   </div>
                   {!isPersonalTransaction && (
                     <InputSelect
+                      onChange={(event) =>
+                        setCompanySelectedId((event as Company).id)
+                      }
                       isClearable
                       className="mb-8"
                       placeholder="Company"
@@ -477,7 +516,7 @@ export default function Transactions() {
                     isClearable
                     className="mb-8"
                     placeholder="Expense"
-                    options={expenses?.data}
+                    options={filteredExpenses}
                     getOptionLabel={getSelectExpenseOptionLabel as any}
                     getOptionValue={getSelectExpenseOptionValue as any}
                     name="expense"
