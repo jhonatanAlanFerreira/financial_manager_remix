@@ -42,6 +42,9 @@ export default function Transactions() {
   >({});
   const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [filteredClassifications, setFilteredClassifications] = useState<
+    TransactionClassification[]
+  >([]);
 
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
@@ -103,6 +106,7 @@ export default function Transactions() {
 
   useEffect(() => {
     filterExpenses();
+    filterClassifications();
   }, [isPersonalTransaction, expenses, companySelectedId]);
 
   useEffect(() => {
@@ -253,11 +257,29 @@ export default function Transactions() {
         expenses.data.filter((expense) => {
           const expenseTypeFilter = isPersonalTransaction
             ? expense.is_personal_expense
-            : !expense.is_personal_expense;
+            : true;
 
           const companyFilter =
             !companySelectedId ||
             expense.company_ids.includes(companySelectedId);
+
+          return expenseTypeFilter && companyFilter;
+        })
+      );
+    }
+  };
+
+  const filterClassifications = () => {
+    if (classifications.data) {
+      setFilteredClassifications(
+        classifications.data.filter((classification) => {
+          const expenseTypeFilter = isPersonalTransaction
+            ? classification.is_personal_transaction_classification
+            : true;
+
+          const companyFilter =
+            !companySelectedId ||
+            classification.company_ids.includes(companySelectedId);
 
           return expenseTypeFilter && companyFilter;
         })
@@ -528,7 +550,7 @@ export default function Transactions() {
                     isClearable
                     className="mb-8"
                     placeholder="Classification"
-                    options={classifications?.data}
+                    options={filteredClassifications}
                     getOptionLabel={getSelectClassificationOptionLabel as any}
                     getOptionValue={getSelectClassificationOptionValue as any}
                     name="classification"
@@ -617,6 +639,9 @@ export default function Transactions() {
                         (company) =>
                           company.id == transactionToUpdate?.company_id
                       )}
+                      onChange={(event) =>
+                        setCompanySelectedId((event as Company).id)
+                      }
                     ></InputSelect>
                   )}
                   <InputSelect
@@ -635,7 +660,7 @@ export default function Transactions() {
                     isClearable
                     className="mb-8"
                     placeholder="Classification"
-                    options={classifications?.data}
+                    options={filteredClassifications}
                     getOptionLabel={getSelectClassificationOptionLabel as any}
                     getOptionValue={getSelectClassificationOptionValue as any}
                     name="classification"
