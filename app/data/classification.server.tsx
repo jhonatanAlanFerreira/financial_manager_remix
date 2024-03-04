@@ -26,6 +26,7 @@ export async function create(
     data: {
       name: data.name,
       user_id: user.id,
+      is_income: data.is_income,
       is_personal_transaction_classification:
         data.is_personal_transaction_classification,
       company_ids: data.company_ids,

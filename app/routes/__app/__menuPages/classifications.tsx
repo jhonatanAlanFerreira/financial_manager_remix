@@ -296,19 +296,36 @@ export default function Classifications() {
                   classificationToUpdate?.company_ids.includes(company.id)
                 )}
               ></InputSelect>
-              <Checkbox
-                name="is_personal_transaction_classification"
-                id="is_personal_transaction_classification"
-                defaultChecked={
-                  classificationToUpdate?.is_personal_transaction_classification
-                }
-              ></Checkbox>
-              <label
-                className="pl-3 text-violet-950 cursor-pointer"
-                htmlFor="is_personal_transaction_classification"
-              >
-                Use as personal classification
-              </label>
+              <div className="flex flex-col gap-2">
+                <div>
+                  <Checkbox
+                    name="is_personal_transaction_classification"
+                    id="is_personal_transaction_classification"
+                    defaultChecked={
+                      classificationToUpdate?.is_personal_transaction_classification
+                    }
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_personal_transaction_classification"
+                  >
+                    Use as personal classification
+                  </label>
+                </div>
+                <div>
+                  <Checkbox
+                    name="is_income"
+                    id="is_income"
+                    defaultChecked={classificationToUpdate?.is_income}
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_income"
+                  >
+                    Income classification
+                  </label>
+                </div>
+              </div>
             </Form>
           </div>
           <div className="flex justify-between p-2">

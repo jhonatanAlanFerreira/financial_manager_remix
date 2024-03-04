@@ -21,6 +21,7 @@ let createClassification = async (request: Request) => {
 
   const data: ClassificationCreateRequest = {
     name: String(body.get("name") || ""),
+    is_income: !!body.get("is_income"),
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),
@@ -70,6 +71,7 @@ let updateClassification = async (request: Request) => {
 
   const data: ClassificationUpdateRequest = {
     name: String(body.get("name") || ""),
+    is_income: !!body.get("is_income"),
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),

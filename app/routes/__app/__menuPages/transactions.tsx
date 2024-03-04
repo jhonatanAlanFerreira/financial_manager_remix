@@ -37,6 +37,7 @@ export default function Transactions() {
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [isPersonalTransaction, setIsPersonalTransaction] = useState(false);
   const [companySelectedId, setCompanySelectedId] = useState<string | null>();
+  const [isIncome, setIsIncome] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
   >({});
@@ -107,7 +108,7 @@ export default function Transactions() {
   useEffect(() => {
     filterExpenses();
     filterClassifications();
-  }, [isPersonalTransaction, expenses, companySelectedId]);
+  }, [isPersonalTransaction, expenses, companySelectedId, isIncome]);
 
   useEffect(() => {
     setCompanySelectedId(transactionToUpdate?.company_id);
@@ -168,7 +169,8 @@ export default function Transactions() {
     setOpenAddModal(true);
   };
 
-  const onTabSelect = () => {
+  const onTabSelect = (tabSelected: number) => {
+    setIsIncome(!!tabSelected);
     setIsPersonalTransaction(!!transactionToUpdate?.is_personal_transaction);
   };
 
@@ -276,7 +278,11 @@ export default function Transactions() {
             !companySelectedId ||
             classification.company_ids.includes(companySelectedId);
 
-          return expenseTypeFilter && companyFilter;
+          const isIncomeFilter = isIncome
+            ? classification.is_income
+            : !classification.is_income;
+
+          return expenseTypeFilter && companyFilter && isIncomeFilter;
         })
       );
     }
@@ -413,7 +419,7 @@ export default function Transactions() {
         </h2>
         <div>
           <Tabs
-            onSelect={onTabSelect}
+            onSelect={(event: number) => onTabSelect(event)}
             defaultIndex={!!transactionToUpdate?.is_income ? 1 : 0}
           >
             <TabList>
@@ -458,7 +464,7 @@ export default function Transactions() {
                     type="checkbox"
                     name="is_income"
                     hidden
-                    checked={false}
+                    defaultChecked={false}
                   />
                   <InputText
                     label="Name *"
@@ -568,7 +574,7 @@ export default function Transactions() {
                     type="checkbox"
                     name="is_income"
                     hidden
-                    checked={true}
+                    defaultChecked={true}
                   />
                   <InputText
                     label="Name *"
