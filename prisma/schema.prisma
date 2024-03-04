@@ -56,29 +56,30 @@ model Expense {
 }
 
 model Transaction {
-  id                            String                     @id @default(auto()) @map("_id") @db.ObjectId
-  name                          String
-  amount                        Float
-  transaction_date              String
-  user_id                       String                     @db.ObjectId
-  user                          User                       @relation(fields: [user_id], references: [id])
-  company_id                    String?                    @db.ObjectId
-  company                       Company?                   @relation(fields: [company_id], references: [id])
-  file                          File?
-  transaction_classification_id String?                    @db.ObjectId
-  transaction_classification    TransactionClassification? @relation(fields: [transaction_classification_id], references: [id])
-  expense_id                    String?                    @db.ObjectId
-  expense                       Expense?                   @relation(fields: [expense_id], references: [id])
-  income                        Income?                    @relation(fields: [income_id], references: [id])
-  income_id                     String?                    @db.ObjectId
-  is_personal_transaction       Boolean                    @default(false)
-  is_income                     Boolean                    @default(false)
+  id                             String                      @id @default(auto()) @map("_id") @db.ObjectId
+  name                           String
+  amount                         Float
+  transaction_date               String
+  user_id                        String                      @db.ObjectId
+  user                           User                        @relation(fields: [user_id], references: [id])
+  company_id                     String?                     @db.ObjectId
+  company                        Company?                    @relation(fields: [company_id], references: [id])
+  file                           File?
+  transaction_classification_ids String[]                    @db.ObjectId
+  transaction_classifications    TransactionClassification[] @relation(fields: [transaction_classification_ids], references: [id])
+  expense_id                     String?                     @db.ObjectId
+  expense                        Expense?                    @relation(fields: [expense_id], references: [id])
+  income                         Income?                     @relation(fields: [income_id], references: [id])
+  income_id                      String?                     @db.ObjectId
+  is_personal_transaction        Boolean                     @default(false)
+  is_income                      Boolean                     @default(false)
 }
 
 model TransactionClassification {
   id                                     String        @id @default(auto()) @map("_id") @db.ObjectId
   name                                   String
-  transactions                           Transaction[]
+  transaction_ids                        String[]      @db.ObjectId
+  transactions                           Transaction[] @relation(fields: [transaction_ids], references: [id])
   user_id                                String        @db.ObjectId
   user                                   User          @relation(fields: [user_id], references: [id])
   is_personal_transaction_classification Boolean       @default(false)
