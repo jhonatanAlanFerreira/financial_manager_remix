@@ -206,11 +206,6 @@ export default function Transactions() {
   const getExpenseNameFromTransaction = (transaction: Transaction) => {
     return expenses?.data?.find((e) => e.id == transaction.expense_id)?.name;
   };
-  const getClassificationNameFromTransaction = (transaction: Transaction) => {
-    return classifications?.data?.find(
-      (c) => c.id == transaction.transaction_classification_id
-    )?.name;
-  };
   const getIncomeNameFromTransaction = (transaction: Transaction) => {
     return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
   };
@@ -304,7 +299,6 @@ export default function Transactions() {
             <th className="py-2 px-4 border-b border-r">Company</th>
             <th className="py-2 px-4 border-b border-r">Expense</th>
             <th className="py-2 px-4 border-b border-r">Income</th>
-            <th className="py-2 px-4 border-b border-r">Classification</th>
             <th className="py-2 px-4 border-b border-r">Date</th>
             <th className="py-2 px-4 border-b border-r">Amount</th>
             <th className="py-2 px-4 border-b">Actions</th>
@@ -347,15 +341,7 @@ export default function Transactions() {
               >
                 {getIncomeNameFromTransaction(transaction) || "Not set"}
               </td>
-              <td
-                className={`py-2 px-4 border-b border-r ${
-                  getClassificationNameFromTransaction(transaction)
-                    ? ""
-                    : "opacity-50"
-                }`}
-              >
-                {getClassificationNameFromTransaction(transaction) || "Not set"}
-              </td>
+
               <td className="py-2 px-4 border-b border-r">
                 {formatDate(transaction.transaction_date)}
               </td>
@@ -553,11 +539,13 @@ export default function Transactions() {
                     options={filteredClassifications}
                     getOptionLabel={getSelectClassificationOptionLabel as any}
                     getOptionValue={getSelectClassificationOptionValue as any}
-                    name="classification"
-                    defaultValue={classifications.data?.find(
+                    isMulti
+                    name="classification_ids"
+                    defaultValue={classificationData?.data?.filter(
                       (classification) =>
-                        classification.id ==
-                        transactionToUpdate?.transaction_classification_id
+                        transactionToUpdate?.transaction_classification_ids.includes(
+                          classification.id
+                        )
                     )}
                   ></InputSelect>
                 </Form>
@@ -658,16 +646,17 @@ export default function Transactions() {
                   ></InputSelect>
                   <InputSelect
                     isClearable
+                    isMulti
                     className="mb-8"
                     placeholder="Classification"
                     options={filteredClassifications}
                     getOptionLabel={getSelectClassificationOptionLabel as any}
                     getOptionValue={getSelectClassificationOptionValue as any}
-                    name="classification"
-                    defaultValue={classifications.data?.find(
+                    defaultValue={classificationData?.data?.filter(
                       (classification) =>
-                        classification.id ==
-                        transactionToUpdate?.transaction_classification_id
+                        transactionToUpdate?.transaction_classification_ids.includes(
+                          classification.id
+                        )
                     )}
                   ></InputSelect>
                 </Form>

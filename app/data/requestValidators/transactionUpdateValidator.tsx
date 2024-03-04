@@ -69,17 +69,24 @@ export default async function (
       })
     : true;
 
-  const validClassification = data.transaction_classification_id
-    ? prisma.transactionClassification.findFirst({
+  let validClassifications = true;
+  if (data.transaction_classification_ids?.length) {
+    const classificationsFromSameUser =
+      await prisma.transactionClassification.findMany({
         where: {
-          id: data.transaction_classification_id,
+          id: {
+            in: data.transaction_classification_ids,
+          },
           user_id: user.id,
         },
-      })
-    : true;
+      });
+    validClassifications =
+      classificationsFromSameUser.length ==
+      data.transaction_classification_ids.length;
+  }
 
   const ValidTransactionData = (
-    await Promise.all([validCompany, validExpense, validClassification])
+    await Promise.all([validCompany, validExpense, validClassifications])
   ).every((isValid) => isValid);
 
   if (!ValidTransactionData) {
