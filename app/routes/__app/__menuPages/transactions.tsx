@@ -172,6 +172,7 @@ export default function Transactions() {
   const onTabSelect = (tabSelected: number) => {
     setIsIncome(!!tabSelected);
     setIsPersonalTransaction(!!transactionToUpdate?.is_personal_transaction);
+    setCompanySelectedId(null);
   };
 
   const onIsPersonalTransactionChange = (
@@ -281,7 +282,6 @@ export default function Transactions() {
           const isIncomeFilter = isIncome
             ? classification.is_income
             : !classification.is_income;
-
           return expenseTypeFilter && companyFilter && isIncomeFilter;
         })
       );
@@ -604,9 +604,7 @@ export default function Transactions() {
                   ></InputText>
                   <div className="mb-6">
                     <Checkbox
-                      onChange={(event) =>
-                        setIsPersonalTransaction(event.target.checked)
-                      }
+                      onChange={(event) => onIsPersonalTransactionChange(event)}
                       name="is_personal_transaction"
                       id="is_personal_transaction"
                       defaultChecked={
