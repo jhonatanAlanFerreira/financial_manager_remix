@@ -117,14 +117,15 @@ model LogOperationType {
 }
 
 model Income {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  user_id      String        @db.ObjectId
-  user         User          @relation(fields: [user_id], references: [id])
-  company_ids  String[]      @db.ObjectId
-  companies    Company[]     @relation(fields: [company_ids], references: [id])
-  transactions Transaction[]
-  amount       Float?
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  user_id            String        @db.ObjectId
+  user               User          @relation(fields: [user_id], references: [id])
+  company_ids        String[]      @db.ObjectId
+  companies          Company[]     @relation(fields: [company_ids], references: [id])
+  transactions       Transaction[]
+  amount             Float?
+  is_personal_income Boolean       @default(false)
 
   @@unique([user_id, name])
 }

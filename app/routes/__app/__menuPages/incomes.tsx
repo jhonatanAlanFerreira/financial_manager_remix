@@ -8,6 +8,7 @@ import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import Icon from "~/components/icon/Icon";
+import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
@@ -24,6 +25,7 @@ export default function Incomes() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isPersonalIncome, setIsPersonalIncome] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
@@ -135,14 +137,17 @@ export default function Incomes() {
     }
   };
 
+  const onClickAdd = () => {
+    setIncomeToUpdate(null);
+    setOpenAddModal(true);
+    setIsPersonalIncome(false);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={() => {
-            setIncomeToUpdate(null);
-            setOpenAddModal(true);
-          }}
+          onClick={onClickAdd}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -259,19 +264,37 @@ export default function Incomes() {
                 min={0}
                 defaultValue={incomeToUpdate?.amount || 0}
               ></InputText>
-              <InputSelect
-                isMulti
-                isClearable
-                className="mb-8"
-                placeholder="Company"
-                options={companies?.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
-                name="companies"
-                defaultValue={companies?.data?.filter((company) =>
-                  incomeToUpdate?.company_ids.includes(company.id)
-                )}
-              ></InputSelect>
+              <div className="mb-6">
+                <Checkbox
+                  onChange={(event) =>
+                    setIsPersonalIncome(event.target.checked)
+                  }
+                  name="is_personal_income"
+                  id="is_personal_income"
+                  defaultChecked={incomeToUpdate?.is_personal_income}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_income"
+                >
+                  Use as personal income
+                </label>
+              </div>
+              {!isPersonalIncome && (
+                <InputSelect
+                  isMulti
+                  isClearable
+                  className="mb-8"
+                  placeholder="Company"
+                  options={companies?.data}
+                  getOptionLabel={getSelectCompanyOptionLabel as any}
+                  getOptionValue={getSelectCompanyOptionValue as any}
+                  name="companies"
+                  defaultValue={companies?.data?.filter((company) =>
+                    incomeToUpdate?.company_ids.includes(company.id)
+                  )}
+                ></InputSelect>
+              )}
             </Form>
           </div>
           <div className="flex justify-between p-2">

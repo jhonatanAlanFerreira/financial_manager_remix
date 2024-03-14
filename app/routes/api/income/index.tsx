@@ -34,6 +34,7 @@ let createIncome = async (request: Request) => {
   const data: IncomeCreateRequest = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
+    is_personal_income: !!body.get("is_personal_income"),
     company_ids: body.get("companies")
       ? (body.getAll("companies") as string[])
       : [],
@@ -77,6 +78,7 @@ let updateIncome = async (request: Request) => {
   const data: IncomeCreateRequest = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
+    is_personal_income: !!body.get("is_personal_income"),
     company_ids: body.get("companies")
       ? (body.getAll("companies") as string[])
       : [],
