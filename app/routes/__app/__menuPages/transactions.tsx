@@ -38,11 +38,16 @@ export default function Transactions() {
   const [isPersonalTransaction, setIsPersonalTransaction] = useState(false);
   const [companySelectedId, setCompanySelectedId] = useState<string | null>();
   const [isIncome, setIsIncome] = useState<boolean>(false);
+  const [expenseSelected, setExpenseSelected] = useState<Expense | null>();
+  const [incomeSelected, setIncomeSelected] = useState<Income | null>();
+  const [transactionName, setTransactionName] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0);
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
   >({});
   const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
   const [filteredClassifications, setFilteredClassifications] = useState<
     TransactionClassification[]
   >([]);
@@ -107,12 +112,37 @@ export default function Transactions() {
 
   useEffect(() => {
     filterExpenses();
+    filterIncomes();
     filterClassifications();
   }, [isPersonalTransaction, expenses, companySelectedId, isIncome]);
 
   useEffect(() => {
     setCompanySelectedId(transactionToUpdate?.company_id);
+    setExpenseSelected(
+      expenses.data?.find(
+        (expense) => expense.id == transactionToUpdate?.expense_id
+      )
+    );
+    setIncomeSelected(
+      incomes.data?.find(
+        (income) => income.id == transactionToUpdate?.income_id
+      )
+    );
+    setAmount(transactionToUpdate?.amount || 0);
+    setTransactionName(transactionToUpdate?.name || "");
   }, [transactionToUpdate]);
+
+  const onExpenseChange = (expense: Expense) => {
+    setTransactionName(expense?.name || "");
+    setAmount(expense?.amount || 0);
+    setExpenseSelected(expense);
+  };
+
+  const onIncomeChange = (income: Income) => {
+    setTransactionName(income?.name || "");
+    setAmount(income?.amount || 0);
+    setIncomeSelected(income);
+  };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -154,12 +184,18 @@ export default function Transactions() {
           return "Sorry, unexpected error. Be back soon";
         },
       })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+      .finally(() => {
+        setTransactionToUpdate(null);
+        setTimeout(() => setIsSubmitting(false), 500);
+      });
   };
 
   const onClickAdd = () => {
+    setExpenseSelected(null);
     setTransactionToUpdate(null);
     setIsPersonalTransaction(false);
+    setAmount(0);
+    setTransactionName("");
     setOpenAddModal(true);
   };
 
@@ -286,6 +322,35 @@ export default function Transactions() {
         })
       );
     }
+  };
+
+  const filterIncomes = () => {
+    if (incomes.data) {
+      setFilteredIncomes(
+        incomes.data.filter((income) => {
+          const incomeTypeFilter = isPersonalTransaction
+            ? income.is_personal_income
+            : true;
+
+          const companyFilter =
+            !companySelectedId ||
+            income.company_ids.includes(companySelectedId);
+
+          return incomeTypeFilter && companyFilter;
+        })
+      );
+    }
+  };
+
+  const onModalCancel = () => {
+    setOpenAddModal(false);
+    setTransactionToUpdate(null);
+  };
+
+  const onCompanyChange = (company: Company) => {
+    setCompanySelectedId(company.id);
+    setExpenseSelected(null);
+    setIncomeSelected(null);
   };
 
   return (
@@ -466,32 +531,6 @@ export default function Transactions() {
                     hidden
                     defaultChecked={false}
                   />
-                  <InputText
-                    label="Name *"
-                    name="name"
-                    required
-                    defaultValue={transactionToUpdate?.name}
-                  ></InputText>
-                  <InputText
-                    label="Date *"
-                    name="transaction_date"
-                    type="date"
-                    required
-                    defaultValue={
-                      transactionToUpdate?.transaction_date ||
-                      todayFormatedDate()
-                    }
-                  ></InputText>
-                  <InputText
-                    label="Amount *"
-                    name="amount"
-                    type="number"
-                    step={0.01}
-                    min={0.01}
-                    required
-                    defaultValue={transactionToUpdate?.amount || 0}
-                    errorMessage={responseErrors?.data?.errors?.["amount"]}
-                  ></InputText>
                   <div className="mb-6">
                     <Checkbox
                       onChange={(event) => onIsPersonalTransactionChange(event)}
@@ -510,9 +549,7 @@ export default function Transactions() {
                   </div>
                   {!isPersonalTransaction && (
                     <InputSelect
-                      onChange={(event) =>
-                        setCompanySelectedId((event as Company).id)
-                      }
+                      onChange={(event) => onCompanyChange(event as Company)}
                       isClearable
                       className="mb-8"
                       placeholder="Company"
@@ -534,10 +571,37 @@ export default function Transactions() {
                     getOptionLabel={getSelectExpenseOptionLabel as any}
                     getOptionValue={getSelectExpenseOptionValue as any}
                     name="expense"
-                    defaultValue={expenses.data?.find(
-                      (expense) => expense.id == transactionToUpdate?.expense_id
-                    )}
+                    value={expenseSelected}
+                    onChange={(event) => onExpenseChange(event as Expense)}
                   ></InputSelect>
+                  <InputText
+                    label="Name *"
+                    name="name"
+                    required
+                    value={transactionName}
+                    onChange={(event) => setTransactionName(event.target.value)}
+                  ></InputText>
+                  <InputText
+                    label="Date *"
+                    name="transaction_date"
+                    type="date"
+                    required
+                    defaultValue={
+                      transactionToUpdate?.transaction_date ||
+                      todayFormatedDate()
+                    }
+                  ></InputText>
+                  <InputText
+                    label="Amount *"
+                    name="amount"
+                    type="number"
+                    step={0.01}
+                    min={0.01}
+                    required
+                    value={amount}
+                    onChange={(event) => setAmount(+event.target.value)}
+                    errorMessage={responseErrors?.data?.errors?.["amount"]}
+                  ></InputText>
                   <InputSelect
                     isClearable
                     className="mb-8"
@@ -576,32 +640,6 @@ export default function Transactions() {
                     hidden
                     defaultChecked={true}
                   />
-                  <InputText
-                    label="Name *"
-                    name="name"
-                    required
-                    defaultValue={transactionToUpdate?.name}
-                  ></InputText>
-                  <InputText
-                    label="Date *"
-                    name="transaction_date"
-                    type="date"
-                    required
-                    defaultValue={
-                      transactionToUpdate?.transaction_date ||
-                      todayFormatedDate()
-                    }
-                  ></InputText>
-                  <InputText
-                    label="Amount *"
-                    name="amount"
-                    type="number"
-                    step={0.01}
-                    min={0.01}
-                    required
-                    defaultValue={transactionToUpdate?.amount || 0}
-                    errorMessage={responseErrors?.data?.errors?.["amount"]}
-                  ></InputText>
                   <div className="mb-6">
                     <Checkbox
                       onChange={(event) => onIsPersonalTransactionChange(event)}
@@ -620,6 +658,7 @@ export default function Transactions() {
                   </div>
                   {!isPersonalTransaction && (
                     <InputSelect
+                      onChange={(event) => onCompanyChange(event as Company)}
                       isClearable
                       className="mb-8"
                       placeholder="Company"
@@ -631,23 +670,47 @@ export default function Transactions() {
                         (company) =>
                           company.id == transactionToUpdate?.company_id
                       )}
-                      onChange={(event) =>
-                        setCompanySelectedId((event as Company).id)
-                      }
                     ></InputSelect>
                   )}
                   <InputSelect
                     isClearable
                     className="mb-8"
                     placeholder="Income"
-                    options={incomes?.data}
+                    options={filteredIncomes}
                     getOptionLabel={getSelectIncomeOptionLabel as any}
                     getOptionValue={getSelectIncomeOptionValue as any}
                     name="income_id"
-                    defaultValue={incomes.data?.find(
-                      (income) => income.id == transactionToUpdate?.income_id
-                    )}
+                    value={incomeSelected}
+                    onChange={(event) => onIncomeChange(event as Income)}
                   ></InputSelect>
+                  <InputText
+                    label="Name *"
+                    name="name"
+                    required
+                    value={transactionName}
+                    onChange={(event) => setTransactionName(event.target.value)}
+                  ></InputText>
+                  <InputText
+                    label="Date *"
+                    name="transaction_date"
+                    type="date"
+                    required
+                    defaultValue={
+                      transactionToUpdate?.transaction_date ||
+                      todayFormatedDate()
+                    }
+                  ></InputText>
+                  <InputText
+                    label="Amount *"
+                    name="amount"
+                    type="number"
+                    step={0.01}
+                    min={0.01}
+                    required
+                    value={amount}
+                    onChange={(event) => setAmount(+event.target.value)}
+                    errorMessage={responseErrors?.data?.errors?.["amount"]}
+                  ></InputText>
                   <InputSelect
                     isClearable
                     isMulti
@@ -670,7 +733,7 @@ export default function Transactions() {
           <div className="flex justify-between p-2">
             <DangerButton
               text="Cancel"
-              onClick={() => setOpenAddModal(false)}
+              onClick={() => onModalCancel()}
             ></DangerButton>
             <PrimaryButton
               text="Save"
