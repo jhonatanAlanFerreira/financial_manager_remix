@@ -1,7 +1,7 @@
 #!/bin/bash
 # init-replica-set.sh
 
-hosts=("mongo" "mongo_replica_1" "mongo_replica_2")
+hosts=("mongo_financial_manager" "mongo_financial_manager_replica_1" "mongo_financial_manager_replica_2")
 
 # Initiate the replica set
 mongosh --host ${hosts[0]} --eval "
