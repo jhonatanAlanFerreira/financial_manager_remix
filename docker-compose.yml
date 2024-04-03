@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    command: mongod --replSet financialDbReplicaSet --bind_ip_all
+    networks:
+      - mongoCluster
+    container_name: mongo
+
+  mongo_replica_1:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    command: mongod --replSet financialDbReplicaSet --bind_ip_all
+    networks:
+      - mongoCluster
+    container_name: mongo_replica_1
+
+  mongo_replica_2:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    command: mongod --replSet financialDbReplicaSet --bind_ip_all
+    networks:
+      - mongoCluster
+    container_name: mongo_replica_2
+
+  financial_manager_app:
+    build: .
+    command: npm run dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - mongo_replica_1
+      - mongo_replica_2
+    networks:
+      - mongoCluster
+
+  init-replica:
+    image: mongo:latest
+    depends_on:
+      - mongo
+      - mongo_replica_1
+      - mongo_replica_2
+    volumes:
+      - ./init-replica-set.sh:/init-replica-set.sh
+    entrypoint: ["/bin/bash", "/init-replica-set.sh"]
+    networks:
+      - mongoCluster
+
+volumes:
+  node_modules:
+
+networks:
+  mongoCluster:
+    name: mongoCluster
+    driver: bridge
