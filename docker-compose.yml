@@ -9,6 +9,8 @@ services:
     networks:
       - mongoCluster
     container_name: mongo_financial_manager
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   mongo_financial_manager_replica_1:
     image: mongo:latest
@@ -18,6 +20,8 @@ services:
     networks:
       - mongoCluster
     container_name: mongo_financial_manager_replica_1
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   mongo_financial_manager_replica_2:
     image: mongo:latest
@@ -27,6 +31,8 @@ services:
     networks:
       - mongoCluster
     container_name: mongo_financial_manager_replica_2
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   financial_manager_app:
     build: .
@@ -42,6 +48,8 @@ services:
       - mongo_financial_manager_replica_2
     networks:
       - mongoCluster
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   init-replica:
     image: mongo:latest
@@ -51,9 +59,15 @@ services:
       - mongo_financial_manager_replica_2
     volumes:
       - ./init-replica-set.sh:/init-replica-set.sh
+    environment:
+      - MONGO_FINANCIAL_MANAGER_PORT=${MONGO_FINANCIAL_MANAGER_PORT}
+      - MONGO_FINANCIAL_MANAGER_REPLICA_1_PORT=${MONGO_FINANCIAL_MANAGER_REPLICA_1_PORT}
+      - MONGO_FINANCIAL_MANAGER_REPLICA_2_PORT=${MONGO_FINANCIAL_MANAGER_REPLICA_2_PORT}
     entrypoint: ["/bin/bash", "/init-replica-set.sh"]
     networks:
       - mongoCluster
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
 volumes:
   node_modules:
