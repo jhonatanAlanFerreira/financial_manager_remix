@@ -19,7 +19,7 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 
 export default function Incomes() {
-  const [loading, setLoading] = useState<boolean>(false); //true
+  const [loading, setLoading] = useState<boolean>(true);
   const [incomeToDelete, setIncomeToDelete] = useState<Income | null>();
   const [incomeToUpdate, setIncomeToUpdate] = useState<Income | null>();
   const [openAddModal, setOpenAddModal] = useState(false);
