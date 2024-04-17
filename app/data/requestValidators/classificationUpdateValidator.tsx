@@ -17,14 +17,14 @@ export default async function classificationUpdateValidator(
     };
   }
 
-  const company = await prisma.transactionClassification.findFirst({
+  const classification = await prisma.transactionClassification.findFirst({
     where: {
       id: classificationId,
       user_id: user.id,
     },
   });
 
-  if (!company) {
+  if (!classification) {
     return {
       isValid: false,
       errors: {
