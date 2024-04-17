@@ -32,6 +32,7 @@ export default function Expenses() {
   const [loading, setLoading] = useState<boolean>(true);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>();
   const [expenseToUpdate, setExpenseToUpdate] = useState<Expense | null>();
+  const [isPersonalExpense, setIsPersonalExpense] = useState<boolean>(false);
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponse<ExpenseWithCompanies[]>;
@@ -114,14 +115,10 @@ export default function Expenses() {
   };
 
   const getExpenseType = (expense: ExpenseWithCompanies) => {
-    if (expense.companies.length) {
-      return expense.is_personal_expense
-        ? "Company and Personal Expense"
-        : "Company Expense";
-    } else {
-      if (expense.is_personal_expense) return "Personal Expense";
+    if (!expense.is_personal_expense && !expense.company_ids.length) {
       return null;
     }
+    return expense.is_personal_expense ? "Personal Expense" : "Company Expense";
   };
 
   const removeExpense = async () => {
@@ -152,14 +149,17 @@ export default function Expenses() {
     }
   };
 
+  const onAddClick = () => {
+    setExpenseToUpdate(null);
+    setOpenAddModal(true);
+    setIsPersonalExpense(false);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={() => {
-            setExpenseToUpdate(null);
-            setOpenAddModal(true);
-          }}
+          onClick={onAddClick}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -290,20 +290,23 @@ export default function Expenses() {
                 min={0}
                 defaultValue={expenseToUpdate?.amount || 0}
               ></InputText>
-              <InputSelect
-                isMulti
-                isClearable
-                className="mb-8"
-                placeholder="Company"
-                options={companies?.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
-                name="companies"
-                defaultValue={companies?.data?.filter((company) =>
-                  expenseToUpdate?.company_ids.includes(company.id)
-                )}
-              ></InputSelect>
+              {!isPersonalExpense && (
+                <InputSelect
+                  isMulti
+                  isClearable
+                  className="mb-8"
+                  placeholder="Company"
+                  options={companies?.data}
+                  getOptionLabel={getSelectCompanyOptionLabel as any}
+                  getOptionValue={getSelectCompanyOptionValue as any}
+                  name="companies"
+                  defaultValue={companies?.data?.filter((company) =>
+                    expenseToUpdate?.company_ids.includes(company.id)
+                  )}
+                ></InputSelect>
+              )}
               <Checkbox
+                onChange={(event) => setIsPersonalExpense(event.target.checked)}
                 name="is_personal_expense"
                 id="is_personal_expense"
                 defaultChecked={expenseToUpdate?.is_personal_expense}
