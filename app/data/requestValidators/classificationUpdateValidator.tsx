@@ -33,21 +33,46 @@ export default async function classificationUpdateValidator(
     };
   }
 
-  if (data.company_id) {
-    const companyFromSameUser = await prisma.company.findFirst({
+  if (data.company_ids?.length) {
+    const companiesFromSameUser = await prisma.company.findMany({
       where: {
-        id: data.company_id,
+        id: {
+          in: data.company_ids,
+        },
         user_id: user.id,
       },
     });
-    if (!companyFromSameUser) {
+    if (companiesFromSameUser.length != data.company_ids.length) {
       return {
         isValid: false,
         errors: {
-          company_id: "Company does not exist",
+          company_ids: "There are some invalid companies",
         },
       };
     }
+  }
+
+  const classificationsExists =
+    await prisma.transactionClassification.findUnique({
+      where: {
+        NOT: { id: classificationId },
+        user_id_name_is_personal_transaction_classification_is_income: {
+          name: data.name,
+          user_id: user.id,
+          is_personal_transaction_classification:
+            data.is_personal_transaction_classification,
+          is_income: data.is_income,
+        },
+      },
+    });
+
+  if (classificationsExists !== null) {
+    return {
+      isValid: false,
+      errors: {
+        name: "This classification already exists",
+      },
+    };
   }
 
   return {

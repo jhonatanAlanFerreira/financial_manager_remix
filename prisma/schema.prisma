@@ -87,7 +87,7 @@ model TransactionClassification {
   company_ids                            String[]      @db.ObjectId
   is_income                              Boolean       @default(false)
 
-  @@unique([user_id, name, is_personal_transaction_classification])
+  @@unique([user_id, name, is_personal_transaction_classification, is_income])
 }
 
 model File {

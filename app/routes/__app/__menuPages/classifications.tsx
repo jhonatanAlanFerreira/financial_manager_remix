@@ -22,6 +22,8 @@ export default function Classifications() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [isPersonalClassification, setIsPersonalClassification] =
+    useState<boolean>(false);
   const [classificationToDelete, setClassificationToDelete] =
     useState<TransactionClassification | null>();
   const [classificationToUpdate, setClassificationToUpdate] =
@@ -116,15 +118,16 @@ export default function Classifications() {
   };
 
   const getClassificationType = (classification: ClassificationWithCompany) => {
-    if (classification.companies.length) {
-      return classification.is_personal_transaction_classification
-        ? "Company and Personal Transaction Classification"
-        : "Company Transaction Classification";
-    } else {
-      if (classification.is_personal_transaction_classification)
-        return "Personal Transaction Classification";
+    if (
+      !classification.is_personal_transaction_classification &&
+      !classification.company_ids.length
+    ) {
       return null;
     }
+
+    return classification.is_personal_transaction_classification
+      ? "Personal Transaction Classification"
+      : "Company Transaction Classification";
   };
 
   const removeClassification = async () => {
@@ -157,14 +160,17 @@ export default function Classifications() {
     }
   };
 
+  const onClickAdd = () => {
+    setClassificationToUpdate(null);
+    setOpenAddModal(true);
+    setIsPersonalClassification(false);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={() => {
-            setClassificationToUpdate(null);
-            setOpenAddModal(true);
-          }}
+          onClick={onClickAdd}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -283,22 +289,27 @@ export default function Classifications() {
                 defaultValue={classificationToUpdate?.name}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
-              <InputSelect
-                isClearable
-                isMulti
-                className="mb-8"
-                placeholder="Company"
-                options={companies?.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
-                name="companies"
-                defaultValue={companies?.data?.filter((company) =>
-                  classificationToUpdate?.company_ids.includes(company.id)
-                )}
-              ></InputSelect>
+              {!isPersonalClassification && (
+                <InputSelect
+                  isClearable
+                  isMulti
+                  className="mb-8"
+                  placeholder="Company"
+                  options={companies?.data}
+                  getOptionLabel={getSelectCompanyOptionLabel as any}
+                  getOptionValue={getSelectCompanyOptionValue as any}
+                  name="companies"
+                  defaultValue={companies?.data?.filter((company) =>
+                    classificationToUpdate?.company_ids.includes(company.id)
+                  )}
+                ></InputSelect>
+              )}
               <div className="flex flex-col gap-2">
                 <div>
                   <Checkbox
+                    onChange={(event) =>
+                      setIsPersonalClassification(event.target.checked)
+                    }
                     name="is_personal_transaction_classification"
                     id="is_personal_transaction_classification"
                     defaultChecked={
