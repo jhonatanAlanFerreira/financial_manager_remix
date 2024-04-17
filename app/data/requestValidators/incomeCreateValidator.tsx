@@ -37,9 +37,10 @@ export async function incomeCreateValidator(
 
   const incomeExists = await prisma.income.findUnique({
     where: {
-      user_id_name: {
+      user_id_name_is_personal_income: {
         name: data.name,
         user_id: user.id,
+        is_personal_income: data.is_personal_income
       },
     },
   });

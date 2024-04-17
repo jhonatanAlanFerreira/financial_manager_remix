@@ -127,5 +127,5 @@ model Income {
   amount             Float?
   is_personal_income Boolean       @default(false)
 
-  @@unique([user_id, name])
+  @@unique([user_id, name, is_personal_income])
 }

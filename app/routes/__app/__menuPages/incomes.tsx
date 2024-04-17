@@ -137,6 +137,13 @@ export default function Incomes() {
     }
   };
 
+  const getIncomeType = (income: Income) => {
+    if (!income.is_personal_income && !income.company_ids.length) {
+      return null;
+    }
+    return income.is_personal_income ? "Personal Income" : "Company Income";
+  };
+
   const onClickAdd = () => {
     setIncomeToUpdate(null);
     setOpenAddModal(true);
@@ -158,6 +165,7 @@ export default function Incomes() {
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
               <th className="py-2 px-4 border-b border-r">Amount</th>
+              <th className="py-2 px-4 border-b border-r">Type</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
@@ -173,6 +181,13 @@ export default function Incomes() {
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{income.name}</td>
                 <td className="py-2 px-4 border-b border-r">{income.amount}</td>
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getIncomeType(income) ? "" : "opacity-50"
+                  }`}
+                >
+                  {getIncomeType(income) || "Not set"}
+                </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {

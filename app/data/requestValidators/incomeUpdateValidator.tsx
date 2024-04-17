@@ -58,6 +58,7 @@ export default async function incomeUpdateValidator(
         { id: { not: incomeId } },
         { name: data.name },
         { user_id: user.id },
+        { is_personal_income: data.is_personal_income }
       ],
     },
   });
