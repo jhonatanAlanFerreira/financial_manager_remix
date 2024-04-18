@@ -52,6 +52,26 @@ export async function expenseUpdateValidator(
     }
   }
 
+  const expenseExists = await prisma.expense.findFirst({
+    where: {
+      AND: [
+        { id: { not: expenseId } },
+        { name: data.name },
+        { user_id: user.id },
+        { is_personal_expense: data.is_personal_expense },
+      ],
+    },
+  });
+
+  if (expenseExists !== null) {
+    return {
+      isValid: false,
+      errors: {
+        name: "This expense already exists",
+      },
+    };
+  }
+
   return {
     isValid: true,
   };
