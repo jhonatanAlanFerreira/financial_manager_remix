@@ -487,7 +487,7 @@ export default function Transactions() {
             onSelect={(event: number) => onTabSelect(event)}
             defaultIndex={!!transactionToUpdate?.is_income ? 1 : 0}
           >
-            <TabList>
+            <TabList className="mb-2">
               <div className="flex justify-around">
                 <Tab
                   disabled={
