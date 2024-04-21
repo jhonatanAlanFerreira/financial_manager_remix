@@ -279,6 +279,21 @@ export default function Incomes() {
                 min={0}
                 defaultValue={incomeToUpdate?.amount || 0}
               ></InputText>
+              {!isPersonalIncome && (
+                <InputSelect
+                  isMulti
+                  isClearable
+                  className="mb-8"
+                  placeholder="Company"
+                  options={companies?.data}
+                  getOptionLabel={getSelectCompanyOptionLabel as any}
+                  getOptionValue={getSelectCompanyOptionValue as any}
+                  name="companies"
+                  defaultValue={companies?.data?.filter((company) =>
+                    incomeToUpdate?.company_ids.includes(company.id)
+                  )}
+                ></InputSelect>
+              )}
               <div className="mb-6">
                 <Checkbox
                   onChange={(event) =>
@@ -295,21 +310,6 @@ export default function Incomes() {
                   Use as personal income
                 </label>
               </div>
-              {!isPersonalIncome && (
-                <InputSelect
-                  isMulti
-                  isClearable
-                  className="mb-8"
-                  placeholder="Company"
-                  options={companies?.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
-                  name="companies"
-                  defaultValue={companies?.data?.filter((company) =>
-                    incomeToUpdate?.company_ids.includes(company.id)
-                  )}
-                ></InputSelect>
-              )}
             </Form>
           </div>
           <div className="flex justify-between p-2">

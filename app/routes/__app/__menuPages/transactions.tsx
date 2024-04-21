@@ -531,22 +531,6 @@ export default function Transactions() {
                     hidden
                     defaultChecked={false}
                   />
-                  <div className="mb-6">
-                    <Checkbox
-                      onChange={(event) => onIsPersonalTransactionChange(event)}
-                      name="is_personal_transaction"
-                      id="is_personal_transaction"
-                      defaultChecked={
-                        transactionToUpdate?.is_personal_transaction
-                      }
-                    ></Checkbox>
-                    <label
-                      className="pl-3 text-violet-950 cursor-pointer"
-                      htmlFor="is_personal_transaction"
-                    >
-                      Personal transaction
-                    </label>
-                  </div>
                   {!isPersonalTransaction && (
                     <InputSelect
                       onChange={(event) => onCompanyChange(event as Company)}
@@ -618,6 +602,22 @@ export default function Transactions() {
                         )
                     )}
                   ></InputSelect>
+                  <div className="mb-6">
+                    <Checkbox
+                      onChange={(event) => onIsPersonalTransactionChange(event)}
+                      name="is_personal_transaction"
+                      id="is_personal_transaction"
+                      defaultChecked={
+                        transactionToUpdate?.is_personal_transaction
+                      }
+                    ></Checkbox>
+                    <label
+                      className="pl-3 text-violet-950 cursor-pointer"
+                      htmlFor="is_personal_transaction"
+                    >
+                      Personal transaction
+                    </label>
+                  </div>
                 </Form>
               </div>
             </TabPanel>
@@ -640,22 +640,6 @@ export default function Transactions() {
                     hidden
                     defaultChecked={true}
                   />
-                  <div className="mb-6">
-                    <Checkbox
-                      onChange={(event) => onIsPersonalTransactionChange(event)}
-                      name="is_personal_transaction"
-                      id="is_personal_transaction"
-                      defaultChecked={
-                        transactionToUpdate?.is_personal_transaction
-                      }
-                    ></Checkbox>
-                    <label
-                      className="pl-3 text-violet-950 cursor-pointer"
-                      htmlFor="is_personal_transaction"
-                    >
-                      Personal transaction
-                    </label>
-                  </div>
                   {!isPersonalTransaction && (
                     <InputSelect
                       onChange={(event) => onCompanyChange(event as Company)}
@@ -726,6 +710,22 @@ export default function Transactions() {
                         )
                     )}
                   ></InputSelect>
+                  <div className="mb-6">
+                    <Checkbox
+                      onChange={(event) => onIsPersonalTransactionChange(event)}
+                      name="is_personal_transaction"
+                      id="is_personal_transaction"
+                      defaultChecked={
+                        transactionToUpdate?.is_personal_transaction
+                      }
+                    ></Checkbox>
+                    <label
+                      className="pl-3 text-violet-950 cursor-pointer"
+                      htmlFor="is_personal_transaction"
+                    >
+                      Personal transaction
+                    </label>
+                  </div>
                 </Form>
               </div>
             </TabPanel>
