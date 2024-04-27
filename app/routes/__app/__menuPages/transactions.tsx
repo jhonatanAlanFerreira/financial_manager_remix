@@ -131,6 +131,10 @@ export default function Transactions() {
     runFilters();
   }, [formik.values.is_personal_transaction]);
 
+  useEffect(() => {
+    runFilters();
+  }, [formik.values.is_income]);
+
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -310,7 +314,7 @@ export default function Transactions() {
 
   const onTabSelect = (tabSelected: number) => {
     formik.setFieldValue("classifications", null);
-    runFilters();
+    formik.setFieldValue("is_income", !!tabSelected);
   };
 
   const onModalCancel = () => {
@@ -472,7 +476,7 @@ export default function Transactions() {
             <TabList className="mb-2">
               <div className="flex justify-around">
                 <Tab
-                  disabled={!!formik.values && !!formik.values.is_income}
+                  disabled={!!formik.values.id && !!formik.values.is_income}
                   selectedClassName="bg-violet-900 text-white"
                   disabledClassName="opacity-50 pointer-events-none"
                   className="w-full text-center cursor-pointer p-2 text-violet-950"
@@ -497,20 +501,6 @@ export default function Transactions() {
                   id="classification-form"
                   onSubmit={formSubmit}
                 >
-                  <input
-                    type="text"
-                    name="id"
-                    hidden
-                    onChange={formik.handleChange}
-                    value={formik.values.id}
-                  />
-                  <input
-                    type="checkbox"
-                    name="is_income"
-                    hidden
-                    readOnly
-                    checked={formik.values.is_income}
-                  />
                   {!formik.values.is_personal_transaction && (
                     <InputSelect
                       isClearable
@@ -601,20 +591,6 @@ export default function Transactions() {
                   id="classification-form"
                   onSubmit={formSubmit}
                 >
-                  <input
-                    type="text"
-                    name="id"
-                    hidden
-                    onChange={formik.handleChange}
-                    value={formik.values.id}
-                  />
-                  <input
-                    type="checkbox"
-                    name="is_income"
-                    hidden
-                    readOnly
-                    checked={formik.values.is_income}
-                  />
                   {!formik.values.is_personal_transaction && (
                     <InputSelect
                       isClearable
