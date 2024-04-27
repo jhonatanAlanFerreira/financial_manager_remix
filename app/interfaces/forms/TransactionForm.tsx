@@ -1,4 +1,9 @@
-import { Company, Expense, Income, Transaction } from "@prisma/client";
+import {
+  Company,
+  Expense,
+  Income,
+  TransactionClassification,
+} from "@prisma/client";
 
 export interface TransactionForm {
   id: string;
@@ -6,7 +11,7 @@ export interface TransactionForm {
   amount: number;
   is_personal_transaction: boolean;
   is_income: boolean;
-  classifications: Transaction[];
+  classifications: TransactionClassification[];
   income: Income | null;
   company: Company | null;
   expense: Expense | null;
