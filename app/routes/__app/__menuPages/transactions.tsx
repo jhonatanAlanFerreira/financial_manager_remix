@@ -35,6 +35,7 @@ export default function Transactions() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [skipEffect, setSkipEffect] = useState(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
   const [classifications, setClassifications] = useState<
@@ -117,6 +118,7 @@ export default function Transactions() {
   }, [companyData, transactionData, expenseData, classificationData]);
 
   useEffect(() => {
+    if (skipEffect) return setSkipEffect(false);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
     formik.setFieldValue("classifications", null);
@@ -124,6 +126,7 @@ export default function Transactions() {
   }, [formik.values.company]);
 
   useEffect(() => {
+    if (skipEffect) return setSkipEffect(false);
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
@@ -132,17 +135,36 @@ export default function Transactions() {
   }, [formik.values.is_personal_transaction]);
 
   useEffect(() => {
+    if (skipEffect) return setSkipEffect(false);
     runFilters();
   }, [formik.values.is_income]);
+
+  useEffect(() => {
+    if (skipEffect) return setSkipEffect(false);
+    formik.setFieldValue("name", formik.values.income?.name || "");
+    formik.setFieldValue("amount", formik.values.income?.amount || 0);
+  }, [formik.values.income]);
+
+  useEffect(() => {
+    if (skipEffect) return setSkipEffect(false);
+    formik.setFieldValue("name", formik.values.expense?.name || "");
+    formik.setFieldValue("amount", formik.values.expense?.amount || 0);
+  }, [formik.values.expense]);
+
+  useEffect(() => {
+    if (openAddModal) runFilters();
+  }, [openAddModal]);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+    if (formik.values.is_income) formData.set("is_income", "on");
+
     let axiosRequest;
     let loadingMessage;
 
-    if (formData.get("id")) {
+    if (formik.values.id) {
       axiosRequest = axios.patch(
         `/api/transaction?transactionId=${formik.values.id}`,
         formData
@@ -153,6 +175,7 @@ export default function Transactions() {
       loadingMessage = "Creating transaction";
     }
 
+    formik.resetForm();
     setIsSubmitting(true);
 
     toast
@@ -306,11 +329,45 @@ export default function Transactions() {
 
   const onClickAdd = () => {
     formik.resetForm();
-    runFilters();
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (transaction: Transaction) => {};
+  const onClickUpdate = (transaction: Transaction) => {
+    setFormValues(transaction);
+    setOpenAddModal(true);
+  };
+
+  const onClickDelete = (transaction: Transaction) => {
+    formik.setFieldValue("id", transaction.id);
+    setOpenRemoveModal(true);
+  };
+
+  const setFormValues = (transaction: Transaction) => {
+    setSkipEffect(true);
+    formik.setValues({
+      id: transaction.id,
+      amount: transaction.amount,
+      is_income: transaction.is_income,
+      is_personal_transaction: transaction.is_personal_transaction,
+      name: transaction.name,
+      transaction_date: transaction.transaction_date,
+      classifications:
+        classifications.data?.filter((classification) =>
+          transaction.transaction_classification_ids.includes(classification.id)
+        ) || [],
+      company:
+        companies.data?.find(
+          (company) => company.id == transaction.company_id
+        ) || null,
+      expense:
+        expenses.data?.find(
+          (expense) => expense.id == transaction.expense_id
+        ) || null,
+      income:
+        incomes.data?.find((income) => income.id == transaction.income_id) ||
+        null,
+    });
+  };
 
   const onTabSelect = (tabSelected: number) => {
     formik.setFieldValue("classifications", null);
@@ -413,9 +470,7 @@ export default function Transactions() {
                   className="cursor-pointer"
                 ></Icon>{" "}
                 <Icon
-                  onClick={() => {
-                    setOpenRemoveModal(true);
-                  }}
+                  onClick={() => onClickDelete(transaction)}
                   name="Trash"
                   className="cursor-pointer"
                   color="red"
