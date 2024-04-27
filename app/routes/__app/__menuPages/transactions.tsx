@@ -141,14 +141,18 @@ export default function Transactions() {
 
   useEffect(() => {
     if (skipEffect) return setSkipEffect(false);
-    formik.setFieldValue("name", formik.values.income?.name || "");
-    formik.setFieldValue("amount", formik.values.income?.amount || 0);
+    if (formik.values.income?.name)
+      formik.setFieldValue("name", formik.values.income.name);
+    if (formik.values.income?.amount)
+      formik.setFieldValue("amount", formik.values.income.amount);
   }, [formik.values.income]);
 
   useEffect(() => {
     if (skipEffect) return setSkipEffect(false);
-    formik.setFieldValue("name", formik.values.expense?.name || "");
-    formik.setFieldValue("amount", formik.values.expense?.amount || 0);
+    if (formik.values.expense?.name)
+      formik.setFieldValue("name", formik.values.expense.name);
+    if (formik.values.expense?.amount)
+      formik.setFieldValue("amount", formik.values.expense.amount);
   }, [formik.values.expense]);
 
   useEffect(() => {
