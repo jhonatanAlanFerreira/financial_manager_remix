@@ -87,7 +87,7 @@ export default function Transactions() {
       is_income: false,
       company: null,
       expense: null,
-      transaction_date: "",
+      transaction_date: todayFormatedDate(),
       amount: 0,
       classifications: [],
       is_personal_transaction: false,
