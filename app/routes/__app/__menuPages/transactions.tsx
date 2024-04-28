@@ -538,7 +538,11 @@ export default function Transactions() {
                   disabled={!!formik.values.id && !!formik.values.is_income}
                   selectedClassName="bg-violet-900 text-white"
                   disabledClassName="opacity-50 pointer-events-none"
-                  className="w-full text-center cursor-pointer p-2 text-violet-950"
+                  className={`w-full text-center p-2 text-violet-950 ${
+                    !formik.values.is_income
+                      ? "pointer-events-none"
+                      : "cursor-pointer"
+                  }`}
                 >
                   Expense Transaction
                 </Tab>
@@ -547,7 +551,11 @@ export default function Transactions() {
                   disabled={!!formik.values.id && !formik.values.is_income}
                   selectedClassName="bg-violet-900 text-white"
                   disabledClassName="opacity-50 pointer-events-none"
-                  className="w-full text-center cursor-pointer p-2 text-violet-950"
+                  className={`w-full text-center p-2 text-violet-950 ${
+                    !!formik.values.is_income
+                      ? "pointer-events-none"
+                      : "cursor-pointer"
+                  }`}
                 >
                   Income Transaction
                 </Tab>
