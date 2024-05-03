@@ -17,6 +17,8 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { Company, Expense } from "@prisma/client";
 import Icon from "~/components/icon/Icon";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
+import { useFormik } from "formik";
+import { ExpenseForm } from "~/interfaces/forms/ExpenseForm";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -30,14 +32,22 @@ export default function Expenses() {
     ServerResponse<ValidatedData>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
-  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>();
-  const [expenseToUpdate, setExpenseToUpdate] = useState<Expense | null>();
-  const [isPersonalExpense, setIsPersonalExpense] = useState<boolean>(false);
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponse<ExpenseWithCompanies[]>;
     companyData: ServerResponse<Company[]>;
   }>();
+
+  const formik = useFormik<ExpenseForm>({
+    initialValues: {
+      id: "",
+      name: "",
+      amount: 0,
+      companies: [],
+      is_personal_expense: false,
+    },
+    onSubmit: () => {},
+  });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -78,9 +88,9 @@ export default function Expenses() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formData.get("id")) {
+    if (formik.values.id) {
       axiosRequest = axios.patch(
-        `/api/expense?expenseId=${expenseToUpdate?.id}`,
+        `/api/expense?expenseId=${formik.values.id}`,
         formData
       );
       loadingMessage = "Updating expense";
@@ -122,44 +132,65 @@ export default function Expenses() {
   };
 
   const removeExpense = async () => {
-    if (expenseToDelete) {
-      setOpenRemoveModal(false);
-      setLoading(true);
+    setOpenRemoveModal(false);
+    setLoading(true);
 
-      toast.promise(
-        axios.delete(`/api/expense?expenseId=${expenseToDelete.id}`),
-        {
-          loading: "Deleting expense",
-          success: (res: AxiosResponse<ServerResponse>) => {
-            loadExpenses();
-            return res.data.message as string;
-          },
-          error: (error) => {
-            if (isAxiosError(error)) {
-              setLoading(false);
-              return (
-                error.response?.data.message ||
-                "Sorry, unexpected error. Be back soon"
-              );
-            }
-            return "Sorry, unexpected error. Be back soon";
-          },
+    toast.promise(axios.delete(`/api/expense?expenseId=${formik.values.id}`), {
+      loading: "Deleting expense",
+      success: (res: AxiosResponse<ServerResponse>) => {
+        loadExpenses();
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          setLoading(false);
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
         }
-      );
-    }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    });
   };
 
-  const onAddClick = () => {
-    setExpenseToUpdate(null);
+  const setFormValues = (expense: Expense) => {
+    formik.setValues({
+      id: expense.id,
+      amount: expense.amount,
+      is_personal_expense: expense.is_personal_expense,
+      name: expense.name,
+      companies:
+        companies.data?.filter((company) =>
+          expense.company_ids.includes(company.id)
+        ) || [],
+    });
+  };
+
+  const onCompaniesChange = (companies: Company[]) => {
+    formik.setFieldValue("companies", companies);
+  };
+
+  const onClickAdd = () => {
+    formik.resetForm();
     setOpenAddModal(true);
-    setIsPersonalExpense(false);
+  };
+
+  const onClickUpdate = (expense: Expense) => {
+    setFormValues(expense);
+    setOpenAddModal(true);
+  };
+
+  const onClickDelete = (expense: Expense) => {
+    formik.setFieldValue("id", expense.id);
+    setOpenRemoveModal(true);
   };
 
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={onAddClick}
+          onClick={onClickAdd}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -201,17 +232,13 @@ export default function Expenses() {
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
-                    onClick={() => {
-                      setExpenseToUpdate(expense);
-                      setOpenAddModal(true);
-                    }}
+                    onClick={() => onClickUpdate(expense)}
                     name="Edit"
                     className="cursor-pointer"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
-                      setExpenseToDelete(expense);
-                      setOpenRemoveModal(true);
+                      onClickDelete(expense);
                     }}
                     name="Trash"
                     className="cursor-pointer"
@@ -264,22 +291,17 @@ export default function Expenses() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {expenseToUpdate ? "Update expense" : "Add new expense"}
+          {formik.values.id ? "Update expense" : "Add new expense"}
         </h2>
         <div>
           <div className="p-4">
             <Form method="post" id="expense-form" onSubmit={formSubmit}>
-              <input
-                type="text"
-                name="id"
-                hidden
-                defaultValue={expenseToUpdate?.id}
-              />
               <InputText
                 label="Name *"
                 name="name"
                 required
-                defaultValue={expenseToUpdate?.name}
+                value={formik.values.name}
+                onChange={formik.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
               <InputText
@@ -288,9 +310,10 @@ export default function Expenses() {
                 type="number"
                 step={0.01}
                 min={0}
-                defaultValue={expenseToUpdate?.amount || 0}
+                value={formik.values.amount || 0}
+                onChange={formik.handleChange}
               ></InputText>
-              {!isPersonalExpense && (
+              {!formik.values.is_personal_expense && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -300,16 +323,15 @@ export default function Expenses() {
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
-                  defaultValue={companies?.data?.filter((company) =>
-                    expenseToUpdate?.company_ids.includes(company.id)
-                  )}
+                  onChange={(event) => onCompaniesChange(event as Company[])}
+                  value={formik.values.companies}
                 ></InputSelect>
               )}
               <Checkbox
-                onChange={(event) => setIsPersonalExpense(event.target.checked)}
                 name="is_personal_expense"
                 id="is_personal_expense"
-                defaultChecked={expenseToUpdate?.is_personal_expense}
+                checked={formik.values.is_personal_expense}
+                onChange={formik.handleChange}
               ></Checkbox>
               <label
                 className="pl-3 text-violet-950 cursor-pointer"
