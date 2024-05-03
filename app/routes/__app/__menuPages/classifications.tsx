@@ -17,17 +17,13 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import Icon from "~/components/icon/Icon";
 import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
+import { useFormik } from "formik";
+import { ClassificationForm } from "~/interfaces/forms/ClassificationForm";
 
 export default function Classifications() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [isPersonalClassification, setIsPersonalClassification] =
-    useState<boolean>(false);
-  const [classificationToDelete, setClassificationToDelete] =
-    useState<TransactionClassification | null>();
-  const [classificationToUpdate, setClassificationToUpdate] =
-    useState<TransactionClassification | null>();
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
@@ -41,6 +37,17 @@ export default function Classifications() {
     companyData: ServerResponse<Company[]>;
     classificationData: ServerResponse<ClassificationWithCompany[]>;
   }>();
+
+  const formik = useFormik<ClassificationForm>({
+    initialValues: {
+      id: "",
+      name: "",
+      companies: [],
+      is_personal_transaction_classification: false,
+      is_income: false,
+    },
+    onSubmit: () => {},
+  });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -81,9 +88,9 @@ export default function Classifications() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formData.get("id")) {
+    if (formik.values.id) {
       axiosRequest = axios.patch(
-        `/api/classification?classificationId=${classificationToUpdate?.id}`,
+        `/api/classification?classificationId=${formik.values.id}`,
         formData
       );
       loadingMessage = "Updating classification";
@@ -131,39 +138,62 @@ export default function Classifications() {
   };
 
   const removeClassification = async () => {
-    if (classificationToDelete) {
-      setOpenRemoveModal(false);
-      setLoading(true);
+    setOpenRemoveModal(false);
+    setLoading(true);
 
-      toast.promise(
-        axios.delete(
-          `/api/classification?classificationId=${classificationToDelete.id}`
-        ),
-        {
-          loading: "Deleting classification",
-          success: (res: AxiosResponse<ServerResponse>) => {
-            loadClassifications();
-            return res.data.message as string;
-          },
-          error: (error) => {
-            if (isAxiosError(error)) {
-              setLoading(false);
-              return (
-                error.response?.data.message ||
-                "Sorry, unexpected error. Be back soon"
-              );
-            }
-            return "Sorry, unexpected error. Be back soon";
-          },
-        }
-      );
-    }
+    toast.promise(
+      axios.delete(`/api/classification?classificationId=${formik.values.id}`),
+      {
+        loading: "Deleting classification",
+        success: (res: AxiosResponse<ServerResponse>) => {
+          loadClassifications();
+          return res.data.message as string;
+        },
+        error: (error) => {
+          if (isAxiosError(error)) {
+            setLoading(false);
+            return (
+              error.response?.data.message ||
+              "Sorry, unexpected error. Be back soon"
+            );
+          }
+          return "Sorry, unexpected error. Be back soon";
+        },
+      }
+    );
+  };
+
+  const setFormValues = (classification: TransactionClassification) => {
+    formik.setValues({
+      id: classification.id,
+      name: classification.name,
+      is_personal_transaction_classification:
+        classification.is_personal_transaction_classification,
+      is_income: classification.is_income,
+      companies:
+        companies.data?.filter((company) =>
+          classification.company_ids.includes(company.id)
+        ) || [],
+    });
+  };
+
+  const onCompaniesChange = (companies: Company[]) => {
+    formik.setFieldValue("companies", companies);
   };
 
   const onClickAdd = () => {
-    setClassificationToUpdate(null);
+    formik.resetForm();
     setOpenAddModal(true);
-    setIsPersonalClassification(false);
+  };
+
+  const onClickUpdate = (classification: TransactionClassification) => {
+    setFormValues(classification);
+    setOpenAddModal(true);
+  };
+
+  const onClickDelete = (classification: TransactionClassification) => {
+    formik.setFieldValue("id", classification.id);
+    setOpenRemoveModal(true);
   };
 
   return (
@@ -206,18 +236,12 @@ export default function Classifications() {
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
-                    onClick={() => {
-                      setClassificationToUpdate(classification);
-                      setOpenAddModal(true);
-                    }}
+                    onClick={() => onClickUpdate(classification)}
                     name="Edit"
                     className="cursor-pointer"
                   ></Icon>{" "}
                   <Icon
-                    onClick={() => {
-                      setClassificationToDelete(classification);
-                      setOpenRemoveModal(true);
-                    }}
+                    onClick={() => onClickDelete(classification)}
                     name="Trash"
                     className="cursor-pointer"
                     color="red"
@@ -269,27 +293,22 @@ export default function Classifications() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {classificationToUpdate
+          {formik.values.id
             ? "Update classification"
             : "Add new classification"}
         </h2>
         <div>
           <div className="p-4">
             <Form method="post" id="classification-form" onSubmit={formSubmit}>
-              <input
-                type="text"
-                name="id"
-                hidden
-                defaultValue={classificationToUpdate?.id}
-              />
               <InputText
                 label="Name *"
                 name="name"
                 required
-                defaultValue={classificationToUpdate?.name}
+                value={formik.values.name}
+                onChange={formik.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
-              {!isPersonalClassification && (
+              {!formik.values.is_personal_transaction_classification && (
                 <InputSelect
                   isClearable
                   isMulti
@@ -299,22 +318,19 @@ export default function Classifications() {
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
-                  defaultValue={companies?.data?.filter((company) =>
-                    classificationToUpdate?.company_ids.includes(company.id)
-                  )}
+                  onChange={(event) => onCompaniesChange(event as Company[])}
+                  value={formik.values.companies}
                 ></InputSelect>
               )}
               <div className="flex flex-col gap-2">
                 <div>
                   <Checkbox
-                    onChange={(event) =>
-                      setIsPersonalClassification(event.target.checked)
-                    }
                     name="is_personal_transaction_classification"
                     id="is_personal_transaction_classification"
-                    defaultChecked={
-                      classificationToUpdate?.is_personal_transaction_classification
+                    checked={
+                      formik.values.is_personal_transaction_classification
                     }
+                    onChange={formik.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
@@ -327,7 +343,8 @@ export default function Classifications() {
                   <Checkbox
                     name="is_income"
                     id="is_income"
-                    defaultChecked={classificationToUpdate?.is_income}
+                    checked={formik.values.is_income}
+                    onChange={formik.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"

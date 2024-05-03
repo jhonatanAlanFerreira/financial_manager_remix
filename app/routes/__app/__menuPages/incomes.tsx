@@ -2,6 +2,7 @@ import { Company, Income } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
+import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
@@ -14,18 +15,16 @@ import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
+import { IncomeForm } from "~/interfaces/forms/IncomeForm";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 
 export default function Incomes() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [incomeToDelete, setIncomeToDelete] = useState<Income | null>();
-  const [incomeToUpdate, setIncomeToUpdate] = useState<Income | null>();
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isPersonalIncome, setIsPersonalIncome] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
@@ -40,6 +39,17 @@ export default function Incomes() {
     incomeData: ServerResponse<IncomeWithCompanies[]>;
   }>();
 
+  const formik = useFormik<IncomeForm>({
+    initialValues: {
+      id: "",
+      name: "",
+      amount: 0,
+      companies: [],
+      is_personal_income: false,
+    },
+    onSubmit: () => {},
+  });
+
   useEffect(() => {
     if (companyData) {
       setCompanies(companyData);
@@ -50,6 +60,10 @@ export default function Incomes() {
     setLoading(false);
   }, [companyData, incomeData]);
 
+  useEffect(() => {
+    formik.setFieldValue("companies", null);
+  }, [formik.values.is_personal_income]);
+
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -57,9 +71,9 @@ export default function Incomes() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formData.get("id")) {
+    if (formik.values.id) {
       axiosRequest = axios.patch(
-        `/api/income?incomeId=${incomeToUpdate?.id}`,
+        `/api/income?incomeId=${formik.values.id}`,
         formData
       );
       loadingMessage = "Updating income";
@@ -113,28 +127,26 @@ export default function Incomes() {
   };
 
   const removeIncome = async () => {
-    if (incomeToDelete) {
-      setOpenRemoveModal(false);
-      setLoading(true);
+    setOpenRemoveModal(false);
+    setLoading(true);
 
-      toast.promise(axios.delete(`/api/income?incomeId=${incomeToDelete.id}`), {
-        loading: "Deleting income",
-        success: (res: AxiosResponse<ServerResponse>) => {
-          loadIncomes();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      });
-    }
+    toast.promise(axios.delete(`/api/income?incomeId=${formik.values.id}`), {
+      loading: "Deleting income",
+      success: (res: AxiosResponse<ServerResponse>) => {
+        loadIncomes();
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          setLoading(false);
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
+        }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    });
   };
 
   const getIncomeType = (income: Income) => {
@@ -145,9 +157,40 @@ export default function Incomes() {
   };
 
   const onClickAdd = () => {
-    setIncomeToUpdate(null);
+    formik.resetForm();
     setOpenAddModal(true);
-    setIsPersonalIncome(false);
+  };
+
+  const onModalCancel = () => {
+    formik.resetForm();
+    setOpenAddModal(false);
+  };
+
+  const onClickDelete = (income: Income) => {
+    formik.setFieldValue("id", income.id);
+    setOpenRemoveModal(true);
+  };
+
+  const onClickUpdate = (income: Income) => {
+    setFormValues(income);
+    setOpenAddModal(true);
+  };
+
+  const onCompaniesChange = (companies: Company[]) => {
+    formik.setFieldValue("companies", companies);
+  };
+
+  const setFormValues = (income: Income) => {
+    formik.setValues({
+      id: income.id,
+      amount: income.amount,
+      is_personal_income: income.is_personal_income,
+      name: income.name,
+      companies:
+        companies.data?.filter((company) =>
+          income.company_ids.includes(company.id)
+        ) || [],
+    });
   };
 
   return (
@@ -191,16 +234,14 @@ export default function Incomes() {
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
-                      setIncomeToUpdate(income);
-                      setOpenAddModal(true);
+                      onClickUpdate(income);
                     }}
                     name="Edit"
                     className="cursor-pointer"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
-                      setIncomeToDelete(income);
-                      setOpenRemoveModal(true);
+                      onClickDelete(income);
                     }}
                     name="Trash"
                     className="cursor-pointer"
@@ -253,23 +294,18 @@ export default function Incomes() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {incomeToUpdate ? "Update income" : "Add new income"}
+          {formik.values.id ? "Update income" : "Add new income"}
         </h2>
         <div>
           <div className="p-4">
             <Form method="post" id="income-form" onSubmit={formSubmit}>
-              <input
-                type="text"
-                name="id"
-                hidden
-                defaultValue={incomeToUpdate?.id}
-              />
               <InputText
                 label="Name *"
                 name="name"
                 required
-                defaultValue={incomeToUpdate?.name}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
+                value={formik.values.name}
+                onChange={formik.handleChange}
               ></InputText>
               <InputText
                 label="Amount"
@@ -277,9 +313,10 @@ export default function Incomes() {
                 type="number"
                 step={0.01}
                 min={0}
-                defaultValue={incomeToUpdate?.amount || 0}
+                value={formik.values.amount || 0}
+                onChange={formik.handleChange}
               ></InputText>
-              {!isPersonalIncome && (
+              {!formik.values.is_personal_income && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -289,19 +326,16 @@ export default function Incomes() {
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
-                  defaultValue={companies?.data?.filter((company) =>
-                    incomeToUpdate?.company_ids.includes(company.id)
-                  )}
+                  onChange={(event) => onCompaniesChange(event as Company[])}
+                  value={formik.values.companies}
                 ></InputSelect>
               )}
               <div className="mb-6">
                 <Checkbox
-                  onChange={(event) =>
-                    setIsPersonalIncome(event.target.checked)
-                  }
                   name="is_personal_income"
                   id="is_personal_income"
-                  defaultChecked={incomeToUpdate?.is_personal_income}
+                  onChange={formik.handleChange}
+                  checked={formik.values.is_personal_income}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -313,10 +347,7 @@ export default function Incomes() {
             </Form>
           </div>
           <div className="flex justify-between p-2">
-            <DangerButton
-              text="Cancel"
-              onClick={() => setOpenAddModal(false)}
-            ></DangerButton>
+            <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
             <PrimaryButton
               text="Save"
               disabled={isSubmitting}

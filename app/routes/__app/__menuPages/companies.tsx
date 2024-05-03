@@ -2,6 +2,7 @@ import { Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
+import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
@@ -18,8 +19,6 @@ export default function Companies() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [companyToUpdate, setCompanyToUpdate] = useState<Company | null>();
-  const [companyToDelete, setCompanyToDelete] = useState<Company | null>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
@@ -29,6 +28,15 @@ export default function Companies() {
   const { companyData } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
   }>();
+
+  const formik = useFormik({
+    initialValues: {
+      id: "",
+      name: "",
+      working_capital: 0,
+    },
+    onSubmit: () => {},
+  });
 
   useEffect(() => {
     if (companyData) {
@@ -64,9 +72,9 @@ export default function Companies() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formData.get("id")) {
+    if (formik.values.id) {
       axiosRequest = axios.patch(
-        `/api/company?companyId=${companyToUpdate?.id}`,
+        `/api/company?companyId=${formik.values.id}`,
         formData
       );
       loadingMessage = "Updating company";
@@ -101,41 +109,61 @@ export default function Companies() {
   };
 
   const removeCompany = async () => {
-    if (companyToDelete) {
-      setOpenRemoveModal(false);
-      setLoading(true);
+    setOpenRemoveModal(false);
+    setLoading(true);
 
-      toast.promise(
-        axios.delete(`/api/company?companyId=${companyToDelete.id}`),
-        {
-          loading: "Deleting company",
-          success: (res: AxiosResponse<ServerResponse>) => {
-            loadCompanies();
-            return res.data.message as string;
-          },
-          error: (error) => {
-            if (isAxiosError(error)) {
-              setLoading(false);
-              return (
-                error.response?.data.message ||
-                "Sorry, unexpected error. Be back soon"
-              );
-            }
-            return "Sorry, unexpected error. Be back soon";
-          },
+    toast.promise(axios.delete(`/api/company?companyId=${formik.values.id}`), {
+      loading: "Deleting company",
+      success: (res: AxiosResponse<ServerResponse>) => {
+        loadCompanies();
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          setLoading(false);
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
         }
-      );
-    }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    });
+  };
+
+  const setFormValues = (company: Company) => {
+    formik.setValues({
+      id: company.id,
+      name: company.name,
+      working_capital: company.working_capital,
+    });
+  };
+
+  const onClickAdd = () => {
+    formik.resetForm();
+    setOpenAddModal(true);
+  };
+
+  const onClickUpdate = (company: Company) => {
+    setFormValues(company);
+    setOpenAddModal(true);
+  };
+
+  const onClickDelete = (company: Company) => {
+    formik.setFieldValue("id", company.id);
+    setOpenRemoveModal(true);
+  };
+
+  const onModalCancel = () => {
+    formik.resetForm();
+    setOpenAddModal(false);
   };
 
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
         <PrimaryButton
-          onClick={() => {
-            setCompanyToUpdate(null);
-            setOpenAddModal(true);
-          }}
+          onClick={onClickAdd}
           text="Add"
           iconName="PlusCircle"
         ></PrimaryButton>
@@ -170,16 +198,14 @@ export default function Companies() {
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
-                      setCompanyToUpdate(company);
-                      setOpenAddModal(true);
+                      onClickUpdate(company);
                     }}
                     name="Edit"
                     className="cursor-pointer"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
-                      setCompanyToDelete(company);
-                      setOpenRemoveModal(true);
+                      onClickDelete(company);
                     }}
                     name="Trash"
                     className="cursor-pointer"
@@ -232,22 +258,17 @@ export default function Companies() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {companyToUpdate ? "Update company" : "Add new company"}
+          {formik.values.id ? "Update company" : "Add new company"}
         </h2>
         <div className="overflow-auto">
           <div className="p-4">
             <Form method="post" id="company-form" onSubmit={formSubmit}>
-              <input
-                type="text"
-                name="id"
-                hidden
-                defaultValue={companyToUpdate?.id}
-              />
               <InputText
                 label="Name *"
                 name="name"
                 required
-                defaultValue={companyToUpdate?.name}
+                value={formik.values.name}
+                onChange={formik.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
               <InputText
@@ -256,15 +277,13 @@ export default function Companies() {
                 type="number"
                 step={0.01}
                 min={0}
-                defaultValue={companyToUpdate?.working_capital || 0}
+                value={formik.values.working_capital}
+                onChange={formik.handleChange}
               ></InputText>
             </Form>
           </div>
           <div className="flex justify-between p-2">
-            <DangerButton
-              text="Cancel"
-              onClick={() => setOpenAddModal(false)}
-            ></DangerButton>
+            <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
             <PrimaryButton
               text="Save"
               disabled={isSubmitting}
