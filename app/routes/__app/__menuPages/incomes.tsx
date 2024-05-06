@@ -163,6 +163,7 @@ export default function Incomes() {
 
   const onModalCancel = () => {
     formik.resetForm();
+    setResponseErrors({});
     setOpenAddModal(false);
   };
 

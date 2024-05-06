@@ -156,6 +156,7 @@ export default function Companies() {
 
   const onModalCancel = () => {
     formik.resetForm();
+    setResponseErrors({});
     setOpenAddModal(false);
   };
 

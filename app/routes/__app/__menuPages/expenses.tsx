@@ -186,6 +186,12 @@ export default function Expenses() {
     setOpenRemoveModal(true);
   };
 
+  const onModalCancel = () => {
+    formik.resetForm();
+    setResponseErrors({});
+    setOpenAddModal(false);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex justify-end mb-2">
@@ -342,10 +348,7 @@ export default function Expenses() {
             </Form>
           </div>
           <div className="flex justify-between p-2">
-            <DangerButton
-              text="Cancel"
-              onClick={() => setOpenAddModal(false)}
-            ></DangerButton>
+            <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
             <PrimaryButton
               text="Save"
               disabled={isSubmitting}
