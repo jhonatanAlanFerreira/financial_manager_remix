@@ -33,6 +33,25 @@ export default async function companyUpdateValidator(
     };
   }
 
+  const companyExists = await prisma.company.findUnique({
+    where: {
+      NOT: { id: companyId },
+      user_id_name: {
+        name: data.name,
+        user_id: user.id,
+      },
+    },
+  });
+
+  if (companyExists !== null) {
+    return {
+      isValid: false,
+      errors: {
+        name: "This company already exists",
+      },
+    };
+  }
+
   return {
     isValid: true,
   };
