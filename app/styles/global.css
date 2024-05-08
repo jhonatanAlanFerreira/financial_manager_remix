@@ -7,7 +7,9 @@
 }
 
 .float-label-input:focus-within label,
-.float-label-input input:not(:placeholder-shown) + label {
+.float-label-input input:not(:placeholder-shown) + label,
+label.has-value {
   transform: translateY(-1.5rem) scale(0.75);
   background-color: white;
+  opacity: 1;
 }
