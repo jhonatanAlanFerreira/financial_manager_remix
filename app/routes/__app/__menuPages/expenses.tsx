@@ -302,6 +302,21 @@ export default function Expenses() {
         <div>
           <div className="p-4">
             <Form method="post" id="expense-form" onSubmit={formSubmit}>
+              <div className="border-2 border-violet-950 border-opacity-50 p-4">
+                <Checkbox
+                  className="relative top-1"
+                  name="is_personal_expense"
+                  id="is_personal_expense"
+                  checked={formik.values.is_personal_expense}
+                  onChange={formik.handleChange}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_expense"
+                >
+                  Use as personal expense
+                </label>
+              </div>
               <InputText
                 label="Name *"
                 name="name"
@@ -333,18 +348,6 @@ export default function Expenses() {
                   value={formik.values.companies}
                 ></InputSelect>
               )}
-              <Checkbox
-                name="is_personal_expense"
-                id="is_personal_expense"
-                checked={formik.values.is_personal_expense}
-                onChange={formik.handleChange}
-              ></Checkbox>
-              <label
-                className="pl-3 text-violet-950 cursor-pointer"
-                htmlFor="is_personal_expense"
-              >
-                Use as personal expense
-              </label>
             </Form>
           </div>
           <div className="flex justify-between p-2">

@@ -306,6 +306,40 @@ export default function Classifications() {
         <div>
           <div className="p-4">
             <Form method="post" id="classification-form" onSubmit={formSubmit}>
+              <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
+                <div>
+                  <Checkbox
+                    name="is_personal_transaction_classification"
+                    id="is_personal_transaction_classification"
+                    className="relative top-1"
+                    checked={
+                      formik.values.is_personal_transaction_classification
+                    }
+                    onChange={formik.handleChange}
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_personal_transaction_classification"
+                  >
+                    Use as personal classification
+                  </label>
+                </div>
+                <div>
+                  <Checkbox
+                    className="relative top-1"
+                    name="is_income"
+                    id="is_income"
+                    checked={formik.values.is_income}
+                    onChange={formik.handleChange}
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_income"
+                  >
+                    Income classification
+                  </label>
+                </div>
+              </div>
               <InputText
                 label="Name *"
                 name="name"
@@ -328,38 +362,6 @@ export default function Classifications() {
                   value={formik.values.companies}
                 ></InputSelect>
               )}
-              <div className="flex flex-col gap-2">
-                <div>
-                  <Checkbox
-                    name="is_personal_transaction_classification"
-                    id="is_personal_transaction_classification"
-                    checked={
-                      formik.values.is_personal_transaction_classification
-                    }
-                    onChange={formik.handleChange}
-                  ></Checkbox>
-                  <label
-                    className="pl-3 text-violet-950 cursor-pointer"
-                    htmlFor="is_personal_transaction_classification"
-                  >
-                    Use as personal classification
-                  </label>
-                </div>
-                <div>
-                  <Checkbox
-                    name="is_income"
-                    id="is_income"
-                    checked={formik.values.is_income}
-                    onChange={formik.handleChange}
-                  ></Checkbox>
-                  <label
-                    className="pl-3 text-violet-950 cursor-pointer"
-                    htmlFor="is_income"
-                  >
-                    Income classification
-                  </label>
-                </div>
-              </div>
             </Form>
           </div>
           <div className="flex justify-between p-2">

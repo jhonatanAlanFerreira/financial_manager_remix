@@ -300,6 +300,21 @@ export default function Incomes() {
         <div>
           <div className="p-4">
             <Form method="post" id="income-form" onSubmit={formSubmit}>
+              <div className="border-2 border-violet-950 border-opacity-50 p-4">
+                <Checkbox
+                  className="relative top-1"
+                  name="is_personal_income"
+                  id="is_personal_income"
+                  onChange={formik.handleChange}
+                  checked={formik.values.is_personal_income}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_income"
+                >
+                  Use as personal income
+                </label>
+              </div>
               <InputText
                 label="Name *"
                 name="name"
@@ -331,20 +346,6 @@ export default function Incomes() {
                   value={formik.values.companies}
                 ></InputSelect>
               )}
-              <div className="mb-6">
-                <Checkbox
-                  name="is_personal_income"
-                  id="is_personal_income"
-                  onChange={formik.handleChange}
-                  checked={formik.values.is_personal_income}
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_income"
-                >
-                  Use as personal income
-                </label>
-              </div>
             </Form>
           </div>
           <div className="flex justify-between p-2">

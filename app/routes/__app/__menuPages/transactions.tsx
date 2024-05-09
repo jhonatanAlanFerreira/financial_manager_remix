@@ -568,6 +568,21 @@ export default function Transactions() {
                   id="classification-form"
                   onSubmit={formSubmit}
                 >
+                  <div className="border-2 border-violet-950 border-opacity-50 p-4">
+                    <Checkbox
+                      className="relative top-1"
+                      name="is_personal_transaction"
+                      id="is_personal_transaction"
+                      onChange={formik.handleChange}
+                      checked={formik.values.is_personal_transaction}
+                    ></Checkbox>
+                    <label
+                      className="pl-3 text-violet-950 cursor-pointer"
+                      htmlFor="is_personal_transaction"
+                    >
+                      Personal transaction
+                    </label>
+                  </div>
                   {!formik.values.is_personal_transaction && (
                     <InputSelect
                       isClearable
@@ -634,8 +649,19 @@ export default function Transactions() {
                     }
                     value={formik.values.classifications}
                   ></InputSelect>
-                  <div className="mb-6">
+                </Form>
+              </div>
+            </TabPanel>
+            <TabPanel>
+              <div className="p-4">
+                <Form
+                  method="post"
+                  id="classification-form"
+                  onSubmit={formSubmit}
+                >
+                  <div className="border-2 border-violet-950 border-opacity-50 p-4">
                     <Checkbox
+                      className="relative top-1"
                       name="is_personal_transaction"
                       id="is_personal_transaction"
                       onChange={formik.handleChange}
@@ -648,16 +674,6 @@ export default function Transactions() {
                       Personal transaction
                     </label>
                   </div>
-                </Form>
-              </div>
-            </TabPanel>
-            <TabPanel>
-              <div className="p-4">
-                <Form
-                  method="post"
-                  id="classification-form"
-                  onSubmit={formSubmit}
-                >
                   {!formik.values.is_personal_transaction && (
                     <InputSelect
                       isClearable
@@ -724,20 +740,6 @@ export default function Transactions() {
                     }
                     value={formik.values.classifications}
                   ></InputSelect>
-                  <div className="mb-6">
-                    <Checkbox
-                      name="is_personal_transaction"
-                      id="is_personal_transaction"
-                      onChange={formik.handleChange}
-                      checked={formik.values.is_personal_transaction}
-                    ></Checkbox>
-                    <label
-                      className="pl-3 text-violet-950 cursor-pointer"
-                      htmlFor="is_personal_transaction"
-                    >
-                      Personal transaction
-                    </label>
-                  </div>
                 </Form>
               </div>
             </TabPanel>
