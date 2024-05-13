@@ -410,80 +410,88 @@ export default function Transactions() {
           iconName="PlusCircle"
         ></PrimaryButton>
       </div>
-      <table className="min-w-full bg-white border border-gray-300 text-violet-900">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="py-2 px-4 border-b border-r">Name</th>
-            <th className="py-2 px-4 border-b border-r">Type</th>
-            <th className="py-2 px-4 border-b border-r">Company</th>
-            <th className="py-2 px-4 border-b border-r">Expense</th>
-            <th className="py-2 px-4 border-b border-r">Income</th>
-            <th className="py-2 px-4 border-b border-r">Date</th>
-            <th className="py-2 px-4 border-b border-r">Amount</th>
-            <th className="py-2 px-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {!transactions.data?.length && (
-            <tr>
-              <td className="py-2 px-4" colSpan={4}>
-                There are no data yet
-              </td>
+      <div className="overflow-x-auto px-10">
+        <table className="min-w-full bg-white border border-gray-300 text-violet-900">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="py-2 px-4 border-b border-r">Name</th>
+              <th className="py-2 px-4 border-b border-r">Type</th>
+              <th className="py-2 px-4 border-b border-r">Company</th>
+              <th className="py-2 px-4 border-b border-r">Expense</th>
+              <th className="py-2 px-4 border-b border-r">Income</th>
+              <th className="py-2 px-4 border-b border-r">Date</th>
+              <th className="py-2 px-4 border-b border-r">Amount</th>
+              <th className="py-2 px-4 border-b">Actions</th>
             </tr>
-          )}
-          {transactions.data?.map((transaction, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="py-2 px-4 border-b border-r">
-                {transaction.name}
-              </td>
-              <td className="py-2 px-4 border-b border-r">
-                {getTransactionType(transaction)}
-              </td>
-              <td
-                className={`py-2 px-4 border-b border-r ${
-                  getCompanyNameFromTransaction(transaction) ? "" : "opacity-50"
-                }`}
-              >
-                {getCompanyNameFromTransaction(transaction) || "Not set"}
-              </td>
-              <td
-                className={`py-2 px-4 border-b border-r ${
-                  getExpenseNameFromTransaction(transaction) ? "" : "opacity-50"
-                }`}
-              >
-                {getExpenseNameFromTransaction(transaction) || "Not set"}
-              </td>
-              <td
-                className={`py-2 px-4 border-b border-r ${
-                  getIncomeNameFromTransaction(transaction) ? "" : "opacity-50"
-                }`}
-              >
-                {getIncomeNameFromTransaction(transaction) || "Not set"}
-              </td>
+          </thead>
+          <tbody>
+            {!transactions.data?.length && (
+              <tr>
+                <td className="py-2 px-4" colSpan={4}>
+                  There are no data yet
+                </td>
+              </tr>
+            )}
+            {transactions.data?.map((transaction, index) => (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="py-2 px-4 border-b border-r">
+                  {transaction.name}
+                </td>
+                <td className="py-2 px-4 border-b border-r">
+                  {getTransactionType(transaction)}
+                </td>
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getCompanyNameFromTransaction(transaction)
+                      ? ""
+                      : "opacity-50"
+                  }`}
+                >
+                  {getCompanyNameFromTransaction(transaction) || "Not set"}
+                </td>
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getExpenseNameFromTransaction(transaction)
+                      ? ""
+                      : "opacity-50"
+                  }`}
+                >
+                  {getExpenseNameFromTransaction(transaction) || "Not set"}
+                </td>
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    getIncomeNameFromTransaction(transaction)
+                      ? ""
+                      : "opacity-50"
+                  }`}
+                >
+                  {getIncomeNameFromTransaction(transaction) || "Not set"}
+                </td>
 
-              <td className="py-2 px-4 border-b border-r">
-                {formatDate(transaction.transaction_date)}
-              </td>
-              <td className="py-2 px-4 border-b border-r">
-                {transaction.amount}
-              </td>
-              <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                <Icon
-                  onClick={() => onClickUpdate(transaction)}
-                  name="Edit"
-                  className="cursor-pointer"
-                ></Icon>{" "}
-                <Icon
-                  onClick={() => onClickDelete(transaction)}
-                  name="Trash"
-                  className="cursor-pointer"
-                  color="red"
-                ></Icon>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                <td className="py-2 px-4 border-b border-r">
+                  {formatDate(transaction.transaction_date)}
+                </td>
+                <td className="py-2 px-4 border-b border-r">
+                  {transaction.amount}
+                </td>
+                <td className="flex justify-center gap-5 py-2 px-4 border-b">
+                  <Icon
+                    onClick={() => onClickUpdate(transaction)}
+                    name="Edit"
+                    className="cursor-pointer"
+                  ></Icon>{" "}
+                  <Icon
+                    onClick={() => onClickDelete(transaction)}
+                    name="Trash"
+                    className="cursor-pointer"
+                    color="red"
+                  ></Icon>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <Modal
         classNames={{
