@@ -285,7 +285,7 @@ export default function Incomes() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-3/4 overflow-visible",
+          modal: "p-0 m-0 w-full sm:w-3/4 max-h-95vh",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
