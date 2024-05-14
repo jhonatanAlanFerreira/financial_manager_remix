@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Icon from "../icon/Icon";
+import Icon from "~/components/icon/Icon";
 import { Link } from "@remix-run/react";
 import SidebarItemProps from "~/interfaces/componentsProps/SidebarItemProps";
 

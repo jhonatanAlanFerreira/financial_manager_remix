@@ -1,5 +1,5 @@
 import InputPasswordProps from "~/interfaces/componentsProps/InputPasswordProps";
-import InputText from "../inputText/InputText";
+import InputText from "~/components/inputs/inputText/InputText";
 import { useState } from "react";
 import { IconNameType } from "~/types/IconNameType";
 

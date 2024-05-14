@@ -5,7 +5,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import { hash, compare } from "bcrypt";
 import { exclude } from "~/utilities";
 import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
-import { loginValidator } from "./requestValidators/loginValidator";
+import { loginValidator } from "~/data/requestValidators/loginValidator";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { User } from "@prisma/client";
 

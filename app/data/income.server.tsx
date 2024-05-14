@@ -2,11 +2,11 @@ import { Income, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import IncomeCreateRequest from "~/interfaces/bodyRequests/IncomeCreateRequest";
 import { prisma } from "~/data/database.server";
-import { incomeCreateValidator } from "./requestValidators/incomeCreateValidator";
+import { incomeCreateValidator } from "~/data/requestValidators/incomeCreateValidator";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
-import incomeDeleteValidator from "./requestValidators/incomeDeleteValidator";
+import incomeDeleteValidator from "~/data/requestValidators/incomeDeleteValidator";
 import IncomeUpdateRequest from "~/interfaces/bodyRequests/IncomeUpdateRequest";
-import incomeUpdateValidator from "./requestValidators/incomeUpdateValidator";
+import incomeUpdateValidator from "~/data/requestValidators/incomeUpdateValidator";
 
 export async function create(
   data: IncomeCreateRequest,
