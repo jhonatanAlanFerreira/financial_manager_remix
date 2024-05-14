@@ -118,52 +118,79 @@ export default function Transactions() {
   }, [companyData, transactionData, expenseData, classificationData]);
 
   useEffect(() => {
-    if (skipEffect) return setSkipEffect(false);
+    if (skipEffect) {
+      return setSkipEffect(false);
+    }
+
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
     formik.setFieldValue("classifications", null);
+
     runFilters();
   }, [formik.values.company]);
 
   useEffect(() => {
-    if (skipEffect) return setSkipEffect(false);
+    if (skipEffect) {
+      return setSkipEffect(false);
+    }
+
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
     formik.setFieldValue("classifications", null);
+
     runFilters();
   }, [formik.values.is_personal_transaction]);
 
   useEffect(() => {
-    if (skipEffect) return setSkipEffect(false);
+    if (skipEffect) {
+      return setSkipEffect(false);
+    }
+
     runFilters();
   }, [formik.values.is_income]);
 
   useEffect(() => {
-    if (skipEffect) return setSkipEffect(false);
-    if (formik.values.income?.name)
+    if (skipEffect) {
+      return setSkipEffect(false);
+    }
+
+    if (formik.values.income?.name) {
       formik.setFieldValue("name", formik.values.income.name);
-    if (formik.values.income?.amount)
+    }
+
+    if (formik.values.income?.amount) {
       formik.setFieldValue("amount", formik.values.income.amount);
+    }
   }, [formik.values.income]);
 
   useEffect(() => {
-    if (skipEffect) return setSkipEffect(false);
-    if (formik.values.expense?.name)
+    if (skipEffect) {
+      return setSkipEffect(false);
+    }
+
+    if (formik.values.expense?.name) {
       formik.setFieldValue("name", formik.values.expense.name);
-    if (formik.values.expense?.amount)
+    }
+
+    if (formik.values.expense?.amount) {
       formik.setFieldValue("amount", formik.values.expense.amount);
+    }
   }, [formik.values.expense]);
 
   useEffect(() => {
-    if (openAddModal) runFilters();
+    if (openAddModal) {
+      runFilters();
+    }
   }, [openAddModal]);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    if (formik.values.is_income) formData.set("is_income", "on");
+    if (formik.values.is_income) {
+      formData.set("is_income", "on");
+    }
 
     let axiosRequest;
     let loadingMessage;

@@ -20,7 +20,9 @@ export function exclude<T, Key extends keyof T>(
 }
 
 export function formatDate(dateString: string) {
-  if (!dateString) return null;
+  if (!dateString) {
+    return null;
+  }
   return moment(dateString).format("YYYY/MM/DD");
 }
 

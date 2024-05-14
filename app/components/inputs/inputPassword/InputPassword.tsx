@@ -10,7 +10,10 @@ export default function InputPassword({
   const [isPassVisible, setIsPassVisible] = useState<boolean>();
 
   const icon = (): IconNameType | undefined => {
-    if (!showEyeIcon) return undefined;
+    if (!showEyeIcon) {
+      return undefined;
+    }
+
     return isPassVisible ? "EyeOff" : "Eye";
   };
 
