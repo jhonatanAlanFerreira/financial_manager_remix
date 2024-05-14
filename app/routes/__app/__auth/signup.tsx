@@ -87,27 +87,27 @@ export default function Signup() {
               ></InputPassword>
             </Form>
             <div className="text-right">
-              <span className="text-violet-950">
-                Go to{" "}
-                <Link className="underline" to="/login">
-                  <b>login</b>
-                </Link>{" "}
-                if you already have an account
-              </span>
+              <button
+                form="signup-form"
+                type="submit"
+                className={`text-white rounded-lg px-10 py-1 ${
+                  isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
+                }`}
+                disabled={isSubmitting}
+              >
+                Sign Up
+              </button>
             </div>
           </div>
 
           <div className="text-right">
-            <button
-              form="signup-form"
-              type="submit"
-              className={`text-white rounded-lg px-10 py-1 ${
-                isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
-              }`}
-              disabled={isSubmitting}
-            >
-              Sign Up
-            </button>
+            <span className="text-violet-950">
+              Go to{" "}
+              <Link className="underline" to="/login">
+                <b>login</b>
+              </Link>{" "}
+              if you already have an account
+            </span>
           </div>
         </div>
       </div>
