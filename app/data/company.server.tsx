@@ -4,9 +4,9 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import CompanyCreateRequest from "~/interfaces/bodyRequests/CompanyCreateRequest";
 import companyCreateValidator from "~/data/requestValidators/companyCreateValidator";
 import ValidatedData from "~/interfaces/ValidatedData";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/UpdateCompanyRequest";
 import companyUpdateValidator from "~/data/requestValidators/companyUpdateValidator";
 import companyDeleteValidator from "~/data/requestValidators/companyDeleteValidator";
+import CompanyUpdateRequest from "~/interfaces/bodyRequests/CompanyUpdateRequest";
 
 export async function list(user: User): Promise<ServerResponse<Company[]>> {
   const companies = await prisma.company.findMany({
