@@ -100,7 +100,7 @@ export default function Signup() {
             </div>
           </div>
 
-          <div className="text-right">
+          <div className="text-right mt-2">
             <span className="text-violet-950">
               Go to{" "}
               <Link className="underline" to="/login">
