@@ -16,16 +16,16 @@ export async function incomeCreateValidator(
     };
   }
 
-  if (data.company_ids?.length) {
+  if (data.companies?.length) {
     const companiesFromSameUser = await prisma.company.findMany({
       where: {
         id: {
-          in: data.company_ids,
+          in: data.companies,
         },
         user_id: user.id,
       },
     });
-    if (companiesFromSameUser.length != data.company_ids.length) {
+    if (companiesFromSameUser.length != data.companies.length) {
       return {
         isValid: false,
         errors: {
@@ -40,7 +40,7 @@ export async function incomeCreateValidator(
       user_id_name_is_personal_income: {
         name: data.name,
         user_id: user.id,
-        is_personal_income: data.is_personal_income
+        is_personal_income: data.is_personal_income,
       },
     },
   });

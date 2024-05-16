@@ -25,7 +25,7 @@ let createClassification = async (request: Request) => {
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),
-    company_ids: body.get("companies")
+    companies: body.get("companies")
       ? (body.getAll("companies") as string[])
       : [],
   };
@@ -75,7 +75,7 @@ let updateClassification = async (request: Request) => {
     is_personal_transaction_classification: !!body.get(
       "is_personal_transaction_classification"
     ),
-    company_ids: body.get("companies")
+    companies: body.get("companies")
       ? (body.getAll("companies") as string[])
       : [],
   };

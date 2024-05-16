@@ -34,7 +34,18 @@ export async function create(
   }
 
   const transaction = await prisma.transaction.create({
-    data,
+    data: {
+      name: data.name,
+      amount: data.amount,
+      transaction_date: data.transaction_date,
+      company_id: data.company,
+      expense_id: data.expense,
+      income_id: data.income,
+      is_income: data.is_income,
+      is_personal_transaction: data.is_personal_transaction,
+      transaction_classification_ids: data.classifications,
+      user_id: user.id,
+    },
   });
 
   return {
@@ -88,7 +99,17 @@ export async function update(
   }
 
   const res = await prisma.transaction.update({
-    data,
+    data: {
+      name: data.name,
+      amount: data.amount,
+      transaction_date: data.transaction_date,
+      company_id: data.company,
+      expense_id: data.expense,
+      income_id: data.income,
+      is_income: data.is_income,
+      is_personal_transaction: data.is_personal_transaction,
+      transaction_classification_ids: data.classifications,
+    },
     where: {
       id: transactionId,
     },

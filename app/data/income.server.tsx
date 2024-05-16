@@ -26,7 +26,7 @@ export async function create(
     data: {
       name: data.name,
       user_id: user.id,
-      company_ids: data.company_ids,
+      company_ids: data.companies,
       amount: data.amount,
       is_personal_income: data.is_personal_income,
     },
@@ -95,7 +95,13 @@ export async function update(
   }
 
   const res = await prisma.income.update({
-    data,
+    data: {
+      name: data.name,
+      user_id: user.id,
+      company_ids: data.companies,
+      amount: data.amount,
+      is_personal_income: data.is_personal_income,
+    },
     where: {
       id: incomeId,
     },

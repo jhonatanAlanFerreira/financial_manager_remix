@@ -29,7 +29,7 @@ export async function create(
       is_income: data.is_income,
       is_personal_transaction_classification:
         data.is_personal_transaction_classification,
-      company_ids: data.company_ids,
+      company_ids: data.companies,
     },
   });
 
@@ -87,7 +87,14 @@ export async function update(
   }
 
   const res = await prisma.transactionClassification.update({
-    data,
+    data: {
+      name: data.name,
+      user_id: user.id,
+      is_income: data.is_income,
+      is_personal_transaction_classification:
+        data.is_personal_transaction_classification,
+      company_ids: data.companies,
+    },
     where: {
       id: classificationId,
     },

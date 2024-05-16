@@ -22,13 +22,12 @@ let createTransaction = async (request: Request) => {
   const data: TransactionCreateRequest = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company_id: body.get("company") ? String(body.get("company")) : null,
-    expense_id: body.get("expense") ? String(body.get("expense")) : null,
-    income_id: body.get("income") ? String(body.get("income")) : null,
-    transaction_classification_ids: body.get("classifications")
+    company: body.get("company") ? String(body.get("company")) : null,
+    expense: body.get("expense") ? String(body.get("expense")) : null,
+    income: body.get("income") ? String(body.get("income")) : null,
+    classifications: body.get("classifications")
       ? (body.getAll("classifications") as string[])
       : [],
-    user_id: user.id,
     transaction_date: String(body.get("transaction_date") || ""),
     is_personal_transaction: !!body.get("is_personal_transaction"),
     is_income: !!body.get("is_income"),
@@ -76,13 +75,12 @@ let updateTransaction = async (request: Request) => {
   const data: TransactionUpdateRequest = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company_id: body.get("company") ? String(body.get("company")) : null,
-    expense_id: body.get("expense") ? String(body.get("expense")) : null,
-    income_id: body.get("income") ? String(body.get("income")) : null,
-    transaction_classification_ids: body.get("classifications")
+    company: body.get("company") ? String(body.get("company")) : null,
+    expense: body.get("expense") ? String(body.get("expense")) : null,
+    income: body.get("income") ? String(body.get("income")) : null,
+    classifications: body.get("classifications")
       ? (body.getAll("classifications") as string[])
       : [],
-    user_id: user.id,
     transaction_date: String(body.get("transaction_date") || ""),
     is_personal_transaction: !!body.get("is_personal_transaction"),
     is_income: !!body.get("is_income"),
