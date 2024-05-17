@@ -353,7 +353,7 @@ export default function Classifications() {
                   isClearable
                   isMulti
                   className="mb-8"
-                  placeholder="Company"
+                  placeholder="Companies"
                   options={companies?.data}
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}

@@ -337,7 +337,7 @@ export default function Incomes() {
                   isMulti
                   isClearable
                   className="mb-8"
-                  placeholder="Company"
+                  placeholder="Companies"
                   options={companies?.data}
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
