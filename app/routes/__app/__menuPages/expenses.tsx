@@ -125,9 +125,6 @@ export default function Expenses() {
   };
 
   const getExpenseType = (expense: ExpenseWithCompanies) => {
-    if (!expense.is_personal_expense && !expense.company_ids.length) {
-      return null;
-    }
     return expense.is_personal_expense ? "Personal Expense" : "Company Expense";
   };
 
@@ -229,13 +226,7 @@ export default function Expenses() {
                 >
                   {expense.amount || "Not Set"}
                 </td>
-                <td
-                  className={`py-2 px-4 border-b border-r ${
-                    getExpenseType(expense) ? "" : "opacity-50"
-                  }`}
-                >
-                  {getExpenseType(expense) || "Not set"}
-                </td>
+                <td>{getExpenseType(expense)}</td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => onClickUpdate(expense)}

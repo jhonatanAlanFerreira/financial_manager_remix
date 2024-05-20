@@ -125,13 +125,6 @@ export default function Classifications() {
   };
 
   const getClassificationType = (classification: ClassificationWithCompany) => {
-    if (
-      !classification.is_personal_transaction_classification &&
-      !classification.company_ids.length
-    ) {
-      return null;
-    }
-
     return classification.is_personal_transaction_classification
       ? "Personal Transaction Classification"
       : "Company Transaction Classification";
@@ -233,13 +226,7 @@ export default function Classifications() {
                 <td className="py-2 px-4 border-b border-r">
                   {classification.name}
                 </td>
-                <td
-                  className={`py-2 px-4 border-b border-r ${
-                    getClassificationType(classification) ? "" : "opacity-50"
-                  }`}
-                >
-                  {getClassificationType(classification) || "Not set"}
-                </td>
+                <td>{getClassificationType(classification)}</td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => onClickUpdate(classification)}
