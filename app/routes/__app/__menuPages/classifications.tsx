@@ -259,7 +259,7 @@ export default function Classifications() {
         center
         showCloseIcon={false}
         open={openRemoveModal}
-        onClose={() => setOpenAddModal(false)}
+        onClose={() => setOpenRemoveModal(false)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
