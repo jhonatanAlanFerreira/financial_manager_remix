@@ -226,7 +226,9 @@ export default function Classifications() {
                 <td className="py-2 px-4 border-b border-r">
                   {classification.name}
                 </td>
-                <td>{getClassificationType(classification)}</td>
+                <td className="py-2 px-4 border-b border-r">
+                  {getClassificationType(classification)}
+                </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => onClickUpdate(classification)}

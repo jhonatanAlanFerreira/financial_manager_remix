@@ -222,7 +222,9 @@ export default function Incomes() {
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{income.name}</td>
                 <td className="py-2 px-4 border-b border-r">{income.amount}</td>
-                <td>{getIncomeType(income)}</td>
+                <td className="py-2 px-4 border-b border-r">
+                  {getIncomeType(income)}
+                </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
