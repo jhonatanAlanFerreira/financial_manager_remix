@@ -210,6 +210,7 @@ export default function Classifications() {
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
               <th className="py-2 px-4 border-b border-r">Type</th>
+              <th className="py-2 px-4 border-b border-r">Income/Expense</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
@@ -228,6 +229,9 @@ export default function Classifications() {
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {getClassificationType(classification)}
+                </td>
+                <td className="py-2 px-4 border-b border-r">
+                  {classification.is_income ? "Income" : "Expense"}
                 </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
