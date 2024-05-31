@@ -29,11 +29,14 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/TransactionForm";
+import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
+import TransactionsFilters from "~/components/pageComponents/transactions/filters/TransactionsFilters";
 
 export default function Transactions() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [openFilterModal, setOpenFilterModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [skipEffect, setSkipEffect] = useState(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
@@ -53,6 +56,7 @@ export default function Transactions() {
   const [transactions, setTransactions] = useState<
     ServerResponse<Transaction[]>
   >({});
+  const [searchParams, setSearchParams] = useState<string>("");
 
   const {
     companyData,
@@ -95,6 +99,25 @@ export default function Transactions() {
       name: "",
     },
     onSubmit: () => {},
+  });
+
+  const filterFormik = useFormik<TransactionFiltersForm>({
+    initialValues: {
+      name: "",
+      is_personal_transaction: false,
+      company: null,
+      expense: null,
+      income: null,
+      date_after: "",
+      date_before: "",
+      amount_greater: 0,
+      amount_less: 0,
+    },
+    onSubmit: () => {
+      console.log(filterFormik.values);
+      loadTransactions();
+      setOpenFilterModal(false);
+    },
   });
 
   useEffect(() => {
@@ -184,6 +207,10 @@ export default function Transactions() {
     }
   }, [openAddModal]);
 
+  useEffect(() => {
+    loadTransactions();
+  }, [searchParams]);
+
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -234,10 +261,25 @@ export default function Transactions() {
       });
   };
 
+  const onFilterFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const values = Object.fromEntries(
+      new FormData(event.target as HTMLFormElement)
+    );
+
+    const searchParams = new URLSearchParams(values as any).toString();
+
+    setOpenFilterModal(false);
+    setSearchParams(searchParams);
+  };
+
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/transaction");
+      const res = await axios.get("/api/transaction?" + searchParams);
       setTransactions(res.data);
       setLoading(false);
     } catch (error) {
@@ -430,7 +472,14 @@ export default function Transactions() {
 
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div
+          onClick={() => setOpenFilterModal(true)}
+          className="flex cursor-pointer text-violet-950"
+        >
+          <Icon size={30} name="Filter"></Icon>
+          Filters
+        </div>
         <PrimaryButton
           onClick={onClickAdd}
           text="Add"
@@ -789,6 +838,31 @@ export default function Transactions() {
               className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
             ></PrimaryButton>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        showCloseIcon={false}
+        open={openFilterModal}
+        onClose={() => setOpenFilterModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Filters
+        </h2>
+        <div className="p-4">
+          <TransactionsFilters
+            companies={companies.data || []}
+            expenses={expenses.data || []}
+            incomes={incomes.data || []}
+            formik={filterFormik}
+            onSubmit={onFilterFormSubmit}
+          ></TransactionsFilters>
         </div>
       </Modal>
     </Loader>
