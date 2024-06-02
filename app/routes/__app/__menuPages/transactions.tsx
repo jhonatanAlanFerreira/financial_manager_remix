@@ -305,7 +305,7 @@ export default function Transactions() {
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
-        <div className="flex">
+        <div className="flex flex-wrap justify-center">
           <div
             onClick={() => setOpenFilterModal(true)}
             className="flex cursor-pointer text-violet-950"
