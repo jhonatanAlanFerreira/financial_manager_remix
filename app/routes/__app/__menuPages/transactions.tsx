@@ -96,7 +96,6 @@ export default function Transactions() {
       amount_less: 0,
     },
     onSubmit: () => {
-      console.log(filterForm.values);
       loadTransactions();
       setOpenFilterModal(false);
     },
