@@ -4,7 +4,7 @@ import Select, { StylesConfig, Props as SelectProps } from "react-select";
 export default function InputSelect({ ...rest }: SelectProps) {
   const inputId = useId();
   const [hasValue, setHasValue] = useState(false);
-  var selectRef = useRef(null);
+  const selectRef = useRef(null);
 
   useEffect(() => {
     const select: any = selectRef.current;
