@@ -9,6 +9,6 @@ export interface TransactionFiltersForm {
   income: Income | null;
   date_after: string;
   date_before: string;
-  amount_greater: 0;
-  amount_less: 0;
+  amount_greater: number | undefined;
+  amount_less: number | undefined;
 }

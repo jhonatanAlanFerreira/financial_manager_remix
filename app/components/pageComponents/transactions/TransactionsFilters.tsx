@@ -67,6 +67,8 @@ export default function TransactionsFilters({
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
+    formik.setFieldValue("date_after", "");
+    formik.setFieldValue("date_before", "");
   };
 
   const filterExpenses = () => {

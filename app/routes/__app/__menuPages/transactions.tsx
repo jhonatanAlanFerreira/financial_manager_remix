@@ -22,12 +22,19 @@ import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as transactionLoader } from "~/routes/api/transaction/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import Icon from "~/components/icon/Icon";
-import { formatDate, todayFormatedDate } from "~/utilities";
-import { useFormik } from "formik";
+import {
+  firstDayOfCurrentMonth,
+  formatDate,
+  lastDayOfCurrentMonth,
+  todayFormatedDate,
+} from "~/utilities";
+import { Formik, useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
 import TransactionsFilters from "~/components/pageComponents/transactions/TransactionsFilters";
 import TransactionAdd from "~/components/pageComponents/transactions/TransactionAdd";
+import FilterTag from "~/components/filterTag/FilterTag";
+import { FilterTagsConfig } from "~/interfaces/pageComponents/transactions/FilterTagsConfig";
 
 export default function Transactions() {
   const [loading, setLoading] = useState(true);
@@ -90,10 +97,10 @@ export default function Transactions() {
       company: null,
       expense: null,
       income: null,
-      date_after: "",
-      date_before: "",
-      amount_greater: 0,
-      amount_less: 0,
+      date_after: firstDayOfCurrentMonth(),
+      date_before: lastDayOfCurrentMonth(),
+      amount_greater: undefined,
+      amount_less: undefined,
     },
     onSubmit: () => {
       loadTransactions();
@@ -298,12 +305,30 @@ export default function Transactions() {
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
-        <div
-          onClick={() => setOpenFilterModal(true)}
-          className="flex cursor-pointer text-violet-950"
-        >
-          <Icon size={30} name="Filter"></Icon>
-          Filters
+        <div className="flex">
+          <div
+            onClick={() => setOpenFilterModal(true)}
+            className="flex cursor-pointer text-violet-950"
+          >
+            <Icon size={30} name="Filter"></Icon>
+            Filters
+          </div>
+          {FilterTagsConfig.map(
+            (filter, index) =>
+              filterForm.values[filter.fieldName] && (
+                <FilterTag
+                  fieldName={filter.fieldName}
+                  onClose={(fieldName) => {
+                    filterForm.setFieldValue(fieldName, "");
+                    loadTransactions();
+                  }}
+                  className="ml-2"
+                  label={filter.label}
+                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  key={index}
+                ></FilterTag>
+              )
+          )}
         </div>
         <PrimaryButton
           onClick={onClickAdd}

@@ -29,3 +29,11 @@ export function formatDate(dateString: string) {
 export function todayFormatedDate() {
   return moment().format("YYYY-MM-DD");
 }
+
+export function firstDayOfCurrentMonth(){
+ return moment().startOf('month').format("YYYY-MM-DD");
+}
+
+export function lastDayOfCurrentMonth(){
+  return moment().endOf('month').format("YYYY-MM-DD");
+ }
