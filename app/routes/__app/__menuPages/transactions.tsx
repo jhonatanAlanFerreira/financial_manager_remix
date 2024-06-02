@@ -86,6 +86,7 @@ export default function Transactions() {
     initialValues: {
       name: "",
       is_personal_transaction: false,
+      is_income_transaction: false,
       company: null,
       expense: null,
       income: null,
@@ -136,7 +137,7 @@ export default function Transactions() {
   const getIncomeNameFromTransaction = (transaction: Transaction) => {
     return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
   };
-  
+
   const getTransactionType = (transaction: Transaction) => {
     return transaction.is_personal_transaction
       ? "Personal Transaction"
