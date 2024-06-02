@@ -322,7 +322,7 @@ export default function Transactions() {
                     filterForm.setFieldValue(fieldName, "");
                     loadTransactions();
                   }}
-                  className="ml-2"
+                  className="ml-2 mb-2"
                   label={filter.label}
                   value={filter.getValue(filterForm.values[filter.fieldName])}
                   key={index}

@@ -15,7 +15,7 @@ export default function FilterTag({
       >
         <span className="text-violet-950 font-extrabold">
           {label}
-          {value && <span></span>}
+          {value && <span>:</span>}
         </span>
         &nbsp;
         {value}
