@@ -6,15 +6,13 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import InputSelect from "~/components/inputs/inputSelect/InputSelect";
-import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
@@ -25,38 +23,34 @@ import { loader as transactionLoader } from "~/routes/api/transaction/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import Icon from "~/components/icon/Icon";
 import { formatDate, todayFormatedDate } from "~/utilities";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
-import TransactionsFilters from "~/components/pageComponents/transactions/filters/TransactionsFilters";
+import TransactionsFilters from "~/components/pageComponents/transactions/TransactionsFilters";
+import TransactionAdd from "~/components/pageComponents/transactions/TransactionAdd";
 
 export default function Transactions() {
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [openFilterModal, setOpenFilterModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [skipEffect, setSkipEffect] = useState(false);
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
-  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
-  const [classifications, setClassifications] = useState<
-    ServerResponse<TransactionClassification[]>
-  >({});
-  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
-  const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
-  const [filteredClassifications, setFilteredClassifications] = useState<
-    TransactionClassification[]
-  >([]);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
-  >({});
+  const [searchParams, setSearchParams] = useState("");
+
   const [transactions, setTransactions] = useState<
     ServerResponse<Transaction[]>
   >({});
-  const [searchParams, setSearchParams] = useState<string>("");
+  const [classifications, setClassifications] = useState<
+    ServerResponse<TransactionClassification[]>
+  >({});
+  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
+  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
+
+  const [responseErrors, setResponseErrors] = useState<
+    ServerResponse<ValidatedData>
+  >({});
 
   const {
     companyData,
@@ -72,20 +66,7 @@ export default function Transactions() {
     incomeData: ServerResponse<Income[]>;
   }>();
 
-  const getSelectCompanyOptionValue = (option: Company) => option.id;
-  const getSelectCompanyOptionLabel = (option: Company) => option.name;
-  const getSelectExpenseOptionValue = (option: Expense) => option.id;
-  const getSelectExpenseOptionLabel = (option: Expense) => option.name;
-  const getSelectIncomeOptionValue = (option: Income) => option.id;
-  const getSelectIncomeOptionLabel = (option: Income) => option.name;
-  const getSelectClassificationOptionValue = (
-    option: TransactionClassification
-  ) => option.id;
-  const getSelectClassificationOptionLabel = (
-    option: TransactionClassification
-  ) => option.name;
-
-  const formik = useFormik<TransactionForm>({
+  const mainForm = useFormik<TransactionForm>({
     initialValues: {
       id: "",
       is_income: false,
@@ -101,7 +82,7 @@ export default function Transactions() {
     onSubmit: () => {},
   });
 
-  const filterFormik = useFormik<TransactionFiltersForm>({
+  const filterForm = useFormik<TransactionFiltersForm>({
     initialValues: {
       name: "",
       is_personal_transaction: false,
@@ -114,7 +95,7 @@ export default function Transactions() {
       amount_less: 0,
     },
     onSubmit: () => {
-      console.log(filterFormik.values);
+      console.log(filterForm.values);
       loadTransactions();
       setOpenFilterModal(false);
     },
@@ -141,90 +122,60 @@ export default function Transactions() {
   }, [companyData, transactionData, expenseData, classificationData]);
 
   useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    formik.setFieldValue("classifications", null);
-
-    runFilters();
-  }, [formik.values.company]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    formik.setFieldValue("company", null);
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    formik.setFieldValue("classifications", null);
-
-    runFilters();
-  }, [formik.values.is_personal_transaction]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    runFilters();
-  }, [formik.values.is_income]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    if (formik.values.income?.name) {
-      formik.setFieldValue("name", formik.values.income.name);
-    }
-
-    if (formik.values.income?.amount) {
-      formik.setFieldValue("amount", formik.values.income.amount);
-    }
-  }, [formik.values.income]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    if (formik.values.expense?.name) {
-      formik.setFieldValue("name", formik.values.expense.name);
-    }
-
-    if (formik.values.expense?.amount) {
-      formik.setFieldValue("amount", formik.values.expense.amount);
-    }
-  }, [formik.values.expense]);
-
-  useEffect(() => {
-    if (openAddModal) {
-      runFilters();
-    }
-  }, [openAddModal]);
-
-  useEffect(() => {
     loadTransactions();
   }, [searchParams]);
+
+  const getCompanyNameFromTransaction = (transaction: Transaction) => {
+    return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
+  };
+
+  const getExpenseNameFromTransaction = (transaction: Transaction) => {
+    return expenses?.data?.find((e) => e.id == transaction.expense_id)?.name;
+  };
+
+  const getIncomeNameFromTransaction = (transaction: Transaction) => {
+    return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
+  };
+  
+  const getTransactionType = (transaction: Transaction) => {
+    return transaction.is_personal_transaction
+      ? "Personal Transaction"
+      : "Company Transaction";
+  };
+
+  const loadTransactions = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/api/transaction?" + searchParams);
+      setTransactions(res.data);
+      setLoading(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.error(
+          error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+        );
+      } else {
+        toast.error("Sorry, unexpected error. Be back soon");
+      }
+      setLoading(false);
+    }
+  };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    if (formik.values.is_income) {
+    if (mainForm.values.is_income) {
       formData.set("is_income", "on");
     }
 
     let axiosRequest;
     let loadingMessage;
 
-    if (formik.values.id) {
+    if (mainForm.values.id) {
       axiosRequest = axios.patch(
-        `/api/transaction?transactionId=${formik.values.id}`,
+        `/api/transaction?transactionId=${mainForm.values.id}`,
         formData
       );
       loadingMessage = "Updating transaction";
@@ -233,7 +184,7 @@ export default function Transactions() {
       loadingMessage = "Creating transaction";
     }
 
-    formik.resetForm();
+    mainForm.resetForm();
     setIsSubmitting(true);
 
     toast
@@ -276,47 +227,12 @@ export default function Transactions() {
     setSearchParams(searchParams);
   };
 
-  const loadTransactions = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("/api/transaction?" + searchParams);
-      setTransactions(res.data);
-      setLoading(false);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
-  };
-
-  const getCompanyNameFromTransaction = (transaction: Transaction) => {
-    return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
-  };
-  const getExpenseNameFromTransaction = (transaction: Transaction) => {
-    return expenses?.data?.find((e) => e.id == transaction.expense_id)?.name;
-  };
-  const getIncomeNameFromTransaction = (transaction: Transaction) => {
-    return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
-  };
-
-  const getTransactionType = (transaction: Transaction) => {
-    return transaction.is_personal_transaction
-      ? "Personal Transaction"
-      : "Company Transaction";
-  };
-
   const removeTransaction = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
 
     toast.promise(
-      axios.delete(`/api/transaction?transactionId=${formik.values.id}`),
+      axios.delete(`/api/transaction?transactionId=${mainForm.values.id}`),
       {
         loading: "Deleting transaction",
         success: (res: AxiosResponse<ServerResponse>) => {
@@ -337,71 +253,8 @@ export default function Transactions() {
     );
   };
 
-  const filterExpenses = () => {
-    if (expenses.data) {
-      setFilteredExpenses(
-        expenses.data.filter((expense) => {
-          const expenseTypeFilter = formik.values.is_personal_transaction
-            ? expense.is_personal_expense
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            expense.company_ids.includes(formik.values.company.id);
-
-          return expenseTypeFilter && companyFilter;
-        })
-      );
-    }
-  };
-
-  const filterClassifications = () => {
-    if (classifications.data) {
-      setFilteredClassifications(
-        classifications.data.filter((classification) => {
-          const expenseTypeFilter = formik.values.is_personal_transaction
-            ? classification.is_personal_transaction_classification
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            classification.company_ids.includes(formik.values.company.id);
-
-          const isIncomeFilter = formik.values.is_income
-            ? classification.is_income
-            : !classification.is_income;
-          return expenseTypeFilter && companyFilter && isIncomeFilter;
-        })
-      );
-    }
-  };
-
-  const filterIncomes = () => {
-    if (incomes.data) {
-      setFilteredIncomes(
-        incomes.data.filter((income) => {
-          const incomeTypeFilter = formik.values.is_personal_transaction
-            ? income.is_personal_income
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            income.company_ids.includes(formik.values.company.id);
-
-          return incomeTypeFilter && companyFilter;
-        })
-      );
-    }
-  };
-
-  const runFilters = () => {
-    filterClassifications();
-    filterExpenses();
-    filterIncomes();
-  };
-
   const onClickAdd = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setOpenAddModal(true);
   };
 
@@ -411,13 +264,13 @@ export default function Transactions() {
   };
 
   const onClickDelete = (transaction: Transaction) => {
-    formik.setFieldValue("id", transaction.id);
+    mainForm.setFieldValue("id", transaction.id);
     setOpenRemoveModal(true);
   };
 
   const setFormValues = (transaction: Transaction) => {
     setSkipEffect(true);
-    formik.setValues({
+    mainForm.setValues({
       id: transaction.id,
       amount: transaction.amount,
       is_income: transaction.is_income,
@@ -440,34 +293,6 @@ export default function Transactions() {
         incomes.data?.find((income) => income.id == transaction.income_id) ||
         null,
     });
-  };
-
-  const onTabSelect = (tabSelected: number) => {
-    formik.setFieldValue("classifications", null);
-    formik.setFieldValue("is_income", !!tabSelected);
-  };
-
-  const onModalCancel = () => {
-    formik.resetForm();
-    setOpenAddModal(false);
-  };
-
-  const onCompanyChange = (company: Company) => {
-    formik.setFieldValue("company", company);
-  };
-
-  const onExpenseChange = (expense: Expense) => {
-    formik.setFieldValue("expense", expense);
-  };
-
-  const onIncomeChange = (income: Income) => {
-    formik.setFieldValue("income", income);
-  };
-
-  const onClassificationsChange = (
-    classifications: TransactionClassification[]
-  ) => {
-    formik.setFieldValue("classifications", classifications);
   };
 
   return (
@@ -609,236 +434,21 @@ export default function Transactions() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {formik.values.id ? "Update transaction" : "Add new transaction"}
+          {mainForm.values.id ? "Update transaction" : "Add new transaction"}
         </h2>
-        <div>
-          <Tabs
-            onSelect={(event: number) => onTabSelect(event)}
-            defaultIndex={!!formik.values.is_income ? 1 : 0}
-          >
-            <TabList className="mb-2">
-              <div className="flex justify-around">
-                <Tab
-                  disabled={!!formik.values.id && !!formik.values.is_income}
-                  selectedClassName="bg-violet-900 text-white"
-                  disabledClassName="opacity-50 pointer-events-none"
-                  className={`w-full text-center p-2 text-violet-950 ${
-                    !formik.values.is_income
-                      ? "pointer-events-none"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  Expense Transaction
-                </Tab>
-                <div className="border-r-2"></div>
-                <Tab
-                  disabled={!!formik.values.id && !formik.values.is_income}
-                  selectedClassName="bg-violet-900 text-white"
-                  disabledClassName="opacity-50 pointer-events-none"
-                  className={`w-full text-center p-2 text-violet-950 ${
-                    !!formik.values.is_income
-                      ? "pointer-events-none"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  Income Transaction
-                </Tab>
-              </div>
-            </TabList>
-            <TabPanel>
-              <div className="p-4">
-                <Form
-                  method="post"
-                  id="classification-form"
-                  onSubmit={formSubmit}
-                >
-                  <div className="border-2 border-violet-950 border-opacity-50 p-4">
-                    <Checkbox
-                      className="relative top-1"
-                      name="is_personal_transaction"
-                      id="is_personal_transaction"
-                      onChange={formik.handleChange}
-                      checked={formik.values.is_personal_transaction}
-                    ></Checkbox>
-                    <label
-                      className="pl-3 text-violet-950 cursor-pointer"
-                      htmlFor="is_personal_transaction"
-                    >
-                      Personal transaction
-                    </label>
-                  </div>
-                  {!formik.values.is_personal_transaction && (
-                    <InputSelect
-                      isClearable
-                      className="mb-8"
-                      placeholder="Company"
-                      options={companies?.data}
-                      getOptionLabel={getSelectCompanyOptionLabel as any}
-                      getOptionValue={getSelectCompanyOptionValue as any}
-                      name="company"
-                      onChange={(event) => onCompanyChange(event as Company)}
-                      value={formik.values.company}
-                    ></InputSelect>
-                  )}
-                  <InputSelect
-                    isClearable
-                    className="mb-8"
-                    placeholder="Expense"
-                    options={filteredExpenses}
-                    getOptionLabel={getSelectExpenseOptionLabel as any}
-                    getOptionValue={getSelectExpenseOptionValue as any}
-                    name="expense"
-                    onChange={(event) => onExpenseChange(event as Expense)}
-                    value={formik.values.expense}
-                  ></InputSelect>
-                  <InputText
-                    label="Name *"
-                    name="name"
-                    required
-                    onChange={formik.handleChange}
-                    value={formik.values.name}
-                  ></InputText>
-                  <InputText
-                    label="Date *"
-                    name="transaction_date"
-                    type="date"
-                    required
-                    onChange={formik.handleChange}
-                    value={formik.values.transaction_date}
-                  ></InputText>
-                  <InputText
-                    label="Amount *"
-                    name="amount"
-                    type="number"
-                    step={0.01}
-                    min={0.01}
-                    required
-                    errorMessage={responseErrors?.data?.errors?.["amount"]}
-                    onChange={formik.handleChange}
-                    value={formik.values.amount}
-                  ></InputText>
-                  <InputSelect
-                    isClearable
-                    className="mb-8"
-                    placeholder="Classification"
-                    options={filteredClassifications}
-                    getOptionLabel={getSelectClassificationOptionLabel as any}
-                    getOptionValue={getSelectClassificationOptionValue as any}
-                    isMulti
-                    name="classifications"
-                    onChange={(event) =>
-                      onClassificationsChange(
-                        event as TransactionClassification[]
-                      )
-                    }
-                    value={formik.values.classifications}
-                  ></InputSelect>
-                </Form>
-              </div>
-            </TabPanel>
-            <TabPanel>
-              <div className="p-4">
-                <Form
-                  method="post"
-                  id="classification-form"
-                  onSubmit={formSubmit}
-                >
-                  <div className="border-2 border-violet-950 border-opacity-50 p-4">
-                    <Checkbox
-                      className="relative top-1"
-                      name="is_personal_transaction"
-                      id="is_personal_transaction"
-                      onChange={formik.handleChange}
-                      checked={formik.values.is_personal_transaction}
-                    ></Checkbox>
-                    <label
-                      className="pl-3 text-violet-950 cursor-pointer"
-                      htmlFor="is_personal_transaction"
-                    >
-                      Personal transaction
-                    </label>
-                  </div>
-                  {!formik.values.is_personal_transaction && (
-                    <InputSelect
-                      isClearable
-                      className="mb-8"
-                      placeholder="Company"
-                      options={companies?.data}
-                      getOptionLabel={getSelectCompanyOptionLabel as any}
-                      getOptionValue={getSelectCompanyOptionValue as any}
-                      name="company"
-                      onChange={(event) => onCompanyChange(event as Company)}
-                      value={formik.values.company}
-                    ></InputSelect>
-                  )}
-                  <InputSelect
-                    isClearable
-                    className="mb-8"
-                    placeholder="Income"
-                    options={filteredIncomes}
-                    getOptionLabel={getSelectIncomeOptionLabel as any}
-                    getOptionValue={getSelectIncomeOptionValue as any}
-                    name="income"
-                    onChange={(event) => onIncomeChange(event as Income)}
-                    value={formik.values.income}
-                  ></InputSelect>
-                  <InputText
-                    label="Name *"
-                    name="name"
-                    required
-                    onChange={formik.handleChange}
-                    value={formik.values.name}
-                  ></InputText>
-                  <InputText
-                    label="Date *"
-                    name="transaction_date"
-                    type="date"
-                    required
-                    onChange={formik.handleChange}
-                    value={formik.values.transaction_date}
-                  ></InputText>
-                  <InputText
-                    label="Amount *"
-                    name="amount"
-                    type="number"
-                    step={0.01}
-                    min={0.01}
-                    required
-                    errorMessage={responseErrors?.data?.errors?.["amount"]}
-                    onChange={formik.handleChange}
-                    value={formik.values.amount}
-                  ></InputText>
-                  <InputSelect
-                    isClearable
-                    isMulti
-                    className="mb-8"
-                    placeholder="Classification"
-                    name="classifications"
-                    options={filteredClassifications}
-                    getOptionLabel={getSelectClassificationOptionLabel as any}
-                    getOptionValue={getSelectClassificationOptionValue as any}
-                    onChange={(event) =>
-                      onClassificationsChange(
-                        event as TransactionClassification[]
-                      )
-                    }
-                    value={formik.values.classifications}
-                  ></InputSelect>
-                </Form>
-              </div>
-            </TabPanel>
-          </Tabs>
-          <div className="flex justify-between p-2">
-            <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
-            <PrimaryButton
-              text="Save"
-              disabled={isSubmitting}
-              form="classification-form"
-              type="submit"
-              className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
-            ></PrimaryButton>
-          </div>
-        </div>
+        <TransactionAdd
+          skipEffect={skipEffect}
+          setSkipEffect={(value) => setSkipEffect(value)}
+          formik={mainForm}
+          onModalCancel={() => setOpenAddModal(false)}
+          classifications={classifications.data || []}
+          companies={companies.data || []}
+          expenses={expenses.data || []}
+          incomes={incomes.data || []}
+          isSubmitting={isSubmitting}
+          onSubmit={formSubmit}
+          responseErrors={responseErrors}
+        ></TransactionAdd>
       </Modal>
 
       <Modal
@@ -860,7 +470,7 @@ export default function Transactions() {
             companies={companies.data || []}
             expenses={expenses.data || []}
             incomes={incomes.data || []}
-            formik={filterFormik}
+            formik={filterForm}
             onSubmit={onFilterFormSubmit}
           ></TransactionsFilters>
         </div>
