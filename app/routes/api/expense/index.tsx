@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/expense.server";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/ExpenseUpdateRequest";
+import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
+import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {

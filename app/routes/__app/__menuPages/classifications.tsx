@@ -18,7 +18,7 @@ import { loader as classificationLoader } from "~/routes/api/classification/inde
 import Icon from "~/components/icon/Icon";
 import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
 import { useFormik } from "formik";
-import { ClassificationForm } from "~/interfaces/forms/ClassificationForm";
+import { ClassificationForm } from "~/interfaces/forms/classification/ClassificationForm";
 
 export default function Classifications() {
   const [loading, setLoading] = useState<boolean>(true);

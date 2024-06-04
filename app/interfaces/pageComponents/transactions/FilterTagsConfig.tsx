@@ -1,4 +1,4 @@
-import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
+import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import { formatDate } from "~/utilities";
 
 export const FilterTagsConfig: {

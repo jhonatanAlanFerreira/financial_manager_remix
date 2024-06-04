@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/TransactionCreateRequest";
+import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
 import { prisma } from "~/data/database.server";
 
 export default async function (

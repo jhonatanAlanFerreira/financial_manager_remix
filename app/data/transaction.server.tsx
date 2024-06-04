@@ -1,11 +1,11 @@
 import { Transaction, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { prisma } from "~/data/database.server";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/TransactionCreateRequest";
-import TransactionCreateValidator from "~/data/requestValidators/transactionCreateValidator";
-import transactionDeleteValidator from "~/data/requestValidators/transactionDeleteValidator";
-import TransactionUpdateRequest from "~/interfaces/bodyRequests/TransactionUpdateRequest";
-import transactionUpdateValidator from "~/data/requestValidators/transactionUpdateValidator";
+import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
+import TransactionCreateValidator from "~/data/requestValidators/transaction/transactionCreateValidator";
+import transactionDeleteValidator from "~/data/requestValidators/transaction/transactionDeleteValidator";
+import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
+import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
 
 export async function list(user: User): Promise<ServerResponse<Transaction[]>> {
   const transactions = await prisma.transaction.findMany({

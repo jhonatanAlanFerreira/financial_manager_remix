@@ -1,11 +1,11 @@
 import { prisma } from "~/data/database.server";
-import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
-import { signupValidator } from "~/data/requestValidators/signupValidator";
+import SignupRequest from "~/interfaces/bodyRequests/auth/SignupRequest";
+import { signupValidator } from "~/data/requestValidators/auth/signupValidator";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { hash, compare } from "bcrypt";
 import { exclude } from "~/utilities";
-import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
-import { loginValidator } from "~/data/requestValidators/loginValidator";
+import LoginRequest from "~/interfaces/bodyRequests/auth/LoginRequest";
+import { loginValidator } from "~/data/requestValidators/auth/loginValidator";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { User } from "@prisma/client";
 

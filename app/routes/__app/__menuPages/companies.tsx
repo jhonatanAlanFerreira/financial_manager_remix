@@ -13,6 +13,7 @@ import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
+import { CompanyForm } from "~/interfaces/forms/company/CompanyForm";
 import { loader as companyLoader } from "~/routes/api/company/index";
 
 export default function Companies() {
@@ -29,7 +30,7 @@ export default function Companies() {
     companyData: ServerResponse<Company[]>;
   }>();
 
-  const formik = useFormik({
+  const formik = useFormik<CompanyForm>({
     initialValues: {
       id: "",
       name: "",

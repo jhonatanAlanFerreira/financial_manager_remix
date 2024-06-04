@@ -1,12 +1,12 @@
 import ServerResponse from "~/interfaces/ServerResponse";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
-import { expenseCreateValidator } from "~/data/requestValidators/expenseCreateValidator";
+import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
+import { expenseCreateValidator } from "~/data/requestValidators/expense/expenseCreateValidator";
 import { prisma } from "~/data/database.server";
 import { Expense, User } from "@prisma/client";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
-import expenseDeleteValidator from "~/data/requestValidators/expenseDeleteValidator";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/ExpenseUpdateRequest";
-import { expenseUpdateValidator } from "~/data/requestValidators/expenseUpdateValidator";
+import expenseDeleteValidator from "~/data/requestValidators/expense/expenseDeleteValidator";
+import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
+import { expenseUpdateValidator } from "~/data/requestValidators/expense/expenseUpdateValidator";
 
 export async function create(
   data: ExpenseCreateRequest,

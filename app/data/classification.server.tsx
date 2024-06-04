@@ -1,11 +1,11 @@
 import { TransactionClassification, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import ClassificationCreateRequest from "~/interfaces/bodyRequests/ClassificationCreateRequest";
-import classificationCreateValidator from "~/data/requestValidators/classificationCreateValidator";
+import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
+import classificationCreateValidator from "~/data/requestValidators/classification/classificationCreateValidator";
 import { prisma } from "~/data/database.server";
-import classificationDeleteValidator from "~/data/requestValidators/classificationDeleteValidator";
-import ClassificationUpdateRequest from "~/interfaces/bodyRequests/ClassificationUpdateRequest";
-import classificationUpdateValidator from "~/data/requestValidators/classificationUpdateValidator";
+import classificationDeleteValidator from "~/data/requestValidators/classification/classificationDeleteValidator";
+import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
+import classificationUpdateValidator from "~/data/requestValidators/classification/classificationUpdateValidator";
 import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
 
 export async function create(

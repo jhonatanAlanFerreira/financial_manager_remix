@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/transaction.server";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/TransactionCreateRequest";
-import TransactionUpdateRequest from "~/interfaces/bodyRequests/TransactionUpdateRequest";
+import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
+import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {

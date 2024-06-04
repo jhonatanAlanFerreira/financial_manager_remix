@@ -29,8 +29,8 @@ import {
   todayFormatedDate,
 } from "~/utilities";
 import { Formik, useFormik } from "formik";
-import { TransactionForm } from "~/interfaces/forms/TransactionForm";
-import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
+import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
+import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import TransactionsFilters from "~/components/pageComponents/transactions/TransactionsFilters";
 import TransactionAdd from "~/components/pageComponents/transactions/TransactionAdd";
 import FilterTag from "~/components/filterTag/FilterTag";

@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { createUserSession, login } from "~/data/auth.server";
-import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
+import LoginRequest from "~/interfaces/bodyRequests/auth/LoginRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {

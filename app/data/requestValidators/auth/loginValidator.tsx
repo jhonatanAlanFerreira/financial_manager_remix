@@ -1,4 +1,4 @@
-import LoginRequest from "~/interfaces/bodyRequests/LoginRequest";
+import LoginRequest from "~/interfaces/bodyRequests/auth/LoginRequest";
 import ValidatedData from "~/interfaces/ValidatedData";
 
 export async function loginValidator(

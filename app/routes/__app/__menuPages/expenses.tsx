@@ -18,7 +18,7 @@ import { Company, Expense } from "@prisma/client";
 import Icon from "~/components/icon/Icon";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import { useFormik } from "formik";
-import { ExpenseForm } from "~/interfaces/forms/ExpenseForm";
+import { ExpenseForm } from "~/interfaces/forms/expense/ExpenseForm";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);

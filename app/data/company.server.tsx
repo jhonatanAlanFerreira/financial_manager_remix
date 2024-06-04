@@ -1,12 +1,12 @@
 import { Company, User } from "@prisma/client";
 import { prisma } from "~/data/database.server";
 import ServerResponse from "~/interfaces/ServerResponse";
-import CompanyCreateRequest from "~/interfaces/bodyRequests/CompanyCreateRequest";
-import companyCreateValidator from "~/data/requestValidators/companyCreateValidator";
+import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
+import companyCreateValidator from "~/data/requestValidators/company/companyCreateValidator";
 import ValidatedData from "~/interfaces/ValidatedData";
-import companyUpdateValidator from "~/data/requestValidators/companyUpdateValidator";
-import companyDeleteValidator from "~/data/requestValidators/companyDeleteValidator";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/CompanyUpdateRequest";
+import companyUpdateValidator from "~/data/requestValidators/company/companyUpdateValidator";
+import companyDeleteValidator from "~/data/requestValidators/company/companyDeleteValidator";
+import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 
 export async function list(user: User): Promise<ServerResponse<Company[]>> {
   const companies = await prisma.company.findMany({

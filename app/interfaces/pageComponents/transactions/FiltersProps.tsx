@@ -1,6 +1,6 @@
 import { Company, Expense, Income } from "@prisma/client";
 import { FormikProps } from "formik";
-import { TransactionFiltersForm } from "~/interfaces/forms/TransactionFiltersForm";
+import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 
 export interface FiltersProps {
   companies: Company[];

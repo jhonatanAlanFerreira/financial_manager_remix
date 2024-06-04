@@ -15,7 +15,7 @@ import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
-import { IncomeForm } from "~/interfaces/forms/IncomeForm";
+import { IncomeForm } from "~/interfaces/forms/income/IncomeForm";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";

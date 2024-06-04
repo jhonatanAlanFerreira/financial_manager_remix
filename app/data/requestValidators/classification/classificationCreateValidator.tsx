@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import ClassificationCreateRequest from "~/interfaces/bodyRequests/ClassificationCreateRequest";
+import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
 import { prisma } from "~/data/database.server";
 
 export default async function classificationCreateValidator(

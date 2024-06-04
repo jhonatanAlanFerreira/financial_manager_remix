@@ -1,5 +1,5 @@
 import ValidatedData from "~/interfaces/ValidatedData";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/ExpenseCreateRequest";
+import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import { prisma } from "~/data/database.server";
 import { User } from "@prisma/client";
 
