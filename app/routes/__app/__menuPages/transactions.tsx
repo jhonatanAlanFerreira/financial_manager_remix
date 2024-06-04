@@ -308,7 +308,7 @@ export default function Transactions() {
         <div className="flex flex-wrap justify-center">
           <div
             onClick={() => setOpenFilterModal(true)}
-            className="flex cursor-pointer text-violet-950"
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
           >
             <Icon size={30} name="Filter"></Icon>
             Filters
@@ -404,12 +404,12 @@ export default function Transactions() {
                   <Icon
                     onClick={() => onClickUpdate(transaction)}
                     name="Edit"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => onClickDelete(transaction)}
                     name="Trash"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                     color="red"
                   ></Icon>
                 </td>

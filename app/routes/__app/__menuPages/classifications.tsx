@@ -237,12 +237,12 @@ export default function Classifications() {
                   <Icon
                     onClick={() => onClickUpdate(classification)}
                     name="Edit"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => onClickDelete(classification)}
                     name="Trash"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                     color="red"
                   ></Icon>
                 </td>

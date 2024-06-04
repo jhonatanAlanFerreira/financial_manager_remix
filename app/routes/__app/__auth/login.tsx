@@ -2,6 +2,7 @@ import { Form, Link, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import Icon from "~/components/icon/Icon";
 import InputPassword from "~/components/inputs/inputPassword/InputPassword";
 import InputText from "~/components/inputs/inputText/InputText";
@@ -77,17 +78,16 @@ export default function Login() {
                 errorMessage={responseErrors?.data?.errors?.["password"]}
               ></InputPassword>
             </Form>
-            <div className="text-right">
-              <button
+            <div>
+              <PrimaryButton
+                text="Log In"
                 form="login-form"
                 type="submit"
-                className={`text-white rounded-lg px-10 py-1 ${
-                  isSubmitting ? "bg-violet-950/50" : "bg-violet-950"
+                className={`float-right ${
+                  isSubmitting ? "bg-violet-950/50" : ""
                 }`}
                 disabled={isSubmitting}
-              >
-                Log In
-              </button>
+              ></PrimaryButton>
             </div>
           </div>
 

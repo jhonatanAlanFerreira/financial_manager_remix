@@ -8,7 +8,7 @@ export default function PrimaryButton({
   ...rest
 }: PrimaryButtonProps) {
   const existingClasses =
-    "flex justify-center gap-3 text-white bg-violet-950 py-2 px-5 m-2 rounded";
+    "flex justify-center gap-3 text-white bg-violet-950 py-2 px-5 m-2 rounded shadow shadow-gray-950 transform transition-transform duration-300 hover:scale-110";
   const combinedClasses = `${existingClasses} ${className}`;
 
   return (

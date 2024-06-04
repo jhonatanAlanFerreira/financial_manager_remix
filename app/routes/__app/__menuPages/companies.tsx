@@ -202,14 +202,14 @@ export default function Companies() {
                       onClickUpdate(company);
                     }}
                     name="Edit"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
                       onClickDelete(company);
                     }}
                     name="Trash"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                     color="red"
                   ></Icon>
                 </td>

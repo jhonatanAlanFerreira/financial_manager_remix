@@ -231,14 +231,14 @@ export default function Incomes() {
                       onClickUpdate(income);
                     }}
                     name="Edit"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
                       onClickDelete(income);
                     }}
                     name="Trash"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                     color="red"
                   ></Icon>
                 </td>

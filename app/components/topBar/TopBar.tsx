@@ -6,9 +6,9 @@ export default function TopBar({ updateSidebarOpen }: TopBarProps) {
     <div className="bg-violet-950 w-full h-16 text-white flex items-center pl-1">
       <span
         onClick={() => updateSidebarOpen(true)}
-        className="p-4 cursor-pointer rounded transition duration-500 ease-in-out hover:bg-black hover:bg-opacity-40"
+        className="p-4 cursor-pointer rounded transition-transform duration-500 ease-in-out transform hover:scale-110 hover:bg-black hover:bg-opacity-40"
       >
-        <Icon name="Menu"></Icon>
+        <Icon name="Menu" />
       </span>
     </div>
   );

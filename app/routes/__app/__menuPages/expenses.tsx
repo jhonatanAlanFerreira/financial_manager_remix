@@ -233,14 +233,14 @@ export default function Expenses() {
                   <Icon
                     onClick={() => onClickUpdate(expense)}
                     name="Edit"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                   ></Icon>{" "}
                   <Icon
                     onClick={() => {
                       onClickDelete(expense);
                     }}
                     name="Trash"
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform  transform hover:scale-110"
                     color="red"
                   ></Icon>
                 </td>

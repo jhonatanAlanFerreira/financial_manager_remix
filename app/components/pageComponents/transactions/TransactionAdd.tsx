@@ -198,37 +198,41 @@ export default function TransactionAdd({
   };
 
   return (
-    <div>
+    <div className="p-2">
       <Tabs
         onSelect={(event: number) => onTabSelect(event)}
         defaultIndex={!!formik.values.is_income ? 1 : 0}
       >
         <TabList className="mb-2">
-          <div className="flex justify-around">
+          <div className="flex justify-around gap-2">
             <Tab
               disabled={!!formik.values.id && !!formik.values.is_income}
               selectedClassName="bg-violet-900 text-white"
               disabledClassName="opacity-50 pointer-events-none"
-              className={`w-full text-center p-2 text-violet-950 ${
+              className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
                 !formik.values.is_income
                   ? "pointer-events-none"
                   : "cursor-pointer"
               }`}
             >
-              Expense Transaction
+              <div className="w-full transform transition-transform duration-300 hover:scale-110">
+                Expense Transaction
+              </div>
             </Tab>
             <div className="border-r-2"></div>
             <Tab
               disabled={!!formik.values.id && !formik.values.is_income}
               selectedClassName="bg-violet-900 text-white"
               disabledClassName="opacity-50 pointer-events-none"
-              className={`w-full text-center p-2 text-violet-950 ${
+              className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
                 !!formik.values.is_income
                   ? "pointer-events-none"
                   : "cursor-pointer"
               }`}
             >
-              Income Transaction
+              <div className="w-full transform transition-transform duration-300 hover:scale-110">
+                Income Transaction
+              </div>
             </Tab>
           </div>
         </TabList>
