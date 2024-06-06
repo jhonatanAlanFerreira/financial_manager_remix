@@ -46,6 +46,7 @@ export default function Transactions() {
   const [skipEffect, setSkipEffect] = useState(false);
   const [searchParams, setSearchParams] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [transactions, setTransactions] = useState<
     ServerResponse<Transaction[]>
@@ -132,7 +133,7 @@ export default function Transactions() {
 
   useEffect(() => {
     loadTransactions();
-  }, [searchParams]);
+  }, [searchParams, currentPage]);
 
   const getCompanyNameFromTransaction = (transaction: Transaction) => {
     return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
@@ -155,8 +156,14 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/transaction?" + searchParams);
+      const res = await axios.get<ServerResponse<Transaction[]>>(
+        `/api/transaction?${searchParams}${
+          searchParams ? "&" : ""
+        }${paginationParams()}`
+      );
       setTransactions(res.data);
+      setTotalPages(res.data.pageInfo?.totalPages || 0);
+      setCurrentPage(res.data.pageInfo?.currentPage || 1);
       setLoading(false);
     } catch (error) {
       if (isAxiosError(error)) {
@@ -234,6 +241,12 @@ export default function Transactions() {
 
     setOpenFilterModal(false);
     setSearchParams(searchParams);
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: currentPage,
+    } as any).toString();
   };
 
   const removeTransaction = async () => {
@@ -424,7 +437,7 @@ export default function Transactions() {
       <Pagination
         className="justify-center"
         currentPage={currentPage}
-        totalPages={50}
+        totalPages={totalPages}
         optionsAmount={10}
         onPageChange={(page) => setCurrentPage(page)}
       ></Pagination>
