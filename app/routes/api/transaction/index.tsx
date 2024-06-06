@@ -102,5 +102,9 @@ let updateTransaction = async (request: Request) => {
 export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
-  return list(user);
+  const url = new URL(request.url);
+  const page = Number(url.searchParams.get("page")) || 1;
+  const pageSize = Number(url.searchParams.get("pageSize")) || 10;
+
+  return list(user, page, pageSize);
 };

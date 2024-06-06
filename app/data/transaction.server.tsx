@@ -7,15 +7,37 @@ import transactionDeleteValidator from "~/data/requestValidators/transaction/tra
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
 
-export async function list(user: User): Promise<ServerResponse<Transaction[]>> {
-  const transactions = await prisma.transaction.findMany({
+export async function list(
+  user: User,
+  page: number = 1,
+  pageSize: number = 10
+): Promise<ServerResponse<Transaction[]>> {
+  const skip = (page - 1) * pageSize;
+
+  const totalData = await prisma.transaction.count({
     where: {
       user_id: user.id,
     },
   });
 
+  const totalPages = Math.ceil(totalData / pageSize);
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      user_id: user.id,
+    },
+    skip: skip,
+    take: pageSize,
+  });
+
   return {
     data: transactions,
+    pageInfo: {
+      currentPage: page,
+      totalData,
+      pageSize,
+      totalPages,
+    },
   };
 }
 

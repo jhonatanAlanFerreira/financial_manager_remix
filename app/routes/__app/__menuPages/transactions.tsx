@@ -35,6 +35,7 @@ import TransactionsFilters from "~/components/pageComponents/transactions/Transa
 import TransactionAdd from "~/components/pageComponents/transactions/TransactionAdd";
 import FilterTag from "~/components/filterTag/FilterTag";
 import { FilterTagsConfig } from "~/interfaces/pageComponents/transactions/FilterTagsConfig";
+import Pagination from "~/components/pagination/Pagination";
 
 export default function Transactions() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,7 @@ export default function Transactions() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [skipEffect, setSkipEffect] = useState(false);
   const [searchParams, setSearchParams] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [transactions, setTransactions] = useState<
     ServerResponse<Transaction[]>
@@ -418,6 +420,14 @@ export default function Transactions() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        className="justify-center"
+        currentPage={currentPage}
+        totalPages={50}
+        optionsAmount={10}
+        onPageChange={(page) => setCurrentPage(page)}
+      ></Pagination>
 
       <Modal
         classNames={{
