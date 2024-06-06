@@ -59,9 +59,10 @@ export default function Pagination({
               </span>
             </div>
           )}
-          {options.map((option) => {
+          {options.map((option, i) => {
             return (
               <div
+                key={i}
                 onClick={() => onPageChange(option)}
                 className={`m-3 ${
                   option == currentPage
