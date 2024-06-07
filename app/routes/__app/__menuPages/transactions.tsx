@@ -152,7 +152,11 @@ export default function Transactions() {
   useEffect(() => {
     if (reloadTransactions) {
       setReloadTransactions(false);
-      loadTransactions();
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadTransactions();
+      }
     }
   }, [searchParams]);
 
@@ -261,7 +265,11 @@ export default function Transactions() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadTransactions();
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      loadTransactions();
+    }
   };
 
   const paginationParams = () => {
