@@ -15,6 +15,7 @@ export default function TransactionsFilters({
 }: FiltersProps) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
+  const [skipEffect, setSkipEffect] = useState(true);
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -24,6 +25,15 @@ export default function TransactionsFilters({
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
 
   useEffect(() => {
+    runFilters();
+    setSkipEffect(false);
+  }, []);
+
+  useEffect(() => {
+    if (skipEffect) {
+      return;
+    }
+
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
@@ -32,6 +42,10 @@ export default function TransactionsFilters({
   }, [formik.values.is_personal_transaction]);
 
   useEffect(() => {
+    if (skipEffect) {
+      return;
+    }
+
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
 
@@ -39,6 +53,10 @@ export default function TransactionsFilters({
   }, [formik.values.is_income_transaction]);
 
   useEffect(() => {
+    if (skipEffect) {
+      return;
+    }
+
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
 
@@ -108,7 +126,7 @@ export default function TransactionsFilters({
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form>
       <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
         <span onClick={resetForm}>Clear all filters</span>
       </div>
@@ -219,7 +237,11 @@ export default function TransactionsFilters({
       )}
 
       <div className="flex justify-end p-2 mt-10">
-        <PrimaryButton text="Done" type="submit"></PrimaryButton>
+        <PrimaryButton
+          onClick={onSubmit}
+          text="Done"
+          type="button"
+        ></PrimaryButton>
       </div>
     </form>
   );

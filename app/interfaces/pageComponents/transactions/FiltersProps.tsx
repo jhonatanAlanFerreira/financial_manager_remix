@@ -7,5 +7,5 @@ export interface FiltersProps {
   expenses: Expense[];
   incomes: Income[];
   formik: FormikProps<TransactionFiltersForm>;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: () => void;
 }

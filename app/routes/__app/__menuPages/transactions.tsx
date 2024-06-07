@@ -26,9 +26,10 @@ import {
   firstDayOfCurrentMonth,
   formatDate,
   lastDayOfCurrentMonth,
+  queryParamsFromObject,
   todayFormatedDate,
 } from "~/utilities";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import TransactionsFilters from "~/components/pageComponents/transactions/TransactionsFilters";
@@ -45,8 +46,9 @@ export default function Transactions() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [skipEffect, setSkipEffect] = useState(false);
   const [searchParams, setSearchParams] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [reloadTransactions, setReloadTransactions] = useState(false);
 
   const [transactions, setTransactions] = useState<
     ServerResponse<Transaction[]>
@@ -102,14 +104,18 @@ export default function Transactions() {
       income: null,
       date_after: firstDayOfCurrentMonth(),
       date_before: lastDayOfCurrentMonth(),
-      amount_greater: undefined,
-      amount_less: undefined,
+      amount_greater: 0,
+      amount_less: 0,
     },
     onSubmit: () => {
       loadTransactions();
       setOpenFilterModal(false);
     },
   });
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, []);
 
   useEffect(() => {
     if (companyData) {
@@ -122,6 +128,8 @@ export default function Transactions() {
       setExpenses(expenseData);
     }
     if (transactionData) {
+      setCurrentPage(transactionData.pageInfo?.currentPage || 0);
+      setTotalPages(transactionData.pageInfo?.totalData || 0);
       setTransactions(transactionData);
     }
     if (incomeData) {
@@ -132,8 +140,31 @@ export default function Transactions() {
   }, [companyData, transactionData, expenseData, classificationData]);
 
   useEffect(() => {
-    loadTransactions();
-  }, [searchParams, currentPage]);
+    if (currentPage) {
+      loadTransactions();
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, [filterForm.values]);
+
+  useEffect(() => {
+    if (reloadTransactions) {
+      setReloadTransactions(false);
+      loadTransactions();
+    }
+  }, [searchParams]);
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(filterForm.values, {
+        company: "id",
+        expense: "id",
+        income: "id",
+      })
+    );
+  };
 
   const getCompanyNameFromTransaction = (transaction: Transaction) => {
     return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
@@ -228,19 +259,9 @@ export default function Transactions() {
       });
   };
 
-  const onFilterFormSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-
-    const values = Object.fromEntries(
-      new FormData(event.target as HTMLFormElement)
-    );
-
-    const searchParams = new URLSearchParams(values as any).toString();
-
+  const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    setSearchParams(searchParams);
+    loadTransactions();
   };
 
   const paginationParams = () => {
@@ -330,12 +351,12 @@ export default function Transactions() {
           </div>
           {FilterTagsConfig.map(
             (filter, index) =>
-              filterForm.values[filter.fieldName] && (
+              !!filterForm.values[filter.fieldName] && (
                 <FilterTag
                   fieldName={filter.fieldName}
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
-                    loadTransactions();
+                    setReloadTransactions(true);
                   }}
                   className="ml-2 mb-2"
                   label={filter.label}

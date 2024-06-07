@@ -19,6 +19,27 @@ export function exclude<T, Key extends keyof T>(
   ) as Omit<T, Key>;
 }
 
+export function queryParamsFromObject(
+  obj: any,
+  propertyForKey: {
+    [key: string]: string;
+  } | null = null
+) {
+  let newObject: any = {};
+
+  for (let key in obj) {
+    if (!!obj[key]) {
+      if (propertyForKey?.[key]) {
+        newObject[key] = obj[key][propertyForKey[key]];
+      } else {
+        newObject[key] = obj[key];
+      }
+    }
+  }
+
+  return new URLSearchParams(newObject as any).toString();
+}
+
 export function formatDate(dateString: string) {
   if (!dateString) {
     return null;
@@ -30,10 +51,10 @@ export function todayFormatedDate() {
   return moment().format("YYYY-MM-DD");
 }
 
-export function firstDayOfCurrentMonth(){
- return moment().startOf('month').format("YYYY-MM-DD");
+export function firstDayOfCurrentMonth() {
+  return moment().startOf("month").format("YYYY-MM-DD");
 }
 
-export function lastDayOfCurrentMonth(){
-  return moment().endOf('month').format("YYYY-MM-DD");
- }
+export function lastDayOfCurrentMonth() {
+  return moment().endOf("month").format("YYYY-MM-DD");
+}
