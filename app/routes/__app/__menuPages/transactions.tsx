@@ -463,13 +463,15 @@ export default function Transactions() {
         </table>
       </div>
 
-      <Pagination
-        className="justify-center"
-        currentPage={currentPage}
-        totalPages={totalPages}
-        optionsAmount={10}
-        onPageChange={(page) => setCurrentPage(page)}
-      ></Pagination>
+      {totalPages > 1 && (
+        <Pagination
+          className="justify-center"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          optionsAmount={10}
+          onPageChange={(page) => setCurrentPage(page)}
+        ></Pagination>
+      )}
 
       <Modal
         classNames={{
