@@ -10,4 +10,5 @@ export default interface TransactionLoaderParams extends PaginationParams {
   amount_less: number | null;
   income: string | null;
   expense: string | null;
+  company: string | null;
 }

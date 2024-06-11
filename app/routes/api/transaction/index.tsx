@@ -113,6 +113,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     date_before: url.searchParams.get("date_before"),
     expense: url.searchParams.get("expense"),
     income: url.searchParams.get("income"),
+    company: url.searchParams.get("company"),
     is_income_transaction: !!url.searchParams.get("is_income_transaction"),
     is_personal_transaction: !!url.searchParams.get("is_personal_transaction"),
     name: url.searchParams.get("name"),

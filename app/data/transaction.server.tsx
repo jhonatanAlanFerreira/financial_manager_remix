@@ -1,4 +1,4 @@
-import { Transaction, User } from "@prisma/client";
+import { Prisma, Transaction, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { prisma } from "~/data/database.server";
 import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
@@ -8,24 +8,70 @@ import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/Tran
 import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 
+type TransactionWhereInput = Prisma.TransactionWhereInput;
+
 export async function list(
   user: User,
   params: TransactionLoaderParams
 ): Promise<ServerResponse<Transaction[]>> {
   const skip = (params.page - 1) * params.pageSize;
 
+  const whereClause: TransactionWhereInput = {
+    user_id: user.id,
+  };
+
+  if (params.is_personal_transaction) {
+    whereClause.is_personal_transaction = true;
+  }
+
+  if (params.is_income_transaction) {
+    whereClause.is_income = true;
+  }
+
+  if (params.name) {
+    whereClause.name = { contains: params.name };
+  }
+
+  if (params.date_after || params.date_before) {
+    whereClause.transaction_date = {};
+    if (params.date_after) {
+      whereClause.transaction_date.gte = params.date_after;
+    }
+    if (params.date_before) {
+      whereClause.transaction_date.lte = params.date_before;
+    }
+  }
+
+  if (params.amount_greater || params.amount_less) {
+    whereClause.amount = {};
+    if (params.amount_greater) {
+      whereClause.amount.gte = params.amount_greater;
+    }
+    if (params.amount_less) {
+      whereClause.amount.lte = params.amount_less;
+    }
+  }
+
+  if (params.income) {
+    whereClause.income_id = params.income;
+  }
+
+  if (params.expense) {
+    whereClause.expense_id = params.expense;
+  }
+
+  if (params.company) {
+    whereClause.company_id = params.company;
+  }
+
   const totalData = await prisma.transaction.count({
-    where: {
-      user_id: user.id,
-    },
+    where: whereClause,
   });
 
   const totalPages = Math.ceil(totalData / params.pageSize);
 
   const transactions = await prisma.transaction.findMany({
-    where: {
-      user_id: user.id,
-    },
+    where: whereClause,
     skip: skip,
     take: params.pageSize,
   });
