@@ -3,6 +3,7 @@ import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/transaction.server";
 import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
+import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -103,8 +104,19 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
-  const page = Number(url.searchParams.get("page")) || 1;
-  const pageSize = Number(url.searchParams.get("pageSize")) || 10;
+  const params: TransactionLoaderParams = {
+    page: Number(url.searchParams.get("page")) || 1,
+    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    amount_greater: Number(url.searchParams.get("amount_greater")),
+    amount_less: Number(url.searchParams.get("amount_less")),
+    date_after: url.searchParams.get("date_after"),
+    date_before: url.searchParams.get("date_before"),
+    expense: url.searchParams.get("expense"),
+    income: url.searchParams.get("income"),
+    is_income_transaction: !!url.searchParams.get("is_income_transaction"),
+    is_personal_transaction: !!url.searchParams.get("is_personal_transaction"),
+    name: url.searchParams.get("name"),
+  };
 
-  return list(user, page, pageSize);
+  return list(user, params);
 };

@@ -6,13 +6,13 @@ import TransactionCreateValidator from "~/data/requestValidators/transaction/tra
 import transactionDeleteValidator from "~/data/requestValidators/transaction/transactionDeleteValidator";
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
+import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 
 export async function list(
   user: User,
-  page: number = 1,
-  pageSize: number = 10
+  params: TransactionLoaderParams
 ): Promise<ServerResponse<Transaction[]>> {
-  const skip = (page - 1) * pageSize;
+  const skip = (params.page - 1) * params.pageSize;
 
   const totalData = await prisma.transaction.count({
     where: {
@@ -20,22 +20,22 @@ export async function list(
     },
   });
 
-  const totalPages = Math.ceil(totalData / pageSize);
+  const totalPages = Math.ceil(totalData / params.pageSize);
 
   const transactions = await prisma.transaction.findMany({
     where: {
       user_id: user.id,
     },
     skip: skip,
-    take: pageSize,
+    take: params.pageSize,
   });
 
   return {
     data: transactions,
     pageInfo: {
-      currentPage: page,
+      currentPage: params.page,
+      pageSize: params.pageSize,
       totalData,
-      pageSize,
       totalPages,
     },
   };
