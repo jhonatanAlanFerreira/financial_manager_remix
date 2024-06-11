@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
+import FilterTag from "~/components/filterTag/FilterTag";
 import Icon from "~/components/icon/Icon";
 import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
@@ -15,7 +16,9 @@ import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
+import IncomeFiltersForm from "~/interfaces/forms/income/IncomeFiltersForm";
 import { IncomeForm } from "~/interfaces/forms/income/IncomeForm";
+import { IncomeFilterTagsConfig } from "~/components/pageComponents/income/IncomeFilterTagsConfig";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
@@ -23,13 +26,17 @@ import { loader as incomeLoader } from "~/routes/api/income/index";
 export default function Incomes() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [openFilterModal, setOpenFilterModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [reloadTransactions, setReloadTransactions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -39,12 +46,23 @@ export default function Incomes() {
     incomeData: ServerResponse<IncomeWithCompanies[]>;
   }>();
 
-  const formik = useFormik<IncomeForm>({
+  const mainForm = useFormik<IncomeForm>({
     initialValues: {
       id: "",
       name: "",
       amount: 0,
       companies: [],
+      is_personal_income: false,
+    },
+    onSubmit: () => {},
+  });
+
+  const filterForm = useFormik<IncomeFiltersForm>({
+    initialValues: {
+      name: "",
+      amount_greater: 0,
+      amount_less: 0,
+      company: null,
       is_personal_income: false,
     },
     onSubmit: () => {},
@@ -61,8 +79,12 @@ export default function Incomes() {
   }, [companyData, incomeData]);
 
   useEffect(() => {
-    formik.setFieldValue("companies", null);
-  }, [formik.values.is_personal_income]);
+    mainForm.setFieldValue("companies", null);
+  }, [mainForm.values.is_personal_income]);
+
+  useEffect(() => {
+    filterForm.setFieldValue("company", null);
+  }, [filterForm.values.is_personal_income]);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -71,9 +93,9 @@ export default function Incomes() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formik.values.id) {
+    if (mainForm.values.id) {
       axiosRequest = axios.patch(
-        `/api/income?incomeId=${formik.values.id}`,
+        `/api/income?incomeId=${mainForm.values.id}`,
         formData
       );
       loadingMessage = "Updating income";
@@ -130,7 +152,7 @@ export default function Incomes() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/income?incomeId=${formik.values.id}`), {
+    toast.promise(axios.delete(`/api/income?incomeId=${mainForm.values.id}`), {
       loading: "Deleting income",
       success: (res: AxiosResponse<ServerResponse>) => {
         loadIncomes();
@@ -154,18 +176,18 @@ export default function Incomes() {
   };
 
   const onClickAdd = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setOpenAddModal(true);
   };
 
   const onModalCancel = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setResponseErrors({});
     setOpenAddModal(false);
   };
 
   const onClickDelete = (income: Income) => {
-    formik.setFieldValue("id", income.id);
+    mainForm.setFieldValue("id", income.id);
     setOpenRemoveModal(true);
   };
 
@@ -175,11 +197,11 @@ export default function Incomes() {
   };
 
   const onCompaniesChange = (companies: Company[]) => {
-    formik.setFieldValue("companies", companies);
+    mainForm.setFieldValue("companies", companies);
   };
 
   const setFormValues = (income: Income) => {
-    formik.setValues({
+    mainForm.setValues({
       id: income.id,
       amount: income.amount,
       is_personal_income: income.is_personal_income,
@@ -191,9 +213,47 @@ export default function Incomes() {
     });
   };
 
+  const onFilterFormSubmit = async () => {
+    setOpenFilterModal(false);
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      loadIncomes();
+    }
+  };
+
+  const onCompanyFilterChange = (company: Company) => {
+    filterForm.setFieldValue("company", company);
+  };
+
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap justify-center">
+          <div
+            onClick={() => setOpenFilterModal(true)}
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
+          >
+            <Icon size={30} name="Filter"></Icon>
+            Filters
+          </div>
+          {IncomeFilterTagsConfig.map(
+            (filter, index) =>
+              !!filterForm.values[filter.fieldName] && (
+                <FilterTag
+                  fieldName={filter.fieldName}
+                  onClose={(fieldName) => {
+                    filterForm.setFieldValue(fieldName, "");
+                    setReloadTransactions(true);
+                  }}
+                  className="ml-2 mb-2"
+                  label={filter.label}
+                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  key={index}
+                ></FilterTag>
+              )
+          )}
+        </div>
         <PrimaryButton
           onClick={onClickAdd}
           text="Add"
@@ -288,7 +348,7 @@ export default function Incomes() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {formik.values.id ? "Update income" : "Add new income"}
+          {mainForm.values.id ? "Update income" : "Add new income"}
         </h2>
         <div>
           <div className="p-4">
@@ -298,8 +358,8 @@ export default function Incomes() {
                   className="relative top-1"
                   name="is_personal_income"
                   id="is_personal_income"
-                  onChange={formik.handleChange}
-                  checked={formik.values.is_personal_income}
+                  onChange={mainForm.handleChange}
+                  checked={mainForm.values.is_personal_income}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -313,8 +373,8 @@ export default function Incomes() {
                 name="name"
                 required
                 errorMessage={responseErrors?.data?.errors?.["name"]}
-                value={formik.values.name}
-                onChange={formik.handleChange}
+                value={mainForm.values.name}
+                onChange={mainForm.handleChange}
               ></InputText>
               <InputText
                 label="Amount"
@@ -322,10 +382,10 @@ export default function Incomes() {
                 type="number"
                 step={0.01}
                 min={0}
-                value={formik.values.amount || 0}
-                onChange={formik.handleChange}
+                value={mainForm.values.amount || 0}
+                onChange={mainForm.handleChange}
               ></InputText>
-              {!formik.values.is_personal_income && (
+              {!mainForm.values.is_personal_income && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -336,7 +396,7 @@ export default function Incomes() {
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
                   onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={formik.values.companies}
+                  value={mainForm.values.companies}
                 ></InputSelect>
               )}
             </Form>
@@ -351,6 +411,89 @@ export default function Incomes() {
               className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
             ></PrimaryButton>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        showCloseIcon={false}
+        open={openFilterModal}
+        onClose={() => setOpenFilterModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Filters
+        </h2>
+        <div className="p-4">
+          <form>
+            <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
+              <span onClick={() => filterForm.resetForm()}>
+                Clear all filters
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
+              <div>
+                <Checkbox
+                  className="relative top-1"
+                  name="is_personal_income"
+                  id="is_personal_income_filter"
+                  onChange={filterForm.handleChange}
+                  checked={filterForm.values.is_personal_income}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_income_filter"
+                >
+                  Personal Income
+                </label>
+              </div>
+            </div>
+            <InputText
+              type="number"
+              label="Amount greater than"
+              name="amount_greater"
+              value={filterForm.values.amount_greater}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              type="number"
+              label="Amount less than"
+              name="amount_less"
+              value={filterForm.values.amount_less}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              label="Name"
+              name="name"
+              onChange={filterForm.handleChange}
+              value={filterForm.values.name}
+            ></InputText>
+            {!filterForm.values.is_personal_income && (
+              <InputSelect
+                isClearable
+                className="mb-8"
+                placeholder="Company"
+                options={companies.data}
+                getOptionLabel={getSelectCompanyOptionLabel as any}
+                getOptionValue={getSelectCompanyOptionValue as any}
+                name="company"
+                onChange={(event) => onCompanyFilterChange(event as Company)}
+                value={filterForm.values.company}
+              ></InputSelect>
+            )}
+
+            <div className="flex justify-end p-2 mt-10">
+              <PrimaryButton
+                onClick={onFilterFormSubmit}
+                text="Done"
+                type="button"
+              ></PrimaryButton>
+            </div>
+          </form>
         </div>
       </Modal>
     </Loader>

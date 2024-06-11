@@ -32,11 +32,11 @@ import {
 import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
-import TransactionsFilters from "~/components/pageComponents/transactions/TransactionsFilters";
-import TransactionAdd from "~/components/pageComponents/transactions/TransactionAdd";
+import TransactionsFilters from "~/components/pageComponents/transaction/TransactionsFilters";
+import TransactionAdd from "~/components/pageComponents/transaction/TransactionAdd";
 import FilterTag from "~/components/filterTag/FilterTag";
-import { FilterTagsConfig } from "~/interfaces/pageComponents/transactions/FilterTagsConfig";
 import Pagination from "~/components/pagination/Pagination";
+import { TransactionFilterTagsConfig } from "~/components/pageComponents/transaction/TransactionFilterTagsConfig";
 
 export default function Transactions() {
   const [loading, setLoading] = useState(true);
@@ -357,7 +357,7 @@ export default function Transactions() {
             <Icon size={30} name="Filter"></Icon>
             Filters
           </div>
-          {FilterTagsConfig.map(
+          {TransactionFilterTagsConfig.map(
             (filter, index) =>
               !!filterForm.values[filter.fieldName] && (
                 <FilterTag

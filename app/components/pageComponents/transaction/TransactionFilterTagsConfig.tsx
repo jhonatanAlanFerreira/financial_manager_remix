@@ -1,7 +1,7 @@
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import { formatDate } from "~/utilities";
 
-export const FilterTagsConfig: {
+export const TransactionFilterTagsConfig: {
   fieldName: keyof TransactionFiltersForm;
   label: string;
   getValue: (fieldValue: any) => string;

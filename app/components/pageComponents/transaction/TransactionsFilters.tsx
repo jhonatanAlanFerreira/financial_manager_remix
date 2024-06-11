@@ -4,7 +4,7 @@ import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import InputText from "~/components/inputs/inputText/InputText";
-import { FiltersProps } from "~/interfaces/pageComponents/transactions/FiltersProps";
+import { TransactionFiltersProps } from "~/interfaces/pageComponents/transactions/TransactionFiltersProps";
 
 export default function TransactionsFilters({
   companies,
@@ -12,7 +12,7 @@ export default function TransactionsFilters({
   incomes,
   formik,
   onSubmit,
-}: FiltersProps) {
+}: TransactionFiltersProps) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
   const [skipEffect, setSkipEffect] = useState(true);

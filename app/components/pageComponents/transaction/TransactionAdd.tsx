@@ -12,7 +12,7 @@ import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import InputText from "~/components/inputs/inputText/InputText";
-import { AddProps } from "~/interfaces/pageComponents/transactions/AddProps";
+import { TransactionAddProps } from "~/interfaces/pageComponents/transactions/TransactionAddProps";
 
 export default function TransactionAdd({
   companies,
@@ -26,7 +26,7 @@ export default function TransactionAdd({
   onSubmit,
   setSkipEffect,
   onModalCancel,
-}: AddProps) {
+}: TransactionAddProps) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
   const [filteredClassifications, setFilteredClassifications] = useState<

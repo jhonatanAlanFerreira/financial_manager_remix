@@ -7,9 +7,9 @@ import {
 import { FormikProps } from "formik";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
-import { TransactionForm } from "~/interfaces/forms/TransactionForm";
+import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 
-export interface AddProps {
+export interface TransactionAddProps {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   setSkipEffect: (value: boolean) => void;
   onModalCancel: () => void;
