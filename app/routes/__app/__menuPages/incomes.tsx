@@ -28,7 +28,7 @@ export default function Incomes() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openFilterModal, setOpenFilterModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [reloadTransactions, setReloadTransactions] = useState(false);
+  const [reloadIncomes, setReloadIncomes] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
