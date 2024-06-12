@@ -129,7 +129,7 @@ export default function Transactions() {
     }
     if (transactionData) {
       setCurrentPage(transactionData.pageInfo?.currentPage || 0);
-      setTotalPages(transactionData.pageInfo?.totalData || 0);
+      setTotalPages(transactionData.pageInfo?.totalPages || 0);
       setTransactions(transactionData);
     }
     if (incomeData) {
