@@ -1,4 +1,4 @@
-import { Income, User } from "@prisma/client";
+import { Income, Prisma, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
 import { prisma } from "~/data/database.server";
@@ -7,6 +7,9 @@ import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import incomeDeleteValidator from "~/data/requestValidators/income/incomeDeleteValidator";
 import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 import incomeUpdateValidator from "~/data/requestValidators/income/incomeUpdateValidator";
+import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
+
+type IncomeWhereInput = Prisma.IncomeWhereInput;
 
 export async function create(
   data: IncomeCreateRequest,
@@ -40,17 +43,58 @@ export async function create(
 
 export async function list(
   user: User,
-  includeCompanies: boolean
+  params: IncomeLoaderParams
 ): Promise<ServerResponse<Income[] | IncomeWithCompanies[]>> {
+  const skip = (params.page - 1) * params.pageSize;
+
+  const whereClause: IncomeWhereInput = {
+    user_id: user.id,
+  };
+
+  if (params.is_personal_income) {
+    whereClause.is_personal_income = true;
+  }
+
+  if (params.name) {
+    whereClause.name = { contains: params.name };
+  }
+
+  if (params.amount_greater || params.amount_less) {
+    whereClause.amount = {};
+    if (params.amount_greater) {
+      whereClause.amount.gte = params.amount_greater;
+    }
+    if (params.amount_less) {
+      whereClause.amount.lte = params.amount_less;
+    }
+  }
+
+  if (params.company) {
+    whereClause.company_ids = {
+      has: params.company,
+    };
+  }
+
   const incomes = await prisma.income.findMany({
-    where: {
-      user_id: user.id,
-    },
-    include: includeCompanies ? { companies: true } : undefined,
+    where: whereClause,
+    skip: skip,
+    take: params.pageSize,
   });
+
+  const totalData = await prisma.income.count({
+    where: whereClause,
+  });
+
+  const totalPages = Math.ceil(totalData / params.pageSize);
 
   return {
     data: incomes,
+    pageInfo: {
+      currentPage: params.page,
+      pageSize: params.pageSize,
+      totalData,
+      totalPages,
+    },
   };
 }
 

@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import IncomeUpdateRequest from "~/interfaces/bodyRequests/IncomeUpdateRequest";
 import { prisma } from "~/data/database.server";
+import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 
 export default async function incomeUpdateValidator(
   data: IncomeUpdateRequest,

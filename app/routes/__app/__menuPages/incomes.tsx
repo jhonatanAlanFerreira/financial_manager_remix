@@ -22,6 +22,8 @@ import { IncomeFilterTagsConfig } from "~/components/pageComponents/income/Incom
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
+import Pagination from "~/components/pagination/Pagination";
+import { queryParamsFromObject } from "~/utilities";
 
 export default function Incomes() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,6 +31,7 @@ export default function Incomes() {
   const [openFilterModal, setOpenFilterModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [reloadIncomes, setReloadIncomes] = useState(false);
+  const [searchParams, setSearchParams] = useState("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
@@ -69,10 +72,16 @@ export default function Incomes() {
   });
 
   useEffect(() => {
+    buildSearchParamsUrl();
+  }, []);
+
+  useEffect(() => {
     if (companyData) {
       setCompanies(companyData);
     }
     if (incomeData) {
+      setCurrentPage(incomeData.pageInfo?.currentPage || 0);
+      setTotalPages(incomeData.pageInfo?.totalPages || 0);
       setIncomes(incomeData);
     }
     setLoading(false);
@@ -85,6 +94,27 @@ export default function Incomes() {
   useEffect(() => {
     filterForm.setFieldValue("company", null);
   }, [filterForm.values.is_personal_income]);
+
+  useEffect(() => {
+    if (currentPage) {
+      loadIncomes();
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, [filterForm.values]);
+
+  useEffect(() => {
+    if (reloadIncomes) {
+      setReloadIncomes(false);
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadIncomes();
+      }
+    }
+  }, [searchParams]);
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -132,7 +162,14 @@ export default function Incomes() {
   const loadIncomes = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/income");
+      const res = await axios.get<ServerResponse<Income[]>>(
+        `/api/income?${searchParams}${
+          searchParams ? "&" : ""
+        }${paginationParams()}`
+      );
+      setCurrentPage(res.data.pageInfo?.currentPage || 0);
+      setTotalPages(res.data.pageInfo?.totalPages || 0);
+
       setIncomes(res.data);
       setLoading(false);
     } catch (error) {
@@ -226,6 +263,20 @@ export default function Incomes() {
     filterForm.setFieldValue("company", company);
   };
 
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: currentPage,
+    } as any).toString();
+  };
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(filterForm.values, {
+        company: "id",
+      })
+    );
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -244,7 +295,7 @@ export default function Incomes() {
                   fieldName={filter.fieldName}
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
-                    setReloadTransactions(true);
+                    setReloadIncomes(true);
                   }}
                   className="ml-2 mb-2"
                   label={filter.label}
@@ -307,6 +358,16 @@ export default function Incomes() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          className="justify-center"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          optionsAmount={10}
+          onPageChange={(page) => setCurrentPage(page)}
+        ></Pagination>
+      )}
 
       <Modal
         classNames={{
@@ -503,7 +564,7 @@ export default function Incomes() {
 export async function loader(request: LoaderFunctionArgs) {
   const res = await Promise.all([
     companyLoader(request),
-    incomeLoader(request, true),
+    incomeLoader(request),
   ]);
   return {
     companyData: res[0],

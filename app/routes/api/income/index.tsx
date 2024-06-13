@@ -3,6 +3,7 @@ import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/income.server";
 import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
 import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
+import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -15,16 +16,20 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export let loader = async (
-  { request }: LoaderFunctionArgs,
-  includeCompanies = false
-) => {
+export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
-  if (request.url.includes("includeCompanies=true")) {
-    includeCompanies = true;
-  }
 
-  return list(user, includeCompanies);
+  const url = new URL(request.url);
+  const params: IncomeLoaderParams = {
+    page: Number(url.searchParams.get("page")) || 1,
+    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    amount_greater: Number(url.searchParams.get("amount_greater")),
+    amount_less: Number(url.searchParams.get("amount_less")),
+    company: url.searchParams.get("company"),
+    is_personal_income: !!url.searchParams.get("is_personal_income"),
+    name: url.searchParams.get("name"),
+  };
+  return list(user, params);
 };
 
 let createIncome = async (request: Request) => {
