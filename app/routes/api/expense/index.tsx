@@ -3,6 +3,7 @@ import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/expense.server";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
+import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -15,16 +16,20 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export let loader = async (
-  { request }: LoaderFunctionArgs,
-  includeCompanies = false
-) => {
+export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
-  if (request.url.includes("includeCompanies=true")) {
-    includeCompanies = true;
-  }
 
-  return list(user, includeCompanies);
+  const url = new URL(request.url);
+  const params: ExpenseLoaderParams = {
+    page: Number(url.searchParams.get("page")) || 1,
+    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    amount_greater: Number(url.searchParams.get("amount_greater")),
+    amount_less: Number(url.searchParams.get("amount_less")),
+    company: url.searchParams.get("company"),
+    is_personal_expense: !!url.searchParams.get("is_personal_expense"),
+    name: url.searchParams.get("name"),
+  };
+  return list(user, params);
 };
 
 let createExpense = async (request: Request) => {

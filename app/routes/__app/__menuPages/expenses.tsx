@@ -19,13 +19,21 @@ import Icon from "~/components/icon/Icon";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import { useFormik } from "formik";
 import { ExpenseForm } from "~/interfaces/forms/expense/ExpenseForm";
+import FilterTag from "~/components/filterTag/FilterTag";
+import ExpenseFiltersForm from "~/interfaces/forms/expense/ExpenseFiltersForm";
+import { ExpenseFilterTagsConfig } from "~/components/pageComponents/expense/ExpenseFilterTagsConfig";
+import Pagination from "~/components/pagination/Pagination";
+import { queryParamsFromObject } from "~/utilities";
 
 export default function Expenses() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [expenses, setExpenses] = useState<
-    ServerResponse<ExpenseWithCompanies[]>
-  >({});
+  const [openFilterModal, setOpenFilterModal] = useState(false);
+  const [reloadExpenses, setReloadExpenses] = useState(false);
+  const [searchParams, setSearchParams] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
@@ -34,7 +42,7 @@ export default function Expenses() {
   const [loading, setLoading] = useState<boolean>(true);
 
   const { expenseData, companyData } = useLoaderData<{
-    expenseData: ServerResponse<ExpenseWithCompanies[]>;
+    expenseData: ServerResponse<Expense[]>;
     companyData: ServerResponse<Company[]>;
   }>();
 
@@ -49,11 +57,28 @@ export default function Expenses() {
     onSubmit: () => {},
   });
 
+  const filterForm = useFormik<ExpenseFiltersForm>({
+    initialValues: {
+      name: "",
+      amount_greater: 0,
+      amount_less: 0,
+      company: null,
+      is_personal_expense: false,
+    },
+    onSubmit: () => {},
+  });
+
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
 
   useEffect(() => {
+    buildSearchParamsUrl();
+  }, []);
+
+  useEffect(() => {
     if (expenseData) {
+      setCurrentPage(expenseData.pageInfo?.currentPage || 0);
+      setTotalPages(expenseData.pageInfo?.totalPages || 0);
       setExpenses(expenseData);
     }
     if (companyData) {
@@ -62,10 +87,39 @@ export default function Expenses() {
     setLoading(false);
   }, [expenseData, companyData]);
 
+  useEffect(() => {
+    if (currentPage) {
+      loadExpenses();
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, [filterForm.values]);
+
+  useEffect(() => {
+    if (reloadExpenses) {
+      setReloadExpenses(false);
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadExpenses();
+      }
+    }
+  }, [searchParams]);
+
   const loadExpenses = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/expense?includeCompanies=true");
+      const res = await axios.get<ServerResponse<Expense[]>>(
+        `/api/expense?${searchParams}${
+          searchParams ? "&" : ""
+        }${paginationParams()}`
+      );
+
+      setCurrentPage(res.data.pageInfo?.currentPage || 0);
+      setTotalPages(res.data.pageInfo?.totalPages || 0);
+
       setExpenses(res.data);
       setLoading(false);
     } catch (error) {
@@ -124,7 +178,7 @@ export default function Expenses() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
-  const getExpenseType = (expense: ExpenseWithCompanies) => {
+  const getExpenseType = (expense: Expense) => {
     return expense.is_personal_expense ? "Personal Expense" : "Company Expense";
   };
 
@@ -189,9 +243,61 @@ export default function Expenses() {
     setOpenAddModal(false);
   };
 
+  const onCompanyFilterChange = (company: Company) => {
+    filterForm.setFieldValue("company", company);
+  };
+
+  const onFilterFormSubmit = async () => {
+    setOpenFilterModal(false);
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      loadExpenses();
+    }
+  };
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(filterForm.values, {
+        company: "id",
+      })
+    );
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: currentPage,
+    } as any).toString();
+  };
+
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap justify-center">
+          <div
+            onClick={() => setOpenFilterModal(true)}
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
+          >
+            <Icon size={30} name="Filter"></Icon>
+            Filters
+          </div>
+          {ExpenseFilterTagsConfig.map(
+            (filter, index) =>
+              !!filterForm.values[filter.fieldName] && (
+                <FilterTag
+                  fieldName={filter.fieldName}
+                  onClose={(fieldName) => {
+                    filterForm.setFieldValue(fieldName, "");
+                    setReloadExpenses(true);
+                  }}
+                  className="ml-2 mb-2"
+                  label={filter.label}
+                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  key={index}
+                ></FilterTag>
+              )
+          )}
+        </div>
         <PrimaryButton
           onClick={onClickAdd}
           text="Add"
@@ -249,6 +355,16 @@ export default function Expenses() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          className="justify-center"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          optionsAmount={10}
+          onPageChange={(page) => setCurrentPage(page)}
+        ></Pagination>
+      )}
 
       <Modal
         classNames={{
@@ -355,13 +471,96 @@ export default function Expenses() {
           </div>
         </div>
       </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        showCloseIcon={false}
+        open={openFilterModal}
+        onClose={() => setOpenFilterModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Filters
+        </h2>
+        <div className="p-4">
+          <form>
+            <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
+              <span onClick={() => filterForm.resetForm()}>
+                Clear all filters
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
+              <div>
+                <Checkbox
+                  className="relative top-1"
+                  name="is_personal_expense"
+                  id="is_personal_expense_filter"
+                  onChange={filterForm.handleChange}
+                  checked={filterForm.values.is_personal_expense}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_expense_filter"
+                >
+                  Personal Expense
+                </label>
+              </div>
+            </div>
+            <InputText
+              type="number"
+              label="Amount greater than"
+              name="amount_greater"
+              value={filterForm.values.amount_greater}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              type="number"
+              label="Amount less than"
+              name="amount_less"
+              value={filterForm.values.amount_less}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              label="Name"
+              name="name"
+              onChange={filterForm.handleChange}
+              value={filterForm.values.name}
+            ></InputText>
+            {!filterForm.values.is_personal_expense && (
+              <InputSelect
+                isClearable
+                className="mb-8"
+                placeholder="Company"
+                options={companies.data}
+                getOptionLabel={getSelectCompanyOptionLabel as any}
+                getOptionValue={getSelectCompanyOptionValue as any}
+                name="company"
+                onChange={(event) => onCompanyFilterChange(event as Company)}
+                value={filterForm.values.company}
+              ></InputSelect>
+            )}
+
+            <div className="flex justify-end p-2 mt-10">
+              <PrimaryButton
+                onClick={onFilterFormSubmit}
+                text="Done"
+                type="button"
+              ></PrimaryButton>
+            </div>
+          </form>
+        </div>
+      </Modal>
     </Loader>
   );
 }
 
 export async function loader(request: LoaderFunctionArgs) {
   const res = await Promise.all([
-    expenseLoader(request, true),
+    expenseLoader(request),
     companyLoader(request),
   ]);
 

@@ -2,11 +2,14 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import { expenseCreateValidator } from "~/data/requestValidators/expense/expenseCreateValidator";
 import { prisma } from "~/data/database.server";
-import { Expense, User } from "@prisma/client";
+import { Expense, Prisma, User } from "@prisma/client";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import expenseDeleteValidator from "~/data/requestValidators/expense/expenseDeleteValidator";
 import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 import { expenseUpdateValidator } from "~/data/requestValidators/expense/expenseUpdateValidator";
+import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
+
+type ExpenseWhereInput = Prisma.ExpenseWhereInput;
 
 export async function create(
   data: ExpenseCreateRequest,
@@ -40,17 +43,58 @@ export async function create(
 
 export async function list(
   user: User,
-  includeCompanies: boolean
+  params: ExpenseLoaderParams
 ): Promise<ServerResponse<Expense[] | ExpenseWithCompanies[]>> {
+  const skip = (params.page - 1) * params.pageSize;
+
+  const whereClause: ExpenseWhereInput = {
+    user_id: user.id,
+  };
+
+  if (params.is_personal_expense) {
+    whereClause.is_personal_expense = true;
+  }
+
+  if (params.name) {
+    whereClause.name = { contains: params.name };
+  }
+
+  if (params.amount_greater || params.amount_less) {
+    whereClause.amount = {};
+    if (params.amount_greater) {
+      whereClause.amount.gte = params.amount_greater;
+    }
+    if (params.amount_less) {
+      whereClause.amount.lte = params.amount_less;
+    }
+  }
+
+  if (params.company) {
+    whereClause.company_ids = {
+      has: params.company,
+    };
+  }
+
   const expenses = await prisma.expense.findMany({
-    where: {
-      user_id: user.id,
-    },
-    include: includeCompanies ? { companies: true } : undefined,
+    where: whereClause,
+    skip: skip,
+    take: params.pageSize,
   });
+
+  const totalData = await prisma.expense.count({
+    where: whereClause,
+  });
+
+  const totalPages = Math.ceil(totalData / params.pageSize);
 
   return {
     data: expenses,
+    pageInfo: {
+      currentPage: params.page,
+      pageSize: params.pageSize,
+      totalData,
+      totalPages,
+    },
   };
 }
 
