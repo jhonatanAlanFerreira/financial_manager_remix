@@ -103,7 +103,7 @@ export let loader = async (
   const url = new URL(request.url);
   const params: ClassificationLoaderParams = {
     page: Number(url.searchParams.get("page")) || 1,
-    pageSize: Number(url.searchParams.get("pageSize")) || 3,
+    pageSize: Number(url.searchParams.get("pageSize")) || 10,
     company: url.searchParams.get("company"),
     name: url.searchParams.get("name"),
     is_income: !!url.searchParams.get("is_income"),
