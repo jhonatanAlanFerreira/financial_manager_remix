@@ -580,7 +580,7 @@ export default function Classifications() {
 export async function loader(request: LoaderFunctionArgs) {
   const res = await Promise.all([
     companyLoader(request),
-    classificationLoader(request, true),
+    classificationLoader(request),
   ]);
 
   return {

@@ -96,7 +96,6 @@ let updateClassification = async (request: Request) => {
 
 export let loader = async (
   { request }: LoaderFunctionArgs,
-  includeCompany = false
 ) => {
   const user = await requireUserSession(request);
 
