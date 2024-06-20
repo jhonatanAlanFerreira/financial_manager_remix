@@ -1,4 +1,4 @@
-import { TransactionClassification, User } from "@prisma/client";
+import { Prisma, TransactionClassification, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
 import classificationCreateValidator from "~/data/requestValidators/classification/classificationCreateValidator";
@@ -7,6 +7,10 @@ import classificationDeleteValidator from "~/data/requestValidators/classificati
 import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 import classificationUpdateValidator from "~/data/requestValidators/classification/classificationUpdateValidator";
 import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
+import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";
+
+type TransactionClassificationWhereInput =
+  Prisma.TransactionClassificationWhereInput;
 
 export async function create(
   data: ClassificationCreateRequest,
@@ -108,18 +112,53 @@ export async function update(
 
 export async function list(
   user: User,
-  includeCompany: boolean
+  params: ClassificationLoaderParams
 ): Promise<
   ServerResponse<TransactionClassification[] | ClassificationWithCompany[]>
 > {
+  const skip = (params.page - 1) * params.pageSize;
+
+  const whereClause: TransactionClassificationWhereInput = {
+    user_id: user.id,
+  };
+
+  if (params.is_income) {
+    whereClause.is_income = true;
+  }
+
+  if (params.is_personal_transaction_classification) {
+    whereClause.is_personal_transaction_classification = true;
+  }
+
+  if (params.name) {
+    whereClause.name = { contains: params.name };
+  }
+
+  if (params.company) {
+    whereClause.company_ids = {
+      has: params.company,
+    };
+  }
+
   const classifications = await prisma.transactionClassification.findMany({
-    where: {
-      user_id: user.id,
-    },
-    include: includeCompany ? { companies: true } : undefined,
+    where: whereClause,
+    skip: skip,
+    take: params.pageSize,
   });
+
+  const totalData = await prisma.transactionClassification.count({
+    where: whereClause,
+  });
+
+  const totalPages = Math.ceil(totalData / params.pageSize);
 
   return {
     data: classifications,
+    pageInfo: {
+      currentPage: params.page,
+      pageSize: params.pageSize,
+      totalData,
+      totalPages,
+    },
   };
 }

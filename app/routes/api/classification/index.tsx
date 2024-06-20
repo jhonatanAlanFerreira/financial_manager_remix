@@ -3,6 +3,7 @@ import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/classification.server";
 import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
 import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
+import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -98,9 +99,17 @@ export let loader = async (
   includeCompany = false
 ) => {
   const user = await requireUserSession(request);
-  if (request.url.includes("includeCompany=true")) {
-    includeCompany = true;
-  }
 
-  return list(user, includeCompany);
+  const url = new URL(request.url);
+  const params: ClassificationLoaderParams = {
+    page: Number(url.searchParams.get("page")) || 1,
+    pageSize: Number(url.searchParams.get("pageSize")) || 3,
+    company: url.searchParams.get("company"),
+    name: url.searchParams.get("name"),
+    is_income: !!url.searchParams.get("is_income"),
+    is_personal_transaction_classification: !!url.searchParams.get(
+      "is_personal_transaction_classification"
+    ),
+  };
+  return list(user, params);
 };

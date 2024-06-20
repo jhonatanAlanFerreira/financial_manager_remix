@@ -46,7 +46,7 @@ export default function Expenses() {
     companyData: ServerResponse<Company[]>;
   }>();
 
-  const formik = useFormik<ExpenseForm>({
+  const mainForm = useFormik<ExpenseForm>({
     initialValues: {
       id: "",
       name: "",
@@ -142,9 +142,9 @@ export default function Expenses() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formik.values.id) {
+    if (mainForm.values.id) {
       axiosRequest = axios.patch(
-        `/api/expense?expenseId=${formik.values.id}`,
+        `/api/expense?expenseId=${mainForm.values.id}`,
         formData
       );
       loadingMessage = "Updating expense";
@@ -186,27 +186,30 @@ export default function Expenses() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/expense?expenseId=${formik.values.id}`), {
-      loading: "Deleting expense",
-      success: (res: AxiosResponse<ServerResponse>) => {
-        loadExpenses();
-        return res.data.message as string;
-      },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
-      },
-    });
+    toast.promise(
+      axios.delete(`/api/expense?expenseId=${mainForm.values.id}`),
+      {
+        loading: "Deleting expense",
+        success: (res: AxiosResponse<ServerResponse>) => {
+          loadExpenses();
+          return res.data.message as string;
+        },
+        error: (error) => {
+          if (isAxiosError(error)) {
+            setLoading(false);
+            return (
+              error.response?.data.message ||
+              "Sorry, unexpected error. Be back soon"
+            );
+          }
+          return "Sorry, unexpected error. Be back soon";
+        },
+      }
+    );
   };
 
   const setFormValues = (expense: Expense) => {
-    formik.setValues({
+    mainForm.setValues({
       id: expense.id,
       amount: expense.amount,
       is_personal_expense: expense.is_personal_expense,
@@ -219,11 +222,11 @@ export default function Expenses() {
   };
 
   const onCompaniesChange = (companies: Company[]) => {
-    formik.setFieldValue("companies", companies);
+    mainForm.setFieldValue("companies", companies);
   };
 
   const onClickAdd = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setOpenAddModal(true);
   };
 
@@ -233,12 +236,12 @@ export default function Expenses() {
   };
 
   const onClickDelete = (expense: Expense) => {
-    formik.setFieldValue("id", expense.id);
+    mainForm.setFieldValue("id", expense.id);
     setOpenRemoveModal(true);
   };
 
   const onModalCancel = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setResponseErrors({});
     setOpenAddModal(false);
   };
@@ -406,7 +409,7 @@ export default function Expenses() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {formik.values.id ? "Update expense" : "Add new expense"}
+          {mainForm.values.id ? "Update expense" : "Add new expense"}
         </h2>
         <div>
           <div className="p-4">
@@ -416,8 +419,8 @@ export default function Expenses() {
                   className="relative top-1"
                   name="is_personal_expense"
                   id="is_personal_expense"
-                  checked={formik.values.is_personal_expense}
-                  onChange={formik.handleChange}
+                  checked={mainForm.values.is_personal_expense}
+                  onChange={mainForm.handleChange}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -430,8 +433,8 @@ export default function Expenses() {
                 label="Name *"
                 name="name"
                 required
-                value={formik.values.name}
-                onChange={formik.handleChange}
+                value={mainForm.values.name}
+                onChange={mainForm.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
               <InputText
@@ -440,10 +443,10 @@ export default function Expenses() {
                 type="number"
                 step={0.01}
                 min={0}
-                value={formik.values.amount || 0}
-                onChange={formik.handleChange}
+                value={mainForm.values.amount || 0}
+                onChange={mainForm.handleChange}
               ></InputText>
-              {!formik.values.is_personal_expense && (
+              {!mainForm.values.is_personal_expense && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -454,7 +457,7 @@ export default function Expenses() {
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
                   onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={formik.values.companies}
+                  value={mainForm.values.companies}
                 ></InputSelect>
               )}
             </Form>

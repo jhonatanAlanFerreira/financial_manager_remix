@@ -16,29 +16,38 @@ import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import Icon from "~/components/icon/Icon";
-import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
 import { useFormik } from "formik";
 import { ClassificationForm } from "~/interfaces/forms/classification/ClassificationForm";
+import FilterTag from "~/components/filterTag/FilterTag";
+import ClassificationFiltersForm from "~/interfaces/forms/classification/ClassificationFiltersForm";
+import { ClassificationFilterTagsConfig } from "~/components/pageComponents/classification/ClassificationFilterTagsConfig";
+import { queryParamsFromObject } from "~/utilities";
+import Pagination from "~/components/pagination/Pagination";
 
 export default function Classifications() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [openFilterModal, setOpenFilterModal] = useState(false);
+  const [reloadClassification, setReloadClassification] = useState(false);
+  const [searchParams, setSearchParams] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
-    ServerResponse<ClassificationWithCompany[]>
+    ServerResponse<TransactionClassification[]>
   >({});
 
   const { companyData, classificationData } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
-    classificationData: ServerResponse<ClassificationWithCompany[]>;
+    classificationData: ServerResponse<TransactionClassification[]>;
   }>();
 
-  const formik = useFormik<ClassificationForm>({
+  const mainForm = useFormik<ClassificationForm>({
     initialValues: {
       id: "",
       name: "",
@@ -49,23 +58,68 @@ export default function Classifications() {
     onSubmit: () => {},
   });
 
+  const filterForm = useFormik<ClassificationFiltersForm>({
+    initialValues: {
+      name: "",
+      company: null,
+      is_personal_transaction_classification: false,
+      is_income: false,
+    },
+    onSubmit: () => {},
+  });
+
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, []);
 
   useEffect(() => {
     if (companyData) {
       setCompanies(companyData);
     }
     if (classificationData) {
+      setCurrentPage(classificationData.pageInfo?.currentPage || 0);
+      setTotalPages(classificationData.pageInfo?.totalPages || 0);
       setClassifications(classificationData);
     }
     setLoading(false);
   }, [companyData, classificationData]);
 
+  useEffect(() => {
+    if (currentPage) {
+      loadClassifications();
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, [filterForm.values]);
+
+  useEffect(() => {
+    if (reloadClassification) {
+      setReloadClassification(false);
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadClassifications();
+      }
+    }
+  }, [searchParams]);
+
   const loadClassifications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/classification?includeCompany=true");
+      const res = await axios.get<ServerResponse<TransactionClassification[]>>(
+        `/api/classification?${searchParams}${
+          searchParams ? "&" : ""
+        }${paginationParams()}`
+      );
+
+      setCurrentPage(res.data.pageInfo?.currentPage || 0);
+      setTotalPages(res.data.pageInfo?.totalPages || 0);
+
       setClassifications(res.data);
       setLoading(false);
     } catch (error) {
@@ -88,9 +142,9 @@ export default function Classifications() {
     let axiosRequest;
     let loadingMessage;
 
-    if (formik.values.id) {
+    if (mainForm.values.id) {
       axiosRequest = axios.patch(
-        `/api/classification?classificationId=${formik.values.id}`,
+        `/api/classification?classificationId=${mainForm.values.id}`,
         formData
       );
       loadingMessage = "Updating classification";
@@ -124,7 +178,7 @@ export default function Classifications() {
       .finally(() => setTimeout(() => setIsSubmitting(false), 500));
   };
 
-  const getClassificationType = (classification: ClassificationWithCompany) => {
+  const getClassificationType = (classification: TransactionClassification) => {
     return classification.is_personal_transaction_classification
       ? "Personal Transaction Classification"
       : "Company Transaction Classification";
@@ -135,7 +189,9 @@ export default function Classifications() {
     setLoading(true);
 
     toast.promise(
-      axios.delete(`/api/classification?classificationId=${formik.values.id}`),
+      axios.delete(
+        `/api/classification?classificationId=${mainForm.values.id}`
+      ),
       {
         loading: "Deleting classification",
         success: (res: AxiosResponse<ServerResponse>) => {
@@ -157,7 +213,7 @@ export default function Classifications() {
   };
 
   const setFormValues = (classification: TransactionClassification) => {
-    formik.setValues({
+    mainForm.setValues({
       id: classification.id,
       name: classification.name,
       is_personal_transaction_classification:
@@ -171,11 +227,11 @@ export default function Classifications() {
   };
 
   const onCompaniesChange = (companies: Company[]) => {
-    formik.setFieldValue("companies", companies);
+    mainForm.setFieldValue("companies", companies);
   };
 
   const onClickAdd = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setOpenAddModal(true);
   };
 
@@ -185,19 +241,71 @@ export default function Classifications() {
   };
 
   const onClickDelete = (classification: TransactionClassification) => {
-    formik.setFieldValue("id", classification.id);
+    mainForm.setFieldValue("id", classification.id);
     setOpenRemoveModal(true);
   };
 
   const onModalCancel = () => {
-    formik.resetForm();
+    mainForm.resetForm();
     setResponseErrors({});
     setOpenAddModal(false);
   };
 
+  const onCompanyFilterChange = (company: Company) => {
+    filterForm.setFieldValue("company", company);
+  };
+
+  const onFilterFormSubmit = async () => {
+    setOpenFilterModal(false);
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      loadClassifications();
+    }
+  };
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(filterForm.values, {
+        company: "id",
+      })
+    );
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: currentPage,
+    } as any).toString();
+  };
+
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap justify-center">
+          <div
+            onClick={() => setOpenFilterModal(true)}
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
+          >
+            <Icon size={30} name="Filter"></Icon>
+            Filters
+          </div>
+          {ClassificationFilterTagsConfig.map(
+            (filter, index) =>
+              !!filterForm.values[filter.fieldName] && (
+                <FilterTag
+                  fieldName={filter.fieldName}
+                  onClose={(fieldName) => {
+                    filterForm.setFieldValue(fieldName, "");
+                    setReloadClassification(true);
+                  }}
+                  className="ml-2 mb-2"
+                  label={filter.label}
+                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  key={index}
+                ></FilterTag>
+              )
+          )}
+        </div>
         <PrimaryButton
           onClick={onClickAdd}
           text="Add"
@@ -252,6 +360,16 @@ export default function Classifications() {
         </table>
       </div>
 
+      {totalPages > 1 && (
+        <Pagination
+          className="justify-center"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          optionsAmount={10}
+          onPageChange={(page) => setCurrentPage(page)}
+        ></Pagination>
+      )}
+
       <Modal
         classNames={{
           modal: "p-0 m-0 w-full sm:w-1/3",
@@ -292,7 +410,7 @@ export default function Classifications() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {formik.values.id
+          {mainForm.values.id
             ? "Update classification"
             : "Add new classification"}
         </h2>
@@ -306,9 +424,9 @@ export default function Classifications() {
                     id="is_personal_transaction_classification"
                     className="relative top-1"
                     checked={
-                      formik.values.is_personal_transaction_classification
+                      mainForm.values.is_personal_transaction_classification
                     }
-                    onChange={formik.handleChange}
+                    onChange={mainForm.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
@@ -322,8 +440,8 @@ export default function Classifications() {
                     className="relative top-1"
                     name="is_income"
                     id="is_income"
-                    checked={formik.values.is_income}
-                    onChange={formik.handleChange}
+                    checked={mainForm.values.is_income}
+                    onChange={mainForm.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
@@ -337,11 +455,11 @@ export default function Classifications() {
                 label="Name *"
                 name="name"
                 required
-                value={formik.values.name}
-                onChange={formik.handleChange}
+                value={mainForm.values.name}
+                onChange={mainForm.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
               ></InputText>
-              {!formik.values.is_personal_transaction_classification && (
+              {!mainForm.values.is_personal_transaction_classification && (
                 <InputSelect
                   isClearable
                   isMulti
@@ -352,7 +470,7 @@ export default function Classifications() {
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
                   onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={formik.values.companies}
+                  value={mainForm.values.companies}
                 ></InputSelect>
               )}
             </Form>
@@ -367,6 +485,92 @@ export default function Classifications() {
               className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
             ></PrimaryButton>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        showCloseIcon={false}
+        open={openFilterModal}
+        onClose={() => setOpenFilterModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Filters
+        </h2>
+        <div className="p-4">
+          <form>
+            <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
+              <span onClick={() => filterForm.resetForm()}>
+                Clear all filters
+              </span>
+            </div>
+            <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
+              <div>
+                <Checkbox
+                  className="relative top-1"
+                  name="is_income"
+                  id="is_income_filter"
+                  onChange={filterForm.handleChange}
+                  checked={filterForm.values.is_income}
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_income_filter"
+                >
+                  Income
+                </label>
+              </div>
+              <div>
+                <Checkbox
+                  className="relative top-1"
+                  name="is_personal_transaction_classification"
+                  id="is_personal_transaction_classification_filter"
+                  onChange={filterForm.handleChange}
+                  checked={
+                    filterForm.values.is_personal_transaction_classification
+                  }
+                ></Checkbox>
+                <label
+                  className="pl-3 text-violet-950 cursor-pointer"
+                  htmlFor="is_personal_transaction_classification_filter"
+                >
+                  Personal Classification
+                </label>
+              </div>
+            </div>
+            <InputText
+              label="Name"
+              name="name"
+              onChange={filterForm.handleChange}
+              value={filterForm.values.name}
+            ></InputText>
+            {!filterForm.values.is_personal_transaction_classification && (
+              <InputSelect
+                isClearable
+                className="mb-8"
+                placeholder="Company"
+                options={companies.data}
+                getOptionLabel={getSelectCompanyOptionLabel as any}
+                getOptionValue={getSelectCompanyOptionValue as any}
+                name="company"
+                onChange={(event) => onCompanyFilterChange(event as Company)}
+                value={filterForm.values.company}
+              ></InputSelect>
+            )}
+
+            <div className="flex justify-end p-2 mt-10">
+              <PrimaryButton
+                onClick={onFilterFormSubmit}
+                text="Done"
+                type="button"
+              ></PrimaryButton>
+            </div>
+          </form>
         </div>
       </Modal>
     </Loader>
