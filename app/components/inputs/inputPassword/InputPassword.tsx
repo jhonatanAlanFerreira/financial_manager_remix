@@ -27,7 +27,6 @@ export default function InputPassword({
       {...rest}
       icon={icon()}
       onIconClicked={onIconClicked}
-      autoComplete=""
     ></InputText>
   );
 }

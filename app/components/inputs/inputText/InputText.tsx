@@ -20,6 +20,7 @@ export default function InputText({
         className={`block w-full bg-white focus:outline-none focus:shadow-outline border rounded-md py-3 px-3 appearance-none leading-normal text-violet-950 ${
           errorMessage ? "border-rose-500" : "border-violet-950"
         }`}
+        autoComplete="off"
         {...rest}
       ></input>
       <label
