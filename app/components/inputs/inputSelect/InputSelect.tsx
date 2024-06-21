@@ -49,7 +49,7 @@ export default function InputSelect({ ...rest }: SelectProps) {
       <div className="relative float-label-input">
         <Select
           ref={selectRef}
-          id={inputId}
+          inputId={inputId}
           {...rest}
           styles={styles}
           placeholder=" "
