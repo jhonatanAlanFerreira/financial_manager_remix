@@ -37,7 +37,7 @@ export default function Pagination({
   return (
     <>
       {!!totalPages && (
-        <div {...rest} className={`flex text-violet-950 ${rest.className}`}>
+        <div {...rest} className={`flex flex-wrap text-violet-950 ${rest.className}`}>
           {currentPage != 1 && (
             <button
               onClick={() => onPageChange(--currentPage)}
