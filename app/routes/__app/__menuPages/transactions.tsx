@@ -37,6 +37,7 @@ import TransactionAdd from "~/components/pageComponents/transaction/TransactionA
 import FilterTag from "~/components/filterTag/FilterTag";
 import Pagination from "~/components/pagination/Pagination";
 import { TransactionFilterTagsConfig } from "~/components/pageComponents/transaction/TransactionFilterTagsConfig";
+import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
 
 export default function Transactions() {
   const [loading, setLoading] = useState(true);
@@ -49,9 +50,11 @@ export default function Transactions() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [reloadTransactions, setReloadTransactions] = useState(false);
+  const [totalIncomeValue, setTotalIncomeValue] = useState(0);
+  const [totalExpenseValue, setTotalExpenseValue] = useState(0);
 
   const [transactions, setTransactions] = useState<
-    ServerResponse<Transaction[]>
+    ServerResponse<TransactionsWithTotals>
   >({});
   const [classifications, setClassifications] = useState<
     ServerResponse<TransactionClassification[]>
@@ -72,7 +75,7 @@ export default function Transactions() {
     incomeData,
   } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
-    transactionData: ServerResponse<Transaction[]>;
+    transactionData: ServerResponse<TransactionsWithTotals>;
     expenseData: ServerResponse<Expense[]>;
     classificationData: ServerResponse<TransactionClassification[]>;
     incomeData: ServerResponse<Income[]>;
@@ -98,7 +101,7 @@ export default function Transactions() {
     initialValues: {
       name: "",
       is_personal_transaction: false,
-      is_income_transaction: false,
+      is_income_or_expense: "all",
       company: null,
       expense: null,
       income: null,
@@ -191,14 +194,19 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponse<Transaction[]>>(
+      const res = await axios.get<ServerResponse<TransactionsWithTotals>>(
         `/api/transaction?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
       );
-      setTransactions(res.data);
-      setTotalPages(res.data.pageInfo?.totalPages || 0);
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+
+      const { data } = res;
+
+      setTransactions(data);
+      setTotalPages(data.pageInfo?.totalPages || 0);
+      setCurrentPage(data.pageInfo?.currentPage || 1);
+      setTotalExpenseValue(data.data?.totalExpenseValue || 0);
+      setTotalIncomeValue(data.data?.totalIncomeValue || 0);
       setLoading(false);
     } catch (error) {
       if (isAxiosError(error)) {
@@ -395,14 +403,14 @@ export default function Transactions() {
             </tr>
           </thead>
           <tbody>
-            {!transactions.data?.length && (
+            {!transactions.data?.transactions.length && (
               <tr>
                 <td className="py-2 px-4" colSpan={4}>
                   There are no data yet
                 </td>
               </tr>
             )}
-            {transactions.data?.map((transaction, index) => (
+            {transactions.data?.transactions.map((transaction, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.name}
@@ -461,6 +469,18 @@ export default function Transactions() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div
+        title="Total incomes and expenses using the current filters"
+        className="w-100 text-right px-10 pt-2 text-violet-900 text-lg"
+      >
+        <span className="mr-4">
+          Income Total: <span className="text-black">{totalIncomeValue}</span>
+        </span>
+        <span>
+          Expense Total: <span className="text-black">{totalExpenseValue}</span>
+        </span>
       </div>
 
       {totalPages > 1 && (

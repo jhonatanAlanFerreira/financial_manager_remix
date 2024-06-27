@@ -114,9 +114,12 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     expense: url.searchParams.get("expense"),
     income: url.searchParams.get("income"),
     company: url.searchParams.get("company"),
-    is_income_transaction: !!url.searchParams.get("is_income_transaction"),
     is_personal_transaction: !!url.searchParams.get("is_personal_transaction"),
     name: url.searchParams.get("name"),
+    is_income_or_expense: url.searchParams.get("is_income_or_expense") as
+      | "expense"
+      | "income"
+      | "all",
   };
 
   return list(user, params);

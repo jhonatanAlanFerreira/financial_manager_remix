@@ -50,7 +50,7 @@ export default function TransactionsFilters({
     formik.setFieldValue("income", null);
 
     runFilters();
-  }, [formik.values.is_income_transaction]);
+  }, [formik.values.is_income_or_expense]);
 
   useEffect(() => {
     if (skipEffect) {
@@ -125,6 +125,10 @@ export default function TransactionsFilters({
     }
   };
 
+  const isIncomeOrExpenseChange = (e: any) => {
+    formik.setFieldValue("is_income_or_expense", e.currentTarget.value);
+  };
+
   return (
     <form>
       <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
@@ -132,19 +136,30 @@ export default function TransactionsFilters({
       </div>
       <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
         <div>
-          <Checkbox
-            className="relative top-1"
-            name="is_income_transaction"
-            id="is_income_transaction_filter"
-            onChange={formik.handleChange}
-            checked={formik.values.is_income_transaction}
-          ></Checkbox>
-          <label
-            className="pl-3 text-violet-950 cursor-pointer"
-            htmlFor="is_income_transaction_filter"
-          >
-            Income transaction
-          </label>
+          <input
+            type="radio"
+            name="is_income_or_expense"
+            value={"expense"}
+            onChange={isIncomeOrExpenseChange}
+            checked={formik.values.is_income_or_expense == "expense"}
+          ></input>
+          <label>Expense transaction</label>
+          <input
+            type="radio"
+            name="is_income_or_expense"
+            value={"income"}
+            onChange={isIncomeOrExpenseChange}
+            checked={formik.values.is_income_or_expense == "income"}
+          ></input>
+          <label>Income transaction</label>
+          <input
+            type="radio"
+            name="is_income_or_expense"
+            value={"all"}
+            onChange={isIncomeOrExpenseChange}
+            checked={formik.values.is_income_or_expense == "all"}
+          ></input>
+          <label>All</label>
         </div>
         <div>
           <Checkbox
@@ -209,7 +224,7 @@ export default function TransactionsFilters({
           value={formik.values.company}
         ></InputSelect>
       )}
-      {!formik.values.is_income_transaction && (
+      {formik.values.is_income_or_expense != "income" && (
         <InputSelect
           isClearable
           className="mb-8"
@@ -222,7 +237,7 @@ export default function TransactionsFilters({
           value={formik.values.expense}
         ></InputSelect>
       )}
-      {formik.values.is_income_transaction && (
+      {formik.values.is_income_or_expense != "expense" && (
         <InputSelect
           isClearable
           className="mb-8"

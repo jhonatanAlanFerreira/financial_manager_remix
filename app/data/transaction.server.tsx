@@ -7,77 +7,71 @@ import transactionDeleteValidator from "~/data/requestValidators/transaction/tra
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
+import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 
 export async function list(
   user: User,
   params: TransactionLoaderParams
-): Promise<ServerResponse<Transaction[]>> {
+): Promise<ServerResponse<TransactionsWithTotals>> {
   const skip = (params.page - 1) * params.pageSize;
 
   const whereClause: TransactionWhereInput = {
     user_id: user.id,
+    is_personal_transaction: params.is_personal_transaction || undefined,
+    is_income:
+      params.is_income_or_expense !== "all"
+        ? params.is_income_or_expense === "income"
+        : undefined,
+    name: params.name ? { contains: params.name } : undefined,
+    transaction_date: {
+      gte: params.date_after || undefined,
+      lte: params.date_before || undefined,
+    },
+    amount: {
+      gte: params.amount_greater || undefined,
+      lte: params.amount_less || undefined,
+    },
+    income_id: params.income || undefined,
+    expense_id: params.expense || undefined,
+    company_id: params.company || undefined,
   };
 
-  if (params.is_personal_transaction) {
-    whereClause.is_personal_transaction = true;
-  }
-
-  if (params.is_income_transaction) {
-    whereClause.is_income = true;
-  }
-
-  if (params.name) {
-    whereClause.name = { contains: params.name };
-  }
-
-  if (params.date_after || params.date_before) {
-    whereClause.transaction_date = {};
-    if (params.date_after) {
-      whereClause.transaction_date.gte = params.date_after;
-    }
-    if (params.date_before) {
-      whereClause.transaction_date.lte = params.date_before;
-    }
-  }
-
-  if (params.amount_greater || params.amount_less) {
-    whereClause.amount = {};
-    if (params.amount_greater) {
-      whereClause.amount.gte = params.amount_greater;
-    }
-    if (params.amount_less) {
-      whereClause.amount.lte = params.amount_less;
-    }
-  }
-
-  if (params.income) {
-    whereClause.income_id = params.income;
-  }
-
-  if (params.expense) {
-    whereClause.expense_id = params.expense;
-  }
-
-  if (params.company) {
-    whereClause.company_id = params.company;
-  }
-
-  const totalData = await prisma.transaction.count({
-    where: whereClause,
-  });
+  const [totalData, totalExpense, totalIncome] = await prisma.$transaction([
+    prisma.transaction.count({ where: whereClause }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: false },
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: true },
+    }),
+  ]);
 
   const totalPages = Math.ceil(totalData / params.pageSize);
 
   const transactions = await prisma.transaction.findMany({
     where: whereClause,
-    skip: skip,
+    skip,
     take: params.pageSize,
   });
 
+  const totalExpenseValue = totalExpense._sum.amount || 0;
+  const totalIncomeValue = totalIncome._sum.amount || 0;
+
+  const finalExpenseValue =
+    params.is_income_or_expense === "income" ? 0 : totalExpenseValue;
+  const finalIncomeValue =
+    params.is_income_or_expense === "expense" ? 0 : totalIncomeValue;
+
   return {
-    data: transactions,
+    data: {
+      transactions,
+      totalExpenseValue: finalExpenseValue,
+      totalIncomeValue: finalIncomeValue,
+    },
     pageInfo: {
       currentPage: params.page,
       pageSize: params.pageSize,
