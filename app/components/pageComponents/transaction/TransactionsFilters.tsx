@@ -134,7 +134,7 @@ export default function TransactionsFilters({
       <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
         <span onClick={resetForm}>Clear all filters</span>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 mb-12">
         <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
           Income or Expense
         </span>
@@ -167,32 +167,67 @@ export default function TransactionsFilters({
           </div>
           <div>
             <input
-              id="all_filter"
+              id="income_expense_all_filter"
               type="radio"
               name="is_income_or_expense"
               value={"all"}
               onChange={isIncomeOrExpenseChange}
               checked={formik.values.is_income_or_expense == "all"}
             ></input>
-            <label className="cursor-pointer ml-2" htmlFor="all_filter">
+            <label
+              className="cursor-pointer ml-2"
+              htmlFor="income_expense_all_filter"
+            >
               All
             </label>
           </div>
         </div>
-        <div>
-          <Checkbox
-            className="relative top-1"
-            name="is_personal_transaction"
-            id="is_personal_transaction_filter"
-            onChange={formik.handleChange}
-            checked={formik.values.is_personal_transaction}
-          ></Checkbox>
-          <label
-            className="pl-3 text-violet-950 cursor-pointer"
-            htmlFor="is_personal_transaction_filter"
-          >
-            Personal transaction
-          </label>
+        <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+          Personal or Company Transaction
+        </span>
+        <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+          <div>
+            <input
+              id="is_personal_filter"
+              type="radio"
+              name="is_personal_or_company"
+              value={"personal"}
+              // onChange={}
+              // checked={}
+            ></input>
+            <label className="cursor-pointer ml-2" htmlFor="is_personal_filter">
+              Personal transaction
+            </label>
+          </div>
+          <div>
+            <input
+              id="is_company_filter"
+              type="radio"
+              name="is_personal_or_company"
+              value={"company"}
+              // onChange={}
+              // checked={}
+            ></input>
+            <label className="cursor-pointer ml-2" htmlFor="is_company_filter">
+              Company transaction
+            </label>
+          </div>
+          <div>
+            <input
+              id="personal_company_all_filter"
+              type="radio"
+              name="is_personal_or_company"
+              value={"all"}
+              // onChange={}
+              // checked={}
+            ></input>
+            <label
+              className="cursor-pointer ml-2"
+              htmlFor="personal_company_all_filter"
+            >
+              All
+            </label>
+          </div>
         </div>
       </div>
       <InputText
