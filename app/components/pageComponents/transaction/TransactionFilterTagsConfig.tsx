@@ -4,56 +4,67 @@ import { formatDate } from "~/utilities";
 export const TransactionFilterTagsConfig: {
   fieldName: keyof TransactionFiltersForm;
   label: string;
+  closeBtn: boolean;
   getValue: (fieldValue: any) => string;
 }[] = [
   {
+    fieldName: "is_income_or_expense",
+    label: "Income/Expense",
+    closeBtn: false,
+    getValue: (fieldValue: any) => fieldValue,
+  },
+  {
     fieldName: "date_after",
     label: "Date After",
+    closeBtn: true,
     getValue: (fieldValue: any) => formatDate(fieldValue)?.toString() || "",
   },
   {
     fieldName: "date_before",
     label: "Date Before",
+    closeBtn: true,
     getValue: (fieldValue: any) => formatDate(fieldValue)?.toString() || "",
   },
   {
     fieldName: "is_personal_transaction",
     label: "Personal Transaction",
-    getValue: (fieldValue: any) => "",
-  },
-  {
-    fieldName: "is_income_transaction",
-    label: "Income Transaction",
+    closeBtn: true,
     getValue: (fieldValue: any) => "",
   },
   {
     fieldName: "name",
     label: "Name",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue,
   },
   {
     fieldName: "company",
     label: "Company",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,
   },
   {
     fieldName: "expense",
     label: "Expense",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,
   },
   {
     fieldName: "income",
     label: "Income",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,
   },
   {
     fieldName: "amount_greater",
     label: "Amount Greater",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue,
   },
   {
     fieldName: "amount_less",
     label: "Amount Less",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue,
   },
 ];

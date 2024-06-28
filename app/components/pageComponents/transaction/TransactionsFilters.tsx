@@ -134,32 +134,50 @@ export default function TransactionsFilters({
       <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
         <span onClick={resetForm}>Clear all filters</span>
       </div>
-      <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
-        <div>
-          <input
-            type="radio"
-            name="is_income_or_expense"
-            value={"expense"}
-            onChange={isIncomeOrExpenseChange}
-            checked={formik.values.is_income_or_expense == "expense"}
-          ></input>
-          <label>Expense transaction</label>
-          <input
-            type="radio"
-            name="is_income_or_expense"
-            value={"income"}
-            onChange={isIncomeOrExpenseChange}
-            checked={formik.values.is_income_or_expense == "income"}
-          ></input>
-          <label>Income transaction</label>
-          <input
-            type="radio"
-            name="is_income_or_expense"
-            value={"all"}
-            onChange={isIncomeOrExpenseChange}
-            checked={formik.values.is_income_or_expense == "all"}
-          ></input>
-          <label>All</label>
+      <div className="flex flex-col gap-2">
+        <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+          Income or Expense
+        </span>
+        <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+          <div>
+            <input
+              id="is_expense_filter"
+              type="radio"
+              name="is_income_or_expense"
+              value={"expense"}
+              onChange={isIncomeOrExpenseChange}
+              checked={formik.values.is_income_or_expense == "expense"}
+            ></input>
+            <label className="cursor-pointer ml-2" htmlFor="is_expense_filter">
+              Expense transaction
+            </label>
+          </div>
+          <div>
+            <input
+              id="is_income_filter"
+              type="radio"
+              name="is_income_or_expense"
+              value={"income"}
+              onChange={isIncomeOrExpenseChange}
+              checked={formik.values.is_income_or_expense == "income"}
+            ></input>
+            <label className="cursor-pointer ml-2" htmlFor="is_income_filter">
+              Income transaction
+            </label>
+          </div>
+          <div>
+            <input
+              id="all_filter"
+              type="radio"
+              name="is_income_or_expense"
+              value={"all"}
+              onChange={isIncomeOrExpenseChange}
+              checked={formik.values.is_income_or_expense == "all"}
+            ></input>
+            <label className="cursor-pointer ml-2" htmlFor="all_filter">
+              All
+            </label>
+          </div>
         </div>
         <div>
           <Checkbox

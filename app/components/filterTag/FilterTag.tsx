@@ -4,6 +4,7 @@ export default function FilterTag({
   label,
   fieldName,
   value,
+  closeBtn,
   onClose,
   ...rest
 }: FilterTagProps) {
@@ -19,12 +20,14 @@ export default function FilterTag({
         </span>
         &nbsp;
         {value}
-        <button
-          onClick={() => onClose(fieldName)}
-          className="ml-2 bg-violet-800 hover:bg-violet-950 text-white rounded-full w-5 h-5 flex items-center justify-center"
-        >
-          <span>x</span>
-        </button>
+        {closeBtn && (
+          <button
+            onClick={() => onClose(fieldName)}
+            className="ml-2 bg-violet-800 hover:bg-violet-950 text-white rounded-full w-5 h-5 flex items-center justify-center"
+          >
+            <span>x</span>
+          </button>
+        )}
       </div>
     </div>
   );
