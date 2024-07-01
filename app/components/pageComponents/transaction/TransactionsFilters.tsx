@@ -147,6 +147,22 @@ export default function TransactionsFilters({
         <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
           <div>
             <input
+              id="income_expense_all_filter"
+              type="radio"
+              name="is_income_or_expense"
+              value={"all"}
+              onChange={isIncomeOrExpenseChange}
+              checked={formik.values.is_income_or_expense == "all"}
+            ></input>
+            <label
+              className="cursor-pointer ml-2"
+              htmlFor="income_expense_all_filter"
+            >
+              All
+            </label>
+          </div>
+          <div>
+            <input
               id="is_expense_filter"
               type="radio"
               name="is_income_or_expense"
@@ -171,27 +187,27 @@ export default function TransactionsFilters({
               Income transaction
             </label>
           </div>
-          <div>
-            <input
-              id="income_expense_all_filter"
-              type="radio"
-              name="is_income_or_expense"
-              value={"all"}
-              onChange={isIncomeOrExpenseChange}
-              checked={formik.values.is_income_or_expense == "all"}
-            ></input>
-            <label
-              className="cursor-pointer ml-2"
-              htmlFor="income_expense_all_filter"
-            >
-              All
-            </label>
-          </div>
         </div>
         <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
           Personal or Company Transaction
         </span>
         <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+          <div>
+            <input
+              id="personal_company_all_filter"
+              type="radio"
+              name="is_personal_or_company"
+              value={"all"}
+              onChange={isPersonalOrCompanyChange}
+              checked={formik.values.is_personal_or_company == "all"}
+            ></input>
+            <label
+              className="cursor-pointer ml-2"
+              htmlFor="personal_company_all_filter"
+            >
+              All
+            </label>
+          </div>
           <div>
             <input
               id="is_personal_filter"
@@ -216,22 +232,6 @@ export default function TransactionsFilters({
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_company_filter">
               Company transaction
-            </label>
-          </div>
-          <div>
-            <input
-              id="personal_company_all_filter"
-              type="radio"
-              name="is_personal_or_company"
-              value={"all"}
-              onChange={isPersonalOrCompanyChange}
-              checked={formik.values.is_personal_or_company == "all"}
-            ></input>
-            <label
-              className="cursor-pointer ml-2"
-              htmlFor="personal_company_all_filter"
-            >
-              All
             </label>
           </div>
         </div>
