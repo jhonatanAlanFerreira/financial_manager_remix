@@ -19,7 +19,6 @@ import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
-import { loader as transactionLoader } from "~/routes/api/transaction/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import Icon from "~/components/icon/Icon";
 import {
