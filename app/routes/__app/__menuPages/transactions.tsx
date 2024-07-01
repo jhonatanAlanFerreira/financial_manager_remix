@@ -100,7 +100,7 @@ export default function Transactions() {
   const filterForm = useFormik<TransactionFiltersForm>({
     initialValues: {
       name: "",
-      is_personal_transaction: false,
+      is_personal_or_company: "all",
       is_income_or_expense: "all",
       company: null,
       expense: null,

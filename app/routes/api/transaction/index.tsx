@@ -114,12 +114,15 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     expense: url.searchParams.get("expense"),
     income: url.searchParams.get("income"),
     company: url.searchParams.get("company"),
-    is_personal_transaction: !!url.searchParams.get("is_personal_transaction"),
     name: url.searchParams.get("name"),
     is_income_or_expense: url.searchParams.get("is_income_or_expense") as
       | "expense"
       | "income"
       | "all",
+    is_personal_or_company: url.searchParams.get("is_personal_or_company") as
+      | "all"
+      | "personal"
+      | "company",
   };
 
   return list(user, params);

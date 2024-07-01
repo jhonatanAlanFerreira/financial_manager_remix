@@ -14,6 +14,12 @@ export const TransactionFilterTagsConfig: {
     getValue: (fieldValue: any) => fieldValue,
   },
   {
+    fieldName: "is_personal_or_company",
+    label: "Personal/Company",
+    closeBtn: false,
+    getValue: (fieldValue: any) => fieldValue,
+  },
+  {
     fieldName: "date_after",
     label: "Date After",
     closeBtn: true,
@@ -24,12 +30,6 @@ export const TransactionFilterTagsConfig: {
     label: "Date Before",
     closeBtn: true,
     getValue: (fieldValue: any) => formatDate(fieldValue)?.toString() || "",
-  },
-  {
-    fieldName: "is_personal_transaction",
-    label: "Personal Transaction",
-    closeBtn: true,
-    getValue: (fieldValue: any) => "",
   },
   {
     fieldName: "name",

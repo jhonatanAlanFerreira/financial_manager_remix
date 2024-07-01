@@ -39,7 +39,7 @@ export default function TransactionsFilters({
     formik.setFieldValue("income", null);
 
     runFilters();
-  }, [formik.values.is_personal_transaction]);
+  }, [formik.values.is_personal_or_company]);
 
   useEffect(() => {
     if (skipEffect) {
@@ -93,9 +93,10 @@ export default function TransactionsFilters({
     if (expenses) {
       setFilteredExpenses(
         expenses.filter((expense) => {
-          const expenseTypeFilter = formik.values.is_personal_transaction
-            ? expense.is_personal_expense
-            : true;
+          const expenseTypeFilter =
+            formik.values.is_personal_or_company == "personal"
+              ? expense.is_personal_expense
+              : true;
 
           const companyFilter =
             !formik.values.company ||
@@ -111,9 +112,10 @@ export default function TransactionsFilters({
     if (incomes) {
       setFilteredIncomes(
         incomes.filter((income) => {
-          const incomeTypeFilter = formik.values.is_personal_transaction
-            ? income.is_personal_income
-            : true;
+          const incomeTypeFilter =
+            formik.values.is_personal_or_company == "personal"
+              ? income.is_personal_income
+              : true;
 
           const companyFilter =
             !formik.values.company ||
@@ -129,6 +131,10 @@ export default function TransactionsFilters({
     formik.setFieldValue("is_income_or_expense", e.currentTarget.value);
   };
 
+  const isPersonalOrCompanyChange = (e: any) => {
+    formik.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
   return (
     <form>
       <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
@@ -136,7 +142,7 @@ export default function TransactionsFilters({
       </div>
       <div className="flex flex-col gap-2 mb-12">
         <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
-          Income or Expense
+          Income or Expense Transaction
         </span>
         <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
           <div>
@@ -192,8 +198,8 @@ export default function TransactionsFilters({
               type="radio"
               name="is_personal_or_company"
               value={"personal"}
-              // onChange={}
-              // checked={}
+              onChange={isPersonalOrCompanyChange}
+              checked={formik.values.is_personal_or_company == "personal"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_personal_filter">
               Personal transaction
@@ -205,8 +211,8 @@ export default function TransactionsFilters({
               type="radio"
               name="is_personal_or_company"
               value={"company"}
-              // onChange={}
-              // checked={}
+              onChange={isPersonalOrCompanyChange}
+              checked={formik.values.is_personal_or_company == "company"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_company_filter">
               Company transaction
@@ -218,8 +224,8 @@ export default function TransactionsFilters({
               type="radio"
               name="is_personal_or_company"
               value={"all"}
-              // onChange={}
-              // checked={}
+              onChange={isPersonalOrCompanyChange}
+              checked={formik.values.is_personal_or_company == "all"}
             ></input>
             <label
               className="cursor-pointer ml-2"
@@ -264,7 +270,7 @@ export default function TransactionsFilters({
         onChange={formik.handleChange}
         value={formik.values.name}
       ></InputText>
-      {!formik.values.is_personal_transaction && (
+      {formik.values.is_personal_or_company == "company" && (
         <InputSelect
           isClearable
           className="mb-8"

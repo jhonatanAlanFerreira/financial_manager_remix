@@ -19,7 +19,10 @@ export async function list(
 
   const whereClause: TransactionWhereInput = {
     user_id: user.id,
-    is_personal_transaction: params.is_personal_transaction || undefined,
+    is_personal_transaction:
+      params.is_personal_or_company !== "all"
+        ? params.is_personal_or_company === "personal"
+        : undefined,
     is_income:
       params.is_income_or_expense !== "all"
         ? params.is_income_or_expense === "income"
