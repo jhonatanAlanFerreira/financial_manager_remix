@@ -118,6 +118,7 @@ export default function Transactions() {
 
   useEffect(() => {
     buildSearchParamsUrl();
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -584,7 +585,6 @@ export async function loader(request: LoaderFunctionArgs) {
     companyLoader(request),
     expenseLoader(request),
     classificationLoader(request),
-    transactionLoader(request),
     incomeLoader(request),
   ]);
 
@@ -592,7 +592,6 @@ export async function loader(request: LoaderFunctionArgs) {
     companyData: res[0],
     expenseData: res[1],
     classificationData: res[2],
-    transactionData: res[3],
-    incomeData: res[4],
+    incomeData: res[3],
   };
 }
