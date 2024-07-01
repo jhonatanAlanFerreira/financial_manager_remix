@@ -27,7 +27,9 @@ export async function list(
       params.is_income_or_expense !== "all"
         ? params.is_income_or_expense === "income"
         : undefined,
-    name: params.name ? { contains: params.name } : undefined,
+    name: params.name
+      ? { contains: params.name, mode: "insensitive" }
+      : undefined,
     transaction_date: {
       gte: params.date_after || undefined,
       lte: params.date_before || undefined,
