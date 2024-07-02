@@ -5,5 +5,5 @@ export default interface IncomeFiltersForm {
   amount_greater: number;
   amount_less: number;
   company: Company | null;
-  is_personal_income: boolean;
+  is_personal_or_company: "personal" | "company" | "all";
 }
