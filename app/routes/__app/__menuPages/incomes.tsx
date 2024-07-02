@@ -73,6 +73,7 @@ export default function Incomes() {
 
   useEffect(() => {
     buildSearchParamsUrl();
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -609,12 +610,8 @@ export default function Incomes() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([
-    companyLoader(request),
-    incomeLoader(request),
-  ]);
+  const res = await Promise.all([companyLoader(request)]);
   return {
     companyData: res[0],
-    incomeData: res[1],
   };
 }
