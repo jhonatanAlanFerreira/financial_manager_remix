@@ -73,6 +73,7 @@ export default function Expenses() {
 
   useEffect(() => {
     buildSearchParamsUrl();
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -562,13 +563,9 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([
-    expenseLoader(request),
-    companyLoader(request),
-  ]);
+  const res = await Promise.all([companyLoader(request)]);
 
   return {
-    expenseData: res[0],
-    companyData: res[1],
+    companyData: res[0],
   };
 }
