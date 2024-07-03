@@ -585,7 +585,7 @@ export default function Expenses() {
               onChange={filterForm.handleChange}
               value={filterForm.values.name}
             ></InputText>
-            {filterForm.values.is_personal_or_company == "company" && (
+            {filterForm.values.is_personal_or_company != "personal" && (
               <InputSelect
                 isClearable
                 className="mb-8"

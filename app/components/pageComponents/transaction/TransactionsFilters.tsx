@@ -270,7 +270,7 @@ export default function TransactionsFilters({
         onChange={formik.handleChange}
         value={formik.values.name}
       ></InputText>
-      {formik.values.is_personal_or_company == "company" && (
+      {formik.values.is_personal_or_company != "personal" && (
         <InputSelect
           isClearable
           className="mb-8"
