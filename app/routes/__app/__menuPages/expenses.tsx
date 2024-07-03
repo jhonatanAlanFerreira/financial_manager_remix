@@ -63,7 +63,7 @@ export default function Expenses() {
       amount_greater: 0,
       amount_less: 0,
       company: null,
-      is_personal_expense: false,
+      is_personal_or_company: "all",
     },
     onSubmit: () => {},
   });
@@ -93,6 +93,10 @@ export default function Expenses() {
       loadExpenses();
     }
   }, [currentPage]);
+
+  useEffect(() => {
+    filterForm.setFieldValue("company", null);
+  }, [filterForm.values.is_personal_or_company]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -274,6 +278,10 @@ export default function Expenses() {
     } as any).toString();
   };
 
+  const isPersonalOrCompanyChange = (e: any) => {
+    filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -290,6 +298,7 @@ export default function Expenses() {
               !!filterForm.values[filter.fieldName] && (
                 <FilterTag
                   fieldName={filter.fieldName}
+                  closeBtn={filter.closeBtn}
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
                     setReloadExpenses(true);
@@ -497,21 +506,63 @@ export default function Expenses() {
                 Clear all filters
               </span>
             </div>
-            <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
-              <div>
-                <Checkbox
-                  className="relative top-1"
-                  name="is_personal_expense"
-                  id="is_personal_expense_filter"
-                  onChange={filterForm.handleChange}
-                  checked={filterForm.values.is_personal_expense}
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_expense_filter"
-                >
-                  Personal Expense
-                </label>
+            <div className="flex flex-col gap-2 mb-12">
+              <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+                Personal or Company Expense
+              </span>
+              <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+                <div>
+                  <input
+                    id="personal_company_all_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"all"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={filterForm.values.is_personal_or_company == "all"}
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="personal_company_all_filter"
+                  >
+                    All
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_personal_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"personal"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={
+                      filterForm.values.is_personal_or_company == "personal"
+                    }
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_personal_filter"
+                  >
+                    Personal expense
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_company_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"company"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={
+                      filterForm.values.is_personal_or_company == "company"
+                    }
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_company_filter"
+                  >
+                    Company expense
+                  </label>
+                </div>
               </div>
             </div>
             <InputText
@@ -534,7 +585,7 @@ export default function Expenses() {
               onChange={filterForm.handleChange}
               value={filterForm.values.name}
             ></InputText>
-            {!filterForm.values.is_personal_expense && (
+            {filterForm.values.is_personal_or_company == "company" && (
               <InputSelect
                 isClearable
                 className="mb-8"

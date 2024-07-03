@@ -51,12 +51,13 @@ export async function list(
     user_id: user.id,
   };
 
-  if (params.is_personal_expense) {
-    whereClause.is_personal_expense = true;
-  }
+  whereClause.is_personal_expense =
+    params.is_personal_or_company !== "all"
+      ? params.is_personal_or_company === "personal"
+      : undefined;
 
   if (params.name) {
-    whereClause.name = { contains: params.name };
+    whereClause.name = { contains: params.name, mode: "insensitive" };
   }
 
   if (params.amount_greater || params.amount_less) {
