@@ -73,6 +73,7 @@ export default function Classifications() {
 
   useEffect(() => {
     buildSearchParamsUrl();
+    setCurrentPage(1);
   }, []);
 
   useEffect(() => {
@@ -578,13 +579,9 @@ export default function Classifications() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([
-    companyLoader(request),
-    classificationLoader(request),
-  ]);
+  const res = await Promise.all([companyLoader(request)]);
 
   return {
     companyData: res[0],
-    classificationData: res[1],
   };
 }
