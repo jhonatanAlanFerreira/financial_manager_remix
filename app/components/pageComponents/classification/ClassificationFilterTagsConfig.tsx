@@ -3,26 +3,31 @@ import ClassificationFiltersForm from "~/interfaces/forms/classification/Classif
 export const ClassificationFilterTagsConfig: {
   fieldName: keyof ClassificationFiltersForm;
   label: string;
+  closeBtn: boolean;
   getValue: (fieldValue: any) => string;
 }[] = [
   {
+    fieldName: "is_income_or_expense",
+    label: "Income/Expense",
+    closeBtn: false,
+    getValue: (fieldValue: any) => fieldValue,
+  },
+  {
+    fieldName: "is_personal_or_company",
+    label: "Personal/Company",
+    closeBtn: false,
+    getValue: (fieldValue: any) => fieldValue,
+  },
+  {
     fieldName: "name",
     label: "Name",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue,
   },
   {
     fieldName: "company",
     label: "Company",
+    closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,
-  },
-  {
-    fieldName: "is_personal_transaction_classification",
-    label: "Personal Classification",
-    getValue: (fieldValue: any) => "",
-  },
-  {
-    fieldName: "is_income",
-    label: "Income",
-    getValue: (fieldValue: any) => "",
   },
 ];

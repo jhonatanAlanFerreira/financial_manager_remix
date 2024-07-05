@@ -122,16 +122,18 @@ export async function list(
     user_id: user.id,
   };
 
-  if (params.is_income) {
-    whereClause.is_income = true;
-  }
+  whereClause.is_personal_transaction_classification =
+    params.is_personal_or_company !== "all"
+      ? params.is_personal_or_company === "personal"
+      : undefined;
 
-  if (params.is_personal_transaction_classification) {
-    whereClause.is_personal_transaction_classification = true;
-  }
+  whereClause.is_income =
+    params.is_income_or_expense !== "all"
+      ? params.is_income_or_expense === "income"
+      : undefined;
 
   if (params.name) {
-    whereClause.name = { contains: params.name };
+    whereClause.name = { contains: params.name, mode: "insensitive" };
   }
 
   if (params.company) {

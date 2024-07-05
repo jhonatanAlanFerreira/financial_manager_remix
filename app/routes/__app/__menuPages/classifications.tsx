@@ -62,8 +62,8 @@ export default function Classifications() {
     initialValues: {
       name: "",
       company: null,
-      is_personal_transaction_classification: false,
-      is_income: false,
+      is_personal_or_company: "all",
+      is_income_or_expense: "all",
     },
     onSubmit: () => {},
   });
@@ -279,6 +279,14 @@ export default function Classifications() {
     } as any).toString();
   };
 
+  const isIncomeOrExpenseChange = (e: any) => {
+    filterForm.setFieldValue("is_income_or_expense", e.currentTarget.value);
+  };
+
+  const isPersonalOrCompanyChange = (e: any) => {
+    filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -295,6 +303,7 @@ export default function Classifications() {
               !!filterForm.values[filter.fieldName] && (
                 <FilterTag
                   fieldName={filter.fieldName}
+                  closeBtn={filter.closeBtn}
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
                     setReloadClassification(true);
@@ -510,38 +519,118 @@ export default function Classifications() {
                 Clear all filters
               </span>
             </div>
-            <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
-              <div>
-                <Checkbox
-                  className="relative top-1"
-                  name="is_income"
-                  id="is_income_filter"
-                  onChange={filterForm.handleChange}
-                  checked={filterForm.values.is_income}
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_income_filter"
-                >
-                  Income
-                </label>
+            <div className="flex flex-col gap-2 mb-12">
+              <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+                Income or Expense Classification
+              </span>
+              <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+                <div>
+                  <input
+                    id="income_expense_all_filter"
+                    type="radio"
+                    name="is_income_or_expense"
+                    value={"all"}
+                    onChange={isIncomeOrExpenseChange}
+                    checked={filterForm.values.is_income_or_expense == "all"}
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="income_expense_all_filter"
+                  >
+                    All
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_expense_filter"
+                    type="radio"
+                    name="is_income_or_expense"
+                    value={"expense"}
+                    onChange={isIncomeOrExpenseChange}
+                    checked={
+                      filterForm.values.is_income_or_expense == "expense"
+                    }
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_expense_filter"
+                  >
+                    Expense classification
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_income_filter"
+                    type="radio"
+                    name="is_income_or_expense"
+                    value={"income"}
+                    onChange={isIncomeOrExpenseChange}
+                    checked={filterForm.values.is_income_or_expense == "income"}
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_income_filter"
+                  >
+                    Income classification
+                  </label>
+                </div>
               </div>
-              <div>
-                <Checkbox
-                  className="relative top-1"
-                  name="is_personal_transaction_classification"
-                  id="is_personal_transaction_classification_filter"
-                  onChange={filterForm.handleChange}
-                  checked={
-                    filterForm.values.is_personal_transaction_classification
-                  }
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_transaction_classification_filter"
-                >
-                  Personal Classification
-                </label>
+              <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+                Personal or Company Classification
+              </span>
+              <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+                <div>
+                  <input
+                    id="personal_company_all_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"all"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={filterForm.values.is_personal_or_company == "all"}
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="personal_company_all_filter"
+                  >
+                    All
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_personal_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"personal"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={
+                      filterForm.values.is_personal_or_company == "personal"
+                    }
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_personal_filter"
+                  >
+                    Personal classification
+                  </label>
+                </div>
+                <div>
+                  <input
+                    id="is_company_filter"
+                    type="radio"
+                    name="is_personal_or_company"
+                    value={"company"}
+                    onChange={isPersonalOrCompanyChange}
+                    checked={
+                      filterForm.values.is_personal_or_company == "company"
+                    }
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_company_filter"
+                  >
+                    Company classification
+                  </label>
+                </div>
               </div>
             </div>
             <InputText
@@ -550,7 +639,7 @@ export default function Classifications() {
               onChange={filterForm.handleChange}
               value={filterForm.values.name}
             ></InputText>
-            {!filterForm.values.is_personal_transaction_classification && (
+            {filterForm.values.is_personal_or_company != "personal" && (
               <InputSelect
                 isClearable
                 className="mb-8"

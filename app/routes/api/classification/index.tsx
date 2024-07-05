@@ -94,9 +94,7 @@ let updateClassification = async (request: Request) => {
   return new Response(JSON.stringify(res), { status });
 };
 
-export let loader = async (
-  { request }: LoaderFunctionArgs,
-) => {
+export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -105,10 +103,14 @@ export let loader = async (
     pageSize: Number(url.searchParams.get("pageSize")) || 10,
     company: url.searchParams.get("company"),
     name: url.searchParams.get("name"),
-    is_income: !!url.searchParams.get("is_income"),
-    is_personal_transaction_classification: !!url.searchParams.get(
-      "is_personal_transaction_classification"
-    ),
+    is_income_or_expense: url.searchParams.get("is_income_or_expense") as
+      | "expense"
+      | "income"
+      | "all",
+    is_personal_or_company: url.searchParams.get("is_personal_or_company") as
+      | "all"
+      | "personal"
+      | "company",
   };
   return list(user, params);
 };
