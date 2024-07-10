@@ -1,4 +1,4 @@
-import { Company, User } from "@prisma/client";
+import { Company, Prisma, User } from "@prisma/client";
 import { prisma } from "~/data/database.server";
 import ServerResponse from "~/interfaces/ServerResponse";
 import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
@@ -7,16 +7,54 @@ import ValidatedData from "~/interfaces/ValidatedData";
 import companyUpdateValidator from "~/data/requestValidators/company/companyUpdateValidator";
 import companyDeleteValidator from "~/data/requestValidators/company/companyDeleteValidator";
 import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
+import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
 
-export async function list(user: User): Promise<ServerResponse<Company[]>> {
+type CompanyWhereInput = Prisma.CompanyWhereInput;
+
+export async function list(
+  user: User,
+  params: CompanyLoaderParams
+): Promise<ServerResponse<Company[]>> {
+  const skip = (params.page - 1) * params.pageSize;
+
+  const whereClause: CompanyWhereInput = {
+    user_id: user.id,
+  };
+
+  if (params.name) {
+    whereClause.name = { contains: params.name, mode: "insensitive" };
+  }
+
+  if (params.working_capital_greater || params.working_capital_less) {
+    whereClause.working_capital = {};
+    if (params.working_capital_greater) {
+      whereClause.working_capital.gte = params.working_capital_greater;
+    }
+    if (params.working_capital_less) {
+      whereClause.working_capital.lte = params.working_capital_less;
+    }
+  }
+
   const companies = await prisma.company.findMany({
-    where: {
-      user_id: user.id,
-    },
+    where: whereClause,
+    skip: skip,
+    take: params.pageSize,
   });
+
+  const totalData = await prisma.company.count({
+    where: whereClause,
+  });
+
+  const totalPages = Math.ceil(totalData / params.pageSize);
 
   return {
     data: companies,
+    pageInfo: {
+      currentPage: params.page,
+      pageSize: params.pageSize,
+      totalData,
+      totalPages,
+    },
   };
 }
 

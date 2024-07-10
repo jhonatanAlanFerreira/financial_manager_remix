@@ -3,6 +3,7 @@ import { requireUserSession } from "~/data/auth.server";
 import { create, list, remove, update } from "~/data/company.server";
 import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
 import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
+import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -18,7 +19,18 @@ export let action = async ({ request }: ActionFunctionArgs) => {
 export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
-  return list(user);
+  const url = new URL(request.url);
+  const params: CompanyLoaderParams = {
+    page: Number(url.searchParams.get("page")) || 1,
+    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    working_capital_greater: Number(
+      url.searchParams.get("working_capital_greater")
+    ),
+    working_capital_less: Number(url.searchParams.get("working_capital_less")),
+    name: url.searchParams.get("name"),
+  };
+
+  return list(user, params);
 };
 
 let createCompany = async (request: Request) => {

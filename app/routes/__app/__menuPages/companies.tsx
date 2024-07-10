@@ -8,17 +8,27 @@ import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
+import FilterTag from "~/components/filterTag/FilterTag";
 import Icon from "~/components/icon/Icon";
 import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
+import { CompanyFilterTagsConfig } from "~/components/pageComponents/company/CompanyFilterTagsConfig";
+import Pagination from "~/components/pagination/Pagination";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
+import CompanyFiltersForm from "~/interfaces/forms/company/CompanyFiltersForm";
 import { CompanyForm } from "~/interfaces/forms/company/CompanyForm";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { queryParamsFromObject } from "~/utilities";
 
 export default function Companies() {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [openFilterModal, setOpenFilterModal] = useState(false);
+  const [searchParams, setSearchParams] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [reloadCompanies, setReloadCompanies] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
@@ -39,6 +49,41 @@ export default function Companies() {
     onSubmit: () => {},
   });
 
+  const filterForm = useFormik<CompanyFiltersForm>({
+    initialValues: {
+      name: "",
+      working_capital_greater: 0,
+      working_capital_less: 0,
+    },
+    onSubmit: () => {},
+  });
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+    setCurrentPage(1);
+  }, []);
+
+  useEffect(() => {
+    buildSearchParamsUrl();
+  }, [filterForm.values]);
+
+  useEffect(() => {
+    if (currentPage) {
+      loadCompanies();
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (reloadCompanies) {
+      setReloadCompanies(false);
+      if (currentPage != 1) {
+        setCurrentPage(1);
+      } else {
+        loadCompanies();
+      }
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (companyData) {
       setCompanies(companyData);
@@ -49,7 +94,14 @@ export default function Companies() {
   const loadCompanies = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/api/company");
+      const res = await axios.get(
+        `/api/company?${searchParams}${
+          searchParams ? "&" : ""
+        }${paginationParams()}`
+      );
+
+      setCurrentPage(res.data.pageInfo?.currentPage || 0);
+      setTotalPages(res.data.pageInfo?.totalPages || 0);
 
       setCompanies(res.data);
       setLoading(false);
@@ -161,9 +213,54 @@ export default function Companies() {
     setOpenAddModal(false);
   };
 
+  const onFilterFormSubmit = async () => {
+    setOpenFilterModal(false);
+    if (currentPage != 1) {
+      setCurrentPage(1);
+    } else {
+      loadCompanies();
+    }
+  };
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(queryParamsFromObject(filterForm.values));
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: currentPage,
+    } as any).toString();
+  };
+
   return (
     <Loader loading={loading}>
-      <div className="flex justify-end mb-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap justify-center">
+          <div
+            onClick={() => setOpenFilterModal(true)}
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
+          >
+            <Icon size={30} name="Filter"></Icon>
+            Filters
+          </div>
+          {CompanyFilterTagsConfig.map(
+            (filter, index) =>
+              !!filterForm.values[filter.fieldName] && (
+                <FilterTag
+                  fieldName={filter.fieldName}
+                  closeBtn={filter.closeBtn}
+                  onClose={(fieldName) => {
+                    filterForm.setFieldValue(fieldName, "");
+                    setReloadCompanies(true);
+                  }}
+                  className="ml-2 mb-2"
+                  label={filter.label}
+                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  key={index}
+                ></FilterTag>
+              )
+          )}
+        </div>
         <PrimaryButton
           onClick={onClickAdd}
           text="Add"
@@ -219,6 +316,16 @@ export default function Companies() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          className="justify-center"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          optionsAmount={10}
+          onPageChange={(page) => setCurrentPage(page)}
+        ></Pagination>
+      )}
 
       <Modal
         classNames={{
@@ -294,6 +401,59 @@ export default function Companies() {
               className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
             ></PrimaryButton>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        closeOnEsc={false}
+        closeOnOverlayClick={false}
+        showCloseIcon={false}
+        open={openFilterModal}
+        onClose={() => setOpenFilterModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Filters
+        </h2>
+        <div className="p-4">
+          <form>
+            <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
+              <span onClick={() => filterForm.resetForm()}>
+                Clear all filters
+              </span>
+            </div>
+            <InputText
+              type="number"
+              label="Working Capital greater than"
+              name="working_capital_greater"
+              value={filterForm.values.working_capital_greater}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              type="number"
+              label="Working Capital less than"
+              name="working_capital_less"
+              value={filterForm.values.working_capital_less}
+              onChange={filterForm.handleChange}
+            ></InputText>
+            <InputText
+              label="Name"
+              name="name"
+              onChange={filterForm.handleChange}
+              value={filterForm.values.name}
+            ></InputText>
+
+            <div className="flex justify-end p-2 mt-10">
+              <PrimaryButton
+                onClick={onFilterFormSubmit}
+                text="Done"
+                type="button"
+              ></PrimaryButton>
+            </div>
+          </form>
         </div>
       </Modal>
     </Loader>
