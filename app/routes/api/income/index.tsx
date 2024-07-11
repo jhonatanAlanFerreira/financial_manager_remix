@@ -22,7 +22,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params: IncomeLoaderParams = {
     page: Number(url.searchParams.get("page")) || 1,
-    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
     company: url.searchParams.get("company"),

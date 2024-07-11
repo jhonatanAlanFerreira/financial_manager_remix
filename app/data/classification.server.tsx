@@ -116,7 +116,9 @@ export async function list(
 ): Promise<
   ServerResponse<TransactionClassification[] | ClassificationWithCompany[]>
 > {
-  const skip = (params.page - 1) * params.pageSize;
+  const take = params.pageSize != "all" ? params.pageSize : undefined;
+  const skip =
+    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
 
   const whereClause: TransactionClassificationWhereInput = {
     user_id: user.id,
@@ -144,21 +146,23 @@ export async function list(
 
   const classifications = await prisma.transactionClassification.findMany({
     where: whereClause,
-    skip: skip,
-    take: params.pageSize,
+    skip,
+    take,
   });
 
   const totalData = await prisma.transactionClassification.count({
     where: whereClause,
   });
 
-  const totalPages = Math.ceil(totalData / params.pageSize);
+  const totalPages =
+    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
+  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
 
   return {
     data: classifications,
     pageInfo: {
       currentPage: params.page,
-      pageSize: params.pageSize,
+      pageSize,
       totalData,
       totalPages,
     },

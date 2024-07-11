@@ -15,7 +15,9 @@ export async function list(
   user: User,
   params: TransactionLoaderParams
 ): Promise<ServerResponse<TransactionsWithTotals>> {
-  const skip = (params.page - 1) * params.pageSize;
+  const take = params.pageSize != "all" ? params.pageSize : undefined;
+  const skip =
+    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
 
   const whereClause: TransactionWhereInput = {
     user_id: user.id,
@@ -55,12 +57,10 @@ export async function list(
     }),
   ]);
 
-  const totalPages = Math.ceil(totalData / params.pageSize);
-
   const transactions = await prisma.transaction.findMany({
     where: whereClause,
     skip,
-    take: params.pageSize,
+    take,
   });
 
   const totalExpenseValue = totalExpense._sum.amount || 0;
@@ -71,6 +71,10 @@ export async function list(
   const finalIncomeValue =
     params.is_income_or_expense === "expense" ? 0 : totalIncomeValue;
 
+  const totalPages =
+    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
+  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
+
   return {
     data: {
       transactions,
@@ -79,7 +83,7 @@ export async function list(
     },
     pageInfo: {
       currentPage: params.page,
-      pageSize: params.pageSize,
+      pageSize,
       totalData,
       totalPages,
     },

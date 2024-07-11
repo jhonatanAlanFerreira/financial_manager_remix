@@ -106,7 +106,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const params: TransactionLoaderParams = {
     page: Number(url.searchParams.get("page")) || 1,
-    pageSize: Number(url.searchParams.get("pageSize")) || 10,
+    pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
     date_after: url.searchParams.get("date_after"),

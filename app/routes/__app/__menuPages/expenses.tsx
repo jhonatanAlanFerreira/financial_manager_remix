@@ -273,6 +273,7 @@ export default function Expenses() {
   const paginationParams = () => {
     return new URLSearchParams({
       page: currentPage,
+      pageSize: 10,
     } as any).toString();
   };
 

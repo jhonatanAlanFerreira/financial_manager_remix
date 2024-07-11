@@ -276,6 +276,7 @@ export default function Classifications() {
   const paginationParams = () => {
     return new URLSearchParams({
       page: currentPage,
+      pageSize: 10,
     } as any).toString();
   };
 

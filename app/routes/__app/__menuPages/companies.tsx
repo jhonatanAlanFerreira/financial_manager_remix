@@ -1,6 +1,5 @@
 import { Company } from "@prisma/client";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -18,7 +17,6 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import CompanyFiltersForm from "~/interfaces/forms/company/CompanyFiltersForm";
 import { CompanyForm } from "~/interfaces/forms/company/CompanyForm";
-import { loader as companyLoader } from "~/routes/api/company/index";
 import { queryParamsFromObject } from "~/utilities";
 
 export default function Companies() {
@@ -35,10 +33,6 @@ export default function Companies() {
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
-
-  const { companyData } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
-  }>();
 
   const formik = useFormik<CompanyForm>({
     initialValues: {
@@ -83,13 +77,6 @@ export default function Companies() {
       }
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (companyData) {
-      setCompanies(companyData);
-    }
-    setLoading(false);
-  }, [companyData]);
 
   const loadCompanies = async () => {
     try {
@@ -229,6 +216,7 @@ export default function Companies() {
   const paginationParams = () => {
     return new URLSearchParams({
       page: currentPage,
+      pageSize: 10,
     } as any).toString();
   };
 
@@ -458,12 +446,4 @@ export default function Companies() {
       </Modal>
     </Loader>
   );
-}
-
-export async function loader(request: LoaderFunctionArgs) {
-  const res = await companyLoader(request);
-
-  return {
-    companyData: res,
-  };
 }

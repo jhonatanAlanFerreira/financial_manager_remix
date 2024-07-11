@@ -45,7 +45,9 @@ export async function list(
   user: User,
   params: IncomeLoaderParams
 ): Promise<ServerResponse<Income[] | IncomeWithCompanies[]>> {
-  const skip = (params.page - 1) * params.pageSize;
+  const take = params.pageSize != "all" ? params.pageSize : undefined;
+  const skip =
+    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
 
   const whereClause: IncomeWhereInput = {
     user_id: user.id,
@@ -78,21 +80,23 @@ export async function list(
 
   const incomes = await prisma.income.findMany({
     where: whereClause,
-    skip: skip,
-    take: params.pageSize,
+    skip,
+    take,
   });
 
   const totalData = await prisma.income.count({
     where: whereClause,
   });
 
-  const totalPages = Math.ceil(totalData / params.pageSize);
+  const totalPages =
+    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
+  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
 
   return {
     data: incomes,
     pageInfo: {
       currentPage: params.page,
-      pageSize: params.pageSize,
+      pageSize,
       totalData,
       totalPages,
     },

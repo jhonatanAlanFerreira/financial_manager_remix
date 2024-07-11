@@ -45,7 +45,9 @@ export async function list(
   user: User,
   params: ExpenseLoaderParams
 ): Promise<ServerResponse<Expense[] | ExpenseWithCompanies[]>> {
-  const skip = (params.page - 1) * params.pageSize;
+  const take = params.pageSize != "all" ? params.pageSize : undefined;
+  const skip =
+    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
 
   const whereClause: ExpenseWhereInput = {
     user_id: user.id,
@@ -78,21 +80,23 @@ export async function list(
 
   const expenses = await prisma.expense.findMany({
     where: whereClause,
-    skip: skip,
-    take: params.pageSize,
+    skip,
+    take,
   });
 
   const totalData = await prisma.expense.count({
     where: whereClause,
   });
 
-  const totalPages = Math.ceil(totalData / params.pageSize);
+  const totalPages =
+    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
+  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
 
   return {
     data: expenses,
     pageInfo: {
       currentPage: params.page,
-      pageSize: params.pageSize,
+      pageSize,
       totalData,
       totalPages,
     },
