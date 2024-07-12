@@ -27,10 +27,11 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     amount_less: Number(url.searchParams.get("amount_less")),
     company: url.searchParams.get("company"),
     name: url.searchParams.get("name"),
-    is_personal_or_company: url.searchParams.get("is_personal_or_company") as
-      | "all"
-      | "personal"
-      | "company",
+    is_personal_or_company:
+      (url.searchParams.get("is_personal_or_company") as
+        | "all"
+        | "personal"
+        | "company") || "all",
   };
   return list(user, params);
 };

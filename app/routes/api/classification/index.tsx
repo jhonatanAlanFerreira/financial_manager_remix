@@ -103,14 +103,16 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     company: url.searchParams.get("company"),
     name: url.searchParams.get("name"),
-    is_income_or_expense: url.searchParams.get("is_income_or_expense") as
-      | "expense"
-      | "income"
-      | "all",
-    is_personal_or_company: url.searchParams.get("is_personal_or_company") as
-      | "all"
-      | "personal"
-      | "company",
+    is_income_or_expense:
+      (url.searchParams.get("is_income_or_expense") as
+        | "expense"
+        | "income"
+        | "all") || "all",
+    is_personal_or_company:
+      (url.searchParams.get("is_personal_or_company") as
+        | "all"
+        | "personal"
+        | "company") || "all",
   };
   return list(user, params);
 };
