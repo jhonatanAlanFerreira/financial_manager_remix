@@ -295,18 +295,18 @@ export default function Incomes() {
             Filters
           </div>
           {IncomeFilterTagsConfig.map(
-            (filter, index) =>
-              !!filterForm.values[filter.fieldName] && (
+            (config, index) =>
+              !!filterForm.values[config.fieldName] && (
                 <FilterTag
-                  fieldName={filter.fieldName}
-                  closeBtn={filter.closeBtn}
+                  fieldName={config.fieldName}
+                  closeBtn={config.closeBtn}
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
                     setReloadIncomes(true);
                   }}
                   className="ml-2 mb-2"
-                  label={filter.label}
-                  value={filter.getValue(filterForm.values[filter.fieldName])}
+                  label={config.label}
+                  value={config.getValue(filterForm.values[config.fieldName])}
                   key={index}
                 ></FilterTag>
               )
