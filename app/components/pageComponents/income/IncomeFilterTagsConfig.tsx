@@ -7,6 +7,12 @@ export const IncomeFilterTagsConfig: {
   getValue: (fieldValue: any) => string;
 }[] = [
   {
+    fieldName: "is_personal_or_company",
+    label: "Personal/Company",
+    closeBtn: false,
+    getValue: (fieldValue: any) => fieldValue,
+  },
+  {
     fieldName: "name",
     label: "Name",
     closeBtn: true,
@@ -28,12 +34,6 @@ export const IncomeFilterTagsConfig: {
     fieldName: "amount_less",
     label: "Amount Less",
     closeBtn: true,
-    getValue: (fieldValue: any) => fieldValue,
-  },
-  {
-    fieldName: "is_personal_or_company",
-    label: "Personal/Company",
-    closeBtn: false,
     getValue: (fieldValue: any) => fieldValue,
   },
 ];
