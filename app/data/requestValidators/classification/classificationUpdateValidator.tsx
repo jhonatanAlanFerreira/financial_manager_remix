@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import ClassificationUpdateRequest from "~/interfaces/bodyRequests/ClassificationUpdateRequest";
 import { prisma } from "~/data/database.server";
+import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 
 export default async function classificationUpdateValidator(
   data: ClassificationUpdateRequest,

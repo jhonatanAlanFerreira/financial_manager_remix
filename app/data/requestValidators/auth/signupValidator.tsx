@@ -1,6 +1,6 @@
 import ValidatedData from "~/interfaces/ValidatedData";
-import SignupRequest from "~/interfaces/bodyRequests/SignupRequest";
 import { prisma } from "~/data/database.server";
+import SignupRequest from "~/interfaces/bodyRequests/auth/SignupRequest";
 
 export async function signupValidator(
   data: SignupRequest

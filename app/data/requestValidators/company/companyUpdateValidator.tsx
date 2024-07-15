@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "~/data/database.server";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/CompanyUpdateRequest";
+import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 
 export default async function companyUpdateValidator(
   data: CompanyUpdateRequest,

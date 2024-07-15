@@ -1,7 +1,6 @@
 import { Company, Expense, Income } from "@prisma/client";
 import { useEffect, useState } from "react";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import Checkbox from "~/components/inputs/checkbox/Checkbox";
 import InputSelect from "~/components/inputs/inputSelect/InputSelect";
 import InputText from "~/components/inputs/inputText/InputText";
 import { TransactionFiltersProps } from "~/interfaces/pageComponents/transactions/TransactionFiltersProps";

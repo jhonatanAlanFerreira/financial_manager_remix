@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/ExpenseUpdateRequest";
 import { prisma } from "~/data/database.server";
+import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 
 export async function expenseUpdateValidator(
   expenseId: string,
