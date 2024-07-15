@@ -10,7 +10,7 @@ export default {
     },
   },
   plugins: [],
-  ...(process.env.NODE_ENV == "development" && {
+  ...(process.env.NODE_ENV === "development" && {
     safelist: [{ pattern: /.*/ }],
   }),
 } satisfies Config;

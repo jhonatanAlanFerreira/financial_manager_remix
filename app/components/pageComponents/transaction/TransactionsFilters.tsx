@@ -94,7 +94,7 @@ export default function TransactionsFilters({
       setFilteredExpenses(
         expenses.filter((expense) => {
           const expenseTypeFilter =
-            formik.values.is_personal_or_company == "personal"
+            formik.values.is_personal_or_company === "personal"
               ? expense.is_personal_expense
               : true;
 
@@ -113,7 +113,7 @@ export default function TransactionsFilters({
       setFilteredIncomes(
         incomes.filter((income) => {
           const incomeTypeFilter =
-            formik.values.is_personal_or_company == "personal"
+            formik.values.is_personal_or_company === "personal"
               ? income.is_personal_income
               : true;
 
@@ -152,7 +152,7 @@ export default function TransactionsFilters({
               name="is_income_or_expense"
               value={"all"}
               onChange={isIncomeOrExpenseChange}
-              checked={formik.values.is_income_or_expense == "all"}
+              checked={formik.values.is_income_or_expense === "all"}
             ></input>
             <label
               className="cursor-pointer ml-2"
@@ -168,7 +168,7 @@ export default function TransactionsFilters({
               name="is_income_or_expense"
               value={"expense"}
               onChange={isIncomeOrExpenseChange}
-              checked={formik.values.is_income_or_expense == "expense"}
+              checked={formik.values.is_income_or_expense === "expense"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_expense_filter">
               Expense transaction
@@ -181,7 +181,7 @@ export default function TransactionsFilters({
               name="is_income_or_expense"
               value={"income"}
               onChange={isIncomeOrExpenseChange}
-              checked={formik.values.is_income_or_expense == "income"}
+              checked={formik.values.is_income_or_expense === "income"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_income_filter">
               Income transaction
@@ -199,7 +199,7 @@ export default function TransactionsFilters({
               name="is_personal_or_company"
               value={"all"}
               onChange={isPersonalOrCompanyChange}
-              checked={formik.values.is_personal_or_company == "all"}
+              checked={formik.values.is_personal_or_company === "all"}
             ></input>
             <label
               className="cursor-pointer ml-2"
@@ -215,7 +215,7 @@ export default function TransactionsFilters({
               name="is_personal_or_company"
               value={"personal"}
               onChange={isPersonalOrCompanyChange}
-              checked={formik.values.is_personal_or_company == "personal"}
+              checked={formik.values.is_personal_or_company === "personal"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_personal_filter">
               Personal transaction
@@ -228,7 +228,7 @@ export default function TransactionsFilters({
               name="is_personal_or_company"
               value={"company"}
               onChange={isPersonalOrCompanyChange}
-              checked={formik.values.is_personal_or_company == "company"}
+              checked={formik.values.is_personal_or_company === "company"}
             ></input>
             <label className="cursor-pointer ml-2" htmlFor="is_company_filter">
               Company transaction

@@ -532,7 +532,7 @@ export default function Classifications() {
                     name="is_income_or_expense"
                     value={"all"}
                     onChange={isIncomeOrExpenseChange}
-                    checked={filterForm.values.is_income_or_expense == "all"}
+                    checked={filterForm.values.is_income_or_expense === "all"}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -549,7 +549,7 @@ export default function Classifications() {
                     value={"expense"}
                     onChange={isIncomeOrExpenseChange}
                     checked={
-                      filterForm.values.is_income_or_expense == "expense"
+                      filterForm.values.is_income_or_expense === "expense"
                     }
                   ></input>
                   <label
@@ -566,7 +566,7 @@ export default function Classifications() {
                     name="is_income_or_expense"
                     value={"income"}
                     onChange={isIncomeOrExpenseChange}
-                    checked={filterForm.values.is_income_or_expense == "income"}
+                    checked={filterForm.values.is_income_or_expense === "income"}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -587,7 +587,7 @@ export default function Classifications() {
                     name="is_personal_or_company"
                     value={"all"}
                     onChange={isPersonalOrCompanyChange}
-                    checked={filterForm.values.is_personal_or_company == "all"}
+                    checked={filterForm.values.is_personal_or_company === "all"}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -604,7 +604,7 @@ export default function Classifications() {
                     value={"personal"}
                     onChange={isPersonalOrCompanyChange}
                     checked={
-                      filterForm.values.is_personal_or_company == "personal"
+                      filterForm.values.is_personal_or_company === "personal"
                     }
                   ></input>
                   <label
@@ -622,7 +622,7 @@ export default function Classifications() {
                     value={"company"}
                     onChange={isPersonalOrCompanyChange}
                     checked={
-                      filterForm.values.is_personal_or_company == "company"
+                      filterForm.values.is_personal_or_company === "company"
                     }
                   ></input>
                   <label

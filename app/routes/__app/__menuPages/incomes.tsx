@@ -515,7 +515,7 @@ export default function Incomes() {
                     name="is_personal_or_company"
                     value={"all"}
                     onChange={isPersonalOrCompanyChange}
-                    checked={filterForm.values.is_personal_or_company == "all"}
+                    checked={filterForm.values.is_personal_or_company === "all"}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -532,7 +532,7 @@ export default function Incomes() {
                     value={"personal"}
                     onChange={isPersonalOrCompanyChange}
                     checked={
-                      filterForm.values.is_personal_or_company == "personal"
+                      filterForm.values.is_personal_or_company === "personal"
                     }
                   ></input>
                   <label
@@ -550,7 +550,7 @@ export default function Incomes() {
                     value={"company"}
                     onChange={isPersonalOrCompanyChange}
                     checked={
-                      filterForm.values.is_personal_or_company == "company"
+                      filterForm.values.is_personal_or_company === "company"
                     }
                   ></input>
                   <label
