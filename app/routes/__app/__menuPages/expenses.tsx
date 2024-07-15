@@ -93,7 +93,9 @@ export default function Expenses() {
   }, [currentPage]);
 
   useEffect(() => {
-    filterForm.setFieldValue("company", null);
+    if (filterForm.values.is_personal_or_company === "personal") {
+      filterForm.setFieldValue("company", null);
+    }
   }, [filterForm.values.is_personal_or_company]);
 
   useEffect(() => {

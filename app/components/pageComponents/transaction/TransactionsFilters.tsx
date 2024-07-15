@@ -33,9 +33,11 @@ export default function TransactionsFilters({
       return;
     }
 
-    formik.setFieldValue("company", null);
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
+    if (formik.values.is_personal_or_company === "personal") {
+      formik.setFieldValue("company", null);
+      formik.setFieldValue("expense", null);
+      formik.setFieldValue("income", null);
+    }
 
     runFilters();
   }, [formik.values.is_personal_or_company]);
@@ -45,8 +47,13 @@ export default function TransactionsFilters({
       return;
     }
 
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
+    if (formik.values.is_income_or_expense == "income") {
+      formik.setFieldValue("expense", null);
+    }
+
+    if (formik.values.is_income_or_expense == "expense") {
+      formik.setFieldValue("income", null);
+    }
 
     runFilters();
   }, [formik.values.is_income_or_expense]);

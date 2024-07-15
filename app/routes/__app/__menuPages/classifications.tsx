@@ -109,6 +109,12 @@ export default function Classifications() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (filterForm.values.is_personal_or_company === "personal") {
+      filterForm.setFieldValue("company", null);
+    }
+  }, [filterForm.values.is_personal_or_company]);
+
   const loadClassifications = async () => {
     try {
       setLoading(true);
@@ -566,7 +572,9 @@ export default function Classifications() {
                     name="is_income_or_expense"
                     value={"income"}
                     onChange={isIncomeOrExpenseChange}
-                    checked={filterForm.values.is_income_or_expense === "income"}
+                    checked={
+                      filterForm.values.is_income_or_expense === "income"
+                    }
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
