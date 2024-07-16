@@ -70,11 +70,7 @@ export default function Companies() {
   useEffect(() => {
     if (reloadCompanies) {
       setReloadCompanies(false);
-      if (currentPage != 1) {
-        setCurrentPage(1);
-      } else {
-        loadCompanies();
-      }
+      loadCompanies();
     }
   }, [searchParams]);
 
@@ -87,11 +83,15 @@ export default function Companies() {
         }${paginationParams()}`
       );
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 0);
-      setTotalPages(res.data.pageInfo?.totalPages || 0);
+      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setCompanies(res.data);
       setLoading(false);
+
+      if (!res.data.data?.length) {
+        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+      }
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
@@ -202,11 +202,7 @@ export default function Companies() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    } else {
-      loadCompanies();
-    }
+    loadCompanies();
   };
 
   const buildSearchParamsUrl = () => {

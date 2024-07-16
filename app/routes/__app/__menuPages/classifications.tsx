@@ -101,11 +101,7 @@ export default function Classifications() {
   useEffect(() => {
     if (reloadClassification) {
       setReloadClassification(false);
-      if (currentPage != 1) {
-        setCurrentPage(1);
-      } else {
-        loadClassifications();
-      }
+      loadClassifications();
     }
   }, [searchParams]);
 
@@ -124,11 +120,15 @@ export default function Classifications() {
         }${paginationParams()}`
       );
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 0);
-      setTotalPages(res.data.pageInfo?.totalPages || 0);
+      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setClassifications(res.data);
       setLoading(false);
+
+      if (!res.data.data?.length) {
+        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+      }
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
@@ -264,11 +264,7 @@ export default function Classifications() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    } else {
-      loadClassifications();
-    }
+    loadClassifications();
   };
 
   const buildSearchParamsUrl = () => {

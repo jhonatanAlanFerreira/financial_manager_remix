@@ -155,11 +155,7 @@ export default function Transactions() {
   useEffect(() => {
     if (reloadTransactions) {
       setReloadTransactions(false);
-      if (currentPage != 1) {
-        setCurrentPage(1);
-      } else {
-        loadTransactions();
-      }
+      loadTransactions();
     }
   }, [searchParams]);
 
@@ -203,11 +199,18 @@ export default function Transactions() {
       const { data } = res;
 
       setTransactions(data);
-      setTotalPages(data.pageInfo?.totalPages || 0);
+
+      setTotalPages(data.pageInfo?.totalPages || 1);
       setCurrentPage(data.pageInfo?.currentPage || 1);
+
       setTotalExpenseValue(data.data?.totalExpenseValue || 0);
       setTotalIncomeValue(data.data?.totalIncomeValue || 0);
+
       setLoading(false);
+
+      if (!data.data?.transactions.length) {
+        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+      }
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
@@ -273,11 +276,7 @@ export default function Transactions() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    } else {
-      loadTransactions();
-    }
+    loadTransactions();
   };
 
   const paginationParams = () => {

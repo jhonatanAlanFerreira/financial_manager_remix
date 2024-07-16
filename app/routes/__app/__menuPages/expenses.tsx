@@ -104,12 +104,7 @@ export default function Expenses() {
 
   useEffect(() => {
     if (reloadExpenses) {
-      setReloadExpenses(false);
-      if (currentPage != 1) {
-        setCurrentPage(1);
-      } else {
-        loadExpenses();
-      }
+      loadExpenses();
     }
   }, [searchParams]);
 
@@ -122,11 +117,15 @@ export default function Expenses() {
         }${paginationParams()}`
       );
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 0);
-      setTotalPages(res.data.pageInfo?.totalPages || 0);
+      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setExpenses(res.data);
       setLoading(false);
+
+      if (!res.data.data?.length) {
+        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+      }
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
@@ -257,11 +256,7 @@ export default function Expenses() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    } else {
-      loadExpenses();
-    }
+    loadExpenses();
   };
 
   const buildSearchParamsUrl = () => {

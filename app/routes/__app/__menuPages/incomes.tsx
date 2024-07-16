@@ -111,11 +111,7 @@ export default function Incomes() {
   useEffect(() => {
     if (reloadIncomes) {
       setReloadIncomes(false);
-      if (currentPage != 1) {
-        setCurrentPage(1);
-      } else {
-        loadIncomes();
-      }
+      loadIncomes();
     }
   }, [searchParams]);
 
@@ -170,11 +166,15 @@ export default function Incomes() {
           searchParams ? "&" : ""
         }${paginationParams()}`
       );
-      setCurrentPage(res.data.pageInfo?.currentPage || 0);
-      setTotalPages(res.data.pageInfo?.totalPages || 0);
+      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setIncomes(res.data);
       setLoading(false);
+
+      if (!res.data.data?.length) {
+        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+      }
     } catch (error) {
       if (isAxiosError(error)) {
         toast.error(
@@ -255,11 +255,7 @@ export default function Incomes() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    if (currentPage != 1) {
-      setCurrentPage(1);
-    } else {
-      loadIncomes();
-    }
+    loadIncomes();
   };
 
   const onCompanyFilterChange = (company: Company) => {
