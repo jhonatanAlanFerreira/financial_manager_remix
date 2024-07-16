@@ -376,7 +376,7 @@ export default function Expenses() {
           currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         ></Pagination>
       )}
 
@@ -403,7 +403,7 @@ export default function Expenses() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeExpense()}
+            onClick={removeExpense}
           ></DangerButton>
         </div>
       </Modal>

@@ -374,7 +374,7 @@ export default function Incomes() {
           currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         ></Pagination>
       )}
 
@@ -401,7 +401,7 @@ export default function Incomes() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeIncome()}
+            onClick={removeIncome}
           ></DangerButton>
         </div>
       </Modal>

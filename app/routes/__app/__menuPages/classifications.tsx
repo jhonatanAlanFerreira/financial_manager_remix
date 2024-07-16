@@ -383,7 +383,7 @@ export default function Classifications() {
           currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         ></Pagination>
       )}
 
@@ -410,7 +410,7 @@ export default function Classifications() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeClassification()}
+            onClick={removeClassification}
           ></DangerButton>
         </div>
       </Modal>

@@ -311,7 +311,7 @@ export default function Companies() {
           currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         ></Pagination>
       )}
 
@@ -338,7 +338,7 @@ export default function Companies() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeCompany()}
+            onClick={removeCompany}
           ></DangerButton>
         </div>
       </Modal>

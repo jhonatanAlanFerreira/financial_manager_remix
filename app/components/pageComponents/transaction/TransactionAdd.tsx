@@ -200,7 +200,7 @@ export default function TransactionAdd({
   return (
     <div className="p-2">
       <Tabs
-        onSelect={(event: number) => onTabSelect(event)}
+        onSelect={onTabSelect}
         defaultIndex={!!formik.values.is_income ? 1 : 0}
       >
         <TabList className="mb-2">

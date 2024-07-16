@@ -491,7 +491,7 @@ export default function Transactions() {
           currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={setCurrentPage}
         ></Pagination>
       )}
 
@@ -518,7 +518,7 @@ export default function Transactions() {
           <DangerButton
             disabled={loading}
             text="Remove"
-            onClick={() => removeTransaction()}
+            onClick={removeTransaction}
           ></DangerButton>
         </div>
       </Modal>
@@ -539,7 +539,7 @@ export default function Transactions() {
         </h2>
         <TransactionAdd
           skipEffect={skipEffect}
-          setSkipEffect={(value) => setSkipEffect(value)}
+          setSkipEffect={setSkipEffect}
           formik={mainForm}
           onModalCancel={() => setOpenAddModal(false)}
           classifications={classifications.data || []}
