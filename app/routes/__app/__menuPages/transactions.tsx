@@ -39,18 +39,18 @@ import { TransactionFilterTagsConfig } from "~/components/pageComponents/transac
 import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
 
 export default function Transactions() {
-  const [loading, setLoading] = useState(true);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [openFilterModal, setOpenFilterModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [skipEffect, setSkipEffect] = useState(false);
-  const [searchParams, setSearchParams] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [reloadTransactions, setReloadTransactions] = useState(false);
-  const [totalIncomeValue, setTotalIncomeValue] = useState(0);
-  const [totalExpenseValue, setTotalExpenseValue] = useState(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [skipEffect, setSkipEffect] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
+  const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
+  const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
 
   const [transactions, setTransactions] = useState<
     ServerResponse<TransactionsWithTotals>

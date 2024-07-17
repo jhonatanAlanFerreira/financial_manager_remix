@@ -27,19 +27,19 @@ import { queryParamsFromObject } from "~/utilities";
 
 export default function Incomes() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openFilterModal, setOpenFilterModal] = useState(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [reloadIncomes, setReloadIncomes] = useState(false);
-  const [searchParams, setSearchParams] = useState("");
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [reloadIncomes, setReloadIncomes] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;

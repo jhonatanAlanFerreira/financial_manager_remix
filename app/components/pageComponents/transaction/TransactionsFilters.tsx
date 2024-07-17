@@ -14,7 +14,7 @@ export default function TransactionsFilters({
 }: TransactionFiltersProps) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
-  const [skipEffect, setSkipEffect] = useState(true);
+  const [skipEffect, setSkipEffect] = useState<boolean>(true);
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;

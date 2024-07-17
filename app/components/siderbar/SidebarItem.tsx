@@ -7,7 +7,7 @@ export default function SidebarItem({
   item,
   updateSidebarOpen,
 }: SidebarItemProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   if (item.childrens) {
     return (

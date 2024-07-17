@@ -20,13 +20,13 @@ import { CompanyForm } from "~/interfaces/forms/company/CompanyForm";
 import { queryParamsFromObject } from "~/utilities";
 
 export default function Companies() {
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [openFilterModal, setOpenFilterModal] = useState(false);
-  const [searchParams, setSearchParams] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [reloadCompanies, setReloadCompanies] = useState(false);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [reloadCompanies, setReloadCompanies] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});

@@ -3,7 +3,7 @@ import Select, { StylesConfig, Props as SelectProps } from "react-select";
 
 export default function InputSelect({ ...rest }: SelectProps) {
   const inputId = useId();
-  const [hasValue, setHasValue] = useState(false);
+  const [hasValue, setHasValue] = useState<boolean>(false);
   const selectRef = useRef(null);
 
   useEffect(() => {

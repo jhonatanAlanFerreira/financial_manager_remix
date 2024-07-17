@@ -5,7 +5,7 @@ import Sidebar from "~/components/siderbar/Sidebar";
 import TopBar from "~/components/topBar/TopBar";
 
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const updateSidebarOpen = (value: boolean) => {
     setSidebarOpen(value);

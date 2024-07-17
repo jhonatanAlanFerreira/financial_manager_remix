@@ -24,13 +24,13 @@ import Pagination from "~/components/pagination/Pagination";
 import { queryParamsFromObject } from "~/utilities";
 
 export default function Expenses() {
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState(false);
-  const [openFilterModal, setOpenFilterModal] = useState(false);
-  const [reloadExpenses, setReloadExpenses] = useState(false);
-  const [searchParams, setSearchParams] = useState("");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
+  const [reloadExpenses, setReloadExpenses] = useState<boolean>(false);
+  const [searchParams, setSearchParams] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
   const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
