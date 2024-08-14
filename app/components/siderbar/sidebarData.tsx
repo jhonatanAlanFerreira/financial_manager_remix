@@ -2,8 +2,8 @@ import { SidebarItemType } from "~/types/SidebarItemType";
 
 export const items: SidebarItemType[] = [
   {
-    title: "Home",
-    icon: "Home",
+    title: "Dashboard",
+    icon: "PieChart",
     path: "/",
   },
   {
