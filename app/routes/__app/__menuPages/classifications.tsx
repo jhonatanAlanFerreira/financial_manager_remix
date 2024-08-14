@@ -29,7 +29,8 @@ export default function Classifications() {
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [reloadClassification, setReloadClassification] = useState<boolean>(false);
+  const [reloadClassification, setReloadClassification] =
+    useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<String>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -673,9 +674,7 @@ export default function Classifications() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([companyLoader(request)]);
-
   return {
-    companyData: res[0],
+    companyData: await companyLoader(request),
   };
 }

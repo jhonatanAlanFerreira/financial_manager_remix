@@ -610,9 +610,7 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([companyLoader(request)]);
-
   return {
-    companyData: res[0],
+    companyData: await companyLoader(request),
   };
 }
