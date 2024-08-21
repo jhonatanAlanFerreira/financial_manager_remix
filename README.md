@@ -37,7 +37,6 @@ Make sure to deploy the output of `remix build`
 - `build/`
 - `public/build/`
 
-
 ## Prisma Commands
 
 Run seeders:
@@ -56,4 +55,12 @@ Generate Prisma Client:
 
 ```sh
 npx prisma generate
+```
+
+## Testing
+
+Code Validation
+
+```sh
+npm run typecheck
 ```

@@ -38,7 +38,6 @@ export default function Companies() {
     initialValues: {
       id: "",
       name: "",
-      working_capital: 0,
     },
     onSubmit: () => {},
   });
@@ -175,7 +174,6 @@ export default function Companies() {
     formik.setValues({
       id: company.id,
       name: company.name,
-      working_capital: company.working_capital,
     });
   };
 
@@ -256,7 +254,6 @@ export default function Companies() {
           <thead>
             <tr className="bg-gray-100">
               <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Working Capital</th>
               <th className="py-2 px-4 border-b">Actions</th>
             </tr>
           </thead>
@@ -271,13 +268,6 @@ export default function Companies() {
             {companies.data?.map((company, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">{company.name}</td>
-                <td
-                  className={`py-2 px-4 border-b border-r ${
-                    company.working_capital ? "" : "opacity-50"
-                  }`}
-                >
-                  {company.working_capital || "Not Set"}
-                </td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
                     onClick={() => {
@@ -363,15 +353,6 @@ export default function Companies() {
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
-              ></InputText>
-              <InputText
-                label="Working Capital"
-                name="working_capital"
-                type="number"
-                step={0.01}
-                min={0}
-                value={formik.values.working_capital}
-                onChange={formik.handleChange}
               ></InputText>
             </Form>
           </div>

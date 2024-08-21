@@ -33,10 +33,6 @@ export default function Index() {
       : selectedCompany.name;
   };
 
-  const getSelectCompanyWorkingCapital = () => {
-    return selectedCompany == "personal" ? 0 : selectedCompany.working_capital;
-  };
-
   return (
     <div className="flex h-full">
       <div className="w-60 bg-violet-700 text-white p-4 overflow-auto">
@@ -75,7 +71,6 @@ export default function Index() {
         <h1 className="text-2xl font-bold text-violet-950 relative mb-4">
           <span className="mr-2">{getSelectedCompanyName()}</span>
           <span className="border-l-2 border-gray-300 h-6 mx-3"></span>
-          <span>Working Capital: {getSelectCompanyWorkingCapital()}</span>
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">

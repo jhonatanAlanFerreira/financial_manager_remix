@@ -82,11 +82,19 @@ export async function signup(data: SignupRequest): Promise<ServerResponse> {
     },
   });
 
+  await prisma.account.create({
+    data: {
+      name: "Personal Account",
+      user_id: user.id,
+      balance: 0,
+    },
+  });
+
   const userWithoutPass = exclude(user, ["password"]);
 
   return {
     data: userWithoutPass,
-    message: "Your user was created successfully",
+    message: "Your user and default account were created successfully",
   };
 }
 

@@ -27,16 +27,6 @@ export async function list(
     whereClause.name = { contains: params.name, mode: "insensitive" };
   }
 
-  if (params.working_capital_greater || params.working_capital_less) {
-    whereClause.working_capital = {};
-    if (params.working_capital_greater) {
-      whereClause.working_capital.gte = params.working_capital_greater;
-    }
-    if (params.working_capital_less) {
-      whereClause.working_capital.lte = params.working_capital_less;
-    }
-  }
-
   const companies = await prisma.company.findMany({
     where: whereClause,
     skip,
@@ -79,7 +69,6 @@ export async function create(
   const company = await prisma.company.create({
     data: {
       name: data.name,
-      working_capital: data.working_capital,
       user_id: user.id,
     },
   });

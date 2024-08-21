@@ -22,12 +22,12 @@ model User {
   logs                        Log[]
   transaction_classifications TransactionClassification[]
   incomes                     Income[]
+  accounts                    Account[]
 }
 
 model Company {
   id                             String                      @id @default(auto()) @map("_id") @db.ObjectId
   name                           String
-  working_capital                Float                       @default(0)
   user_id                        String                      @db.ObjectId
   user                           User                        @relation(fields: [user_id], references: [id])
   expense_ids                    String[]                    @db.ObjectId
@@ -37,6 +37,7 @@ model Company {
   incomes                        Income[]                    @relation(fields: [income_ids], references: [id])
   transaction_classification_ids String[]                    @db.ObjectId
   transaction_classification     TransactionClassification[] @relation(fields: [transaction_classification_ids], references: [id])
+  accounts                       Account[]
 
   @@unique([user_id, name])
 }
@@ -90,6 +91,31 @@ model TransactionClassification {
   @@unique([user_id, name, is_personal_transaction_classification, is_income])
 }
 
+model Income {
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  name               String
+  user_id            String        @db.ObjectId
+  user               User          @relation(fields: [user_id], references: [id])
+  company_ids        String[]      @db.ObjectId
+  companies          Company[]     @relation(fields: [company_ids], references: [id])
+  transactions       Transaction[]
+  amount             Float?
+  is_personal_income Boolean       @default(false)
+
+  @@unique([user_id, name, is_personal_income])
+}
+
+model Account {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  user_id             String   @db.ObjectId
+  user                User     @relation(fields: [user_id], references: [id])
+  is_personal_account Boolean  @default(false)
+  company_id          String?  @db.ObjectId
+  company             Company? @relation(fields: [company_id], references: [id])
+  balance             Float?
+}
+
 model File {
   id             String      @id @default(auto()) @map("_id") @db.ObjectId
   sha1           String      @unique
@@ -114,18 +140,4 @@ model LogOperationType {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
   log  Log[]
-}
-
-model Income {
-  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  user_id            String        @db.ObjectId
-  user               User          @relation(fields: [user_id], references: [id])
-  company_ids        String[]      @db.ObjectId
-  companies          Company[]     @relation(fields: [company_ids], references: [id])
-  transactions       Transaction[]
-  amount             Float?
-  is_personal_income Boolean       @default(false)
-
-  @@unique([user_id, name, is_personal_income])
 }
