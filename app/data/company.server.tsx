@@ -8,13 +8,14 @@ import companyUpdateValidator from "~/data/requestValidators/company/companyUpda
 import companyDeleteValidator from "~/data/requestValidators/company/companyDeleteValidator";
 import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
+import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 
 type CompanyWhereInput = Prisma.CompanyWhereInput;
 
 export async function list(
   user: User,
   params: CompanyLoaderParams
-): Promise<ServerResponse<Company[]>> {
+): Promise<ServerResponse<Company[] | CompanyWithAccounts[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
@@ -31,6 +32,7 @@ export async function list(
     where: whereClause,
     skip,
     take,
+    include: { accounts: params.with_accounts },
   });
 
   const totalData = await prisma.company.count({
@@ -70,6 +72,16 @@ export async function create(
     data: {
       name: data.name,
       user_id: user.id,
+    },
+  });
+
+  await prisma.account.create({
+    data: {
+      name: `${data.name} Account`,
+      user_id: user.id,
+      balance: data.balance,
+      is_personal_account: false,
+      company_id: company.id,
     },
   });
 

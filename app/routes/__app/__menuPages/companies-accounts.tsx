@@ -5,6 +5,8 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
+import Accordion from "~/components/accordion/Accordion";
+import AddButton from "~/components/buttons/add-button/AddButton";
 import DangerButton from "~/components/buttons/danger-button/DangerButton";
 import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import FilterTag from "~/components/filterTag/FilterTag";
@@ -17,6 +19,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import CompanyFiltersForm from "~/interfaces/forms/company/CompanyFiltersForm";
 import { CompanyForm } from "~/interfaces/forms/company/CompanyForm";
+import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { queryParamsFromObject } from "~/utilities";
 
 export default function Companies() {
@@ -29,7 +32,9 @@ export default function Companies() {
   const [reloadCompanies, setReloadCompanies] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [companies, setCompanies] = useState<
+    ServerResponse<CompanyWithAccounts[]>
+  >({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
@@ -38,6 +43,7 @@ export default function Companies() {
     initialValues: {
       id: "",
       name: "",
+      balance: 0,
     },
     onSubmit: () => {},
   });
@@ -47,6 +53,7 @@ export default function Companies() {
       name: "",
       working_capital_greater: 0,
       working_capital_less: 0,
+      with_accounts: true,
     },
     onSubmit: () => {},
   });
@@ -174,6 +181,7 @@ export default function Companies() {
     formik.setValues({
       id: company.id,
       name: company.name,
+      balance: 0,
     });
   };
 
@@ -245,50 +253,52 @@ export default function Companies() {
         </div>
         <PrimaryButton
           onClick={onClickAdd}
-          text="Add"
           iconName="PlusCircle"
+          text="Add Company"
         ></PrimaryButton>
       </div>
       <div className="overflow-x-auto px-10">
-        <table className="min-w-full bg-white border border-gray-300 text-violet-900">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!companies.data?.length && (
-              <tr>
-                <td className="py-2 px-4" colSpan={3}>
-                  There are no data yet
-                </td>
-              </tr>
-            )}
-            {companies.data?.map((company, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="py-2 px-4 border-b border-r">{company.name}</td>
-                <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                  <Icon
-                    onClick={() => {
-                      onClickUpdate(company);
-                    }}
-                    name="Edit"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                  ></Icon>{" "}
-                  <Icon
-                    onClick={() => {
-                      onClickDelete(company);
-                    }}
-                    name="Trash"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                    color="red"
-                  ></Icon>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {companies.data?.map((company, index) => (
+          <Accordion key={index} title={company.name}>
+            <div className="flex justify-end">
+              <AddButton title="Add Account" onClick={() => {}}></AddButton>
+            </div>
+            <div className="overflow-x-auto px-10 pb-8">
+              <table className="min-w-full bg-white border border-gray-300 text-violet-900">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="py-2 px-4 border-b border-r">Name</th>
+                    <th className="py-2 px-4 border-b border-r">Balance</th>
+                    <th className="py-2 px-4 border-b">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {company.accounts.map((account, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="py-2 px-4 border-b border-r">
+                        {account.name}
+                      </td>
+                      <td className="py-2 px-4 border-b border-r">
+                        {account.balance}
+                      </td>
+                      <td className="flex justify-center gap-5 py-2 px-4 border-b">
+                        <Icon
+                          name="Edit"
+                          className="cursor-pointer transition-transform  transform hover:scale-110"
+                        ></Icon>{" "}
+                        <Icon
+                          name="Trash"
+                          className="cursor-pointer transition-transform  transform hover:scale-110"
+                          color="red"
+                        ></Icon>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Accordion>
+        ))}
       </div>
 
       {totalPages > 1 && (
@@ -353,6 +363,15 @@ export default function Companies() {
                 value={formik.values.name}
                 onChange={formik.handleChange}
                 errorMessage={responseErrors?.data?.errors?.["name"]}
+              ></InputText>
+              <InputText
+                label="Balance"
+                name="balance"
+                type="number"
+                step={0.01}
+                min={0}
+                value={formik.values.balance}
+                onChange={formik.handleChange}
               ></InputText>
             </Form>
           </div>

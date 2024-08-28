@@ -10,7 +10,7 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <div
-      className={`absolute z-10 text-white h-screen overflow-auto bg-violet-950 shadow-xl shadow-black transition-all duration-500 ease-in-out ${
+      className={`absolute z-10 text-white h-screen overflow-auto bg-violet-950 shadow-xl shadow-black transition-all duration-500 ease-in-out whitespace-nowrap ${
         sidebarOpen ? "opacity-1 w-60" : "opacity-0 w-0"
       }`}
     >

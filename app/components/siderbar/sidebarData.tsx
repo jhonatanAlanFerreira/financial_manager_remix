@@ -12,14 +12,14 @@ export const items: SidebarItemType[] = [
     path: "/transactions",
   },
   {
+    title: "Companies and Accounts",
+    icon: "Briefcase",
+    path: "/companies-accounts",
+  },
+  {
     title: "Incomes",
     icon: "TrendingUp",
     path: "/incomes",
-  },
-  {
-    title: "Companies",
-    icon: "Briefcase",
-    path: "/companies",
   },
   {
     title: "Expenses",

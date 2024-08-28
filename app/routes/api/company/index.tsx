@@ -23,6 +23,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const params: CompanyLoaderParams = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
+    with_accounts: !!url.searchParams.get("with_accounts"),
     working_capital_greater: Number(
       url.searchParams.get("working_capital_greater")
     ),
@@ -39,7 +40,7 @@ let createCompany = async (request: Request) => {
 
   const data: CompanyCreateRequest = {
     name: String(body.get("name") || ""),
-    working_capital: +(body.get("working_capital") || 0),
+    balance: +(body.get("balance") || 0),
   };
 
   const res = await create(data, user);
@@ -79,7 +80,7 @@ let updateCompany = async (request: Request) => {
 
   const data: CompanyUpdateRequest = {
     name: String(body.get("name") || ""),
-    working_capital: +(body.get("working_capital") || 0),
+    balance: +(body.get("balance") || 0),
   };
 
   const res = await update(data, user, companyId);
