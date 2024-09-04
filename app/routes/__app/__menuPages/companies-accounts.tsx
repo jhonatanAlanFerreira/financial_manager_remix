@@ -274,7 +274,10 @@ export default function Companies() {
               },
             ]}
           >
-            <AccountDropdown company={company}></AccountDropdown>
+            <AccountDropdown
+              company={company}
+              onSave={loadCompanies}
+            ></AccountDropdown>
           </Accordion>
         ))}
       </div>

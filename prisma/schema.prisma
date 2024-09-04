@@ -114,6 +114,8 @@ model Account {
   company_id          String?  @db.ObjectId
   company             Company? @relation(fields: [company_id], references: [id])
   balance             Float?
+
+  @@unique([user_id, name, company_id])
 }
 
 model File {

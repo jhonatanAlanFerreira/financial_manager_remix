@@ -14,7 +14,10 @@ import AccountDropdownProps from "~/interfaces/pageComponents/companies-accounts
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 
-export default function AccountDropdown({ company }: AccountDropdownProps) {
+export default function AccountDropdown({
+  company,
+  onSave,
+}: AccountDropdownProps) {
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,6 +64,7 @@ export default function AccountDropdown({ company }: AccountDropdownProps) {
         success: (res: AxiosResponse<ServerResponse>) => {
           setOpenAddModal(false);
           setResponseErrors({});
+          onSave();
           return res.data.message as string;
         },
         error: (error) => {
