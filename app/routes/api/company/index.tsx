@@ -40,7 +40,6 @@ let createCompany = async (request: Request) => {
 
   const data: CompanyCreateRequest = {
     name: String(body.get("name") || ""),
-    balance: +(body.get("balance") || 0),
   };
 
   const res = await create(data, user);
@@ -80,7 +79,6 @@ let updateCompany = async (request: Request) => {
 
   const data: CompanyUpdateRequest = {
     name: String(body.get("name") || ""),
-    balance: +(body.get("balance") || 0),
   };
 
   const res = await update(data, user, companyId);

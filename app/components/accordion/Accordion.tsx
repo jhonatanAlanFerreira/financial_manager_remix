@@ -2,7 +2,11 @@ import { useState } from "react";
 import AccordionProps from "~/interfaces/componentsProps/AccordionProps";
 import Icon from "../icon/Icon";
 
-export default function Accordion({ title, children }: AccordionProps) {
+export default function Accordion({
+  title,
+  titleIcons,
+  children,
+}: AccordionProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {
@@ -16,12 +20,30 @@ export default function Accordion({ title, children }: AccordionProps) {
         className="flex justify-between w-full px-4 py-2 text-left bg-purple-600 text-white rounded-lg focus:outline-none"
       >
         <span>{title}</span>
-        <Icon
-          name="ChevronDown"
-          className={`w-5 h-5 transition-transform duration-200 ${
-            isOpen ? "transform rotate-180" : ""
-          }`}
-        />
+        <div className="flex gap-2">
+          {titleIcons?.map((icon, iconIndex) => (
+            <span
+              className="transition-transform  transform hover:scale-110"
+              key={iconIndex}
+              title={icon.iconTitle}
+            >
+              <Icon
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                name={icon.iconName}
+                color={icon.iconColor}
+                onClickCapture={icon.onClick}
+              ></Icon>
+            </span>
+          ))}
+          <Icon
+            name="ChevronDown"
+            className={`w-5 h-5 transition-transform duration-200 ml-5 ${
+              isOpen ? "transform rotate-180" : ""
+            }`}
+          ></Icon>
+        </div>
       </button>
       <div
         className={`overflow-hidden transition-max-height duration-500 ease-in-out ${

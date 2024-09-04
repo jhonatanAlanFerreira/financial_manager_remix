@@ -1,5 +1,4 @@
-export interface CompanyForm {
+export default interface CompanyForm {
   id: string;
   name: string;
-  balance: number;
 }

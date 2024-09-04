@@ -75,16 +75,6 @@ export async function create(
     },
   });
 
-  await prisma.account.create({
-    data: {
-      name: `${data.name} Account`,
-      user_id: user.id,
-      balance: data.balance,
-      is_personal_account: false,
-      company_id: company.id,
-    },
-  });
-
   return {
     data: company,
     message: "Company was created successfully",
