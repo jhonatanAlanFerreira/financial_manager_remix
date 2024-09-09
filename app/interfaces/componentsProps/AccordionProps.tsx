@@ -8,6 +8,6 @@ export default interface AccordionProps {
     iconName: IconNameType;
     iconColor?: string;
     iconTitle?: string;
-    onClick: () => void;
+    onClick?: () => void;
   }[];
 }

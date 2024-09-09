@@ -16,13 +16,12 @@ export default async function accountCreateValidator(
     };
   }
 
-  const accountExists = await prisma.account.findUnique({
+  const accountExists = await prisma.account.findFirst({
     where: {
-      user_id_name_company_id: {
-        name: data.name,
-        user_id: user.id,
-        company_id: data.company,
-      },
+      name: data.name,
+      user_id: user.id,
+      company_id: data.company || null,
+      is_personal_account: !data.company,
     },
   });
 

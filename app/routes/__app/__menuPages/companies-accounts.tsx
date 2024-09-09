@@ -1,5 +1,6 @@
-import { Company } from "@prisma/client";
-import { Form } from "@remix-run/react";
+import { Account, Company } from "@prisma/client";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { Form, useLoaderData } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ import CompanyFiltersForm from "~/interfaces/forms/company/CompanyFiltersForm";
 import CompanyForm from "~/interfaces/forms/company/CompanyForm";
 import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { queryParamsFromObject } from "~/utilities";
+import { loader as userAccountLoader } from "~/routes/api/account/index";
 
 export default function Companies() {
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -38,6 +40,13 @@ export default function Companies() {
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
   >({});
+  const [userAccounts, setUserAccounts] = useState<ServerResponse<Account[]>>(
+    {}
+  );
+
+  const { userAccountData } = useLoaderData<{
+    userAccountData: ServerResponse<Account[]>;
+  }>();
 
   const formik = useFormik<CompanyForm>({
     initialValues: {
@@ -56,6 +65,12 @@ export default function Companies() {
     },
     onSubmit: () => {},
   });
+
+  useEffect(() => {
+    if (userAccountData) {
+      setUserAccounts(userAccountData);
+    }
+  }, [userAccountData]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -256,6 +271,26 @@ export default function Companies() {
         ></PrimaryButton>
       </div>
       <div className="overflow-x-auto px-10">
+        <Accordion
+          title="Personal Accounts"
+          titleIcons={[
+            {
+              iconName: "Edit",
+              iconTitle: "Update Company",
+            },
+            {
+              iconName: "Trash",
+              iconTitle: "Remove Company",
+              iconColor: "#f87171",
+            },
+          ]}
+        >
+          <AccountDropdown
+            userAccounts={userAccounts?.data}
+            onSave={loadCompanies}
+            onAccountRemove={loadCompanies}
+          ></AccountDropdown>
+        </Accordion>
         {companies.data?.map((company, index) => (
           <Accordion
             key={index}
@@ -277,6 +312,7 @@ export default function Companies() {
             <AccountDropdown
               company={company}
               onSave={loadCompanies}
+              onAccountRemove={loadCompanies}
             ></AccountDropdown>
           </Accordion>
         ))}
@@ -414,4 +450,10 @@ export default function Companies() {
       </Modal>
     </Loader>
   );
+}
+
+export async function loader(request: LoaderFunctionArgs) {
+  return {
+    userAccountData: await userAccountLoader(request),
+  };
 }

@@ -1,7 +1,7 @@
 import { requireUserSession } from "~/data/auth.server";
 import AccountCreateRequest from "~/interfaces/bodyRequests/account/AccountCreateRequest";
-import { create } from "~/data/account.server";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { create, list } from "~/data/account.server";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -31,4 +31,9 @@ let createAccount = async (request: Request) => {
   }
 
   return new Response(JSON.stringify(res), { status });
+};
+
+export let loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await requireUserSession(request);
+  return list(user);
 };

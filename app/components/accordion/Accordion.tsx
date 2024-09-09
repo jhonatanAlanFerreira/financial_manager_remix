@@ -27,14 +27,16 @@ export default function Accordion({
               key={iconIndex}
               title={icon.iconTitle}
             >
-              <Icon
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                name={icon.iconName}
-                color={icon.iconColor}
-                onClickCapture={icon.onClick}
-              ></Icon>
+              {icon.onClick && (
+                <Icon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  name={icon.iconName}
+                  color={icon.iconColor}
+                  onClickCapture={icon.onClick}
+                ></Icon>
+              )}
             </span>
           ))}
           <Icon
