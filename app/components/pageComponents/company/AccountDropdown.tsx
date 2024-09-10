@@ -117,6 +117,7 @@ export default function AccountDropdown({
       loading: "Deleting account",
       success: (res: AxiosResponse<ServerResponse>) => {
         onAccountRemove();
+        setLoading(false);
         return res.data.message as string;
       },
       error: (error) => {

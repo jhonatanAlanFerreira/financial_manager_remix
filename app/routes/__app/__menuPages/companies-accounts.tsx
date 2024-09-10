@@ -94,6 +94,13 @@ export default function Companies() {
     }
   }, [searchParams]);
 
+  const loadUserAccounts = async () => {
+    setLoading(true);
+    const res = await axios.get(`/api/account`);
+    setUserAccounts(res.data);
+    setLoading(false);
+  };
+
   const loadCompanies = async () => {
     try {
       setLoading(true);
@@ -287,8 +294,8 @@ export default function Companies() {
         >
           <AccountDropdown
             userAccounts={userAccounts?.data}
-            onSave={loadCompanies}
-            onAccountRemove={loadCompanies}
+            onSave={loadUserAccounts}
+            onAccountRemove={loadUserAccounts}
           ></AccountDropdown>
         </Accordion>
         {companies.data?.map((company, index) => (

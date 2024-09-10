@@ -2,7 +2,10 @@ import { Account, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import AccountCreateRequest from "~/interfaces/bodyRequests/account/AccountCreateRequest";
 import { prisma } from "~/data/database.server";
-import accountCreateValidator from "./requestValidators/account/accountCreateValidator";
+import accountCreateValidator from "~/data/requestValidators/account/accountCreateValidator";
+import accountDeleteValidator from "~/data/requestValidators/account/accountDeleteValidator";
+import AccountUpdateRequest from "~/interfaces/bodyRequests/account/AccountUpdateRequest";
+import accountUpdateValidator from "./requestValidators/account/accountUpdateValidator";
 
 export async function create(
   data: AccountCreateRequest,
@@ -44,5 +47,61 @@ export async function list(user: User): Promise<ServerResponse<Account[]>> {
 
   return {
     data: userAccounts,
+  };
+}
+
+export async function remove(
+  classificationId: string,
+  user: User
+): Promise<ServerResponse> {
+  const dataIsValid = await accountDeleteValidator(user, classificationId);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "Classification not found",
+      data: dataIsValid,
+    };
+  }
+
+  await prisma.account.delete({
+    where: {
+      id: classificationId,
+    },
+  });
+
+  return {
+    message: "Classification removed successfully",
+  };
+}
+
+export async function update(
+  accountId: string,
+  user: User,
+  data: AccountUpdateRequest
+): Promise<ServerResponse> {
+  const dataIsValid = await accountUpdateValidator(data, user, accountId);
+
+  if (!dataIsValid.isValid) {
+    return {
+      error: true,
+      message: "There are some errors in your form",
+      data: dataIsValid,
+    };
+  }
+
+  const res = await prisma.account.update({
+    data: {
+      name: data.name,
+      balance: data.balance,
+    },
+    where: {
+      id: accountId,
+    },
+  });
+
+  return {
+    data: res,
+    message: "Account was updated successfully",
   };
 }
