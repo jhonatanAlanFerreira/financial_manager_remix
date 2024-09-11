@@ -17,7 +17,7 @@ export default function Accordion({
     <div className="mb-4">
       <button
         onClick={toggleAccordion}
-        className="flex justify-between w-full px-4 py-2 text-left bg-purple-600 text-white rounded-lg focus:outline-none"
+        className="flex justify-between w-full px-4 py-2 text-left bg-violet-950 text-white rounded-lg focus:outline-none"
       >
         <span>{title}</span>
         <div className="flex gap-2">
