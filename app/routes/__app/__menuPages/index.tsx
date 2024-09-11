@@ -67,7 +67,7 @@ export default function Index() {
         </ul>
       </div>
 
-      <div className="flex-1 p-4 bg-white relative overflow-auto">
+      <div className="flex flex-col w-full p-4 bg-white relative overflow-auto">
         <h1 className="text-2xl font-bold text-violet-950 relative mb-4">
           <span className="mr-2">{getSelectedCompanyName()}</span>
           <span className="border-l-2 border-gray-300 h-6 mx-3"></span>
