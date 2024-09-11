@@ -35,7 +35,7 @@ export default function Index() {
 
   return (
     <div className="flex h-full">
-      <div className="w-60 bg-violet-700 text-white p-4 overflow-auto">
+      <div className="w-2/12 bg-violet-900 text-white p-4 overflow-auto">
         <h2 className="text-lg font-semibold mb-1">Your Dashboard</h2>
         <ul>
           <li
@@ -52,9 +52,10 @@ export default function Index() {
           <h2 className="text-lg font-semibold mb-1">Your Companies</h2>
           {companies.data?.map((company, index) => (
             <li
+              title={company.name}
               onClick={() => selectCompany(company)}
               key={index}
-              className={`p-2 cursor-pointer hover:bg-violet-950 rounded ${
+              className={`p-2 my-2 cursor-pointer hover:bg-violet-950 rounded whitespace-nowrap overflow-hidden text-ellipsis ${
                 selectedCompany != "personal" &&
                 selectedCompany.id == company.id
                   ? "bg-violet-600"
@@ -70,7 +71,6 @@ export default function Index() {
       <div className="flex flex-col w-full p-4 bg-white relative overflow-auto">
         <h1 className="text-2xl font-bold text-violet-950 relative mb-4">
           <span className="mr-2">{getSelectedCompanyName()}</span>
-          <span className="border-l-2 border-gray-300 h-6 mx-3"></span>
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
