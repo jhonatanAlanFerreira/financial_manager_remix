@@ -439,7 +439,7 @@ export default function Classifications() {
         <div>
           <div className="p-4">
             <Form method="post" id="classification-form" onSubmit={formSubmit}>
-              <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4">
+              <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4 mb-6">
                 <div>
                   <Checkbox
                     name="is_personal_transaction_classification"
@@ -457,19 +457,35 @@ export default function Classifications() {
                     Use as personal classification
                   </label>
                 </div>
+              </div>
+              <div className="p-4 text-violet-950 flex justify-start gap-7 border-2 border-violet-950 border-opacity-50">
                 <div>
-                  <Checkbox
-                    className="relative top-1"
+                  <input
+                    id="is_not_income"
+                    type="radio"
                     name="is_income"
+                    value={""}
+                    checked={!mainForm.values.is_income}
+                    onChange={mainForm.handleChange}
+                  ></input>
+                  <label
+                    className="cursor-pointer ml-2"
+                    htmlFor="is_not_income"
+                  >
+                    Expense Classification
+                  </label>
+                </div>
+                <div>
+                  <input
                     id="is_income"
+                    type="radio"
+                    name="is_income"
+                    value={"on"}
                     checked={mainForm.values.is_income}
                     onChange={mainForm.handleChange}
-                  ></Checkbox>
-                  <label
-                    className="pl-3 text-violet-950 cursor-pointer"
-                    htmlFor="is_income"
-                  >
-                    Income classification
+                  ></input>
+                  <label className="cursor-pointer ml-2" htmlFor="is_income">
+                    Income Classification
                   </label>
                 </div>
               </div>
