@@ -17,17 +17,17 @@ export const items: SidebarItemType[] = [
     path: "/companies-accounts",
   },
   {
-    title: "Incomes",
+    title: "Income Categories",
     icon: "TrendingUp",
     path: "/incomes",
   },
   {
-    title: "Expenses",
+    title: "Expenses Categories",
     icon: "DollarSign",
     path: "/expenses",
   },
   {
-    title: "Classifications",
+    title: "Inco./Expe. Classifications",
     icon: "List",
     path: "/classifications",
   },
