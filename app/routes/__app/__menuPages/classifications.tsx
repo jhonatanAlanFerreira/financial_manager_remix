@@ -23,8 +23,11 @@ import ClassificationFiltersForm from "~/interfaces/forms/classification/Classif
 import { ClassificationFilterTagsConfig } from "~/components/pageComponents/classification/ClassificationFilterTagsConfig";
 import { queryParamsFromObject } from "~/utilities";
 import Pagination from "~/components/pagination/Pagination";
+import { useTitle } from "~/components/topBar/TitleContext";
 
 export default function Classifications() {
+  const { setTitle } = useTitle();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
@@ -75,6 +78,11 @@ export default function Classifications() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
+    setTitle("Incomes & Expenses Classifications");
+
+    return () => {
+      setTitle("");
+    };
   }, []);
 
   useEffect(() => {

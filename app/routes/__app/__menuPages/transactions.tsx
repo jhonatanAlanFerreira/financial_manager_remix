@@ -37,8 +37,11 @@ import FilterTag from "~/components/filterTag/FilterTag";
 import Pagination from "~/components/pagination/Pagination";
 import { TransactionFilterTagsConfig } from "~/components/pageComponents/transaction/TransactionFilterTagsConfig";
 import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
+import { useTitle } from "~/components/topBar/TitleContext";
 
 export default function Transactions() {
+  const { setTitle } = useTitle();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
@@ -118,6 +121,11 @@ export default function Transactions() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
+    setTitle("Transactions");
+
+    return () => {
+      setTitle("");
+    };
   }, []);
 
   useEffect(() => {

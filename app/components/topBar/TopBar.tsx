@@ -1,7 +1,10 @@
 import Icon from "~/components/icon/Icon";
 import TopBarProps from "~/interfaces/componentsProps/TopBarProps";
+import { useTitle } from "./TitleContext";
 
 export default function TopBar({ updateSidebarOpen }: TopBarProps) {
+  const { title } = useTitle();
+
   return (
     <div className="bg-violet-950 w-full h-16 text-white flex items-center pl-1">
       <span
@@ -10,6 +13,7 @@ export default function TopBar({ updateSidebarOpen }: TopBarProps) {
       >
         <Icon name="Menu" />
       </span>
+      <div className="text-center w-full">{title}</div>
     </div>
   );
 }

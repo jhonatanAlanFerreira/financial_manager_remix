@@ -2,10 +2,13 @@ import { Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { useTitle } from "~/components/topBar/TitleContext";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { loader as companyLoader } from "~/routes/api/company/index";
 
 export default function Index() {
+  const { setTitle } = useTitle();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [selectedCompany, setSelectedCompany] = useState<Company | "personal">(
@@ -15,6 +18,14 @@ export default function Index() {
   const { companyData } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
   }>();
+
+  useEffect(() => {
+    setTitle("Dashboard");
+
+    return () => {
+      setTitle("");
+    };
+  }, []);
 
   useEffect(() => {
     if (companyData) {

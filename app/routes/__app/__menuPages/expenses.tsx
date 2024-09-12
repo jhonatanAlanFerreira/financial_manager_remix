@@ -22,8 +22,11 @@ import ExpenseFiltersForm from "~/interfaces/forms/expense/ExpenseFiltersForm";
 import { ExpenseFilterTagsConfig } from "~/components/pageComponents/expense/ExpenseFilterTagsConfig";
 import Pagination from "~/components/pagination/Pagination";
 import { queryParamsFromObject } from "~/utilities";
+import { useTitle } from "~/components/topBar/TitleContext";
 
 export default function Expenses() {
+  const { setTitle } = useTitle();
+
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
@@ -72,6 +75,11 @@ export default function Expenses() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
+    setTitle("Expenses");
+
+    return () => {
+      setTitle("");
+    };
   }, []);
 
   useEffect(() => {

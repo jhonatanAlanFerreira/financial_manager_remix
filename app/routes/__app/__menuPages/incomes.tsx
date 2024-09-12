@@ -24,8 +24,11 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import Pagination from "~/components/pagination/Pagination";
 import { queryParamsFromObject } from "~/utilities";
+import { useTitle } from "~/components/topBar/TitleContext";
 
 export default function Incomes() {
+  const { setTitle } = useTitle();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
@@ -74,6 +77,11 @@ export default function Incomes() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
+    setTitle("Incomes");
+
+    return () => {
+      setTitle("");
+    };
   }, []);
 
   useEffect(() => {

@@ -12,6 +12,7 @@ import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
 import InputText from "~/components/inputs/inputText/InputText";
 import Loader from "~/components/loader/Loader";
 import AccountDropdown from "~/components/pageComponents/company/AccountDropdown";
+import { useTitle } from "~/components/topBar/TitleContext";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import CompanyForm from "~/interfaces/forms/company/CompanyForm";
@@ -19,6 +20,8 @@ import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 
 export default function Companies() {
+  const { setTitle } = useTitle();
+
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,6 +47,13 @@ export default function Companies() {
     },
     onSubmit: () => {},
   });
+
+  useEffect(() => {
+    setTitle("Companies & Accounts");
+    return () => {
+      setTitle("");
+    };
+  }, []);
 
   useEffect(() => {
     loadCompanies();
