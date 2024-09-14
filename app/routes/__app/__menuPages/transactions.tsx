@@ -121,10 +121,10 @@ export default function Transactions() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle("Transactions");
+    setTitle({ pageTitle: "Transactions" });
 
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

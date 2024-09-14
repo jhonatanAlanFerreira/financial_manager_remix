@@ -1,6 +1,8 @@
 import { Dispatch, SetStateAction } from "react";
 
 export default interface TitleContextProps {
-  title: string;
-  setTitle: Dispatch<SetStateAction<string>>;
+  title: { pageTitle: string; pageTooltipMessage?: string };
+  setTitle: Dispatch<
+    SetStateAction<{ pageTitle: string; pageTooltipMessage?: string }>
+  >;
 }

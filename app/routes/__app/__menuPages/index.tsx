@@ -20,10 +20,10 @@ export default function Index() {
   }>();
 
   useEffect(() => {
-    setTitle("Dashboard");
+    setTitle({ pageTitle: "Dashboard" });
 
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

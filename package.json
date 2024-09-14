@@ -29,7 +29,8 @@
     "react-hot-toast": "^2.4.1",
     "react-responsive-modal": "^6.4.2",
     "react-select": "^5.8.0",
-    "react-tabs": "^6.0.2"
+    "react-tabs": "^6.0.2",
+    "react-tooltip": "^5.28.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.1.0",

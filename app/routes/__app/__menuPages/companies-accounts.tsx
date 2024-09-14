@@ -49,9 +49,11 @@ export default function Companies() {
   });
 
   useEffect(() => {
-    setTitle("Companies & Accounts");
+    setTitle({
+      pageTitle: "Companies & Accounts",
+    });
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

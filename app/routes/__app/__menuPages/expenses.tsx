@@ -75,10 +75,10 @@ export default function Expenses() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle("Expenses");
+    setTitle({ pageTitle: "Expenses" });
 
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

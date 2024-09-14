@@ -2,12 +2,12 @@ import { createContext, useState, useContext, ReactNode } from "react";
 import TitleContextProps from "~/interfaces/componentsProps/TitleContextProps";
 
 const TitleContext = createContext<TitleContextProps>({
-  title: "",
+  title: { pageTitle: "" },
   setTitle: () => {},
 });
 
 export const TitleProvider = ({ children }: { children: ReactNode }) => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState({ pageTitle: "" });
 
   return (
     <TitleContext.Provider value={{ title, setTitle }}>

@@ -77,10 +77,10 @@ export default function Incomes() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle("Incomes");
+    setTitle({ pageTitle: "Incomes" });
 
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

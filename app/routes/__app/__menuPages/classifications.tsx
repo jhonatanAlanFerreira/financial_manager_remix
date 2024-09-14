@@ -78,10 +78,14 @@ export default function Classifications() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle("Incomes & Expenses Classifications");
+    setTitle({
+      pageTitle: "Incomes & Expenses Classifications",
+      pageTooltipMessage:
+        "Organize your income and expenses for easier tracking in the transaction screen. For example, group income types like 'Salary' and 'Freelance Work' under 'Job Earnings', and categorize expenses such as 'Energy Bill' and 'Groceries' under 'Household Expenses'.",
+    });
 
     return () => {
-      setTitle("");
+      setTitle({ pageTitle: "" });
     };
   }, []);
 

@@ -1,6 +1,7 @@
 import Icon from "~/components/icon/Icon";
 import TopBarProps from "~/interfaces/componentsProps/TopBarProps";
-import { useTitle } from "./TitleContext";
+import TooltipIcon from "~/components/tooltipIcon/TooltipIcon";
+import { useTitle } from "~/components/topBar/TitleContext";
 
 export default function TopBar({ updateSidebarOpen }: TopBarProps) {
   const { title } = useTitle();
@@ -13,7 +14,12 @@ export default function TopBar({ updateSidebarOpen }: TopBarProps) {
       >
         <Icon name="Menu" />
       </span>
-      <div className="text-center w-full">{title}</div>
+      <div className="flex justify-center items-center gap-2 w-full">
+        {title.pageTitle}
+        {title.pageTooltipMessage && (
+          <TooltipIcon message={title.pageTooltipMessage}></TooltipIcon>
+        )}
+      </div>
     </div>
   );
 }
