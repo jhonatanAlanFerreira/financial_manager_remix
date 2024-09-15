@@ -144,7 +144,7 @@ export default function TransactionAdd({
     if (expenses) {
       setFilteredExpenses(
         expenses.filter((expense) => {
-          const expenseTypeFilter = formik.values.is_personal_transaction
+          const transactionTypeFilter = formik.values.is_personal_transaction
             ? expense.is_personal_expense
             : true;
 
@@ -152,7 +152,7 @@ export default function TransactionAdd({
             !formik.values.company ||
             expense.company_ids.includes(formik.values.company.id);
 
-          return expenseTypeFilter && companyFilter;
+          return transactionTypeFilter && companyFilter;
         })
       );
     }
@@ -162,7 +162,7 @@ export default function TransactionAdd({
     if (classifications) {
       setFilteredClassifications(
         classifications.filter((classification) => {
-          const expenseTypeFilter = formik.values.is_personal_transaction
+          const transactionTypeFilter = formik.values.is_personal_transaction
             ? classification.is_personal_transaction_classification
             : true;
 
@@ -173,7 +173,7 @@ export default function TransactionAdd({
           const isIncomeFilter = formik.values.is_income
             ? classification.is_income
             : !classification.is_income;
-          return expenseTypeFilter && companyFilter && isIncomeFilter;
+          return transactionTypeFilter && companyFilter && isIncomeFilter;
         })
       );
     }
