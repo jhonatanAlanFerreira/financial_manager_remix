@@ -121,7 +121,11 @@ export default function Transactions() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle({ pageTitle: "Transactions" });
+    setTitle({
+      pageTitle: "Transactions",
+      pageTooltipMessage:
+        "Manage your transactions here. You can add new transactions, update details like names, amounts, or dates, and categorize them by income or expenses. Select the right account and classifications to keep everything organized.",
+    });
 
     return () => {
       setTitle({ pageTitle: "" });

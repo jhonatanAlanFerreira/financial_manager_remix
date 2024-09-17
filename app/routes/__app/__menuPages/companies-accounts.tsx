@@ -51,6 +51,8 @@ export default function Companies() {
   useEffect(() => {
     setTitle({
       pageTitle: "Companies & Accounts",
+      pageTooltipMessage:
+        "Manage your company's details here. You can create new companies, update company names, and manage accounts by editing account names, balances, or removing unused accounts.",
     });
     return () => {
       setTitle({ pageTitle: "" });
