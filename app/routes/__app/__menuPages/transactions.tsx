@@ -130,7 +130,7 @@ export default function Transactions() {
     setTitle({
       pageTitle: "Transactions",
       pageTooltipMessage:
-        "Manage your transactions here. You can add new transactions, update details like names, amounts, or dates, and categorize them by income or expenses. Select the right account and classifications to keep everything organized.",
+        "Record your transactions here. Select an income or expense type and apply the appropriate classification from the types you’ve set up.",
     });
 
     return () => {

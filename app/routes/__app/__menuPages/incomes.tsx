@@ -77,7 +77,11 @@ export default function Incomes() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle({ pageTitle: "Incomes" });
+    setTitle({
+      pageTitle: "Incomes",
+      pageTooltipMessage:
+        "Add types of income here, such as 'Salary' or 'Freelance Work'. Use the transaction screen to record individual income entries.",
+    });
 
     return () => {
       setTitle({ pageTitle: "" });

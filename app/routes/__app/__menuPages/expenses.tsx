@@ -75,7 +75,11 @@ export default function Expenses() {
   useEffect(() => {
     buildSearchParamsUrl();
     setCurrentPage(1);
-    setTitle({ pageTitle: "Expenses" });
+    setTitle({
+      pageTitle: "Expenses",
+      pageTooltipMessage:
+        "Add types of expenses here, such as 'Rent' or 'Utilities'. Record individual expense transactions on the transaction screen.",
+    });
 
     return () => {
       setTitle({ pageTitle: "" });
