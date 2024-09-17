@@ -1,4 +1,5 @@
 import {
+  Account,
   Company,
   Expense,
   Income,
@@ -20,6 +21,7 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
+import { loader as userAccountLoader } from "~/routes/api/account/index";
 import Icon from "~/components/icon/Icon";
 import {
   firstDayOfCurrentMonth,
@@ -64,6 +66,7 @@ export default function Transactions() {
   const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
   const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
   const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
+  const [accounts, setAccounts] = useState<ServerResponse<Account[]>>({});
 
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>
@@ -75,12 +78,14 @@ export default function Transactions() {
     expenseData,
     classificationData,
     incomeData,
+    userAccountData,
   } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
     transactionData: ServerResponse<TransactionsWithTotals>;
     expenseData: ServerResponse<Expense[]>;
     classificationData: ServerResponse<TransactionClassification[]>;
     incomeData: ServerResponse<Income[]>;
+    userAccountData: ServerResponse<Account[]>;
   }>();
 
   const mainForm = useFormik<TransactionForm>({
@@ -89,6 +94,7 @@ export default function Transactions() {
       is_income: false,
       company: null,
       expense: null,
+      account: null,
       transaction_date: todayFormatedDate(),
       amount: 0,
       classifications: [],
@@ -142,6 +148,9 @@ export default function Transactions() {
     if (expenseData) {
       setExpenses(expenseData);
     }
+    if (userAccountData) {
+      setAccounts(userAccountData);
+    }
     if (transactionData) {
       setCurrentPage(transactionData.pageInfo?.currentPage || 0);
       setTotalPages(transactionData.pageInfo?.totalPages || 0);
@@ -152,7 +161,13 @@ export default function Transactions() {
     }
 
     setLoading(false);
-  }, [companyData, transactionData, expenseData, classificationData]);
+  }, [
+    companyData,
+    transactionData,
+    expenseData,
+    classificationData,
+    userAccountData,
+  ]);
 
   useEffect(() => {
     if (currentPage) {
@@ -363,6 +378,10 @@ export default function Transactions() {
       income:
         incomes.data?.find((income) => income.id == transaction.income_id) ||
         null,
+      account:
+        accounts.data?.find(
+          (account) => account.id == transaction.account_id
+        ) || null,
     });
   };
 
@@ -553,6 +572,7 @@ export default function Transactions() {
           setSkipEffect={setSkipEffect}
           formik={mainForm}
           onModalCancel={() => setOpenAddModal(false)}
+          accounts={accounts.data || []}
           classifications={classifications.data || []}
           companies={companies.data || []}
           expenses={expenses.data || []}
@@ -597,6 +617,7 @@ export async function loader(request: LoaderFunctionArgs) {
     expenseLoader(request),
     classificationLoader(request),
     incomeLoader(request),
+    userAccountLoader(request, false),
   ]);
 
   return {
@@ -604,5 +625,6 @@ export async function loader(request: LoaderFunctionArgs) {
     expenseData: res[1],
     classificationData: res[2],
     incomeData: res[3],
+    userAccountData: res[4],
   };
 }

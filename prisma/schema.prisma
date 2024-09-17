@@ -72,6 +72,8 @@ model Transaction {
   expense                        Expense?                    @relation(fields: [expense_id], references: [id])
   income                         Income?                     @relation(fields: [income_id], references: [id])
   income_id                      String?                     @db.ObjectId
+  account                        Account                     @relation(fields: [account_id], references: [id])
+  account_id                     String                      @db.ObjectId
   is_personal_transaction        Boolean                     @default(false)
   is_income                      Boolean                     @default(false)
 }
@@ -106,14 +108,15 @@ model Income {
 }
 
 model Account {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
   name                String
-  user_id             String   @db.ObjectId
-  user                User     @relation(fields: [user_id], references: [id])
-  is_personal_account Boolean  @default(false)
-  company_id          String?  @db.ObjectId
-  company             Company? @relation(fields: [company_id], references: [id])
+  user_id             String        @db.ObjectId
+  user                User          @relation(fields: [user_id], references: [id])
+  is_personal_account Boolean       @default(false)
+  company_id          String?       @db.ObjectId
+  company             Company?      @relation(fields: [company_id], references: [id])
   balance             Float?
+  transactions        Transaction[]
 
   @@unique([user_id, name, company_id])
 }

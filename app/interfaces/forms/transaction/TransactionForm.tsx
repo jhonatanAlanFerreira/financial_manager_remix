@@ -1,4 +1,5 @@
 import {
+  Account,
   Company,
   Expense,
   Income,
@@ -15,5 +16,6 @@ export interface TransactionForm {
   income: Income | null;
   company: Company | null;
   expense: Expense | null;
+  account: Account | null;
   name: string;
 }

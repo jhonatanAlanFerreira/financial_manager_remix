@@ -1,4 +1,5 @@
 import {
+  Account,
   Company,
   Expense,
   Income,
@@ -21,4 +22,5 @@ export interface TransactionAddProps {
   expenses: Expense[];
   incomes: Income[];
   classifications: TransactionClassification[];
+  accounts: Account[];
 }

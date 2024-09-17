@@ -37,11 +37,14 @@ export async function create(
   };
 }
 
-export async function list(user: User): Promise<ServerResponse<Account[]>> {
+export async function list(
+  user: User,
+  personalOnly = true
+): Promise<ServerResponse<Account[]>> {
   const userAccounts = await prisma.account.findMany({
     where: {
       user_id: user.id,
-      is_personal_account: true,
+      ...(personalOnly && { is_personal_account: true }),
     },
   });
 

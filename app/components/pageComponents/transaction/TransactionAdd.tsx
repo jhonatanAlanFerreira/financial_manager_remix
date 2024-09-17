@@ -1,4 +1,5 @@
 import {
+  Account,
   Company,
   Expense,
   Income,
@@ -19,6 +20,7 @@ export default function TransactionAdd({
   expenses,
   incomes,
   classifications,
+  accounts,
   responseErrors,
   isSubmitting,
   skipEffect,
@@ -29,12 +31,15 @@ export default function TransactionAdd({
 }: TransactionAddProps) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
+  const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
   const [filteredClassifications, setFilteredClassifications] = useState<
     TransactionClassification[]
   >([]);
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
+  const getSelectAccountOptionValue = (option: Account) => option.id;
+  const getSelectAccountOptionLabel = (option: Account) => option.name;
   const getSelectExpenseOptionValue = (option: Expense) => option.id;
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
   const getSelectIncomeOptionValue = (option: Income) => option.id;
@@ -73,6 +78,7 @@ export default function TransactionAdd({
     filterClassifications();
     filterExpenses();
     filterIncomes();
+    filterAccounts();
   };
 
   useEffect(() => {
@@ -87,6 +93,7 @@ export default function TransactionAdd({
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
+    formik.setFieldValue("account", null);
     formik.setFieldValue("classifications", null);
 
     runFilters();
@@ -136,6 +143,7 @@ export default function TransactionAdd({
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
     formik.setFieldValue("classifications", null);
+    formik.setFieldValue("account", null);
 
     runFilters();
   }, [formik.values.company]);
@@ -192,6 +200,25 @@ export default function TransactionAdd({
             income.company_ids.includes(formik.values.company.id);
 
           return incomeTypeFilter && companyFilter;
+        })
+      );
+    }
+  };
+
+  const filterAccounts = () => {
+    if (accounts) {
+      debugger;
+      setFilteredAccounts(
+        accounts.filter((account) => {
+          const transactionTypeFilter = formik.values.is_personal_transaction
+            ? account.is_personal_account
+            : true;
+
+          const companyFilter =
+            !formik.values.company ||
+            account.company_id === formik.values.company.id;
+
+          return transactionTypeFilter && companyFilter;
         })
       );
     }
@@ -267,6 +294,19 @@ export default function TransactionAdd({
                   value={formik.values.company}
                 ></InputSelect>
               )}
+              <InputSelect
+                isClearable
+                className="mb-8"
+                placeholder="Account"
+                options={filteredAccounts}
+                getOptionLabel={getSelectAccountOptionLabel as any}
+                getOptionValue={getSelectAccountOptionValue as any}
+                name="account"
+                onChange={(event) =>
+                  formik.setFieldValue("account", event as Account)
+                }
+                value={formik.values.account}
+              />
               <InputSelect
                 isClearable
                 className="mb-8"
@@ -352,6 +392,19 @@ export default function TransactionAdd({
                   value={formik.values.company}
                 ></InputSelect>
               )}
+              <InputSelect
+                isClearable
+                className="mb-8"
+                placeholder="Account"
+                options={filteredAccounts}
+                getOptionLabel={getSelectAccountOptionLabel as any}
+                getOptionValue={getSelectAccountOptionValue as any}
+                name="account"
+                onChange={(event) =>
+                  formik.setFieldValue("account", event as Account)
+                }
+                value={formik.values.account}
+              />
               <InputSelect
                 isClearable
                 className="mb-8"

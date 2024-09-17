@@ -55,9 +55,12 @@ let removeAccount = async (request: Request) => {
   return new Response(JSON.stringify(res), { status });
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  personalOnly = true
+) => {
   const user = await requireUserSession(request);
-  return list(user);
+  return list(user, personalOnly);
 };
 
 let updateAccount = async (request: Request) => {
