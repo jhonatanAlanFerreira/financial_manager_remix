@@ -104,12 +104,31 @@ export async function create(
     };
   }
 
+  const account = await prisma.account.findUnique({
+    where: { id: data.account },
+  });
+
+  if (!account) {
+    return {
+      error: true,
+      message: "Account not found",
+    };
+  }
+
+  let newBalance = account.balance || 0;
+  if (data.is_income) {
+    newBalance += data.amount;
+  } else {
+    newBalance -= data.amount;
+  }
+
   const transaction = await prisma.transaction.create({
     data: {
       name: data.name,
       amount: data.amount,
       transaction_date: data.transaction_date,
       company_id: data.company,
+      account_id: data.account,
       expense_id: data.expense,
       income_id: data.income,
       is_income: data.is_income,
@@ -117,6 +136,11 @@ export async function create(
       transaction_classification_ids: data.classifications,
       user_id: user.id,
     },
+  });
+
+  await prisma.account.update({
+    where: { id: data.account },
+    data: { balance: newBalance },
   });
 
   return {
@@ -139,6 +163,28 @@ export async function remove(
     };
   }
 
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+  });
+
+  if (!transaction) {
+    return {
+      error: true,
+      message: "Transaction not found",
+    };
+  }
+
+  await prisma.account.update({
+    where: { id: transaction.account_id },
+    data: {
+      balance: {
+        increment: transaction.is_income
+          ? -transaction.amount
+          : transaction.amount,
+      },
+    },
+  });
+
   await prisma.transaction.delete({
     where: {
       id: transactionId,
@@ -146,7 +192,7 @@ export async function remove(
   });
 
   return {
-    message: "Transaction removed successfully",
+    message: "Transaction removed successfully and balance adjusted",
   };
 }
 
@@ -169,7 +215,32 @@ export async function update(
     };
   }
 
-  const res = await prisma.transaction.update({
+  const existingTransaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+  });
+
+  if (!existingTransaction) {
+    return {
+      error: true,
+      message: "Transaction not found",
+    };
+  }
+
+  const adjustmentAmount = data.amount - existingTransaction.amount;
+  const adjustment = existingTransaction.is_income
+    ? adjustmentAmount
+    : -adjustmentAmount;
+
+  await prisma.account.update({
+    where: { id: existingTransaction.account_id },
+    data: {
+      balance: {
+        increment: adjustment,
+      },
+    },
+  });
+
+  const updatedTransaction = await prisma.transaction.update({
     data: {
       name: data.name,
       amount: data.amount,
@@ -181,13 +252,11 @@ export async function update(
       is_personal_transaction: data.is_personal_transaction,
       transaction_classification_ids: data.classifications,
     },
-    where: {
-      id: transactionId,
-    },
+    where: { id: transactionId },
   });
 
   return {
-    data: res,
+    data: updatedTransaction,
     message: "Transaction was updated successfully",
   };
 }
