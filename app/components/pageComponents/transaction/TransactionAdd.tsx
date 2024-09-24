@@ -207,7 +207,6 @@ export default function TransactionAdd({
 
   const filterAccounts = () => {
     if (accounts) {
-      debugger;
       setFilteredAccounts(
         accounts.filter((account) => {
           const transactionTypeFilter = formik.values.is_personal_transaction
