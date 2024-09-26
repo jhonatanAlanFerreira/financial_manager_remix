@@ -11,7 +11,7 @@
     "dev": "remix dev --manual",
     "start": "remix-serve ./build/index.js",
     "typecheck": "tsc",
-    "test": "DATABASE_URL=$DATABASE_TEST_URL jest"
+    "test": "DATABASE_URL=$DATABASE_TEST_URL jest --runInBand"
   },
   "dependencies": {
     "@prisma/client": "^5.12.1",
