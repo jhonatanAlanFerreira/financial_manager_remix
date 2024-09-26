@@ -64,3 +64,9 @@ Code Validation
 ```sh
 npm run typecheck
 ```
+
+Unit and Feature Tests
+
+```sh
+npm run test
+```
