@@ -1,17 +1,16 @@
 import { Prisma, TransactionClassification, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
-import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 import { ClassificationWithCompany } from "~/interfaces/prismaModelDetails/classification";
 import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";
 import classificationCreateValidator, { classificationDeleteValidator, classificationUpdateValidator } from "./classification-validator";
 import { prisma } from "../database/database.server";
+import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
 
 type TransactionClassificationWhereInput =
   Prisma.TransactionClassificationWhereInput;
 
 export async function create(
-  data: ClassificationCreateRequest,
+  data: ClassificationCreateRequestInterface,
   user: User
 ): Promise<ServerResponse> {
   const dataIsValid = await classificationCreateValidator(data, user);
@@ -72,7 +71,7 @@ export async function remove(
 export async function update(
   classificationId: string,
   user: User,
-  data: ClassificationUpdateRequest
+  data: ClassificationUpdateRequestInterface
 ): Promise<ServerResponse> {
   const dataIsValid = await classificationUpdateValidator(
     data,

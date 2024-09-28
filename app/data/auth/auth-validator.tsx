@@ -1,10 +1,9 @@
-import LoginRequest from "~/interfaces/bodyRequests/auth/LoginRequest";
-import SignupRequest from "~/interfaces/bodyRequests/auth/SignupRequest";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "../database/database.server";
+import { LoginRequestInterface, SignupRequestInterface } from "./auth-request-interfaces";
 
 export async function loginValidator(
-  data: LoginRequest
+  data: LoginRequestInterface
 ): Promise<ValidatedData> {
   if (!data.login || !data.password) {
     return {
@@ -21,7 +20,7 @@ export async function loginValidator(
 }
 
 export async function signupValidator(
-  data: SignupRequest
+  data: SignupRequestInterface
 ): Promise<ValidatedData> {
   if (data.password != data.passwordRepeat) {
     return {

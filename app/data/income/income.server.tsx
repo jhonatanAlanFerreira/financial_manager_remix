@@ -1,16 +1,15 @@
 import { Income, Prisma, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
-import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
 import { incomeCreateValidator, incomeDeleteValidator, incomeUpdateValidator } from "./income-validator";
 import { prisma } from "../database/database.server";
+import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
 
 type IncomeWhereInput = Prisma.IncomeWhereInput;
 
 export async function create(
-  data: IncomeCreateRequest,
+  data: IncomeCreateRequestInterface,
   user: User
 ): Promise<ServerResponse> {
   const dataIsValid = await incomeCreateValidator(data, user);
@@ -129,7 +128,7 @@ export async function remove(
 export async function update(
   incomeId: string,
   user: User,
-  data: IncomeUpdateRequest
+  data: IncomeUpdateRequestInterface
 ): Promise<ServerResponse> {
   const dataIsValid = await incomeUpdateValidator(data, user, incomeId);
 

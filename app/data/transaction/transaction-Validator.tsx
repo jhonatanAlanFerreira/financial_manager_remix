@@ -1,11 +1,10 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
-import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import { prisma } from "../database/database.server";
+import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
 
 export async function transactionCreateValidator (
-  data: TransactionCreateRequest,
+  data: TransactionCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -114,7 +113,7 @@ export async function transactionDeleteValidator(
 export async function transactionUpdateValidator(
   transactionId: string,
   user: User,
-  data: TransactionUpdateRequest
+  data: TransactionUpdateRequestInterface
 ): Promise<ValidatedData> {
   const transaction = await prisma.transaction.findFirst({
     where: {

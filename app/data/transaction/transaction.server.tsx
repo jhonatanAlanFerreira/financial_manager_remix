@@ -1,11 +1,10 @@
 import { Prisma, Transaction, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { prisma } from "~/data/database/database.server";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
-import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/transactions-with-totals";
 import { transactionCreateValidator, transactionDeleteValidator, transactionUpdateValidator } from "./transaction-Validator";
+import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 
@@ -89,7 +88,7 @@ export async function list(
 }
 
 export async function create(
-  data: TransactionCreateRequest,
+  data: TransactionCreateRequestInterface,
   user: User
 ): Promise<ServerResponse> {
   const dataIsValid = await transactionCreateValidator(data, user);
@@ -197,7 +196,7 @@ export async function remove(
 export async function update(
   transactionId: string,
   user: User,
-  data: TransactionUpdateRequest
+  data: TransactionUpdateRequestInterface
 ): Promise<ServerResponse> {
   const dataIsValid = await transactionUpdateValidator(
     transactionId,

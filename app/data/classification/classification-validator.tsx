@@ -1,11 +1,10 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
-import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 import { prisma } from "../database/database.server";
+import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
 
 export default async function classificationCreateValidator(
-  data: ClassificationCreateRequest,
+  data: ClassificationCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -90,7 +89,7 @@ export async function classificationDeleteValidator(
 }
 
 export async function classificationUpdateValidator(
-  data: ClassificationUpdateRequest,
+  data: ClassificationUpdateRequestInterface,
   user: User,
   classificationId: string
 ): Promise<ValidatedData> {

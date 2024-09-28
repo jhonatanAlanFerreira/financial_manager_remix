@@ -1,8 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "~/data/company/company-request-interfaces";
 import { create, list, remove, update } from "~/data/company/company.server";
-import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -38,7 +37,7 @@ let createCompany = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: CompanyCreateRequest = {
+  const data: CompanyCreateRequestInterface = {
     name: String(body.get("name") || ""),
   };
 
@@ -77,7 +76,7 @@ let updateCompany = async (request: Request) => {
   const companyId = String(new URL(request.url).searchParams.get("companyId"));
   const body = await request.formData();
 
-  const data: CompanyUpdateRequest = {
+  const data: CompanyUpdateRequestInterface = {
     name: String(body.get("name") || ""),
   };
 

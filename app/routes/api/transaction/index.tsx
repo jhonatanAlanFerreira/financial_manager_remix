@@ -1,8 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
 import { create, list, remove, update } from "~/data/transaction/transaction.server";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
-import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -20,7 +19,7 @@ let createTransaction = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: TransactionCreateRequest = {
+  const data: TransactionCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     company: body.get("company") ? String(body.get("company")) : null,
@@ -74,7 +73,7 @@ let updateTransaction = async (request: Request) => {
   );
   const body = await request.formData();
 
-  const data: TransactionUpdateRequest = {
+  const data: TransactionUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     company: body.get("company") ? String(body.get("company")) : null,

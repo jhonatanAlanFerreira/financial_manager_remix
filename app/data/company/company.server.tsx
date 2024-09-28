@@ -1,12 +1,11 @@
 import { Company, Prisma, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
 import ValidatedData from "~/interfaces/ValidatedData";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
 import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { prisma } from "../database/database.server";
 import { companyCreateValidator, companyDeleteValidator, companyUpdateValidator } from "./company-validator";
+import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
 
 type CompanyWhereInput = Prisma.CompanyWhereInput;
 
@@ -53,7 +52,7 @@ export async function list(
 }
 
 export async function create(
-  data: CompanyCreateRequest,
+  data: CompanyCreateRequestInterface,
   user: User
 ): Promise<ServerResponse<Company | ValidatedData>> {
   const dataIsValid = await companyCreateValidator(data, user);
@@ -80,7 +79,7 @@ export async function create(
 }
 
 export async function update(
-  data: CompanyUpdateRequest,
+  data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
 ): Promise<ServerResponse<Company | ValidatedData>> {

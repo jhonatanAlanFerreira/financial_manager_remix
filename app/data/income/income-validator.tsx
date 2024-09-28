@@ -1,11 +1,10 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
-import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 import { prisma } from "../database/database.server";
+import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
 
 export async function incomeCreateValidator(
-  data: IncomeCreateRequest,
+  data: IncomeCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -86,7 +85,7 @@ export async function incomeDeleteValidator(
 }
 
 export async function incomeUpdateValidator(
-  data: IncomeUpdateRequest,
+  data: IncomeUpdateRequestInterface,
   user: User,
   incomeId: string
 ): Promise<ValidatedData> {

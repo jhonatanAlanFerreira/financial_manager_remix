@@ -1,8 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "~/data/expense/expense-request-interfaces";
 import { create, list, remove, update } from "~/data/expense/expense.server";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -40,7 +39,7 @@ let createExpense = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: ExpenseCreateRequest = {
+  const data: ExpenseCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_expense: !!body.get("is_personal_expense"),
@@ -84,7 +83,7 @@ let updateExpense = async (request: Request) => {
   const expenseId = String(new URL(request.url).searchParams.get("expenseId"));
   const body = await request.formData();
 
-  const data: ExpenseUpdateRequest = {
+  const data: ExpenseUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_expense: !!body.get("is_personal_expense"),

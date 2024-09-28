@@ -1,8 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "~/data/classification/Classification-request-interfaces";
 import { create, list, remove, update } from "~/data/classification/classification.server";
-import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
-import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -20,7 +19,7 @@ let createClassification = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: ClassificationCreateRequest = {
+  const data: ClassificationCreateRequestInterface = {
     name: String(body.get("name") || ""),
     is_income: !!body.get("is_income"),
     is_personal_transaction_classification: !!body.get(
@@ -70,7 +69,7 @@ let updateClassification = async (request: Request) => {
   );
   const body = await request.formData();
 
-  const data: ClassificationUpdateRequest = {
+  const data: ClassificationUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     is_income: !!body.get("is_income"),
     is_personal_transaction_classification: !!body.get(

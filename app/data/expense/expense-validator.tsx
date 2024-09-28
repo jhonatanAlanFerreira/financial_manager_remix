@@ -1,11 +1,10 @@
 import ValidatedData from "~/interfaces/ValidatedData";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import { User } from "@prisma/client";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 import { prisma } from "../database/database.server";
+import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
 
 export async function expenseCreateValidator(
-  data: ExpenseCreateRequest,
+  data: ExpenseCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -88,7 +87,7 @@ export async function expenseDeleteValidator(
 export async function expenseUpdateValidator(
   expenseId: string,
   user: User,
-  data: ExpenseUpdateRequest
+  data: ExpenseUpdateRequestInterface
 ): Promise<ValidatedData> {
   if (!data.name) {
     return {

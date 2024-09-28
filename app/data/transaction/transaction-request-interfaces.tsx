@@ -1,4 +1,4 @@
-export default interface TransactionCreateRequest {
+export interface TransactionCreateRequestInterface {
   name: string;
   amount: number;
   company: string | null;
@@ -10,3 +10,6 @@ export default interface TransactionCreateRequest {
   is_personal_transaction: boolean;
   is_income: boolean;
 }
+
+export interface TransactionUpdateRequestInterface
+  extends TransactionCreateRequestInterface {}

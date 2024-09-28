@@ -1,8 +1,7 @@
 import { requireUserSession } from "~/data/auth/auth.server";
-import AccountCreateRequest from "~/interfaces/bodyRequests/account/AccountCreateRequest";
 import { create, list, remove, update } from "~/data/account/account.server";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import AccountUpdateRequest from "~/interfaces/bodyRequests/account/AccountUpdateRequest";
+import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "~/data/account/account-request-interfaces";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -19,7 +18,7 @@ let createAccount = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: AccountCreateRequest = {
+  const data: AccountCreateRequestInterface = {
     name: String(body.get("name") || ""),
     balance: +(body.get("balance") || 0),
     company: String(body.get("company") || ""),
@@ -68,7 +67,7 @@ let updateAccount = async (request: Request) => {
   const accountId = String(new URL(request.url).searchParams.get("accountId"));
   const body = await request.formData();
 
-  const data: AccountUpdateRequest = {
+  const data: AccountUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     balance: +(body.get("balance") || 0),
   };

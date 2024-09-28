@@ -1,16 +1,15 @@
 import ServerResponse from "~/interfaces/ServerResponse";
-import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import { Expense, Prisma, User } from "@prisma/client";
 import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
-import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
 import { expenseCreateValidator, expenseDeleteValidator, expenseUpdateValidator } from "./expense-validator";
 import { prisma } from "../database/database.server";
+import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
 
 type ExpenseWhereInput = Prisma.ExpenseWhereInput;
 
 export async function create(
-  data: ExpenseCreateRequest,
+  data: ExpenseCreateRequestInterface,
   user: User
 ): Promise<ServerResponse> {
   const dataIsValid = await expenseCreateValidator(data, user);
@@ -129,7 +128,7 @@ export async function remove(
 export async function update(
   expenseId: string,
   user: User,
-  data: ExpenseUpdateRequest
+  data: ExpenseUpdateRequestInterface
 ): Promise<ServerResponse> {
   const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
 

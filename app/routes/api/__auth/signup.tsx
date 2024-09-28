@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
+import { SignupRequestInterface } from "~/data/auth/auth-request-interfaces";
 import { createUserSession, signup } from "~/data/auth/auth.server";
-import SignupRequest from "~/interfaces/bodyRequests/auth/SignupRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
@@ -9,7 +9,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
 
   const body = await request.formData();
 
-  const data: SignupRequest = {
+  const data: SignupRequestInterface = {
     name: String(body.get("name")),
     login: String(body.get("login")),
     password: String(body.get("password")),

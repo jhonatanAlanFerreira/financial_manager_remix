@@ -1,11 +1,10 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import AccountCreateRequest from "~/interfaces/bodyRequests/account/AccountCreateRequest";
-import AccountUpdateRequest from "~/interfaces/bodyRequests/account/AccountUpdateRequest";
 import { prisma } from "../database/database.server";
+import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "./account-request-interfaces";
 
 export async function accountCreateValidator(
-  data: AccountCreateRequest,
+  data: AccountCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -82,7 +81,7 @@ export async function accountDeleteValidator(
 }
 
 export async function accountUpdateValidator(
-  data: AccountUpdateRequest,
+  data: AccountUpdateRequestInterface,
   user: User,
   accountId: string
 ): Promise<ValidatedData> {

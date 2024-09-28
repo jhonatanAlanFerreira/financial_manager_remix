@@ -1,8 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
-import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
-import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -40,7 +39,7 @@ let createIncome = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
 
-  const data: IncomeCreateRequest = {
+  const data: IncomeCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_income: !!body.get("is_personal_income"),
@@ -84,7 +83,7 @@ let updateIncome = async (request: Request) => {
   const incomeId = String(new URL(request.url).searchParams.get("incomeId"));
   const body = await request.formData();
 
-  const data: IncomeUpdateRequest = {
+  const data: IncomeUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
     is_personal_income: !!body.get("is_personal_income"),

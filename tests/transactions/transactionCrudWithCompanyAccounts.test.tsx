@@ -1,7 +1,7 @@
 import { update, create, remove } from "~/data/transaction/transaction.server";
-import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
 import { User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
+import { TransactionCreateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
 
 describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Company Accounts", () => {
   let transactionIdsIncome: string[] = [];
@@ -14,7 +14,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
   const getUser = async () => prisma.user.findFirstOrThrow();
 
   const createTransaction = async (
-    transactionData: TransactionCreateRequest,
+    transactionData: TransactionCreateRequestInterface,
     user: User
   ) => {
     const transaction = await create(transactionData, user);

@@ -1,11 +1,10 @@
 import { User } from "@prisma/client";
 import ValidatedData from "~/interfaces/ValidatedData";
-import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
-import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 import { prisma } from "../database/database.server";
+import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
 
 export async function companyCreateValidator(
-  data: CompanyCreateRequest,
+  data: CompanyCreateRequestInterface,
   user: User
 ): Promise<ValidatedData> {
   if (!data.name) {
@@ -66,7 +65,7 @@ export async function companyDeleteValidator(
 }
 
 export async function companyUpdateValidator(
-  data: CompanyUpdateRequest,
+  data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
 ): Promise<ValidatedData> {
