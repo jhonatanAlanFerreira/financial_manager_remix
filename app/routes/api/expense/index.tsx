@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
-import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove, update } from "~/data/expense.server";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { create, list, remove, update } from "~/data/expense/expense.server";
 import ExpenseCreateRequest from "~/interfaces/bodyRequests/expense/ExpenseCreateRequest";
 import ExpenseUpdateRequest from "~/interfaces/bodyRequests/expense/ExpenseUpdateRequest";
 import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";

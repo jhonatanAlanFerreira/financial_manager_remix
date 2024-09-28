@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
-import { createUserSession, signup } from "~/data/auth.server";
+import { createUserSession, signup } from "~/data/auth/auth.server";
 import SignupRequest from "~/interfaces/bodyRequests/auth/SignupRequest";
 
 export let action = async ({ request }: ActionFunctionArgs) => {

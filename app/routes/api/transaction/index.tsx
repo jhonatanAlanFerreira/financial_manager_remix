@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove, update } from "~/data/transaction.server";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { create, list, remove, update } from "~/data/transaction/transaction.server";
 import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";

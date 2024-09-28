@@ -15,7 +15,7 @@ import Icon from "~/components/icon/icon";
 import { useFormik } from "formik";
 import { ClassificationForm } from "~/interfaces/forms/classification/ClassificationForm";
 import ClassificationFiltersForm from "~/interfaces/forms/classification/ClassificationFiltersForm";
-import { queryParamsFromObject } from "~/utilities";
+import { queryParamsFromObject } from "~/utils/utilities";
 import Pagination from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
 import { ClassificationFilterTagsConfig } from "~/components/page-components/classification/classification-filter-tags-config";

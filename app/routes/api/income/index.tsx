@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove, update } from "~/data/income.server";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { create, list, remove, update } from "~/data/income/income.server";
 import IncomeCreateRequest from "~/interfaces/bodyRequests/income/IncomeCreateRequest";
 import IncomeUpdateRequest from "~/interfaces/bodyRequests/income/IncomeUpdateRequest";
 import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";

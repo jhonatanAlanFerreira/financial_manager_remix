@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { destroyUserSession } from "~/data/auth.server";
+import { destroyUserSession } from "~/data/auth/auth.server";
 
 export function loader({ request }: LoaderFunctionArgs) {
   if (request.method !== "GET") {

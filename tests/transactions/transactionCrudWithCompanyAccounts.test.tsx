@@ -1,7 +1,7 @@
-import { update, create, remove } from "~/data/transaction.server";
-import { prisma } from "~/data/database.server";
+import { update, create, remove } from "~/data/transaction/transaction.server";
 import TransactionCreateRequest from "~/interfaces/bodyRequests/transaction/TransactionCreateRequest";
 import { User } from "@prisma/client";
+import { prisma } from "~/data/database/database.server";
 
 describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Company Accounts", () => {
   let transactionIdsIncome: string[] = [];

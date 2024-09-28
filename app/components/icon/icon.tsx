@@ -1,5 +1,5 @@
 import * as icons from "react-feather";
-import { IconPropsType } from "~/types/IconPropsType";
+import { IconPropsType } from "./icon-props-type";
 
 export default function Icon({ name, ...rest }: IconPropsType) {
   const IconComponent = icons[name];

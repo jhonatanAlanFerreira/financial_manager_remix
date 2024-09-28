@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { IconNameType } from "~/types/IconNameType";
 import InputPasswordProps from "./input-password-props";
 import InputText from "~/components/inputs/input-text/input-text";
+import { IconNameType } from "~/shared/icon-name-type";
 
 export default function InputPassword({
   showEyeIcon,

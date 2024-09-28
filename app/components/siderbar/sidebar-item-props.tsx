@@ -1,4 +1,4 @@
-import { SidebarItemType } from "~/types/SidebarItemType";
+import { SidebarItemType } from "./sidebar-item-type";
 
 export default interface SidebarItemProps {
   item: SidebarItemType;

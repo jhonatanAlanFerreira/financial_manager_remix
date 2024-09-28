@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove, update } from "~/data/classification.server";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { create, list, remove, update } from "~/data/classification/classification.server";
 import ClassificationCreateRequest from "~/interfaces/bodyRequests/classification/ClassificationCreateRequest";
 import ClassificationUpdateRequest from "~/interfaces/bodyRequests/classification/ClassificationUpdateRequest";
 import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";

@@ -1,6 +1,6 @@
-import { requireUserSession } from "~/data/auth.server";
+import { requireUserSession } from "~/data/auth/auth.server";
 import AccountCreateRequest from "~/interfaces/bodyRequests/account/AccountCreateRequest";
-import { create, list, remove, update } from "~/data/account.server";
+import { create, list, remove, update } from "~/data/account/account.server";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import AccountUpdateRequest from "~/interfaces/bodyRequests/account/AccountUpdateRequest";
 

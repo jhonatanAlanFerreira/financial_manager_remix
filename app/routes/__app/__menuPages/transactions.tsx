@@ -27,7 +27,7 @@ import {
   lastDayOfCurrentMonth,
   queryParamsFromObject,
   todayFormatedDate,
-} from "~/utilities";
+} from "~/utils/utilities";
 import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";

@@ -16,7 +16,7 @@ import { IncomeForm } from "~/interfaces/forms/income/IncomeForm";
 import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import Pagination from "~/components/pagination/pagination";
-import { queryParamsFromObject } from "~/utilities";
+import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { IncomeFilterTagsConfig } from "~/components/page-components/income/income-filter-tags-config";
 import FilterTag from "~/components/filter-tag/filter-tag";

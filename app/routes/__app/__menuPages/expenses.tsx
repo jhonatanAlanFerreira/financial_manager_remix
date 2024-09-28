@@ -15,7 +15,7 @@ import { useFormik } from "formik";
 import { ExpenseForm } from "~/interfaces/forms/expense/ExpenseForm";
 import ExpenseFiltersForm from "~/interfaces/forms/expense/ExpenseFiltersForm";
 import Pagination from "~/components/pagination/pagination";
-import { queryParamsFromObject } from "~/utilities";
+import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { ExpenseFilterTagsConfig } from "~/components/page-components/expense/expense-filter-tags-config";
 import FilterTag from "~/components/filter-tag/filter-tag";

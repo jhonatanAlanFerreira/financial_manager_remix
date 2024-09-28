@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { requireUserSession } from "~/data/auth.server";
-import { create, list, remove, update } from "~/data/company.server";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { create, list, remove, update } from "~/data/company/company.server";
 import CompanyCreateRequest from "~/interfaces/bodyRequests/company/CompanyCreateRequest";
 import CompanyUpdateRequest from "~/interfaces/bodyRequests/company/CompanyUpdateRequest";
 import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
