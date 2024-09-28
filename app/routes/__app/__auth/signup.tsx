@@ -2,11 +2,11 @@ import { Form, Link, useNavigate } from "@remix-run/react";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import Icon from "~/components/icon/Icon";
-import InputPassword from "~/components/inputs/inputPassword/InputPassword";
-import InputText from "~/components/inputs/inputText/InputText";
-import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
+import PrimaryButton from "~/components/buttons/primary-button/primary-button";
+import Icon from "~/components/icon/icon";
+import InputPassword from "~/components/inputs/input-password/input-password";
+import InputText from "~/components/inputs/input-text/input-text";
+import NavigationLoader from "~/components/navigation-loader/navigation-loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 

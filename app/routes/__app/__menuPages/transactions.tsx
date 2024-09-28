@@ -12,9 +12,7 @@ import axios, { AxiosResponse, isAxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
-import DangerButton from "~/components/buttons/danger-button/DangerButton";
-import PrimaryButton from "~/components/buttons/primary-button/PrimaryButton";
-import Loader from "~/components/loader/Loader";
+import Loader from "~/components/loader/loader";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
@@ -22,7 +20,7 @@ import { loader as classificationLoader } from "~/routes/api/classification/inde
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
-import Icon from "~/components/icon/Icon";
+import Icon from "~/components/icon/icon";
 import {
   firstDayOfCurrentMonth,
   formatDate,
@@ -33,13 +31,15 @@ import {
 import { useFormik } from "formik";
 import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
-import TransactionsFilters from "~/components/pageComponents/transaction/TransactionsFilters";
-import TransactionAdd from "~/components/pageComponents/transaction/TransactionAdd";
-import FilterTag from "~/components/filterTag/FilterTag";
-import Pagination from "~/components/pagination/Pagination";
-import { TransactionFilterTagsConfig } from "~/components/pageComponents/transaction/TransactionFilterTagsConfig";
-import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
-import { useTitle } from "~/components/topBar/TitleContext";
+import Pagination from "~/components/pagination/pagination";
+import { useTitle } from "~/components/top-bar/title-context";
+import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/transactions-with-totals";
+import { TransactionFilterTagsConfig } from "~/components/page-components/transaction/transaction-filter-tags-config";
+import FilterTag from "~/components/filter-tag/filter-tag";
+import PrimaryButton from "~/components/buttons/primary-button/primary-button";
+import DangerButton from "~/components/buttons/danger-button/danger-button";
+import TransactionAdd from "~/components/page-components/transaction/transaction-add";
+import TransactionFilters from "~/components/page-components/transaction/transaction-filters";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -598,13 +598,13 @@ export default function Transactions() {
           Filters
         </h2>
         <div className="p-4">
-          <TransactionsFilters
+          <TransactionFilters
             companies={companies.data || []}
             expenses={expenses.data || []}
             incomes={incomes.data || []}
             formik={filterForm}
             onSubmit={onFilterFormSubmit}
-          ></TransactionsFilters>
+          ></TransactionFilters>
         </div>
       </Modal>
     </Loader>

@@ -7,7 +7,7 @@ import transactionDeleteValidator from "~/data/requestValidators/transaction/tra
 import TransactionUpdateRequest from "~/interfaces/bodyRequests/transaction/TransactionUpdateRequest";
 import transactionUpdateValidator from "~/data/requestValidators/transaction/transactionUpdateValidator";
 import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
-import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/TransactionsWithTotals";
+import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/transactions-with-totals";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 

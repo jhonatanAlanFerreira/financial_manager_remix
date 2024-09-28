@@ -2,7 +2,7 @@ import { Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import { useTitle } from "~/components/topBar/TitleContext";
+import { useTitle } from "~/components/top-bar/title-context";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { loader as companyLoader } from "~/routes/api/company/index";
 

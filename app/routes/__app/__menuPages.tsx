@@ -1,9 +1,9 @@
 import { Outlet } from "@remix-run/react";
 import { useState } from "react";
-import NavigationLoader from "~/components/navigationLoader/NavigationLoader";
-import Sidebar from "~/components/siderbar/Sidebar";
-import { TitleProvider } from "~/components/topBar/TitleContext";
-import TopBar from "~/components/topBar/TopBar";
+import NavigationLoader from "~/components/navigation-loader/navigation-loader";
+import Sidebar from "~/components/siderbar/sidebar";
+import { TitleProvider } from "~/components/top-bar/title-context";
+import TopBar from "~/components/top-bar/top-bar";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
