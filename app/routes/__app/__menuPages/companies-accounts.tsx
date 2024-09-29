@@ -11,7 +11,7 @@ import DangerButton from "~/components/buttons/danger-button/danger-button";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import Loader from "~/components/loader/loader";
-import AccountDropdown from "~/components/page-components/company/account-dropdown";
+import AccountDropdown from "~/components/page-components/company-accounts/account-dropdown";
 import { useTitle } from "~/components/top-bar/title-context";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";

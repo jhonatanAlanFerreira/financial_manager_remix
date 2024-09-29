@@ -1,5 +1,5 @@
 import Icon from "~/components/icon/icon";
-import DangerButtonProps from "./danger-button-props";
+import DangerButtonProps from "./danger-button-props.interface";
 
 export default function DangerButton({
   text,

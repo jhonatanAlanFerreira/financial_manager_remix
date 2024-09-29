@@ -1,5 +1,5 @@
 import Icon from "~/components/icon/icon";
-import IconButtonProps from "./icon-button-props";
+import IconButtonProps from "./icon-button-props-interface";
 
 export default function IconButton({
   iconColor,

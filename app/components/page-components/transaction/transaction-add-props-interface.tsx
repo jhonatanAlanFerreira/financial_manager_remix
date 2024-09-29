@@ -10,7 +10,7 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
 
-export interface TransactionAddProps {
+export interface TransactionAddPropsInterface {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   setSkipEffect: (value: boolean) => void;
   onModalCancel: () => void;

@@ -33,7 +33,7 @@ import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm"
 import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import Pagination from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
-import TransactionsWithTotals from "~/interfaces/pageComponents/transactions/transactions-with-totals";
+import TransactionsWithTotals from "~/components/page-components/transaction/transactions-with-totals-interface";
 import { TransactionFilterTagsConfig } from "~/components/page-components/transaction/transaction-filter-tags-config";
 import FilterTag from "~/components/filter-tag/filter-tag";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";

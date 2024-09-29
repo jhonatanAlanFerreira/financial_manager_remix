@@ -1,4 +1,4 @@
-import logOperationTypeSeed from "~/data/database/seeders/logOperationTypeSeed";
+import logOperationTypeSeed from "~/data/database/seeders/log-operation-type-seed";
 import { prisma } from "~/data/database/database.server";
 
 const seeders = [

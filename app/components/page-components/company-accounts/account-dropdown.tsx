@@ -9,18 +9,18 @@ import AccountForm from "~/interfaces/forms/company/AccountForm";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { Account } from "@prisma/client";
-import AccountDropdownProps from "~/interfaces/pageComponents/companies-accounts/account-dropdown-props";
 import AddButton from "~/components/buttons/add-button/add-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
+import AccountDropdownPropsInterface from "./account-dropdown-props-interface";
 
 export default function AccountDropdown({
   company,
   userAccounts,
   onSave,
   onAccountRemove,
-}: AccountDropdownProps) {
+}: AccountDropdownPropsInterface) {
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);

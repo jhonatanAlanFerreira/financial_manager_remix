@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Icon from "~/components/icon/icon";
 import { Link } from "@remix-run/react";
-import SidebarItemProps from "./sidebar-item-props";
+import SidebarItemProps from "./sidebar-item-props-interface";
 
 export default function SidebarItem({
   item,

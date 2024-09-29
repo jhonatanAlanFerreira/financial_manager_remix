@@ -1,3 +1,3 @@
-export default interface TopBarProps {
+export default interface TopBarPropsInterface {
   updateSidebarOpen: (value: boolean) => void;
 }

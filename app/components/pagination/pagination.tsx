@@ -1,5 +1,5 @@
 import Icon from "~/components/icon/icon";
-import PaginationProps from "./pagination-props";
+import PaginationProps from "./pagination-props-interface";
 
 export default function Pagination({
   currentPage,

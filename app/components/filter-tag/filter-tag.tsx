@@ -1,4 +1,4 @@
-import FilterTagProps from "./filter-tag-props";
+import FilterTagProps from "./filter-tag-props-interface";
 
 export default function FilterTag({
   label,

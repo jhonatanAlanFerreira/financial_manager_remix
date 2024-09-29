@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Icon from "../icon/icon";
-import AccordionProps from "./accordion-props";
+import AccordionProps from "./accordion-props-interface";
 
 export default function Accordion({
   title,

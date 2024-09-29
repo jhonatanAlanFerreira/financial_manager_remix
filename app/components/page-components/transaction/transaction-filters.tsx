@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import InputSelect from "~/components/inputs/input-select/input-select";
 import InputText from "~/components/inputs/input-text/input-text";
-import { TransactionFiltersProps } from "~/interfaces/pageComponents/transactions/transaction-filters-props";
+import { TransactionFiltersPropsInterface } from "./transaction-filters-props-interface";
 
 export default function TransactionFilters({
   companies,
@@ -11,7 +11,7 @@ export default function TransactionFilters({
   incomes,
   formik,
   onSubmit,
-}: TransactionFiltersProps) {
+}: TransactionFiltersPropsInterface) {
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
   const [skipEffect, setSkipEffect] = useState<boolean>(true);

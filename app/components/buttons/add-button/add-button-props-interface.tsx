@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from "react";
 
-export default interface AddButtonProps
+export default interface AddButtonPropsInterface
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   iconColor?: string;
 }
