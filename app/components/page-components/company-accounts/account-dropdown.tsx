@@ -3,9 +3,6 @@ import { Form } from "@remix-run/react";
 import { useState } from "react";
 import { Modal } from "react-responsive-modal";
 import Icon from "~/components/icon/icon";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
-import AccountForm from "~/interfaces/forms/company/AccountForm";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { Account } from "@prisma/client";
@@ -13,7 +10,9 @@ import AddButton from "~/components/buttons/add-button/add-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import AccountDropdownPropsInterface from "./account-dropdown-props-interface";
+import { AccountDropdownPropsInterface, AccountFormInterface } from "./company-accounts-interfaces";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 export default function AccountDropdown({
   company,
@@ -26,10 +25,10 @@ export default function AccountDropdown({
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
 
-  const formik = useFormik<AccountForm>({
+  const formik = useFormik<AccountFormInterface>({
     initialValues: {
       id: "",
       name: "",
@@ -64,7 +63,7 @@ export default function AccountDropdown({
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           setResponseErrors({});
           onSave();
@@ -115,7 +114,7 @@ export default function AccountDropdown({
 
     toast.promise(axios.delete(`/api/account?accountId=${formik.values.id}`), {
       loading: "Deleting account",
-      success: (res: AxiosResponse<ServerResponse>) => {
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
         onAccountRemove();
         setLoading(false);
         return res.data.message as string;

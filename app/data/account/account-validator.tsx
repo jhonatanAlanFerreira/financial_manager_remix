@@ -1,12 +1,12 @@
 import { User } from "@prisma/client";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "../database/database.server";
 import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "./account-request-interfaces";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
   user: User
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,
@@ -58,7 +58,7 @@ export async function accountCreateValidator(
 export async function accountDeleteValidator(
   user: User,
   accountId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   const accountExistis = await prisma.account.findFirst({
     where: {
       id: accountId,
@@ -84,7 +84,7 @@ export async function accountUpdateValidator(
   data: AccountUpdateRequestInterface,
   user: User,
   accountId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,

@@ -1,17 +1,17 @@
-import ServerResponse from "~/interfaces/ServerResponse";
 import { Expense, Prisma, User } from "@prisma/client";
 import { expenseCreateValidator, expenseDeleteValidator, expenseUpdateValidator } from "./expense-validator";
 import { prisma } from "../database/database.server";
 import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
 import { ExpenseWithCompaniesType } from "./expense-types";
 import ExpenseLoaderParamsInterface from "./expense-query-params-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 type ExpenseWhereInput = Prisma.ExpenseWhereInput;
 
 export async function create(
   data: ExpenseCreateRequestInterface,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await expenseCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -41,7 +41,7 @@ export async function create(
 export async function list(
   user: User,
   params: ExpenseLoaderParamsInterface
-): Promise<ServerResponse<Expense[] | ExpenseWithCompaniesType[]>> {
+): Promise<ServerResponseInterface<Expense[] | ExpenseWithCompaniesType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
@@ -103,7 +103,7 @@ export async function list(
 export async function remove(
   expenseId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await expenseDeleteValidator(user, expenseId);
 
   if (!dataIsValid.isValid) {
@@ -129,7 +129,7 @@ export async function update(
   expenseId: string,
   user: User,
   data: ExpenseUpdateRequestInterface
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
 
   if (!dataIsValid.isValid) {

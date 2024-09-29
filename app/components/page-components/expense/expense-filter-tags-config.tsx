@@ -1,7 +1,7 @@
-import ExpenseFiltersForm from "~/interfaces/forms/expense/ExpenseFiltersForm";
+import ExpenseFiltersFormInterface from "./expense-interfaces";
 
 export const ExpenseFilterTagsConfig: {
-  fieldName: keyof ExpenseFiltersForm;
+  fieldName: keyof ExpenseFiltersFormInterface;
   label: string;
   closeBtn: boolean;
   getValue: (fieldValue: any) => string;

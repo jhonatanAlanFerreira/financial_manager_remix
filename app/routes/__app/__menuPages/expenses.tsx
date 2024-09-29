@@ -3,17 +3,13 @@ import { useEffect, useState } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
 import toast from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
-import ServerResponse from "~/interfaces/ServerResponse";
 import Checkbox from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import Loader from "~/components/loader/loader";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { Company, Expense } from "@prisma/client";
 import Icon from "~/components/icon/icon";
 import { useFormik } from "formik";
-import { ExpenseForm } from "~/interfaces/forms/expense/ExpenseForm";
-import ExpenseFiltersForm from "~/interfaces/forms/expense/ExpenseFiltersForm";
 import Pagination from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -23,6 +19,9 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
+import ExpenseFiltersFormInterface, { ExpenseFormInterface } from "~/components/page-components/expense/expense-interfaces";
 
 export default function Expenses() {
   const { setTitle } = useTitle();
@@ -34,20 +33,20 @@ export default function Expenses() {
   const [searchParams, setSearchParams] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>({});
+  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
 
   const { expenseData, companyData } = useLoaderData<{
-    expenseData: ServerResponse<Expense[]>;
-    companyData: ServerResponse<Company[]>;
+    expenseData: ServerResponseInterface<Expense[]>;
+    companyData: ServerResponseInterface<Company[]>;
   }>();
 
-  const mainForm = useFormik<ExpenseForm>({
+  const mainForm = useFormik<ExpenseFormInterface>({
     initialValues: {
       id: "",
       name: "",
@@ -58,7 +57,7 @@ export default function Expenses() {
     onSubmit: () => {},
   });
 
-  const filterForm = useFormik<ExpenseFiltersForm>({
+  const filterForm = useFormik<ExpenseFiltersFormInterface>({
     initialValues: {
       name: "",
       amount_greater: 0,
@@ -123,7 +122,7 @@ export default function Expenses() {
   const loadExpenses = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponse<Expense[]>>(
+      const res = await axios.get<ServerResponseInterface<Expense[]>>(
         `/api/expense?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -174,7 +173,7 @@ export default function Expenses() {
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           loadExpenses();
           setResponseErrors({});
@@ -206,7 +205,7 @@ export default function Expenses() {
       axios.delete(`/api/expense?expenseId=${mainForm.values.id}`),
       {
         loading: "Deleting expense",
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           loadExpenses();
           return res.data.message as string;
         },

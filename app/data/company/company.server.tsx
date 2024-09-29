@@ -1,18 +1,18 @@
 import { Company, Prisma, User } from "@prisma/client";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "../database/database.server";
 import { companyCreateValidator, companyDeleteValidator, companyUpdateValidator } from "./company-validator";
 import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
 import { CompanyWithAccountsType } from "./company-types";
 import CompanyLoaderParamsInterface from "./company-query-params-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 type CompanyWhereInput = Prisma.CompanyWhereInput;
 
 export async function list(
   user: User,
   params: CompanyLoaderParamsInterface
-): Promise<ServerResponse<Company[] | CompanyWithAccountsType[]>> {
+): Promise<ServerResponseInterface<Company[] | CompanyWithAccountsType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
@@ -54,7 +54,7 @@ export async function list(
 export async function create(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ServerResponse<Company | ValidatedData>> {
+): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
   const dataIsValid = await companyCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -82,7 +82,7 @@ export async function update(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ServerResponse<Company | ValidatedData>> {
+): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
   const dataIsValid = await companyUpdateValidator(data, user, companyId);
 
   if (!dataIsValid.isValid) {
@@ -109,7 +109,7 @@ export async function update(
 export async function remove(
   companyId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await companyDeleteValidator(user, companyId);
 
   if (!dataIsValid.isValid) {

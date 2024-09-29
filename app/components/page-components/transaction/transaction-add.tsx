@@ -13,7 +13,7 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import Checkbox from "~/components/inputs/checkbox/checkbox";
 import InputSelect from "~/components/inputs/input-select/input-select";
 import InputText from "~/components/inputs/input-text/input-text";
-import { TransactionAddPropsInterface } from "./transaction-add-props-interface";
+import { TransactionAddPropsInterface } from "./transaction-interfaces";
 
 export default function TransactionAdd({
   companies,

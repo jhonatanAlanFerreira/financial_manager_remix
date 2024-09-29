@@ -12,12 +12,12 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import Loader from "~/components/loader/loader";
 import AccountDropdown from "~/components/page-components/company-accounts/account-dropdown";
+import { CompanyFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
 import { CompanyWithAccountsType } from "~/data/company/company-types";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
-import CompanyForm from "~/interfaces/forms/company/CompanyForm";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export default function Companies() {
   const { setTitle } = useTitle();
@@ -27,20 +27,20 @@ export default function Companies() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<
-    ServerResponse<CompanyWithAccountsType[]>
+    ServerResponseInterface<CompanyWithAccountsType[]>
   >({});
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
-  const [userAccounts, setUserAccounts] = useState<ServerResponse<Account[]>>(
+  const [userAccounts, setUserAccounts] = useState<ServerResponseInterface<Account[]>>(
     {}
   );
 
   const { userAccountData } = useLoaderData<{
-    userAccountData: ServerResponse<Account[]>;
+    userAccountData: ServerResponseInterface<Account[]>;
   }>();
 
-  const formik = useFormik<CompanyForm>({
+  const formik = useFormik<CompanyFormInterface>({
     initialValues: {
       id: "",
       name: "",
@@ -119,7 +119,7 @@ export default function Companies() {
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           loadCompanies();
           setResponseErrors({});
@@ -145,7 +145,7 @@ export default function Companies() {
 
     toast.promise(axios.delete(`/api/company?companyId=${formik.values.id}`), {
       loading: "Deleting company",
-      success: (res: AxiosResponse<ServerResponse>) => {
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
         loadCompanies();
         return res.data.message as string;
       },

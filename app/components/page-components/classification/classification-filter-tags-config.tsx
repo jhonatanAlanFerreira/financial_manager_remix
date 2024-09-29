@@ -1,7 +1,7 @@
-import ClassificationFiltersForm from "~/interfaces/forms/classification/ClassificationFiltersForm";
+import { ClassificationFiltersFormInterface } from "./classification-finterfaces";
 
 export const ClassificationFilterTagsConfig: {
-  fieldName: keyof ClassificationFiltersForm;
+  fieldName: keyof ClassificationFiltersFormInterface;
   label: string;
   closeBtn: boolean;
   getValue: (fieldValue: any) => string;

@@ -13,8 +13,6 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import Loader from "~/components/loader/loader";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
@@ -29,17 +27,17 @@ import {
   todayFormatedDate,
 } from "~/utils/utilities";
 import { useFormik } from "formik";
-import { TransactionForm } from "~/interfaces/forms/transaction/TransactionForm";
-import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import Pagination from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
-import TransactionsWithTotals from "~/components/page-components/transaction/transactions-with-totals-interface";
 import { TransactionFilterTagsConfig } from "~/components/page-components/transaction/transaction-filter-tags-config";
 import FilterTag from "~/components/filter-tag/filter-tag";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import TransactionAdd from "~/components/page-components/transaction/transaction-add";
 import TransactionFilters from "~/components/page-components/transaction/transaction-filters";
+import { TransactionFiltersFormInterface, TransactionFormInterface, TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -58,18 +56,18 @@ export default function Transactions() {
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
 
   const [transactions, setTransactions] = useState<
-    ServerResponse<TransactionsWithTotals>
+    ServerResponseInterface<TransactionsWithTotalsInterface>
   >({});
   const [classifications, setClassifications] = useState<
-    ServerResponse<TransactionClassification[]>
+    ServerResponseInterface<TransactionClassification[]>
   >({});
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
-  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
-  const [expenses, setExpenses] = useState<ServerResponse<Expense[]>>({});
-  const [accounts, setAccounts] = useState<ServerResponse<Account[]>>({});
+  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
+  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>({});
+  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>({});
 
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
 
   const {
@@ -80,15 +78,15 @@ export default function Transactions() {
     incomeData,
     userAccountData,
   } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
-    transactionData: ServerResponse<TransactionsWithTotals>;
-    expenseData: ServerResponse<Expense[]>;
-    classificationData: ServerResponse<TransactionClassification[]>;
-    incomeData: ServerResponse<Income[]>;
-    userAccountData: ServerResponse<Account[]>;
+    companyData: ServerResponseInterface<Company[]>;
+    transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
+    expenseData: ServerResponseInterface<Expense[]>;
+    classificationData: ServerResponseInterface<TransactionClassification[]>;
+    incomeData: ServerResponseInterface<Income[]>;
+    userAccountData: ServerResponseInterface<Account[]>;
   }>();
 
-  const mainForm = useFormik<TransactionForm>({
+  const mainForm = useFormik<TransactionFormInterface>({
     initialValues: {
       id: "",
       is_income: false,
@@ -105,7 +103,7 @@ export default function Transactions() {
     onSubmit: () => {},
   });
 
-  const filterForm = useFormik<TransactionFiltersForm>({
+  const filterForm = useFormik<TransactionFiltersFormInterface>({
     initialValues: {
       name: "",
       is_personal_or_company: "all",
@@ -217,7 +215,7 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponse<TransactionsWithTotals>>(
+      const res = await axios.get<ServerResponseInterface<TransactionsWithTotalsInterface>>(
         `/api/transaction?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -279,7 +277,7 @@ export default function Transactions() {
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           loadTransactions();
           setResponseErrors({});
@@ -321,7 +319,7 @@ export default function Transactions() {
       axios.delete(`/api/transaction?transactionId=${mainForm.values.id}`),
       {
         loading: "Deleting transaction",
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           loadTransactions();
           return res.data.message as string;
         },

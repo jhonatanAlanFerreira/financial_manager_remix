@@ -7,12 +7,12 @@ import Icon from "~/components/icon/icon";
 import InputPassword from "~/components/inputs/input-password/input-password";
 import InputText from "~/components/inputs/input-text/input-text";
 import NavigationLoader from "~/components/navigation-loader/navigation-loader";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export default function Login() {
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function Login() {
     toast
       .promise(axios.post("/api/login", formData), {
         loading: "Logging in",
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           navigate("/");
           return res.data.message as string;
         },

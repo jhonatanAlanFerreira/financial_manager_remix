@@ -1,8 +1,8 @@
-import { TransactionFiltersForm } from "~/interfaces/forms/transaction/TransactionFiltersForm";
 import { formatDate } from "~/utils/utilities";
+import { TransactionFiltersFormInterface } from "./transaction-interfaces";
 
 export const TransactionFilterTagsConfig: {
-  fieldName: keyof TransactionFiltersForm;
+  fieldName: keyof TransactionFiltersFormInterface;
   label: string;
   closeBtn: boolean;
   getValue: (fieldValue: any) => string;

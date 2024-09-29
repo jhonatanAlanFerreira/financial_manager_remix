@@ -1,4 +1,3 @@
-import ServerResponse from "~/interfaces/ServerResponse";
 import { hash, compare } from "bcrypt";
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import { User } from "@prisma/client";
@@ -6,6 +5,7 @@ import { prisma } from "../database/database.server";
 import { loginValidator, signupValidator } from "./auth-validator";
 import { exclude } from "~/utils/utilities";
 import { LoginRequestInterface, SignupRequestInterface } from "./auth-request-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
@@ -59,7 +59,7 @@ export async function requireUserSession(request: Request): Promise<User> {
   return user;
 }
 
-export async function signup(data: SignupRequestInterface): Promise<ServerResponse> {
+export async function signup(data: SignupRequestInterface): Promise<ServerResponseInterface> {
   const dataIsValid = await signupValidator(data);
 
   if (!dataIsValid.isValid) {
@@ -109,7 +109,7 @@ export async function destroyUserSession(request: Request) {
   });
 }
 
-export async function login(data: LoginRequestInterface): Promise<ServerResponse> {
+export async function login(data: LoginRequestInterface): Promise<ServerResponseInterface> {
   const dataIsValid = await loginValidator(data);
 
   if (!dataIsValid.isValid) {

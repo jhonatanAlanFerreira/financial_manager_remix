@@ -1,7 +1,7 @@
-import CompanyFiltersForm from "~/interfaces/forms/company/CompanyFiltersForm";
+import { CompanyFiltersFormInterface } from "./company-accounts-interfaces";
 
 export const CompanyFilterTagsConfig: {
-  fieldName: keyof CompanyFiltersForm;
+  fieldName: keyof CompanyFiltersFormInterface;
   label: string;
   closeBtn: boolean;
   getValue: (fieldValue: any) => string;

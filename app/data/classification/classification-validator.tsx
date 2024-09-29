@@ -1,12 +1,12 @@
 import { User } from "@prisma/client";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "../database/database.server";
 import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export default async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
   user: User
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,
@@ -65,7 +65,7 @@ export default async function classificationCreateValidator(
 export async function classificationDeleteValidator(
   user: User,
   classificationId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   const classificationExistis =
     await prisma.transactionClassification.findFirst({
       where: {
@@ -92,7 +92,7 @@ export async function classificationUpdateValidator(
   data: ClassificationUpdateRequestInterface,
   user: User,
   classificationId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,

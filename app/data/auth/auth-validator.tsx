@@ -1,10 +1,10 @@
-import ValidatedData from "~/interfaces/ValidatedData";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 import { prisma } from "../database/database.server";
 import { LoginRequestInterface, SignupRequestInterface } from "./auth-request-interfaces";
 
 export async function loginValidator(
   data: LoginRequestInterface
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.login || !data.password) {
     return {
       isValid: false,
@@ -21,7 +21,7 @@ export async function loginValidator(
 
 export async function signupValidator(
   data: SignupRequestInterface
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (data.password != data.passwordRepeat) {
     return {
       isValid: false,

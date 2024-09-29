@@ -1,13 +1,13 @@
 import { Account, User } from "@prisma/client";
-import ServerResponse from "~/interfaces/ServerResponse";
 import { accountCreateValidator, accountDeleteValidator, accountUpdateValidator } from "./account-validator";
 import { prisma } from "../database/database.server";
 import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "./account-request-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 export async function create(
   data: AccountCreateRequestInterface,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await accountCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -37,7 +37,7 @@ export async function create(
 export async function list(
   user: User,
   personalOnly = true
-): Promise<ServerResponse<Account[]>> {
+): Promise<ServerResponseInterface<Account[]>> {
   const userAccounts = await prisma.account.findMany({
     where: {
       user_id: user.id,
@@ -53,7 +53,7 @@ export async function list(
 export async function remove(
   classificationId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await accountDeleteValidator(user, classificationId);
 
   if (!dataIsValid.isValid) {
@@ -79,7 +79,7 @@ export async function update(
   accountId: string,
   user: User,
   data: AccountUpdateRequestInterface
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await accountUpdateValidator(data, user, accountId);
 
   if (!dataIsValid.isValid) {

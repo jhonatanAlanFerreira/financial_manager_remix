@@ -1,7 +1,7 @@
-import IncomeFiltersForm from "~/interfaces/forms/income/IncomeFiltersForm";
+import { IncomeFiltersFormInterface } from "./income-interfaces";
 
 export const IncomeFilterTagsConfig: {
-  fieldName: keyof IncomeFiltersForm;
+  fieldName: keyof IncomeFiltersFormInterface;
   label: string;
   closeBtn: boolean;
   getValue: (fieldValue: any) => string;

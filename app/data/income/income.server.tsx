@@ -1,17 +1,17 @@
 import { Income, Prisma, User } from "@prisma/client";
-import ServerResponse from "~/interfaces/ServerResponse";
 import { incomeCreateValidator, incomeDeleteValidator, incomeUpdateValidator } from "./income-validator";
 import { prisma } from "../database/database.server";
 import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
 import { IncomeWithCompaniesType } from "./income-types";
 import IncomeLoaderParamsInterface from "./income-query-params-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 type IncomeWhereInput = Prisma.IncomeWhereInput;
 
 export async function create(
   data: IncomeCreateRequestInterface,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await incomeCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -41,7 +41,7 @@ export async function create(
 export async function list(
   user: User,
   params: IncomeLoaderParamsInterface
-): Promise<ServerResponse<Income[] | IncomeWithCompaniesType[]>> {
+): Promise<ServerResponseInterface<Income[] | IncomeWithCompaniesType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
@@ -103,7 +103,7 @@ export async function list(
 export async function remove(
   incomeId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await incomeDeleteValidator(user, incomeId);
 
   if (!dataIsValid.isValid) {
@@ -129,7 +129,7 @@ export async function update(
   incomeId: string,
   user: User,
   data: IncomeUpdateRequestInterface
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await incomeUpdateValidator(data, user, incomeId);
 
   if (!dataIsValid.isValid) {

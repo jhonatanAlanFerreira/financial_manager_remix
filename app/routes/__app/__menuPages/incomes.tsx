@@ -9,10 +9,6 @@ import { Modal } from "react-responsive-modal";
 import Icon from "~/components/icon/icon";
 import Checkbox from "~/components/inputs/checkbox/checkbox";
 import Loader from "~/components/loader/loader";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
-import IncomeFiltersForm from "~/interfaces/forms/income/IncomeFiltersForm";
-import { IncomeForm } from "~/interfaces/forms/income/IncomeForm";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import Pagination from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
@@ -24,6 +20,9 @@ import DangerButton from "~/components/buttons/danger-button/danger-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
 import { IncomeWithCompaniesType } from "~/data/income/income-types";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { IncomeFiltersFormInterface, IncomeFormInterface } from "~/components/page-components/income/income-interfaces";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -35,11 +34,11 @@ export default function Incomes() {
   const [reloadIncomes, setReloadIncomes] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
-  const [incomes, setIncomes] = useState<ServerResponse<Income[]>>({});
+  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -47,11 +46,11 @@ export default function Incomes() {
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
 
   const { companyData, incomeData } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
-    incomeData: ServerResponse<IncomeWithCompaniesType[]>;
+    companyData: ServerResponseInterface<Company[]>;
+    incomeData: ServerResponseInterface<IncomeWithCompaniesType[]>;
   }>();
 
-  const mainForm = useFormik<IncomeForm>({
+  const mainForm = useFormik<IncomeFormInterface>({
     initialValues: {
       id: "",
       name: "",
@@ -62,7 +61,7 @@ export default function Incomes() {
     onSubmit: () => {},
   });
 
-  const filterForm = useFormik<IncomeFiltersForm>({
+  const filterForm = useFormik<IncomeFiltersFormInterface>({
     initialValues: {
       name: "",
       amount_greater: 0,
@@ -149,7 +148,7 @@ export default function Incomes() {
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           loadIncomes();
           setResponseErrors({});
@@ -172,7 +171,7 @@ export default function Incomes() {
   const loadIncomes = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponse<Income[]>>(
+      const res = await axios.get<ServerResponseInterface<Income[]>>(
         `/api/income?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -205,7 +204,7 @@ export default function Incomes() {
 
     toast.promise(axios.delete(`/api/income?incomeId=${mainForm.values.id}`), {
       loading: "Deleting income",
-      success: (res: AxiosResponse<ServerResponse>) => {
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
         loadIncomes();
         return res.data.message as string;
       },

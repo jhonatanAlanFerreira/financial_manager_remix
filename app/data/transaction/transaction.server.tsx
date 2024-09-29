@@ -1,17 +1,17 @@
 import { Prisma, Transaction, User } from "@prisma/client";
-import ServerResponse from "~/interfaces/ServerResponse";
 import { prisma } from "~/data/database/database.server";
-import TransactionsWithTotals from "~/components/page-components/transaction/transactions-with-totals-interface";
 import { transactionCreateValidator, transactionDeleteValidator, transactionUpdateValidator } from "./transaction-Validator";
 import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
 import TransactionLoaderParamsInterface from "./transaction-query-params-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import { TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 
 export async function list(
   user: User,
   params: TransactionLoaderParamsInterface
-): Promise<ServerResponse<TransactionsWithTotals>> {
+): Promise<ServerResponseInterface<TransactionsWithTotalsInterface>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
@@ -90,7 +90,7 @@ export async function list(
 export async function create(
   data: TransactionCreateRequestInterface,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await transactionCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -149,7 +149,7 @@ export async function create(
 export async function remove(
   transactionId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await transactionDeleteValidator(user, transactionId);
 
   if (!dataIsValid.isValid) {
@@ -197,7 +197,7 @@ export async function update(
   transactionId: string,
   user: User,
   data: TransactionUpdateRequestInterface
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await transactionUpdateValidator(
     transactionId,
     user,

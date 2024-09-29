@@ -1,10 +1,10 @@
 import { Prisma, TransactionClassification, User } from "@prisma/client";
-import ServerResponse from "~/interfaces/ServerResponse";
 import classificationCreateValidator, { classificationDeleteValidator, classificationUpdateValidator } from "./classification-validator";
 import { prisma } from "../database/database.server";
 import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
 import { ClassificationWithCompanyType } from "./classification-types";
 import ClassificationLoaderParamsInterface from "./classification-query-params-interfaces";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 type TransactionClassificationWhereInput =
   Prisma.TransactionClassificationWhereInput;
@@ -12,7 +12,7 @@ type TransactionClassificationWhereInput =
 export async function create(
   data: ClassificationCreateRequestInterface,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await classificationCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -43,7 +43,7 @@ export async function create(
 export async function remove(
   classificationId: string,
   user: User
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await classificationDeleteValidator(
     user,
     classificationId
@@ -72,7 +72,7 @@ export async function update(
   classificationId: string,
   user: User,
   data: ClassificationUpdateRequestInterface
-): Promise<ServerResponse> {
+): Promise<ServerResponseInterface> {
   const dataIsValid = await classificationUpdateValidator(
     data,
     user,
@@ -111,7 +111,7 @@ export async function list(
   user: User,
   params: ClassificationLoaderParamsInterface
 ): Promise<
-  ServerResponse<TransactionClassification[] | ClassificationWithCompanyType[]>
+  ServerResponseInterface<TransactionClassification[] | ClassificationWithCompanyType[]>
 > {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =

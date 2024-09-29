@@ -3,20 +3,20 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useTitle } from "~/components/top-bar/title-context";
-import ServerResponse from "~/interfaces/ServerResponse";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import ServerResponseInterface from "~/shared/server-response-interface";
 
 export default function Index() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
   const [selectedCompany, setSelectedCompany] = useState<Company | "personal">(
     "personal"
   );
 
   const { companyData } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
+    companyData: ServerResponseInterface<Company[]>;
   }>();
 
   useEffect(() => {

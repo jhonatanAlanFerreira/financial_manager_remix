@@ -1,12 +1,12 @@
 import { User } from "@prisma/client";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { prisma } from "../database/database.server";
 import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
 
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,
@@ -42,7 +42,7 @@ export async function companyCreateValidator(
 export async function companyDeleteValidator(
   user: User,
   companyId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   const companyExistis = await prisma.company.findFirst({
     where: {
       id: companyId,
@@ -68,7 +68,7 @@ export async function companyUpdateValidator(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ValidatedData> {
+): Promise<ValidatedDataInterface> {
   if (!data.name) {
     return {
       isValid: false,

@@ -7,14 +7,9 @@ import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import Checkbox from "~/components/inputs/checkbox/checkbox";
 import Loader from "~/components/loader/loader";
-import ServerResponse from "~/interfaces/ServerResponse";
-import ValidatedData from "~/interfaces/ValidatedData";
 import { loader as companyLoader } from "~/routes/api/company/index";
-import { loader as classificationLoader } from "~/routes/api/classification/index";
 import Icon from "~/components/icon/icon";
 import { useFormik } from "formik";
-import { ClassificationForm } from "~/interfaces/forms/classification/ClassificationForm";
-import ClassificationFiltersForm from "~/interfaces/forms/classification/ClassificationFiltersForm";
 import { queryParamsFromObject } from "~/utils/utilities";
 import Pagination from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -24,6 +19,9 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
+import ServerResponseInterface from "~/shared/server-response-interface";
+import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ClassificationFiltersFormInterface, ClassificationFormInterface } from "~/components/page-components/classification/classification-finterfaces";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -38,20 +36,20 @@ export default function Classifications() {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponse<ValidatedData>
+    ServerResponseInterface<ValidatedDataInterface>
   >({});
-  const [companies, setCompanies] = useState<ServerResponse<Company[]>>({});
+  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
-    ServerResponse<TransactionClassification[]>
+    ServerResponseInterface<TransactionClassification[]>
   >({});
 
   const { companyData, classificationData } = useLoaderData<{
-    companyData: ServerResponse<Company[]>;
-    classificationData: ServerResponse<TransactionClassification[]>;
+    companyData: ServerResponseInterface<Company[]>;
+    classificationData: ServerResponseInterface<TransactionClassification[]>;
   }>();
 
-  const mainForm = useFormik<ClassificationForm>({
+  const mainForm = useFormik<ClassificationFormInterface>({
     initialValues: {
       id: "",
       name: "",
@@ -62,7 +60,7 @@ export default function Classifications() {
     onSubmit: () => {},
   });
 
-  const filterForm = useFormik<ClassificationFiltersForm>({
+  const filterForm = useFormik<ClassificationFiltersFormInterface>({
     initialValues: {
       name: "",
       company: null,
@@ -127,7 +125,7 @@ export default function Classifications() {
   const loadClassifications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponse<TransactionClassification[]>>(
+      const res = await axios.get<ServerResponseInterface<TransactionClassification[]>>(
         `/api/classification?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -178,7 +176,7 @@ export default function Classifications() {
     toast
       .promise(axiosRequest, {
         loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           setOpenAddModal(false);
           loadClassifications();
           setResponseErrors({});
@@ -214,7 +212,7 @@ export default function Classifications() {
       ),
       {
         loading: "Deleting classification",
-        success: (res: AxiosResponse<ServerResponse>) => {
+        success: (res: AxiosResponse<ServerResponseInterface>) => {
           loadClassifications();
           return res.data.message as string;
         },
