@@ -1,16 +1,16 @@
 import { Prisma, Transaction, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import { prisma } from "~/data/database/database.server";
-import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 import TransactionsWithTotals from "~/components/page-components/transaction/transactions-with-totals-interface";
 import { transactionCreateValidator, transactionDeleteValidator, transactionUpdateValidator } from "./transaction-Validator";
 import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
+import TransactionLoaderParamsInterface from "./transaction-query-params-interfaces";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 
 export async function list(
   user: User,
-  params: TransactionLoaderParams
+  params: TransactionLoaderParamsInterface
 ): Promise<ServerResponse<TransactionsWithTotals>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =

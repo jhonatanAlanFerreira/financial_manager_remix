@@ -1,10 +1,10 @@
 import { Prisma, TransactionClassification, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import ClassificationLoaderParams from "~/interfaces/queryParams/classification/ClassificationLoaderParams";
 import classificationCreateValidator, { classificationDeleteValidator, classificationUpdateValidator } from "./classification-validator";
 import { prisma } from "../database/database.server";
 import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
 import { ClassificationWithCompanyType } from "./classification-types";
+import ClassificationLoaderParamsInterface from "./classification-query-params-interfaces";
 
 type TransactionClassificationWhereInput =
   Prisma.TransactionClassificationWhereInput;
@@ -109,7 +109,7 @@ export async function update(
 
 export async function list(
   user: User,
-  params: ClassificationLoaderParams
+  params: ClassificationLoaderParamsInterface
 ): Promise<
   ServerResponse<TransactionClassification[] | ClassificationWithCompanyType[]>
 > {

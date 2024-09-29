@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import TransactionLoaderParamsInterface from "~/data/transaction/transaction-query-params-interfaces";
 import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
 import { create, list, remove, update } from "~/data/transaction/transaction.server";
-import TransactionLoaderParams from "~/interfaces/queryParams/transaction/TransactionLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -105,7 +105,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
-  const params: TransactionLoaderParams = {
+  const params: TransactionLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),

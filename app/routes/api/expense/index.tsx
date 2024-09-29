@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import ExpenseLoaderParamsInterface from "~/data/expense/expense-query-params-interfaces";
 import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "~/data/expense/expense-request-interfaces";
 import { create, list, remove, update } from "~/data/expense/expense.server";
-import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -19,7 +19,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
-  const params: ExpenseLoaderParams = {
+  const params: ExpenseLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),

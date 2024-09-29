@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import IncomeLoaderParamsInterface from "~/data/income/income-query-params-interfaces";
 import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
-import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -19,7 +19,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
-  const params: IncomeLoaderParams = {
+  const params: IncomeLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
