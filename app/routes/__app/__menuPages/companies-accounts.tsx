@@ -13,10 +13,10 @@ import InputText from "~/components/inputs/input-text/input-text";
 import Loader from "~/components/loader/loader";
 import AccountDropdown from "~/components/page-components/company-accounts/account-dropdown";
 import { useTitle } from "~/components/top-bar/title-context";
+import { CompanyWithAccountsType } from "~/data/company/company-types";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import CompanyForm from "~/interfaces/forms/company/CompanyForm";
-import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 
 export default function Companies() {
@@ -27,7 +27,7 @@ export default function Companies() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<
-    ServerResponse<CompanyWithAccounts[]>
+    ServerResponse<CompanyWithAccountsType[]>
   >({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponse<ValidatedData>

@@ -13,7 +13,6 @@ import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import IncomeFiltersForm from "~/interfaces/forms/income/IncomeFiltersForm";
 import { IncomeForm } from "~/interfaces/forms/income/IncomeForm";
-import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import Pagination from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
@@ -24,6 +23,7 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import InputText from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
+import { IncomeWithCompaniesType } from "~/data/income/income-types";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -48,7 +48,7 @@ export default function Incomes() {
 
   const { companyData, incomeData } = useLoaderData<{
     companyData: ServerResponse<Company[]>;
-    incomeData: ServerResponse<IncomeWithCompanies[]>;
+    incomeData: ServerResponse<IncomeWithCompaniesType[]>;
   }>();
 
   const mainForm = useFormik<IncomeForm>({

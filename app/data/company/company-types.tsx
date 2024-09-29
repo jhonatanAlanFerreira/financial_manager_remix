@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 
-export type CompanyWithAccounts = Prisma.CompanyGetPayload<{
+export type CompanyWithAccountsType = Prisma.CompanyGetPayload<{
   include: {
     accounts: true;
   };

@@ -1,8 +1,8 @@
 import { Account } from "@prisma/client";
-import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
+import { CompanyWithAccountsType } from "~/data/company/company-types";
 
 export default interface AccountDropdownPropsInterface {
-  company?: CompanyWithAccounts;
+  company?: CompanyWithAccountsType;
   userAccounts?: Account[];
   onSave: () => void;
   onAccountRemove: () => void;

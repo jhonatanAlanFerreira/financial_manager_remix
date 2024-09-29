@@ -1,10 +1,10 @@
 import { Income, Prisma, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
-import { IncomeWithCompanies } from "~/interfaces/prismaModelDetails/income";
 import IncomeLoaderParams from "~/interfaces/queryParams/income/IncomeLoaderParams";
 import { incomeCreateValidator, incomeDeleteValidator, incomeUpdateValidator } from "./income-validator";
 import { prisma } from "../database/database.server";
 import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
+import { IncomeWithCompaniesType } from "./income-types";
 
 type IncomeWhereInput = Prisma.IncomeWhereInput;
 
@@ -41,7 +41,7 @@ export async function create(
 export async function list(
   user: User,
   params: IncomeLoaderParams
-): Promise<ServerResponse<Income[] | IncomeWithCompanies[]>> {
+): Promise<ServerResponse<Income[] | IncomeWithCompaniesType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;

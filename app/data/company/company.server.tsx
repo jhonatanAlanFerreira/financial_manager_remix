@@ -2,17 +2,17 @@ import { Company, Prisma, User } from "@prisma/client";
 import ServerResponse from "~/interfaces/ServerResponse";
 import ValidatedData from "~/interfaces/ValidatedData";
 import CompanyLoaderParams from "~/interfaces/queryParams/company/CompanyLoaderParams";
-import { CompanyWithAccounts } from "~/interfaces/prismaModelDetails/company";
 import { prisma } from "../database/database.server";
 import { companyCreateValidator, companyDeleteValidator, companyUpdateValidator } from "./company-validator";
 import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
+import { CompanyWithAccountsType } from "./company-types";
 
 type CompanyWhereInput = Prisma.CompanyWhereInput;
 
 export async function list(
   user: User,
   params: CompanyLoaderParams
-): Promise<ServerResponse<Company[] | CompanyWithAccounts[]>> {
+): Promise<ServerResponse<Company[] | CompanyWithAccountsType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;

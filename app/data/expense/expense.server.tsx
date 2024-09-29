@@ -1,10 +1,10 @@
 import ServerResponse from "~/interfaces/ServerResponse";
 import { Expense, Prisma, User } from "@prisma/client";
-import { ExpenseWithCompanies } from "~/interfaces/prismaModelDetails/expense";
 import ExpenseLoaderParams from "~/interfaces/queryParams/expense/ExpenseLoaderParams";
 import { expenseCreateValidator, expenseDeleteValidator, expenseUpdateValidator } from "./expense-validator";
 import { prisma } from "../database/database.server";
 import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
+import { ExpenseWithCompaniesType } from "./expense-types";
 
 type ExpenseWhereInput = Prisma.ExpenseWhereInput;
 
@@ -41,7 +41,7 @@ export async function create(
 export async function list(
   user: User,
   params: ExpenseLoaderParams
-): Promise<ServerResponse<Expense[] | ExpenseWithCompanies[]>> {
+): Promise<ServerResponse<Expense[] | ExpenseWithCompaniesType[]>> {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
