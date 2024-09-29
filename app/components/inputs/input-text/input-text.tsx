@@ -1,6 +1,6 @@
 import { useId } from "react";
 import Icon from "~/components/icon/icon";
-import InputTextProps from "./input-text-props-interface";
+import InputTextPropsInterface from "./input-text-props-interface";
 
 export default function InputText({
   label,
@@ -8,7 +8,7 @@ export default function InputText({
   icon,
   onIconClicked,
   ...rest
-}: InputTextProps) {
+}: InputTextPropsInterface) {
   const inputId = useId();
 
   return (

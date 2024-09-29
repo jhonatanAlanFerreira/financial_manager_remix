@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import TitleContextProps from "./title-context-props-interface";
+import TitleContextPropsInterface from "./title-context-props-interface";
 
-const TitleContext = createContext<TitleContextProps>({
+const TitleContext = createContext<TitleContextPropsInterface>({
   title: { pageTitle: "" },
   setTitle: () => {},
 });

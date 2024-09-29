@@ -1,11 +1,11 @@
 import Icon from "~/components/icon/icon";
-import PrimaryButtonProps from "./primary-button-props-interface";
+import PrimaryButtonPropsInterface from "./primary-button-props-interface";
 
 export default function PrimaryButton({
   text,
   iconName,
   ...rest
-}: PrimaryButtonProps) {
+}: PrimaryButtonPropsInterface) {
   return (
     <button
       {...rest}

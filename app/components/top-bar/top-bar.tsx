@@ -1,9 +1,9 @@
 import Icon from "~/components/icon/icon";
 import { useTitle } from "./title-context";
 import TooltipIcon from "~/components/tooltip-icon/tooltip-icon";
-import TopBarProps from "./top-bar-props-interface";
+import TopBarPropsInterface from "./top-bar-props-interface";
 
-export default function TopBar({ updateSidebarOpen }: TopBarProps) {
+export default function TopBar({ updateSidebarOpen }: TopBarPropsInterface) {
   const { title } = useTitle();
 
   return (

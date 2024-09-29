@@ -320,6 +320,7 @@ export default function Classifications() {
                 <FilterTag
                   fieldName={config.fieldName}
                   closeBtn={config.closeBtn}
+
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
                     setReloadClassification(true);

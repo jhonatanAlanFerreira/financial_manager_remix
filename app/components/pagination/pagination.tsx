@@ -1,5 +1,5 @@
 import Icon from "~/components/icon/icon";
-import PaginationProps from "./pagination-props-interface";
+import PaginationPropsInterface from "./pagination-props-interface";
 
 export default function Pagination({
   currentPage,
@@ -7,7 +7,7 @@ export default function Pagination({
   optionsAmount,
   onPageChange,
   ...rest
-}: PaginationProps) {
+}: PaginationPropsInterface) {
   const calculatePaginationRange = (
     totalPages: number,
     optionsAmount: number,

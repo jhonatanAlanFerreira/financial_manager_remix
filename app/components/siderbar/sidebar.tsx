@@ -1,13 +1,13 @@
 import Icon from "~/components/icon/icon";
 import SidebarItem from "./sidebar-item";
 import { items } from "./sidebar-data";
-import SidebarProps from "./sidebar-props-interface";
+import SidebarPropsInterface from "./sidebar-props-interface";
 import { SidebarItemType } from "./sidebar-item-type";
 
 export default function Sidebar({
   sidebarOpen,
   updateSidebarOpen,
-}: SidebarProps) {
+}: SidebarPropsInterface) {
   return (
     <div
       className={`absolute z-10 text-white h-screen overflow-auto bg-violet-950 shadow-xl shadow-black transition-all duration-500 ease-in-out whitespace-nowrap ${

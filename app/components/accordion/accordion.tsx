@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Icon from "../icon/icon";
-import AccordionProps from "./accordion-props-interface";
+import AccordionPropsInterface from "./accordion-props-interface";
 
 export default function Accordion({
   title,
   titleIcons,
   children,
-}: AccordionProps) {
+}: AccordionPropsInterface) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {

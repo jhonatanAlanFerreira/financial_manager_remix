@@ -1,4 +1,4 @@
-import FilterTagProps from "./filter-tag-props-interface";
+import FilterTagPropsInterface from "./filter-tag-props-interface";
 
 export default function FilterTag({
   label,
@@ -7,7 +7,7 @@ export default function FilterTag({
   closeBtn,
   onClose,
   ...rest
-}: FilterTagProps) {
+}: FilterTagPropsInterface) {
   return (
     <div className="flex space-x-2">
       <div
