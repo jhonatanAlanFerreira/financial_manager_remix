@@ -43,7 +43,7 @@ import {
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
-export function Transactions() {
+export default function Transactions() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

@@ -26,7 +26,7 @@ import {
   ClassificationFormInterface,
 } from "~/components/page-components/classification/classification-finterfaces";
 
-export function Classifications() {
+export default function Classifications() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

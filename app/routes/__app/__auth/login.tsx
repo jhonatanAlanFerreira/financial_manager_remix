@@ -10,7 +10,7 @@ import { NavigationLoader } from "~/components/navigation-loader/navigation-load
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
-export function Login() {
+export default function Login() {
   const [responseErrors, setResponseErrors] = useState<
     ServerResponseInterface<ValidatedDataInterface>
   >({});

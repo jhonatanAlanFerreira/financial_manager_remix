@@ -6,7 +6,7 @@ import { useTitle } from "~/components/top-bar/title-context";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
-export function Index() {
+export default function Index() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

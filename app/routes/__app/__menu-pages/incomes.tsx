@@ -27,7 +27,7 @@ import {
   IncomeFormInterface,
 } from "~/components/page-components/income/income-interfaces";
 
-export function Incomes() {
+export default function Incomes() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

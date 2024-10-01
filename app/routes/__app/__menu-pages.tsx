@@ -5,7 +5,7 @@ import { Sidebar } from "~/components/siderbar/sidebar";
 import { TitleProvider } from "~/components/top-bar/title-context";
 import { TopBar } from "~/components/top-bar/top-bar";
 
-export function App() {
+export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const updateSidebarOpen = (value: boolean) => {

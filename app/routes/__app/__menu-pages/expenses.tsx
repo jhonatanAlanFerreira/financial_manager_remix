@@ -26,7 +26,7 @@ import {
   ExpenseFormInterface,
 } from "~/components/page-components/expense/expense-interfaces";
 
-export function Expenses() {
+export default function Expenses() {
   const { setTitle } = useTitle();
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);

@@ -19,7 +19,7 @@ import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
-export function Companies() {
+export default function Companies() {
   const { setTitle } = useTitle();
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
