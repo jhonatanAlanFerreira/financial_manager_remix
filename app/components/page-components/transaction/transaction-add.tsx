@@ -8,14 +8,14 @@ import {
 import { Form } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import Checkbox from "~/components/inputs/checkbox/checkbox";
-import InputSelect from "~/components/inputs/input-select/input-select";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
+import { Checkbox } from "~/components/inputs/checkbox/checkbox";
+import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
-export default function TransactionAdd({
+export function TransactionAdd({
   companies,
   expenses,
   incomes,

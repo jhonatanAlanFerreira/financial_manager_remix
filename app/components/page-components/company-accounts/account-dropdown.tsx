@@ -2,14 +2,14 @@ import { useFormik } from "formik";
 import { Form } from "@remix-run/react";
 import { useState } from "react";
 import { Modal } from "react-responsive-modal";
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { Account } from "@prisma/client";
-import AddButton from "~/components/buttons/add-button/add-button";
+import { AddButton } from "~/components/buttons/add-button/add-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
@@ -17,7 +17,7 @@ import {
   AccountFormInterface,
 } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 
-export default function AccountDropdown({
+export function AccountDropdown({
   company,
   userAccounts,
   onSave,

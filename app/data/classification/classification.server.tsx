@@ -4,7 +4,8 @@ import {
   ClassificationCreateRequestInterface,
   ClassificationUpdateRequestInterface,
 } from "~/data/classification/classification-request-interfaces";
-import classificationCreateValidator, {
+import {
+  classificationCreateValidator,
   classificationDeleteValidator,
   classificationUpdateValidator,
 } from "~/data/classification/classification-validator";

@@ -3,22 +3,22 @@ import { useEffect, useState } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
 import toast from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
-import Checkbox from "~/components/inputs/checkbox/checkbox";
+import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import Loader from "~/components/loader/loader";
+import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { Company, Expense } from "@prisma/client";
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
-import Pagination from "~/components/pagination/pagination";
+import { Pagination } from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { ExpenseFilterTagsConfig } from "~/components/page-components/expense/expense-filter-tags-config";
-import FilterTag from "~/components/filter-tag/filter-tag";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
+import { FilterTag } from "~/components/filter-tag/filter-tag";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
-import InputSelect from "~/components/inputs/input-select/input-select";
+import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
@@ -26,7 +26,7 @@ import {
   ExpenseFormInterface,
 } from "~/components/page-components/expense/expense-interfaces";
 
-export default function Expenses() {
+export function Expenses() {
   const { setTitle } = useTitle();
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);

@@ -1,6 +1,6 @@
 import { FilterTagPropsInterface } from "~/components/filter-tag/filter-tag-props-interface";
 
-export default function FilterTag({
+export function FilterTag({
   label,
   fieldName,
   value,

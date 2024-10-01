@@ -1,7 +1,7 @@
-import React, { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Select, { StylesConfig, Props as SelectProps } from "react-select";
 
-export default function InputSelect({ ...rest }: SelectProps) {
+export function InputSelect({ ...rest }: SelectProps) {
   const inputId = useId();
   const [hasValue, setHasValue] = useState<boolean>(false);
   const selectRef = useRef(null);

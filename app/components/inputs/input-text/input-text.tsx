@@ -1,5 +1,5 @@
 import { useId } from "react";
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import { InputTextPropsInterface } from "~/components/inputs/input-text/input-text-props-interface";
 
 export function InputText({

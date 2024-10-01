@@ -1,8 +1,8 @@
 import { useNavigation } from "@remix-run/react";
 import { ReactNode } from "react";
-import Loader from "~/components/loader/loader";
+import { Loader } from "~/components/loader/loader";
 
-export default function NavigationLoader({
+export function NavigationLoader({
   children,
 }: {
   children: ReactNode;

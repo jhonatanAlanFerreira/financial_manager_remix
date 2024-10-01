@@ -6,12 +6,12 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
-import Accordion from "~/components/accordion/accordion";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
+import { Accordion } from "~/components/accordion/accordion";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
-import Loader from "~/components/loader/loader";
-import AccountDropdown from "~/components/page-components/company-accounts/account-dropdown";
+import { Loader } from "~/components/loader/loader";
+import { AccountDropdown } from "~/components/page-components/company-accounts/account-dropdown";
 import { CompanyFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
 import { CompanyWithAccountsType } from "~/data/company/company-types";
@@ -19,7 +19,7 @@ import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
-export default function Companies() {
+export function Companies() {
   const { setTitle } = useTitle();
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);

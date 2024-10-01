@@ -1,10 +1,10 @@
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import { SidebarPropsInterface } from "~/components/siderbar/sidebar-props-interface";
 import { SidebarItemType } from "~/components/siderbar/sidebar-item-type";
-import SidebarItem from "~/components/siderbar/sidebar-item";
+import { SidebarItem } from "~/components/siderbar/sidebar-item";
 import { items } from "~/components/siderbar/sidebar-data";
 
-export default function Sidebar({
+export function Sidebar({
   sidebarOpen,
   updateSidebarOpen,
 }: SidebarPropsInterface) {

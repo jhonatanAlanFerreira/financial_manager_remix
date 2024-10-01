@@ -6,19 +6,19 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
-import Icon from "~/components/icon/icon";
-import Checkbox from "~/components/inputs/checkbox/checkbox";
-import Loader from "~/components/loader/loader";
+import { Icon } from "~/components/icon/icon";
+import { Checkbox } from "~/components/inputs/checkbox/checkbox";
+import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
-import Pagination from "~/components/pagination/pagination";
+import { Pagination } from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { IncomeFilterTagsConfig } from "~/components/page-components/income/income-filter-tags-config";
-import FilterTag from "~/components/filter-tag/filter-tag";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
+import { FilterTag } from "~/components/filter-tag/filter-tag";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
-import InputSelect from "~/components/inputs/input-select/input-select";
+import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { IncomeWithCompaniesType } from "~/data/income/income-types";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
@@ -27,7 +27,7 @@ import {
   IncomeFormInterface,
 } from "~/components/page-components/income/income-interfaces";
 
-export default function Incomes() {
+export function Incomes() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

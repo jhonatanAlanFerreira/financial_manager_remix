@@ -12,13 +12,13 @@ import axios, { AxiosResponse, isAxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
-import Loader from "~/components/loader/loader";
+import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import {
   firstDayOfCurrentMonth,
   formatDate,
@@ -27,14 +27,14 @@ import {
   todayFormatedDate,
 } from "~/utils/utilities";
 import { useFormik } from "formik";
-import Pagination from "~/components/pagination/pagination";
+import { Pagination } from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
 import { TransactionFilterTagsConfig } from "~/components/page-components/transaction/transaction-filter-tags-config";
-import FilterTag from "~/components/filter-tag/filter-tag";
-import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import DangerButton from "~/components/buttons/danger-button/danger-button";
-import TransactionAdd from "~/components/page-components/transaction/transaction-add";
-import TransactionFilters from "~/components/page-components/transaction/transaction-filters";
+import { FilterTag } from "~/components/filter-tag/filter-tag";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
+import { DangerButton } from "~/components/buttons/danger-button/danger-button";
+import { TransactionAdd } from "~/components/page-components/transaction/transaction-add";
+import { TransactionFilters } from "~/components/page-components/transaction/transaction-filters";
 import {
   TransactionFiltersFormInterface,
   TransactionFormInterface,
@@ -43,7 +43,7 @@ import {
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
-export default function Transactions() {
+export function Transactions() {
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);

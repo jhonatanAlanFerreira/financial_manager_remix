@@ -6,7 +6,7 @@ import {
 } from "~/data/classification/classification-request-interfaces";
 import { prisma } from "~/data/database/database.server";
 
-export default async function classificationCreateValidator(
+export async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
   user: User
 ): Promise<ValidatedDataInterface> {

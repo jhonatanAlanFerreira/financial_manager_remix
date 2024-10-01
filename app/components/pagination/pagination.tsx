@@ -1,7 +1,7 @@
-import Icon from "~/components/icon/icon";
+import { Icon } from "~/components/icon/icon";
 import { PaginationPropsInterface } from "~/components/pagination/pagination-props-interface";
 
-export default function Pagination({
+export function Pagination({
   currentPage,
   totalPages,
   optionsAmount,
