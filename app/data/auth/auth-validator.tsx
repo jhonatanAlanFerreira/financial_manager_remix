@@ -1,6 +1,9 @@
-import ValidatedDataInterface from "~/shared/validated-data-interface";
-import { prisma } from "../database/database.server";
-import { LoginRequestInterface, SignupRequestInterface } from "./auth-request-interfaces";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  LoginRequestInterface,
+  SignupRequestInterface,
+} from "~/data/auth/auth-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export async function loginValidator(
   data: LoginRequestInterface

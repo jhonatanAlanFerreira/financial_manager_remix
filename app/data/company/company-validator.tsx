@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  CompanyCreateRequestInterface,
+  CompanyUpdateRequestInterface,
+} from "~/data/company/company-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,

@@ -1,7 +1,14 @@
-import { Account, Company, Expense, Income, Transaction, TransactionClassification } from "@prisma/client";
+import {
+  Account,
+  Company,
+  Expense,
+  Income,
+  Transaction,
+  TransactionClassification,
+} from "@prisma/client";
 import { FormikProps } from "formik";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export interface TransactionFiltersFormInterface {
   name: string;

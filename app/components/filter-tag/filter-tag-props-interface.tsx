@@ -1,6 +1,6 @@
 import { HTMLAttributes } from "react";
 
-export default interface FilterTagPropsInterface extends HTMLAttributes<HTMLDivElement> {
+export interface FilterTagPropsInterface extends HTMLAttributes<HTMLDivElement> {
   label: string;
   fieldName: string;
   value: string;

@@ -5,10 +5,10 @@ import toast from "react-hot-toast";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import Icon from "~/components/icon/icon";
 import InputPassword from "~/components/inputs/input-password/input-password";
-import InputText from "~/components/inputs/input-text/input-text";
+import { InputText } from "~/components/inputs/input-text/input-text";
 import NavigationLoader from "~/components/navigation-loader/navigation-loader";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Signup() {
   const [responseErrors, setResponseErrors] = useState<

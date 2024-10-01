@@ -1,10 +1,14 @@
-import { Prisma, Transaction, User } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
-import { transactionCreateValidator, transactionDeleteValidator, transactionUpdateValidator } from "./transaction-Validator";
-import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
-import TransactionLoaderParamsInterface from "./transaction-query-params-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
+import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
+import {
+  transactionCreateValidator,
+  transactionDeleteValidator,
+  transactionUpdateValidator,
+} from "~/data/transaction/transaction-Validator";
 
 type TransactionWhereInput = Prisma.TransactionWhereInput;
 

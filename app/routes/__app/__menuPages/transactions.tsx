@@ -35,9 +35,13 @@ import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import TransactionAdd from "~/components/page-components/transaction/transaction-add";
 import TransactionFilters from "~/components/page-components/transaction/transaction-filters";
-import { TransactionFiltersFormInterface, TransactionFormInterface, TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import {
+  TransactionFiltersFormInterface,
+  TransactionFormInterface,
+  TransactionsWithTotalsInterface,
+} from "~/components/page-components/transaction/transaction-interfaces";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -61,10 +65,16 @@ export default function Transactions() {
   const [classifications, setClassifications] = useState<
     ServerResponseInterface<TransactionClassification[]>
   >({});
-  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
   const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>({});
-  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
+    {}
+  );
+  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
+    {}
+  );
 
   const [responseErrors, setResponseErrors] = useState<
     ServerResponseInterface<ValidatedDataInterface>
@@ -215,7 +225,9 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponseInterface<TransactionsWithTotalsInterface>>(
+      const res = await axios.get<
+        ServerResponseInterface<TransactionsWithTotalsInterface>
+      >(
         `/api/transaction?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`

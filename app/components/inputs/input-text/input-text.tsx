@@ -1,8 +1,8 @@
 import { useId } from "react";
 import Icon from "~/components/icon/icon";
-import InputTextPropsInterface from "./input-text-props-interface";
+import { InputTextPropsInterface } from "~/components/inputs/input-text/input-text-props-interface";
 
-export default function InputText({
+export function InputText({
   label,
   errorMessage,
   icon,

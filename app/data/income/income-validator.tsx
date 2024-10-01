@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  IncomeCreateRequestInterface,
+  IncomeUpdateRequestInterface,
+} from "~/data/income/income-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,

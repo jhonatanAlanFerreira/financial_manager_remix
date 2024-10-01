@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  ExpenseCreateRequestInterface,
+  ExpenseUpdateRequestInterface,
+} from "~/data/expense/expense-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export async function expenseCreateValidator(
   data: ExpenseCreateRequestInterface,

@@ -17,11 +17,14 @@ import { ClassificationFilterTagsConfig } from "~/components/page-components/cla
 import FilterTag from "~/components/filter-tag/filter-tag";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
-import InputText from "~/components/inputs/input-text/input-text";
+import { InputText } from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
-import { ClassificationFiltersFormInterface, ClassificationFormInterface } from "~/components/page-components/classification/classification-finterfaces";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  ClassificationFiltersFormInterface,
+  ClassificationFormInterface,
+} from "~/components/page-components/classification/classification-finterfaces";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -38,7 +41,9 @@ export default function Classifications() {
   const [responseErrors, setResponseErrors] = useState<
     ServerResponseInterface<ValidatedDataInterface>
   >({});
-  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
     ServerResponseInterface<TransactionClassification[]>
@@ -125,7 +130,9 @@ export default function Classifications() {
   const loadClassifications = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponseInterface<TransactionClassification[]>>(
+      const res = await axios.get<
+        ServerResponseInterface<TransactionClassification[]>
+      >(
         `/api/classification?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -318,7 +325,6 @@ export default function Classifications() {
                 <FilterTag
                   fieldName={config.fieldName}
                   closeBtn={config.closeBtn}
-
                   onClose={(fieldName) => {
                     filterForm.setFieldValue(fieldName, "");
                     setReloadClassification(true);

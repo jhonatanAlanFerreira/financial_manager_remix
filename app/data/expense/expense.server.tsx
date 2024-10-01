@@ -1,10 +1,17 @@
 import { Expense, Prisma, User } from "@prisma/client";
-import { expenseCreateValidator, expenseDeleteValidator, expenseUpdateValidator } from "./expense-validator";
-import { prisma } from "../database/database.server";
-import { ExpenseCreateRequestInterface, ExpenseUpdateRequestInterface } from "./expense-request-interfaces";
-import { ExpenseWithCompaniesType } from "./expense-types";
-import ExpenseLoaderParamsInterface from "./expense-query-params-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import {
+  ExpenseCreateRequestInterface,
+  ExpenseUpdateRequestInterface,
+} from "~/data/expense/expense-request-interfaces";
+import {
+  expenseCreateValidator,
+  expenseDeleteValidator,
+  expenseUpdateValidator,
+} from "~/data/expense/expense-validator";
+import { ExpenseLoaderParamsInterface } from "~/data/expense/expense-query-params-interfaces";
+import { ExpenseWithCompaniesType } from "~/data/expense/expense-types";
+import { prisma } from "~/data/database/database.server";
 
 type ExpenseWhereInput = Prisma.ExpenseWhereInput;
 

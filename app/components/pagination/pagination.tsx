@@ -1,5 +1,5 @@
 import Icon from "~/components/icon/icon";
-import PaginationPropsInterface from "./pagination-props-interface";
+import { PaginationPropsInterface } from "~/components/pagination/pagination-props-interface";
 
 export default function Pagination({
   currentPage,
@@ -37,7 +37,10 @@ export default function Pagination({
   return (
     <>
       {!!totalPages && (
-        <div {...rest} className={`flex flex-wrap text-violet-950 ${rest.className}`}>
+        <div
+          {...rest}
+          className={`flex flex-wrap text-violet-950 ${rest.className}`}
+        >
           {currentPage != 1 && (
             <button
               onClick={() => onPageChange(--currentPage)}

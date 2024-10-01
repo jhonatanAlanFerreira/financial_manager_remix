@@ -1,7 +1,10 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
-import IncomeLoaderParamsInterface from "~/data/income/income-query-params-interfaces";
-import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "~/data/income/income-request-interfaces";
+import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
+import {
+  IncomeCreateRequestInterface,
+  IncomeUpdateRequestInterface,
+} from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
 
 export let action = async ({ request }: ActionFunctionArgs) => {

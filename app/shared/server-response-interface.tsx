@@ -1,4 +1,4 @@
-export default interface ServerResponseInterface<T = any> {
+export interface ServerResponseInterface<T = any> {
   error?: boolean;
   message?: string;
   data?: T;

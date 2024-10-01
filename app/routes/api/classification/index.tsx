@@ -1,8 +1,16 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
-import ClassificationLoaderParamsInterface from "~/data/classification/classification-query-params-interfaces";
-import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "~/data/classification/Classification-request-interfaces";
-import { create, list, remove, update } from "~/data/classification/classification.server";
+import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
+import {
+  ClassificationCreateRequestInterface,
+  ClassificationUpdateRequestInterface,
+} from "~/data/classification/classification-request-interfaces";
+import {
+  create,
+  list,
+  remove,
+  update,
+} from "~/data/classification/classification.server";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {

@@ -1,6 +1,6 @@
 import { Company } from "@prisma/client";
 
-export default interface ExpenseFiltersFormInterface {
+export interface ExpenseFiltersFormInterface {
   name: string;
   amount_greater: number;
   amount_less: number;

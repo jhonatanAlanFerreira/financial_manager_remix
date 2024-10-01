@@ -1,4 +1,4 @@
-import LoaderPropsInterface from "./loader-props-interface";
+import { LoaderPropsInterface } from "~/components/loader/loader-props-interface";
 
 export default function Loader({ children, loading }: LoaderPropsInterface) {
   return (

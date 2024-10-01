@@ -1,8 +1,15 @@
 import { Account, User } from "@prisma/client";
-import { accountCreateValidator, accountDeleteValidator, accountUpdateValidator } from "./account-validator";
-import { prisma } from "../database/database.server";
-import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "./account-request-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import {
+  AccountCreateRequestInterface,
+  AccountUpdateRequestInterface,
+} from "~/data/account/account-request-interfaces";
+import {
+  accountCreateValidator,
+  accountDeleteValidator,
+  accountUpdateValidator,
+} from "~/data/account/account-validator";
+import { prisma } from "~/data/database/database.server";
 
 export async function create(
   data: AccountCreateRequestInterface,

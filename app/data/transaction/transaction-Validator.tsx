@@ -1,9 +1,13 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "./transaction-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
 
-export async function transactionCreateValidator (
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  TransactionCreateRequestInterface,
+  TransactionUpdateRequestInterface,
+} from "~/data/transaction/transaction-request-interfaces";
+import { prisma } from "~/data/database/database.server";
+
+export async function transactionCreateValidator(
   data: TransactionCreateRequestInterface,
   user: User
 ): Promise<ValidatedDataInterface> {

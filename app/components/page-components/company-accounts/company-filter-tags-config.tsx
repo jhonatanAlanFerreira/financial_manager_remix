@@ -1,4 +1,4 @@
-import { CompanyFiltersFormInterface } from "./company-accounts-interfaces";
+import { CompanyFiltersFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 
 export const CompanyFilterTagsConfig: {
   fieldName: keyof CompanyFiltersFormInterface;

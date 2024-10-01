@@ -1,10 +1,17 @@
 import { Income, Prisma, User } from "@prisma/client";
-import { incomeCreateValidator, incomeDeleteValidator, incomeUpdateValidator } from "./income-validator";
-import { prisma } from "../database/database.server";
-import { IncomeCreateRequestInterface, IncomeUpdateRequestInterface } from "./income-request-interfaces";
-import { IncomeWithCompaniesType } from "./income-types";
-import IncomeLoaderParamsInterface from "./income-query-params-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import {
+  IncomeCreateRequestInterface,
+  IncomeUpdateRequestInterface,
+} from "~/data/income/income-request-interfaces";
+import {
+  incomeCreateValidator,
+  incomeDeleteValidator,
+  incomeUpdateValidator,
+} from "~/data/income/income-validator";
+import { prisma } from "~/data/database/database.server";
+import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
+import { IncomeWithCompaniesType } from "~/data/income/income-types";
 
 type IncomeWhereInput = Prisma.IncomeWhereInput;
 

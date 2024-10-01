@@ -1,6 +1,6 @@
-import { SidebarItemType } from "./sidebar-item-type";
+import { SidebarItemType } from "~/components/siderbar/sidebar-item-type";
 
-export default interface SidebarItemPropsInterface {
+export interface SidebarItemPropsInterface {
   item: SidebarItemType;
   updateSidebarOpen: (value: boolean) => void;
 }

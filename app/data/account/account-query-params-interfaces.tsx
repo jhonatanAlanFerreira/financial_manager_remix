@@ -1,5 +1,6 @@
-import PaginationParamsInterface from "~/shared/pagination-params-interface";
+import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 
-export default interface AccountLoaderParamsInterface extends PaginationParamsInterface {
+export interface AccountLoaderParamsInterface
+  extends PaginationParamsInterface {
   name: string | null;
 }

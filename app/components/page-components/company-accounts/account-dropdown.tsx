@@ -7,12 +7,15 @@ import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { Account } from "@prisma/client";
 import AddButton from "~/components/buttons/add-button/add-button";
-import InputText from "~/components/inputs/input-text/input-text";
+import { InputText } from "~/components/inputs/input-text/input-text";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
-import { AccountDropdownPropsInterface, AccountFormInterface } from "./company-accounts-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import {
+  AccountDropdownPropsInterface,
+  AccountFormInterface,
+} from "~/components/page-components/company-accounts/company-accounts-interfaces";
 
 export default function AccountDropdown({
   company,

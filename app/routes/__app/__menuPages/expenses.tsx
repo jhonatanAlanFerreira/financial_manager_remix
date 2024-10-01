@@ -17,11 +17,14 @@ import { ExpenseFilterTagsConfig } from "~/components/page-components/expense/ex
 import FilterTag from "~/components/filter-tag/filter-tag";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
-import InputText from "~/components/inputs/input-text/input-text";
+import { InputText } from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
-import ExpenseFiltersFormInterface, { ExpenseFormInterface } from "~/components/page-components/expense/expense-interfaces";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  ExpenseFiltersFormInterface,
+  ExpenseFormInterface,
+} from "~/components/page-components/expense/expense-interfaces";
 
 export default function Expenses() {
   const { setTitle } = useTitle();
@@ -33,8 +36,12 @@ export default function Expenses() {
   const [searchParams, setSearchParams] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>({});
-  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
+    {}
+  );
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
     ServerResponseInterface<ValidatedDataInterface>

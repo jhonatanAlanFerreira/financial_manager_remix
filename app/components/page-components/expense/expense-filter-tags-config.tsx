@@ -1,4 +1,4 @@
-import ExpenseFiltersFormInterface from "./expense-interfaces";
+import { ExpenseFiltersFormInterface } from "~/components/page-components/expense/expense-interfaces";
 
 export const ExpenseFilterTagsConfig: {
   fieldName: keyof ExpenseFiltersFormInterface;

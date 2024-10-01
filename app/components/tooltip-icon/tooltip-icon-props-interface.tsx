@@ -1,3 +1,3 @@
-export default interface TooltipIconPropsInterface {
+export interface TooltipIconPropsInterface {
   message: string;
 }

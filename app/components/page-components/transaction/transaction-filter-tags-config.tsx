@@ -1,5 +1,5 @@
 import { formatDate } from "~/utils/utilities";
-import { TransactionFiltersFormInterface } from "./transaction-interfaces";
+import { TransactionFiltersFormInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
 export const TransactionFilterTagsConfig: {
   fieldName: keyof TransactionFiltersFormInterface;

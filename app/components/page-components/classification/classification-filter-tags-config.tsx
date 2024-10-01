@@ -1,4 +1,4 @@
-import { ClassificationFiltersFormInterface } from "./classification-finterfaces";
+import { ClassificationFiltersFormInterface } from "~/components/page-components/classification/classification-finterfaces";
 
 export const ClassificationFilterTagsConfig: {
   fieldName: keyof ClassificationFiltersFormInterface;

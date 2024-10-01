@@ -1,5 +1,5 @@
-import InputTextPropsInterface from "../input-text/input-text-props-interface";
+import { InputTextPropsInterface } from "~/components/inputs/input-text/input-text-props-interface";
 
-export default interface InputPasswordPropsInterface extends InputTextPropsInterface {
+export interface InputPasswordPropsInterface extends InputTextPropsInterface {
   showEyeIcon?: boolean;
 }

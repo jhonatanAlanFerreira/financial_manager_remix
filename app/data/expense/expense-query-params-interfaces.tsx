@@ -1,6 +1,6 @@
-import PaginationParamsInterface from "~/shared/pagination-params-interface";
+import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 
-export default interface ExpenseLoaderParamsInterface extends PaginationParamsInterface {
+export interface ExpenseLoaderParamsInterface extends PaginationParamsInterface {
   name: string | null;
   is_personal_or_company: "personal" | "company" | "all";
   amount_greater: number | null;

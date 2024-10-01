@@ -1,4 +1,4 @@
-import { IncomeFiltersFormInterface } from "./income-interfaces";
+import { IncomeFiltersFormInterface } from "~/components/page-components/income/income-interfaces";
 
 export const IncomeFilterTagsConfig: {
   fieldName: keyof IncomeFiltersFormInterface;

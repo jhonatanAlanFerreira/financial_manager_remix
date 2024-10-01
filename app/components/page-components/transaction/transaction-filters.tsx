@@ -2,8 +2,8 @@ import { Company, Expense, Income } from "@prisma/client";
 import { useEffect, useState } from "react";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import InputSelect from "~/components/inputs/input-select/input-select";
-import InputText from "~/components/inputs/input-text/input-text";
-import { TransactionFiltersPropsInterface } from "./transaction-interfaces";
+import { InputText } from "~/components/inputs/input-text/input-text";
+import { TransactionFiltersPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
 export default function TransactionFilters({
   companies,

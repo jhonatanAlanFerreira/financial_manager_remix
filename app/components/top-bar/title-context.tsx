@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import TitleContextPropsInterface from "./title-context-props-interface";
+import { TitleContextPropsInterface } from "~/components/top-bar/title-context-props-interface";
 
 const TitleContext = createContext<TitleContextPropsInterface>({
   title: { pageTitle: "" },

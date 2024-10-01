@@ -17,12 +17,15 @@ import { IncomeFilterTagsConfig } from "~/components/page-components/income/inco
 import FilterTag from "~/components/filter-tag/filter-tag";
 import PrimaryButton from "~/components/buttons/primary-button/primary-button";
 import DangerButton from "~/components/buttons/danger-button/danger-button";
-import InputText from "~/components/inputs/input-text/input-text";
+import { InputText } from "~/components/inputs/input-text/input-text";
 import InputSelect from "~/components/inputs/input-select/input-select";
 import { IncomeWithCompaniesType } from "~/data/income/income-types";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
-import { IncomeFiltersFormInterface, IncomeFormInterface } from "~/components/page-components/income/income-interfaces";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  IncomeFiltersFormInterface,
+  IncomeFormInterface,
+} from "~/components/page-components/income/income-interfaces";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -34,7 +37,9 @@ export default function Incomes() {
   const [reloadIncomes, setReloadIncomes] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [companies, setCompanies] = useState<ServerResponseInterface<Company[]>>({});
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
   const [responseErrors, setResponseErrors] = useState<
     ServerResponseInterface<ValidatedDataInterface>
   >({});

@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { AccountCreateRequestInterface, AccountUpdateRequestInterface } from "./account-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  AccountCreateRequestInterface,
+  AccountUpdateRequestInterface,
+} from "~/data/account/account-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,

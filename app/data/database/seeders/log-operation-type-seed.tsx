@@ -1,4 +1,4 @@
-import { prisma } from "../database.server";
+import { prisma } from "~/data/database/database.server";
 
 export default async function main() {
   await prisma.logOperationType.upsert({

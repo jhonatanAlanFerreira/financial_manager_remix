@@ -1,7 +1,10 @@
 import { User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import {
+  ClassificationCreateRequestInterface,
+  ClassificationUpdateRequestInterface,
+} from "~/data/classification/classification-request-interfaces";
+import { prisma } from "~/data/database/database.server";
 
 export default async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,

@@ -1,7 +1,10 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
-import CompanyLoaderParamsInterface from "~/data/company/company-query-params-interfaces";
-import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "~/data/company/company-request-interfaces";
+import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
+import {
+  CompanyCreateRequestInterface,
+  CompanyUpdateRequestInterface,
+} from "~/data/company/company-request-interfaces";
 import { create, list, remove, update } from "~/data/company/company.server";
 
 export let action = async ({ request }: ActionFunctionArgs) => {

@@ -1,10 +1,16 @@
 import { Prisma, TransactionClassification, User } from "@prisma/client";
-import classificationCreateValidator, { classificationDeleteValidator, classificationUpdateValidator } from "./classification-validator";
-import { prisma } from "../database/database.server";
-import { ClassificationCreateRequestInterface, ClassificationUpdateRequestInterface } from "./Classification-request-interfaces";
-import { ClassificationWithCompanyType } from "./classification-types";
-import ClassificationLoaderParamsInterface from "./classification-query-params-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import {
+  ClassificationCreateRequestInterface,
+  ClassificationUpdateRequestInterface,
+} from "~/data/classification/classification-request-interfaces";
+import classificationCreateValidator, {
+  classificationDeleteValidator,
+  classificationUpdateValidator,
+} from "~/data/classification/classification-validator";
+import { prisma } from "~/data/database/database.server";
+import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
+import { ClassificationWithCompanyType } from "~/data/classification/classification-types";
 
 type TransactionClassificationWhereInput =
   Prisma.TransactionClassificationWhereInput;
@@ -111,7 +117,9 @@ export async function list(
   user: User,
   params: ClassificationLoaderParamsInterface
 ): Promise<
-  ServerResponseInterface<TransactionClassification[] | ClassificationWithCompanyType[]>
+  ServerResponseInterface<
+    TransactionClassification[] | ClassificationWithCompanyType[]
+  >
 > {
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =

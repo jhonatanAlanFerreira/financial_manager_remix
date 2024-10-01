@@ -1,7 +1,7 @@
 import { Tooltip } from "react-tooltip";
 import Icon from "~/components/icon/icon";
 import { useId } from "react";
-import TooltipIconPropsInterface from "./tooltip-icon-props-interface";
+import { TooltipIconPropsInterface } from "~/components/tooltip-icon/tooltip-icon-props-interface";
 
 export default function TooltipIcon({ message }: TooltipIconPropsInterface) {
   const tooltipId = useId();

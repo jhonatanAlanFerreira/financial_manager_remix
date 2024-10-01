@@ -1,11 +1,18 @@
 import { Company, Prisma, User } from "@prisma/client";
-import { prisma } from "../database/database.server";
-import { companyCreateValidator, companyDeleteValidator, companyUpdateValidator } from "./company-validator";
-import { CompanyCreateRequestInterface, CompanyUpdateRequestInterface } from "./company-request-interfaces";
-import { CompanyWithAccountsType } from "./company-types";
-import CompanyLoaderParamsInterface from "./company-query-params-interfaces";
-import ServerResponseInterface from "~/shared/server-response-interface";
-import ValidatedDataInterface from "~/shared/validated-data-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
+import { CompanyWithAccountsType } from "~/data/company/company-types";
+import { prisma } from "~/data/database/database.server";
+import {
+  CompanyCreateRequestInterface,
+  CompanyUpdateRequestInterface,
+} from "~/data/company/company-request-interfaces";
+import {
+  companyCreateValidator,
+  companyDeleteValidator,
+  companyUpdateValidator,
+} from "~/data/company/company-validator";
 
 type CompanyWhereInput = Prisma.CompanyWhereInput;
 
