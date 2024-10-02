@@ -58,3 +58,12 @@ export function firstDayOfCurrentMonth() {
 export function lastDayOfCurrentMonth() {
   return moment().endOf("month").format("YYYY-MM-DD");
 }
+
+export function getBaseUrl() {
+  const port = process.env.APP_PORT;
+  const host =
+    process.env.NODE_ENV === "production"
+      ? process.env.APP_URL
+      : `localhost:${port}`;
+  return `http://${host}`;
+}

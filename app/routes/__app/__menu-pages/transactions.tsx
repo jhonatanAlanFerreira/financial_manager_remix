@@ -627,7 +627,7 @@ export async function loader(request: LoaderFunctionArgs) {
     expenseLoader(request),
     classificationLoader(request),
     incomeLoader(request),
-    userAccountLoader(request, false),
+    userAccountLoader(request),
   ]);
 
   return {

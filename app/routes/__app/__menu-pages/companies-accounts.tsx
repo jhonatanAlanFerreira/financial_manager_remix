@@ -320,6 +320,6 @@ export default function Companies() {
 
 export async function loader(request: LoaderFunctionArgs) {
   return {
-    userAccountData: await userAccountLoader(request),
+    userAccountData: await userAccountLoader(request, true),
   };
 }
