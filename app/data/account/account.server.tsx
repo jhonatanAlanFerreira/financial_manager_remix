@@ -6,7 +6,7 @@ import {
 } from "~/data/account/account-request-interfaces";
 import {
   accountCreateValidator,
-  accountDeleteValidator,
+  accountRemoveValidator,
   accountUpdateValidator,
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
@@ -15,13 +15,12 @@ export async function create(
   data: AccountCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountCreateValidator(data, user);
+  const serverError = await accountCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -61,13 +60,12 @@ export async function remove(
   classificationId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountDeleteValidator(user, classificationId);
+  const serverError = await accountRemoveValidator(user, classificationId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      errors: serverError,
       message: "Classification not found",
-      data: dataIsValid,
     };
   }
 
@@ -87,13 +85,12 @@ export async function update(
   user: User,
   data: AccountUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountUpdateValidator(data, user, accountId);
+  const serverError = await accountUpdateValidator(data, user, accountId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 

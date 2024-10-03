@@ -1,18 +1,18 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   AccountCreateRequestInterface,
   AccountUpdateRequestInterface,
 } from "~/data/account/account-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
@@ -30,7 +30,7 @@ export async function accountCreateValidator(
 
   if (accountExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This account already exists",
       },
@@ -46,22 +46,20 @@ export async function accountCreateValidator(
 
   if (validCompany === null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "Invalid company",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
-export async function accountDeleteValidator(
+export async function accountRemoveValidator(
   user: User,
   accountId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   const accountExistis = await prisma.account.findFirst({
     where: {
       id: accountId,
@@ -71,26 +69,24 @@ export async function accountDeleteValidator(
 
   if (!accountExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Account not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function accountUpdateValidator(
   data: AccountUpdateRequestInterface,
   user: User,
   accountId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
@@ -106,7 +102,7 @@ export async function accountUpdateValidator(
 
   if (!account) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Account not found",
       },
@@ -127,14 +123,12 @@ export async function accountUpdateValidator(
 
   if (accountExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This account already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }

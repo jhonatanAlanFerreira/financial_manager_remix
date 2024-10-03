@@ -1,5 +1,7 @@
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+
 export interface ServerResponseInterface<T = any> {
-  error?: boolean;
+  errors?: ServerResponseErrorInterface;
   message?: string;
   data?: T;
   pageInfo?: {

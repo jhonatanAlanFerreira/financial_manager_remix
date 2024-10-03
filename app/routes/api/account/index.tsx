@@ -53,7 +53,8 @@ export let loader = async (
 ) => {
   const user = await requireUserSession(request);
   if (personalOnly === null) {
-    personalOnly = new URL(request.url).searchParams.get("personalOnly") === 'true';
+    personalOnly =
+      new URL(request.url).searchParams.get("personalOnly") === "true";
   }
   return list(user, personalOnly);
 };
@@ -95,9 +96,7 @@ let createAccount = async (request: Request) => {
   };
 
   const res = await create(data, user);
-
-  let status: number = res.error ? 400 : 201;
-
+  const status: number = res.errors ? res.errors.errorCode : 201;
   return new Response(JSON.stringify(res), { status });
 };
 
@@ -125,9 +124,7 @@ let removeAccount = async (request: Request) => {
   const accountId = String(new URL(request.url).searchParams.get("accountId"));
 
   const res = await remove(accountId, user);
-
-  let status: number = res.error ? 404 : 200;
-
+  const status: number = res.errors ? res.errors.errorCode : 200;
   return new Response(JSON.stringify(res), { status });
 };
 
@@ -172,8 +169,6 @@ let updateAccount = async (request: Request) => {
   };
 
   const res = await update(accountId, user, data);
-
-  let status: number = res.error ? 400 : 200;
-
+  const status: number = res.errors ? res.errors.errorCode : 200;
   return new Response(JSON.stringify(res), { status });
 };
