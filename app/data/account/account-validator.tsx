@@ -5,6 +5,7 @@ import {
 } from "~/data/account/account-request-interfaces";
 import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ObjectId } from "mongodb";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
@@ -17,6 +18,33 @@ export async function accountCreateValidator(
         empty: "Name can not be empty",
       },
     };
+  }
+
+  if (data.company) {
+    if (!ObjectId.isValid(data.company)) {
+      return {
+        errorCode: 400,
+        errors: {
+          company: "Invalid company ID format",
+        },
+      };
+    }
+
+    const validCompany = await prisma.company.findFirst({
+      where: {
+        id: data.company,
+        user_id: user.id,
+      },
+    });
+
+    if (validCompany === null) {
+      return {
+        errorCode: 400,
+        errors: {
+          name: "Invalid company",
+        },
+      };
+    }
   }
 
   const accountExists = await prisma.account.findFirst({
@@ -33,22 +61,6 @@ export async function accountCreateValidator(
       errorCode: 400,
       errors: {
         name: "This account already exists",
-      },
-    };
-  }
-
-  const validCompany = prisma.company.findFirst({
-    where: {
-      id: data.company,
-      user_id: user.id,
-    },
-  });
-
-  if (validCompany === null) {
-    return {
-      errorCode: 400,
-      errors: {
-        name: "Invalid company",
       },
     };
   }

@@ -52,26 +52,37 @@ export async function getUserFromSession(
   });
 }
 
-export async function requireUserSession(request: Request): Promise<User> {
-  const user = await getUserFromSession(request);
+export async function requireUserSession(request: Request) {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  const userId = session.get("userId");
 
-  if (!user) {
+  if (!userId) {
+    const acceptHeader = request.headers.get("Accept") || "";
+
+    if (acceptHeader.includes("application/json")) {
+      throw new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     throw redirect("/login");
   }
 
-  return user;
+  return userId;
 }
 
 export async function signup(
   data: SignupRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await signupValidator(data);
+  const serverError = await signupValidator(data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -117,13 +128,12 @@ export async function destroyUserSession(request: Request) {
 export async function login(
   data: LoginRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await loginValidator(data);
+  const serverError = await loginValidator(data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -135,7 +145,9 @@ export async function login(
 
   if (!user) {
     return {
-      error: true,
+      errors: {
+        errorCode: 401,
+      },
       message: "Login or password is invalid",
     };
   }
@@ -144,7 +156,9 @@ export async function login(
 
   if (!validPass) {
     return {
-      error: true,
+      errors: {
+        errorCode: 401,
+      },
       message: "Login or password is invalid",
     };
   }

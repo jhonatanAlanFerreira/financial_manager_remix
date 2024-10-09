@@ -38,8 +38,6 @@ model Company {
   transaction_classification_ids String[]                    @db.ObjectId
   transaction_classification     TransactionClassification[] @relation(fields: [transaction_classification_ids], references: [id])
   accounts                       Account[]
-
-  @@unique([user_id, name])
 }
 
 model Expense {
@@ -52,8 +50,6 @@ model Expense {
   company_ids         String[]      @db.ObjectId
   companies           Company[]     @relation(fields: [company_ids], references: [id])
   transactions        Transaction[]
-
-  @@unique([user_id, name, is_personal_expense])
 }
 
 model Transaction {
@@ -89,8 +85,6 @@ model TransactionClassification {
   companies                              Company[]     @relation(fields: [company_ids], references: [id])
   company_ids                            String[]      @db.ObjectId
   is_income                              Boolean       @default(false)
-
-  @@unique([user_id, name, is_personal_transaction_classification, is_income])
 }
 
 model Income {
@@ -103,8 +97,6 @@ model Income {
   transactions       Transaction[]
   amount             Float?
   is_personal_income Boolean       @default(false)
-
-  @@unique([user_id, name, is_personal_income])
 }
 
 model Account {
@@ -117,8 +109,6 @@ model Account {
   company             Company?      @relation(fields: [company_id], references: [id])
   balance             Float?
   transactions        Transaction[]
-
-  @@unique([user_id, name, company_id])
 }
 
 model File {

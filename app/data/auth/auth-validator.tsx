@@ -1,33 +1,31 @@
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   LoginRequestInterface,
   SignupRequestInterface,
 } from "~/data/auth/auth-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export async function loginValidator(
   data: LoginRequestInterface
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.login || !data.password) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "There are empty fields",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function signupValidator(
   data: SignupRequestInterface
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (data.password != data.passwordRepeat) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         password: "You sent two different passwords",
       },
@@ -42,7 +40,7 @@ export async function signupValidator(
 
   if (loginExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         login: "The login you sent already exists",
       },
@@ -51,7 +49,7 @@ export async function signupValidator(
 
   if (!data.login || !data.name || !data.password) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "There are empty fields",
       },
@@ -64,7 +62,7 @@ export async function signupValidator(
     )
   ) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         password:
           "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, one digit, and one special character",
@@ -72,7 +70,5 @@ export async function signupValidator(
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
