@@ -52,7 +52,7 @@ export async function getUserFromSession(
   });
 }
 
-export async function requireUserSession(request: Request) {
+export async function requireUserSession(request: Request): Promise<User> {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
@@ -71,7 +71,7 @@ export async function requireUserSession(request: Request) {
     throw redirect("/login");
   }
 
-  return userId;
+  return await prisma.user.findFirstOrThrow({ where: { id: userId } });
 }
 
 export async function signup(

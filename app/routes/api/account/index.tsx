@@ -82,8 +82,29 @@ export let loader = async (
  *     responses:
  *       201:
  *         description: Account created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     balance:
+ *                       type: number
+ *                     company:
+ *                       type: string
+ *                 message:
+ *                   type: string
+ *                   example: "Account created successfully"
  *       400:
  *         description: Bad Request
+ *       401:
+ *         description: Unauthorized
  */
 let createAccount = async (request: Request) => {
   const user = await requireUserSession(request);
