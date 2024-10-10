@@ -20,6 +20,15 @@ export async function accountCreateValidator(
     };
   }
 
+  if (isNaN(data.balance) || typeof data.balance !== "number") {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Balance must be a valid number",
+      },
+    };
+  }
+
   if (data.company) {
     if (!ObjectId.isValid(data.company)) {
       return {
