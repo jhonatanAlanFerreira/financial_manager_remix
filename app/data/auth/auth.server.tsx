@@ -118,6 +118,21 @@ export async function destroyUserSession(request: Request) {
     request.headers.get("Cookie")
   );
 
+  const acceptHeader = request.headers.get("Accept") || "";
+
+  if (acceptHeader.includes("application/json")) {
+    return new Response(
+      JSON.stringify({ message: "Successfully logged out" }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": await sessionStorage.destroySession(session),
+        },
+      }
+    );
+  }
+
   return redirect("/login", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
