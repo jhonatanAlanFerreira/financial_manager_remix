@@ -10,6 +10,7 @@ import {
   accountUpdateValidator,
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
+import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
 
 export async function create(
   data: AccountCreateRequestInterface,
@@ -42,12 +43,12 @@ export async function create(
 
 export async function list(
   user: User,
-  personalOnly = true
+  params: AccountLoaderParamsInterface
 ): Promise<ServerResponseInterface<Account[]>> {
   const userAccounts = await prisma.account.findMany({
     where: {
       user_id: user.id,
-      ...(personalOnly && { is_personal_account: true }),
+      // ...(personalOnly && { is_personal_account: true }),
     },
   });
 
