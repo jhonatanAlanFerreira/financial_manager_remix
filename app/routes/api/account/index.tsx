@@ -37,31 +37,26 @@ export let action = async ({ request }: ActionFunctionArgs) => {
  *         name: company
  *         schema:
  *           type: string
- *         description: Filter by company ID
  *       - in: query
  *         name: name
  *         schema:
  *           type: string
- *         description: Filter by account name
  *       - in: query
  *         name: is_personal_or_company
  *         schema:
  *           type: string
  *           enum: [all, personal, company]
  *           default: all
- *         description: Filter for personal or company accounts
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
  *           default: 1
- *         description: The page number for pagination
  *       - in: query
  *         name: pageSize
  *         schema:
  *           type: integer
  *           default: 10
- *         description: The number of accounts to return per page
  *     responses:
  *       200:
  *         description: A list of accounts
@@ -96,6 +91,11 @@ export let action = async ({ request }: ActionFunctionArgs) => {
  *                     is_personal_account: false
  *                     company_id: "670704278b4ab4826a250f34"
  *                     balance: 0
+ *                 pageInfo:
+ *                     currentPage: 1
+ *                     pageSize: 10
+ *                     totalData: 10
+ *                     totalPages: 1
  *       400:
  *         description: Bad Request
  *       401:
@@ -119,7 +119,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
   };
-  new URL(request.url).searchParams.get("personalOnly") === "true";
+
   return list(user, params);
 };
 

@@ -1,4 +1,4 @@
-import { Account, User } from "@prisma/client";
+import { Account, Prisma, User } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   AccountCreateRequestInterface,
@@ -11,6 +11,8 @@ import {
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
 import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
+
+type AccountWhereInput = Prisma.AccountWhereInput;
 
 export async function create(
   data: AccountCreateRequestInterface,
@@ -45,15 +47,49 @@ export async function list(
   user: User,
   params: AccountLoaderParamsInterface
 ): Promise<ServerResponseInterface<Account[]>> {
-  const userAccounts = await prisma.account.findMany({
-    where: {
-      user_id: user.id,
-      // ...(personalOnly && { is_personal_account: true }),
-    },
+  const take = params.pageSize != "all" ? params.pageSize : undefined;
+  const skip =
+    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+
+  const whereClause: AccountWhereInput = {
+    user_id: user.id,
+  };
+
+  whereClause.is_personal_account =
+    params.is_personal_or_company !== "all"
+      ? params.is_personal_or_company === "personal"
+      : undefined;
+
+  if (params.name) {
+    whereClause.name = { contains: params.name, mode: "insensitive" };
+  }
+
+  if (params.company) {
+    whereClause.company_id = params.company;
+  }
+
+  const accounts = await prisma.account.findMany({
+    where: whereClause,
+    skip,
+    take,
   });
 
+  const totalData = await prisma.account.count({
+    where: whereClause,
+  });
+
+  const totalPages =
+    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
+  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
+
   return {
-    data: userAccounts,
+    data: accounts,
+    pageInfo: {
+      currentPage: params.page,
+      pageSize,
+      totalData,
+      totalPages,
+    },
   };
 }
 

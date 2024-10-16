@@ -6,6 +6,7 @@ import {
 import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ObjectId } from "mongodb";
+import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
@@ -153,3 +154,8 @@ export async function accountUpdateValidator(
 
   return null;
 }
+
+export async function listAccountsValidator(
+  params: AccountLoaderParamsInterface,
+  user: User
+) {}
