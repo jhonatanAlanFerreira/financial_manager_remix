@@ -1,0 +1,7 @@
+openapi: 3.1.0
+
+tags:
+  - name: Auth Services
+    description: API for managing authentication and user sessions
+  - name: Accounting Services
+    description: API for managing accounts and financial data

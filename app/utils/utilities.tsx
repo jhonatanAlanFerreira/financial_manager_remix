@@ -64,6 +64,6 @@ export function getBaseUrl() {
   const host =
     process.env.NODE_ENV === "production"
       ? process.env.APP_URL
-      : `localhost:${port}`;
+      : `host.docker.internal:${port}`;
   return `http://${host}`;
 }

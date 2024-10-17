@@ -2,14 +2,14 @@ import swaggerJsdoc from "swagger-jsdoc";
 
 const swaggerOptions = {
   definition: {
-    openapi: "3.0.0",
+    openapi: "3.1.0",
     info: {
       title: "Financial Manager API",
       version: "1.0.0",
-      description: "API documentation for the Financial Manager App",
+      description: "API documentation for the Financial Manager API",
     },
   },
-  apis: ["./app/routes/api/**/*.tsx"],
+  apis: ["./app/routes/docs/schemas/**/*.yaml"],
 };
 
 export let loader = async () => {
