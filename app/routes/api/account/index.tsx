@@ -6,6 +6,7 @@ import {
   AccountUpdateRequestInterface,
 } from "~/data/account/account-request-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -26,10 +27,9 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     company: url.searchParams.get("company"),
     name: url.searchParams.get("name"),
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
   };

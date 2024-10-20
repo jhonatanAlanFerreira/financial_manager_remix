@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {InputText} from "~/components/inputs/input-text/input-text";
-import { IconNameType } from "~/shared/icon-name-type";
+import { IconNameType } from "~/shared/shared-types";
 import { InputPasswordPropsInterface } from "~/components/inputs/input-password/input-password-props-interface";
 
 export function InputPassword({

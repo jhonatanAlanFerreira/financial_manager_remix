@@ -9,7 +9,7 @@ const swaggerOptions = {
       description: "API documentation for the Financial Manager API",
     },
   },
-  apis: ["./app/routes/docs/schemas/**/*.yaml"],
+  apis: ["./app/data/swagger/schemas/**/*.yaml"],
 };
 
 export let loader = async () => {

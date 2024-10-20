@@ -1,5 +1,5 @@
 import { InputHTMLAttributes } from "react";
-import { IconNameType } from "~/shared/icon-name-type";
+import { IconNameType } from "~/shared/shared-types";
 
 export interface InputTextPropsInterface
   extends InputHTMLAttributes<HTMLInputElement> {

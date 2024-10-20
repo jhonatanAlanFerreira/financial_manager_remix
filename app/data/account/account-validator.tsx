@@ -7,6 +7,10 @@ import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ObjectId } from "mongodb";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import {
+  validateCompany,
+  validatePaginationParams,
+} from "~/shared/validation-helpers";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
@@ -30,31 +34,9 @@ export async function accountCreateValidator(
     };
   }
 
-  if (data.company) {
-    if (!ObjectId.isValid(data.company)) {
-      return {
-        errorCode: 400,
-        errors: {
-          company: "Invalid company ID format",
-        },
-      };
-    }
-
-    const validCompany = await prisma.company.findFirst({
-      where: {
-        id: data.company,
-        user_id: user.id,
-      },
-    });
-
-    if (validCompany === null) {
-      return {
-        errorCode: 400,
-        errors: {
-          name: "Invalid company",
-        },
-      };
-    }
+  const companyErrors = await validateCompany(data.company, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const accountExists = await prisma.account.findFirst({
@@ -158,4 +140,16 @@ export async function accountUpdateValidator(
 export async function listAccountsValidator(
   params: AccountLoaderParamsInterface,
   user: User
-) {}
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = await validateCompany(params.company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  return null;
+}

@@ -1,4 +1,4 @@
-import { IconNameType } from "~/shared/icon-name-type";
+import { IconNameType } from "~/shared/shared-types";
 
 export type SidebarItemType = {
   title: string;

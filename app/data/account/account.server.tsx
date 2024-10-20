@@ -8,6 +8,7 @@ import {
   accountCreateValidator,
   accountRemoveValidator,
   accountUpdateValidator,
+  listAccountsValidator,
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
 import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
@@ -47,6 +48,15 @@ export async function list(
   user: User,
   params: AccountLoaderParamsInterface
 ): Promise<ServerResponseInterface<Account[]>> {
+  const serverError = await listAccountsValidator(params, user);
+
+  if (serverError) {
+    return {
+      errors: serverError,
+      message: "There are some invalid params",
+    };
+  }
+
   const take = params.pageSize != "all" ? params.pageSize : undefined;
   const skip =
     params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;

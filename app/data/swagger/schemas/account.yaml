@@ -33,8 +33,11 @@ paths:
         - in: query
           name: pageSize
           schema:
-            type: integer
-            default: 10
+            oneOf:
+              - type: integer
+                default: 10
+              - type: string
+                enum: ["all"]
       responses:
         200:
           description: A list of accounts
