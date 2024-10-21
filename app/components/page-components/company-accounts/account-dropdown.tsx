@@ -10,7 +10,6 @@ import { AddButton } from "~/components/buttons/add-button/add-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   AccountDropdownPropsInterface,
@@ -28,7 +27,7 @@ export function AccountDropdown({
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
 
   const formik = useFormik<AccountFormInterface>({

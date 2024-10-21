@@ -21,7 +21,6 @@ import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { IncomeWithCompaniesType } from "~/data/income/income-types";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   IncomeFiltersFormInterface,
   IncomeFormInterface,
@@ -41,7 +40,7 @@ export default function Incomes() {
     ServerResponseInterface<Company[]>
   >({});
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
   const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
   const [currentPage, setCurrentPage] = useState<number>(0);

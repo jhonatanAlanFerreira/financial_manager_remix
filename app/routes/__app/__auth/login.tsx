@@ -8,11 +8,10 @@ import { InputPassword } from "~/components/inputs/input-password/input-password
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { NavigationLoader } from "~/components/navigation-loader/navigation-loader";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Login() {
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();

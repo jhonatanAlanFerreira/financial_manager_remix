@@ -55,11 +55,8 @@ let createIncome = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };
@@ -72,12 +69,8 @@ let removeIncome = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
-
+  //WIP
+  status = 200;
   return new Response(JSON.stringify(res), { status });
 };
 
@@ -99,11 +92,8 @@ let updateIncome = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };

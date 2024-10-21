@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   IncomeCreateRequestInterface,
   IncomeUpdateRequestInterface,
@@ -9,7 +8,7 @@ import { prisma } from "~/data/database/database.server";
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -38,13 +37,11 @@ export async function incomeCreateValidator(
     }
   }
 
-  const incomeExists = await prisma.income.findUnique({
+  const incomeExists = await prisma.income.findFirst({
     where: {
-      user_id_name_is_personal_income: {
         name: data.name,
         user_id: user.id,
         is_personal_income: data.is_personal_income,
-      },
     },
   });
 
@@ -65,7 +62,7 @@ export async function incomeCreateValidator(
 export async function incomeDeleteValidator(
   user: User,
   incomeId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const incomeExistis = await prisma.income.findFirst({
     where: {
       id: incomeId,
@@ -91,7 +88,7 @@ export async function incomeUpdateValidator(
   data: IncomeUpdateRequestInterface,
   user: User,
   incomeId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,

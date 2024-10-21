@@ -1,6 +1,5 @@
 import { User } from "@prisma/client";
 
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
@@ -10,7 +9,7 @@ import { prisma } from "~/data/database/database.server";
 export async function transactionCreateValidator(
   data: TransactionCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -92,7 +91,7 @@ export async function transactionCreateValidator(
 export async function transactionDeleteValidator(
   user: User,
   transactionId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const transactionExistis = await prisma.transaction.findFirst({
     where: {
       id: transactionId,
@@ -118,7 +117,7 @@ export async function transactionUpdateValidator(
   transactionId: string,
   user: User,
   data: TransactionUpdateRequestInterface
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const transaction = await prisma.transaction.findFirst({
     where: {
       id: transactionId,

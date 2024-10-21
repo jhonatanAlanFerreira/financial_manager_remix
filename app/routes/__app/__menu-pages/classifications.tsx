@@ -20,7 +20,6 @@ import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ClassificationFiltersFormInterface,
   ClassificationFormInterface,
@@ -39,7 +38,7 @@ export default function Classifications() {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>

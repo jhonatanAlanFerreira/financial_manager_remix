@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   CompanyCreateRequestInterface,
   CompanyUpdateRequestInterface,
@@ -9,7 +8,7 @@ import { prisma } from "~/data/database/database.server";
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -19,12 +18,10 @@ export async function companyCreateValidator(
     };
   }
 
-  const companyExists = await prisma.company.findUnique({
+  const companyExists = await prisma.company.findFirst({
     where: {
-      user_id_name: {
         name: data.name,
         user_id: user.id,
-      },
     },
   });
 
@@ -45,7 +42,7 @@ export async function companyCreateValidator(
 export async function companyDeleteValidator(
   user: User,
   companyId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const companyExistis = await prisma.company.findFirst({
     where: {
       id: companyId,
@@ -71,7 +68,7 @@ export async function companyUpdateValidator(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -97,13 +94,11 @@ export async function companyUpdateValidator(
     };
   }
 
-  const companyExists = await prisma.company.findUnique({
+  const companyExists = await prisma.company.findFirst({
     where: {
       NOT: { id: companyId },
-      user_id_name: {
         name: data.name,
         user_id: user.id,
-      },
     },
   });
 

@@ -8,7 +8,6 @@ import {
 } from "@prisma/client";
 import { FormikProps } from "formik";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export interface TransactionFiltersFormInterface {
   name: string;
@@ -44,7 +43,7 @@ export interface TransactionAddPropsInterface {
   formik: FormikProps<TransactionFormInterface>;
   skipEffect: boolean;
   isSubmitting: boolean;
-  responseErrors: ServerResponseInterface<ValidatedDataInterface>;
+  responseErrors: ServerResponseInterface<any>; //WIP
   companies: Company[];
   expenses: Expense[];
   incomes: Income[];

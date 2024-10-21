@@ -99,7 +99,7 @@ export async function create(
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+      // error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -111,7 +111,7 @@ export async function create(
 
   if (!account) {
     return {
-      error: true,
+      // error: true, WIP
       message: "Account not found",
     };
   }
@@ -158,7 +158,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+      // error: true, WIP
       message: "Transaction not found",
       data: dataIsValid,
     };
@@ -170,7 +170,7 @@ export async function remove(
 
   if (!transaction) {
     return {
-      error: true,
+      // error: true, WIP
       message: "Transaction not found",
     };
   }
@@ -210,7 +210,7 @@ export async function update(
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+      // error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -222,7 +222,7 @@ export async function update(
 
   if (!existingTransaction) {
     return {
-      error: true,
+      // error: true, WIP
       message: "Transaction not found",
     };
   }

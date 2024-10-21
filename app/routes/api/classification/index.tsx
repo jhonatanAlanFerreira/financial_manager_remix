@@ -42,11 +42,8 @@ let createClassification = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };
@@ -61,11 +58,8 @@ let removeClassification = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };
@@ -92,11 +86,8 @@ let updateClassification = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };

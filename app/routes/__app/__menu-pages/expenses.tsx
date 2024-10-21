@@ -20,7 +20,6 @@ import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ExpenseFiltersFormInterface,
   ExpenseFormInterface,
@@ -44,7 +43,7 @@ export default function Expenses() {
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
   const [loading, setLoading] = useState<boolean>(true);
 

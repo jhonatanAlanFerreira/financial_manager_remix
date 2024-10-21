@@ -41,7 +41,6 @@ import {
   TransactionsWithTotalsInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -77,7 +76,7 @@ export default function Transactions() {
   );
 
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
 
   const {

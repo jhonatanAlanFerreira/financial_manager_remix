@@ -46,11 +46,8 @@ let createTransaction = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };
@@ -65,11 +62,8 @@ let removeTransaction = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };
@@ -100,11 +94,8 @@ let updateTransaction = async (request: Request) => {
 
   let status: number;
 
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
+  //WIP
+  status = 200;
 
   return new Response(JSON.stringify(res), { status });
 };

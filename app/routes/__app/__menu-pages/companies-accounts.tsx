@@ -17,7 +17,6 @@ import { useTitle } from "~/components/top-bar/title-context";
 import { CompanyWithAccountsType } from "~/data/company/company-types";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Companies() {
   const { setTitle } = useTitle();
@@ -30,7 +29,7 @@ export default function Companies() {
     ServerResponseInterface<CompanyWithAccountsType[]>
   >({});
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+    ServerResponseInterface<any> //WIP
   >({});
   const [userAccounts, setUserAccounts] = useState<
     ServerResponseInterface<Account[]>
@@ -320,6 +319,6 @@ export default function Companies() {
 
 export async function loader(request: LoaderFunctionArgs) {
   return {
-    userAccountData: await userAccountLoader(request, true),
+    userAccountData: await userAccountLoader(request),
   };
 }

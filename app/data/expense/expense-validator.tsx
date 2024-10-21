@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ExpenseCreateRequestInterface,
   ExpenseUpdateRequestInterface,
@@ -9,7 +8,7 @@ import { prisma } from "~/data/database/database.server";
 export async function expenseCreateValidator(
   data: ExpenseCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -19,13 +18,11 @@ export async function expenseCreateValidator(
     };
   }
 
-  const expenseExists = await prisma.expense.findUnique({
+  const expenseExists = await prisma.expense.findFirst({
     where: {
-      user_id_name_is_personal_expense: {
         name: data.name,
         user_id: user.id,
         is_personal_expense: data.is_personal_expense,
-      },
     },
   });
 
@@ -65,7 +62,7 @@ export async function expenseCreateValidator(
 export async function expenseDeleteValidator(
   user: User,
   expenseId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const expenseExistis = await prisma.expense.findFirst({
     where: {
       id: expenseId,
@@ -91,7 +88,7 @@ export async function expenseUpdateValidator(
   expenseId: string,
   user: User,
   data: ExpenseUpdateRequestInterface
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,

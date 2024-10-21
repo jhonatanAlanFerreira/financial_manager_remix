@@ -1,6 +1,5 @@
 import { Company, Prisma, User } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
 import { CompanyWithAccountsType } from "~/data/company/company-types";
 import { prisma } from "~/data/database/database.server";
@@ -61,12 +60,12 @@ export async function list(
 export async function create(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
+): Promise<ServerResponseInterface<Company | any>> { //WIP
   const dataIsValid = await companyCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+      //error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -89,12 +88,12 @@ export async function update(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
+): Promise<ServerResponseInterface<Company | any>> { //WIP
   const dataIsValid = await companyUpdateValidator(data, user, companyId);
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+       //error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -121,7 +120,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-      error: true,
+       //error: true, WIP
       message: "Company not found",
       data: dataIsValid,
     };

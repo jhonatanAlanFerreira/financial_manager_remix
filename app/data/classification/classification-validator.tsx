@@ -1,5 +1,4 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ClassificationCreateRequestInterface,
   ClassificationUpdateRequestInterface,
@@ -9,7 +8,7 @@ import { prisma } from "~/data/database/database.server";
 export async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -20,16 +19,14 @@ export async function classificationCreateValidator(
   }
 
   const classificationsExists =
-    await prisma.transactionClassification.findUnique({
+    await prisma.transactionClassification.findFirst({
       where: {
-        user_id_name_is_personal_transaction_classification_is_income: {
           name: data.name,
           user_id: user.id,
           is_personal_transaction_classification:
             data.is_personal_transaction_classification,
           is_income: data.is_income,
         },
-      },
     });
 
   if (classificationsExists !== null) {
@@ -68,7 +65,7 @@ export async function classificationCreateValidator(
 export async function classificationDeleteValidator(
   user: User,
   classificationId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   const classificationExistis =
     await prisma.transactionClassification.findFirst({
       where: {
@@ -95,7 +92,7 @@ export async function classificationUpdateValidator(
   data: ClassificationUpdateRequestInterface,
   user: User,
   classificationId: string
-): Promise<ValidatedDataInterface> {
+): Promise<any> { //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -141,17 +138,15 @@ export async function classificationUpdateValidator(
   }
 
   const classificationsExists =
-    await prisma.transactionClassification.findUnique({
+    await prisma.transactionClassification.findFirst({
       where: {
         NOT: { id: classificationId },
-        user_id_name_is_personal_transaction_classification_is_income: {
           name: data.name,
           user_id: user.id,
           is_personal_transaction_classification:
             data.is_personal_transaction_classification,
           is_income: data.is_income,
         },
-      },
     });
 
   if (classificationsExists !== null) {
