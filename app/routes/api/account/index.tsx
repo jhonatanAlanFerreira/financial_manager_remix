@@ -24,8 +24,8 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
 
   const url = new URL(request.url);
   const params: AccountLoaderParamsInterface = {
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
     is_personal_or_company:
       (url.searchParams.get(
         "is_personal_or_company"

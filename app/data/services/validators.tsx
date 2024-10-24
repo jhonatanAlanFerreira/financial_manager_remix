@@ -15,7 +15,7 @@ export function validatePaginationParams(
       },
     };
   }
-  
+
   if (
     params.pageSize !== "all" &&
     (isNaN(Number(params.pageSize)) || typeof params.pageSize !== "number")
@@ -32,7 +32,7 @@ export function validatePaginationParams(
 }
 
 export async function validateCompany(
-  companyId: string | null,
+  companyId: string | undefined,
   user: User
 ): Promise<ServerResponseErrorInterface | null> {
   if (companyId) {
