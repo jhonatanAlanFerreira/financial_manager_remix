@@ -5,12 +5,11 @@ import {
 } from "~/data/account/account-request-interfaces";
 import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import { ObjectId } from "mongodb";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import {
   validateCompany,
   validatePaginationParams,
-} from "~/shared/validation-helpers";
+} from "~/data/services/validators";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,

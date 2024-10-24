@@ -3,7 +3,7 @@ import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export interface AccountLoaderParamsInterface
   extends PaginationParamsInterface {
-  name: string | null;
-  company: string | null;
+  name: string | undefined;
+  company: string | undefined;
   is_personal_or_company: IsPersonalOrCompanyType;
 }

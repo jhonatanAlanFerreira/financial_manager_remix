@@ -12,6 +12,7 @@ import {
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
 import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
+import { paginate } from "~/data/services/list.service";
 
 type AccountWhereInput = Prisma.AccountWhereInput;
 
@@ -50,57 +51,14 @@ export async function list(
 ): Promise<ServerResponseInterface<Account[]>> {
   const serverError = await listAccountsValidator(params, user);
 
-  if (serverError) {
-    return {
-      errors: serverError,
-      message: "There are some invalid params",
-    };
-  }
+  const { page, pageSize, ...restParams } = params;
 
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
-
-  const whereClause: AccountWhereInput = {
-    user_id: user.id,
-  };
-
-  whereClause.is_personal_account =
-    params.is_personal_or_company !== "all"
-      ? params.is_personal_or_company === "personal"
-      : undefined;
-
-  if (params.name) {
-    whereClause.name = { contains: params.name, mode: "insensitive" };
-  }
-
-  if (params.company) {
-    whereClause.company_id = params.company;
-  }
-
-  const accounts = await prisma.account.findMany({
-    where: whereClause,
-    skip,
-    take,
-  });
-
-  const totalData = await prisma.account.count({
-    where: whereClause,
-  });
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
-
-  return {
-    data: accounts,
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
-    },
-  };
+  return paginate<Account, Prisma.AccountFindManyArgs, Prisma.AccountCountArgs>(
+    prisma.account.findMany,
+    prisma.account.count,
+    { page, pageSize },
+    restParams
+  );
 }
 
 export async function remove(
