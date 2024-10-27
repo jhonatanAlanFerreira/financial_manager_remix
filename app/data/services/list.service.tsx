@@ -6,10 +6,7 @@ import {
   Models,
 } from "~/data/services/list-service-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
-
-export function buildWhereClause(params?: {
-  [K in keyof WhereParamsInterface]?: WhereParamsInterface[K];
-}): Record<string, any> {
+export function buildWhereClause(params?: Partial<WhereParamsInterface>): Record<string, any> {
   const whereClause: Record<keyof WhereParamsInterface, any> = {
     company_id: undefined,
     name: undefined,
