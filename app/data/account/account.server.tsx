@@ -51,6 +51,13 @@ export async function list(
 ): Promise<ServerResponseInterface<Account[]>> {
   const serverError = await listAccountsValidator(params, user);
 
+  if (serverError) {
+    return {
+      errors: serverError,
+      message: "There are some invalid params",
+    };
+  }
+
   const { page, pageSize, ...restParams } = params;
 
   return paginate<Account, Prisma.AccountFindManyArgs, Prisma.AccountCountArgs>(
