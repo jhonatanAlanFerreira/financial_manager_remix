@@ -36,19 +36,14 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: "6705d447724aa25c72ff57fc"
                       name:
                         type: string
-                        example: "Admin"
                       login:
                         type: string
-                        example: "Admin"
                       accountant_balance:
                         type: number
-                        example: 0
                   message:
                     type: string
-                    example: "OK"
         400:
           description: Bad Request
         401:
@@ -69,7 +64,6 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Successfully logged out"
         400:
           description: Bad Request
 
@@ -87,16 +81,12 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "Admin"
                 login:
                   type: string
-                  example: "admin"
                 password:
                   type: string
-                  example: "password"
                 passwordRepeat:
                   type: string
-                  example: "password"
       responses:
         201:
           description: Login created
@@ -110,18 +100,13 @@ paths:
                     properties:
                       id:
                         type: string
-                        example: "6705d007724aa25c72ff57f8"
                       name:
                         type: string
-                        example: "Admin"
                       login:
                         type: string
-                        example: "admin"
                       accountant_balance:
                         type: number
-                        example: 0
                   message:
                     type: string
-                    example: "Your user and default account were created successfully"
         400:
           description: Bad Request

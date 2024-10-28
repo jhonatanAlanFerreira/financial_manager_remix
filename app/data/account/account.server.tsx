@@ -35,7 +35,7 @@ export async function create(
       balance: data.balance,
       company_id: data.company || null,
       user_id: user.id,
-      is_personal_account: !data.company,
+      is_personal: !data.company,
     },
   });
 

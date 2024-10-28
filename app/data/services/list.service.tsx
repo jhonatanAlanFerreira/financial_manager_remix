@@ -6,11 +6,10 @@ import {
   Models,
 } from "~/data/services/list-service-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
-export function buildWhereClause(params?: Partial<WhereParamsInterface>): Record<string, any> {
-  const whereClause: Record<keyof WhereParamsInterface, any> = {
-    company_id: undefined,
-    name: undefined,
-  };
+export function buildWhereClause(
+  params?: Partial<WhereParamsInterface>
+): Record<string, any> {
+  const whereClause: Record<string, any> = {};
 
   if (params) {
     if (params.name) {
@@ -19,6 +18,11 @@ export function buildWhereClause(params?: Partial<WhereParamsInterface>): Record
 
     if (params.company_id) {
       whereClause.company_id = params.company_id;
+    }
+
+    if (params.is_personal_or_company !== "all") {
+      whereClause.is_personal =
+        params.is_personal_or_company === "personal" ? true : false;
     }
   }
 

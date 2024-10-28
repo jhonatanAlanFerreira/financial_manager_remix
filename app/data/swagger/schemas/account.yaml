@@ -57,26 +57,24 @@ paths:
                           type: string
                         user_id:
                           type: string
-                        is_personal_account:
+                        is_personal:
                           type: boolean
                         company_id:
                           type: string
                           nullable: true
                         balance:
-                          type: number
-              example:
-                data:
-                  - id: "670705250198a726d9fdc6dd"
-                    name: "Admin"
-                    user_id: "6706fd5c0198a726d9fdc6d4"
-                    is_personal_account: false
-                    company_id: "670704278b4ab4826a250f34"
-                    balance: 0
-                pageInfo:
-                  currentPage: 1
-                  pageSize: 10
-                  totalData: 10
-                  totalPages: 1
+                          type: integer
+                  pageInfo:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      totalData:
+                        type: integer
+                      totalPages:
+                        type: integer
         400:
           description: Bad Request
         401:
@@ -96,7 +94,7 @@ paths:
                 name:
                   type: string
                 balance:
-                  type: number
+                  type: integer
                 company:
                   type: string
       responses:
@@ -114,13 +112,16 @@ paths:
                         type: string
                       name:
                         type: string
+                      user_id:
+                        type: string
+                      is_personal:
+                        type: boolean
                       balance:
-                        type: number
-                      company:
+                        type: integer
+                      company_id:
                         type: string
                   message:
                     type: string
-                    example: "Account created successfully"
         400:
           description: Bad Request
         401:
@@ -162,7 +163,7 @@ paths:
                 name:
                   type: string
                 balance:
-                  type: number
+                  type: integer
       responses:
         200:
           description: Account updated

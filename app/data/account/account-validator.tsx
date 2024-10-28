@@ -43,7 +43,7 @@ export async function accountCreateValidator(
       name: data.name,
       user_id: user.id,
       company_id: data.company || null,
-      is_personal_account: !data.company,
+      is_personal: !data.company,
     },
   });
 
@@ -117,7 +117,7 @@ export async function accountUpdateValidator(
       name: data.name,
       user_id: user.id,
       company_id: account.company_id,
-      is_personal_account: account.is_personal_account,
+      is_personal: account.is_personal,
       NOT: {
         id: accountId,
       },

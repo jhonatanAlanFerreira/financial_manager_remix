@@ -40,15 +40,15 @@ model Company {
 }
 
 model Expense {
-  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  amount              Float?
-  user_id             String        @db.ObjectId
-  is_personal_expense Boolean       @default(false)
-  user                User          @relation(fields: [user_id], references: [id])
-  company_ids         String[]      @db.ObjectId
-  companies           Company[]     @relation(fields: [company_ids], references: [id])
-  transactions        Transaction[]
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  amount       Float?
+  user_id      String        @db.ObjectId
+  is_personal  Boolean       @default(false)
+  user         User          @relation(fields: [user_id], references: [id])
+  company_ids  String[]      @db.ObjectId
+  companies    Company[]     @relation(fields: [company_ids], references: [id])
+  transactions Transaction[]
 }
 
 model Transaction {
@@ -69,45 +69,45 @@ model Transaction {
   income_id                      String?                     @db.ObjectId
   account                        Account                     @relation(fields: [account_id], references: [id])
   account_id                     String                      @db.ObjectId
-  is_personal_transaction        Boolean                     @default(false)
+  is_personal                    Boolean                     @default(false)
   is_income                      Boolean                     @default(false)
 }
 
 model TransactionClassification {
-  id                                     String        @id @default(auto()) @map("_id") @db.ObjectId
-  name                                   String
-  transaction_ids                        String[]      @db.ObjectId
-  transactions                           Transaction[] @relation(fields: [transaction_ids], references: [id])
-  user_id                                String        @db.ObjectId
-  user                                   User          @relation(fields: [user_id], references: [id])
-  is_personal_transaction_classification Boolean       @default(false)
-  companies                              Company[]     @relation(fields: [company_ids], references: [id])
-  company_ids                            String[]      @db.ObjectId
-  is_income                              Boolean       @default(false)
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  transaction_ids String[]      @db.ObjectId
+  transactions    Transaction[] @relation(fields: [transaction_ids], references: [id])
+  user_id         String        @db.ObjectId
+  user            User          @relation(fields: [user_id], references: [id])
+  is_personal     Boolean       @default(false)
+  companies       Company[]     @relation(fields: [company_ids], references: [id])
+  company_ids     String[]      @db.ObjectId
+  is_income       Boolean       @default(false)
 }
 
 model Income {
-  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  user_id            String        @db.ObjectId
-  user               User          @relation(fields: [user_id], references: [id])
-  company_ids        String[]      @db.ObjectId
-  companies          Company[]     @relation(fields: [company_ids], references: [id])
-  transactions       Transaction[]
-  amount             Float?
-  is_personal_income Boolean       @default(false)
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  user_id      String        @db.ObjectId
+  user         User          @relation(fields: [user_id], references: [id])
+  company_ids  String[]      @db.ObjectId
+  companies    Company[]     @relation(fields: [company_ids], references: [id])
+  transactions Transaction[]
+  amount       Float?
+  is_personal  Boolean       @default(false)
 }
 
 model Account {
-  id                  String        @id @default(auto()) @map("_id") @db.ObjectId
-  name                String
-  user_id             String        @db.ObjectId
-  user                User          @relation(fields: [user_id], references: [id])
-  is_personal_account Boolean       @default(false)
-  company_id          String?       @db.ObjectId
-  company             Company?      @relation(fields: [company_id], references: [id])
-  balance             Float?
-  transactions        Transaction[]
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  user_id      String        @db.ObjectId
+  user         User          @relation(fields: [user_id], references: [id])
+  is_personal  Boolean       @default(false)
+  company_id   String?       @db.ObjectId
+  company      Company?      @relation(fields: [company_id], references: [id])
+  balance      Float?
+  transactions Transaction[]
 }
 
 model File {
