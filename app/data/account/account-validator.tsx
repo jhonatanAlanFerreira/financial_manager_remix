@@ -8,6 +8,8 @@ import { ServerResponseErrorInterface } from "~/shared/server-response-error-int
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import {
   validateCompany,
+  validateIdFormat,
+  validateNumber,
   validatePaginationParams,
 } from "~/data/services/validators";
 
@@ -24,7 +26,7 @@ export async function accountCreateValidator(
     };
   }
 
-  if (isNaN(data.balance) || typeof data.balance !== "number") {
+  if (!validateNumber(data.balance)) {
     return {
       errorCode: 400,
       errors: {
@@ -63,6 +65,15 @@ export async function accountRemoveValidator(
   user: User,
   accountId: string
 ): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(accountId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid account ID format",
+      },
+    };
+  }
+
   const accountExistis = await prisma.account.findFirst({
     where: {
       id: accountId,

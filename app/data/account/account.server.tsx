@@ -14,8 +14,6 @@ import { prisma } from "~/data/database/database.server";
 import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
 import { paginate } from "~/data/services/list.service";
 
-type AccountWhereInput = Prisma.AccountWhereInput;
-
 export async function create(
   data: AccountCreateRequestInterface,
   user: User

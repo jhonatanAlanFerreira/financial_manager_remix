@@ -4,10 +4,18 @@ import { PaginationParamsInterface } from "~/shared/pagination-params-interface"
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { prisma } from "~/data/database/database.server";
 
+export function validateNumber(value: any) {
+  return !isNaN(Number(value)) && typeof Number(value) === "number";
+}
+
+export function validateIdFormat(id: any) {
+  return ObjectId.isValid(id);
+}
+
 export function validatePaginationParams(
   params: PaginationParamsInterface
 ): ServerResponseErrorInterface | null {
-  if (isNaN(params.page) || typeof params.page !== "number") {
+  if (!validateNumber(params.page)) {
     return {
       errorCode: 400,
       errors: {
@@ -16,10 +24,7 @@ export function validatePaginationParams(
     };
   }
 
-  if (
-    params.pageSize !== "all" &&
-    (isNaN(Number(params.pageSize)) || typeof params.pageSize !== "number")
-  ) {
+  if (params.pageSize !== "all" && !validateNumber(params.pageSize)) {
     return {
       errorCode: 400,
       errors: {
@@ -36,7 +41,7 @@ export async function validateCompany(
   user: User
 ): Promise<ServerResponseErrorInterface | null> {
   if (companyId) {
-    if (!ObjectId.isValid(companyId)) {
+    if (!validateIdFormat(companyId)) {
       return {
         errorCode: 400,
         errors: {

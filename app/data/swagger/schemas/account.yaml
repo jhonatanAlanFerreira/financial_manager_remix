@@ -140,6 +140,13 @@ paths:
       responses:
         200:
           description: Account deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
         404:
           description: Account not found
 
