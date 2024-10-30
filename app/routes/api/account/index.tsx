@@ -47,18 +47,14 @@ let createAccount = async (request: Request) => {
     company: String(body.get("company") || ""),
   };
 
-  const res = await create(data, user);
-  const status: number = res.errors ? res.errors.errorCode : 201;
-  return new Response(JSON.stringify(res), { status });
+  return create(data, user);
 };
 
 let removeAccount = async (request: Request) => {
   const user = await requireUserSession(request);
   const accountId = String(new URL(request.url).searchParams.get("accountId"));
 
-  const res = await remove(accountId, user);
-  const status: number = res.errors ? res.errors.errorCode : 200;
-  return new Response(JSON.stringify(res), { status });
+  return remove(accountId, user);
 };
 
 let updateAccount = async (request: Request) => {
@@ -71,7 +67,5 @@ let updateAccount = async (request: Request) => {
     balance: +(body.get("balance") || 0),
   };
 
-  const res = await update(accountId, user, data);
-  const status: number = res.errors ? res.errors.errorCode : 200;
-  return new Response(JSON.stringify(res), { status });
+  return update(accountId, user, data);
 };

@@ -75,7 +75,7 @@ export async function remove(
   if (serverError) {
     return {
       errors: serverError,
-      message: "Classification not found",
+      message: "There are some invalid params",
     };
   }
 

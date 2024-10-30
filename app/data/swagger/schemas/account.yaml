@@ -149,6 +149,8 @@ paths:
                     type: string
         404:
           description: Account not found
+        401:
+          description: Unauthorized
 
     patch:
       tags:
@@ -198,3 +200,5 @@ paths:
                     type: string
         400:
           description: Bad Request
+        401:
+          description: Unauthorized
