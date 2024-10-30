@@ -174,5 +174,27 @@ paths:
       responses:
         200:
           description: Account updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      user_id:
+                        type: string
+                      is_personal:
+                        type: boolean
+                      balance:
+                        type: integer
+                      company_id:
+                        type: string
+                  message:
+                    type: string
         400:
           description: Bad Request

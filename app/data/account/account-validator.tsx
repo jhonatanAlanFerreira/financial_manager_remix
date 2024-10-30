@@ -98,6 +98,24 @@ export async function accountUpdateValidator(
   user: User,
   accountId: string
 ): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(accountId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid account ID format",
+      },
+    };
+  }
+
+  if (!validateNumber(data.balance)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Balance must be a valid number",
+      },
+    };
+  }
+
   if (!data.name) {
     return {
       errorCode: 400,
