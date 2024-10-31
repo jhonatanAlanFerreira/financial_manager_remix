@@ -4,11 +4,18 @@ import {
   CompanyUpdateRequestInterface,
 } from "~/data/company/company-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  validatePaginationParams,
+  validateCompany,
+} from "~/data/services/validators";
 
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<any> { //WIP
+): Promise<any> {
+  //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -20,8 +27,8 @@ export async function companyCreateValidator(
 
   const companyExists = await prisma.company.findFirst({
     where: {
-        name: data.name,
-        user_id: user.id,
+      name: data.name,
+      user_id: user.id,
     },
   });
 
@@ -42,7 +49,8 @@ export async function companyCreateValidator(
 export async function companyDeleteValidator(
   user: User,
   companyId: string
-): Promise<any> { //WIP
+): Promise<any> {
+  //WIP
   const companyExistis = await prisma.company.findFirst({
     where: {
       id: companyId,
@@ -68,7 +76,8 @@ export async function companyUpdateValidator(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<any> { //WIP
+): Promise<any> {
+  //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -97,8 +106,8 @@ export async function companyUpdateValidator(
   const companyExists = await prisma.company.findFirst({
     where: {
       NOT: { id: companyId },
-        name: data.name,
-        user_id: user.id,
+      name: data.name,
+      user_id: user.id,
     },
   });
 
@@ -114,4 +123,16 @@ export async function companyUpdateValidator(
   return {
     isValid: true,
   };
+}
+
+export async function listCompaniesValidator(
+  params: CompanyLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  return null;
 }

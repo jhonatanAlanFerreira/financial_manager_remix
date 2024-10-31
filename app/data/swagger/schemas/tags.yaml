@@ -5,3 +5,5 @@ tags:
     description: API for managing authentication and user sessions
   - name: Accounting Services
     description: API for managing accounts and financial data
+  - name: Company Services
+    description: API for managing company-related data

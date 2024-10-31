@@ -25,11 +25,6 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const params: CompanyLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    with_accounts: !!url.searchParams.get("with_accounts"),
-    working_capital_greater: Number(
-      url.searchParams.get("working_capital_greater")
-    ),
-    working_capital_less: Number(url.searchParams.get("working_capital_less")),
     name: url.searchParams.get("name"),
   };
 

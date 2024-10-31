@@ -20,7 +20,10 @@ export function buildWhereClause(
       whereClause.company_id = params.company_id;
     }
 
-    if (params.is_personal_or_company !== "all") {
+    if (
+      params.is_personal_or_company &&
+      params.is_personal_or_company !== "all"
+    ) {
       whereClause.is_personal =
         params.is_personal_or_company === "personal" ? true : false;
     }

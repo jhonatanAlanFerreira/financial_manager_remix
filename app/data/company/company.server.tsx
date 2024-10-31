@@ -11,56 +11,38 @@ import {
   companyCreateValidator,
   companyDeleteValidator,
   companyUpdateValidator,
+  listCompaniesValidator,
 } from "~/data/company/company-validator";
-
-type CompanyWhereInput = Prisma.CompanyWhereInput;
+import { paginate } from "~/data/services/list.service";
 
 export async function list(
   user: User,
   params: CompanyLoaderParamsInterface
 ): Promise<ServerResponseInterface<Company[] | CompanyWithAccountsType[]>> {
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+  const serverError = await listCompaniesValidator(params, user);
 
-  const whereClause: CompanyWhereInput = {
-    user_id: user.id,
-  };
-
-  if (params.name) {
-    whereClause.name = { contains: params.name, mode: "insensitive" };
+  if (serverError) {
+    return {
+      errors: serverError,
+      message: "There are some invalid params",
+    };
   }
 
-  const companies = await prisma.company.findMany({
-    where: whereClause,
-    skip,
-    take,
-    include: { accounts: params.with_accounts },
-  });
+  const { page, pageSize, ...restParams } = params;
 
-  const totalData = await prisma.company.count({
-    where: whereClause,
-  });
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
-
-  return {
-    data: companies,
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
-    },
-  };
+  return paginate<Company, Prisma.CompanyFindManyArgs, Prisma.CompanyCountArgs>(
+    prisma.company.findMany,
+    prisma.company.count,
+    { page, pageSize },
+    restParams
+  );
 }
 
 export async function create(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface<Company | any>> { //WIP
+): Promise<ServerResponseInterface<Company | any>> {
+  //WIP
   const dataIsValid = await companyCreateValidator(data, user);
 
   if (!dataIsValid.isValid) {
@@ -88,12 +70,13 @@ export async function update(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ServerResponseInterface<Company | any>> { //WIP
+): Promise<ServerResponseInterface<Company | any>> {
+  //WIP
   const dataIsValid = await companyUpdateValidator(data, user, companyId);
 
   if (!dataIsValid.isValid) {
     return {
-       //error: true, WIP
+      //error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -120,7 +103,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-       //error: true, WIP
+      //error: true, WIP
       message: "Company not found",
       data: dataIsValid,
     };
