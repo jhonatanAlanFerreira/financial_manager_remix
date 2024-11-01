@@ -6,6 +6,8 @@ import {
   CompanyUpdateRequestInterface,
 } from "~/data/company/company-request-interfaces";
 import { create, list, remove, update } from "~/data/company/company.server";
+import { parseIncludes } from "~/utils/utilities";
+import { companyIncludeOptions } from "~/data/company/company-types";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -25,7 +27,8 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const params: CompanyLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    name: url.searchParams.get("name"),
+    name: url.searchParams.get("name") || undefined,
+    extends: parseIncludes(url, companyIncludeOptions),
   };
 
   return list(user, params);

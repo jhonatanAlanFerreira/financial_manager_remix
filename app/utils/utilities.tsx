@@ -67,3 +67,17 @@ export function getBaseUrl() {
       : `host.docker.internal:${port}`;
   return `http://${host}`;
 }
+
+export function parseIncludes<T extends readonly string[]>(
+  url: URL,
+  includeOptions: T
+): T[number][] {
+  const includesParam = url.searchParams.get("extends");
+  if (!includesParam) return [];
+
+  return includesParam
+    .split(",")
+    .filter((value): value is T[number] =>
+      includeOptions.includes(value as T[number])
+    );
+}

@@ -126,8 +126,7 @@ export async function companyUpdateValidator(
 }
 
 export async function listCompaniesValidator(
-  params: CompanyLoaderParamsInterface,
-  user: User
+  params: CompanyLoaderParamsInterface
 ): Promise<ServerResponseErrorInterface | null> {
   const paginationErrors = validatePaginationParams(params);
   if (paginationErrors) {

@@ -1,7 +1,6 @@
 import { Company, Prisma, User } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
-import { CompanyWithAccountsType } from "~/data/company/company-types";
 import { prisma } from "~/data/database/database.server";
 import {
   CompanyCreateRequestInterface,
@@ -14,12 +13,13 @@ import {
   listCompaniesValidator,
 } from "~/data/company/company-validator";
 import { paginate } from "~/data/services/list.service";
+import { CompanyIncludeOptions } from "~/data/company/company-types";
 
 export async function list(
   user: User,
   params: CompanyLoaderParamsInterface
-): Promise<ServerResponseInterface<Company[] | CompanyWithAccountsType[]>> {
-  const serverError = await listCompaniesValidator(params, user);
+): Promise<ServerResponseInterface<Company[]>> {
+  const serverError = await listCompaniesValidator(params);
 
   if (serverError) {
     return {
@@ -28,13 +28,19 @@ export async function list(
     };
   }
 
-  const { page, pageSize, ...restParams } = params;
+  const { page, pageSize, extends: companyIncludes, ...restParams } = params;
 
-  return paginate<Company, Prisma.CompanyFindManyArgs, Prisma.CompanyCountArgs>(
+  return paginate<
+    Company,
+    Prisma.CompanyFindManyArgs,
+    Prisma.CompanyCountArgs,
+    CompanyIncludeOptions
+  >(
     prisma.company.findMany,
     prisma.company.count,
     { page, pageSize },
-    restParams
+    restParams,
+    companyIncludes
   );
 }
 

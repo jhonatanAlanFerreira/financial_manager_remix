@@ -35,13 +35,14 @@ export function buildWhereClause(
 export async function paginate<
   Model extends Models,
   FindManyArg extends FindManyArgs,
-  CountArg extends CountArgs
+  CountArg extends CountArgs,
+  IncludeOption extends string
 >(
   findManyQuery: (findManyArg: FindManyArg) => Promise<Model[]>,
   countQuery: (countArg: CountArg) => Promise<number>,
   paginationParams: PaginationParamsInterface = { page: 1, pageSize: "all" },
   whereParams?: WhereParamsInterface,
-  additionalQuery?: AdditionalArgs
+  includes?: IncludeOption[]
 ): Promise<{
   data: Model[];
   pageInfo: {
@@ -60,11 +61,16 @@ export async function paginate<
 
   const whereClause = buildWhereClause(whereParams);
 
+  const includeQuery = includes?.reduce(
+    (acc, include) => ({ ...acc, [include]: true }),
+    {} as Record<string, boolean>
+  );
+
   const finalQuery = {
     where: whereClause,
     skip,
     take,
-    ...additionalQuery,
+    include: includeQuery,
   } as FindManyArg;
 
   const data = await findManyQuery(finalQuery);

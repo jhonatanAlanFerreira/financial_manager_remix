@@ -1,6 +1,5 @@
 paths:
   /api/company:
-  
     get:
       tags:
         - Company Services
@@ -23,6 +22,11 @@ paths:
                 default: 10
               - type: string
                 enum: ["all"]
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "accounts,users"
       responses:
         200:
           description: A list of companies
