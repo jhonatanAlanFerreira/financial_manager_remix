@@ -37,8 +37,8 @@ export async function paginate<
   Model extends Models,
   FindManyArg extends FindManyArgs,
   CountArg extends CountArgs,
-  IncludeOption extends string,
-  WhereType extends WhereInputs
+  IncludeOption extends string = string,
+  WhereType extends WhereInputs = {}
 >(
   findManyQuery: (findManyArg: FindManyArg) => Promise<Model[]>,
   countQuery: (countArg: CountArg) => Promise<number>,
