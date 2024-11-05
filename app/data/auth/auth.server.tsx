@@ -101,7 +101,7 @@ export async function signup(
       name: "Personal Account",
       user_id: user.id,
       balance: 0,
-      is_personal_account: true,
+      is_personal: true,
     },
   });
 
