@@ -6,19 +6,15 @@ import {
 import { prisma } from "~/data/database/database.server";
 import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import {
-  validatePaginationParams,
-  validateCompany,
-} from "~/data/services/validators";
+import { validatePaginationParams } from "~/data/services/validators";
 
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
@@ -34,16 +30,14 @@ export async function companyCreateValidator(
 
   if (companyExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This company already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function companyDeleteValidator(

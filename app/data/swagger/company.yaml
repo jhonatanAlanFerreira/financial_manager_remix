@@ -58,6 +58,11 @@ paths:
                           type: array
                           items:
                             type: string
+                        accounts:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Account"
+                          nullable: true
                   pageInfo:
                     type: object
                     properties:

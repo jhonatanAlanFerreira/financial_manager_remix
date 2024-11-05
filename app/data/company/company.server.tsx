@@ -50,14 +50,12 @@ export async function create(
   data: CompanyCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface<Company | any>> {
-  //WIP
-  const dataIsValid = await companyCreateValidator(data, user);
+  const serverError = await companyCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      //error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 

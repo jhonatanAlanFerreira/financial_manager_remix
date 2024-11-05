@@ -42,14 +42,7 @@ let createCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return create(data, user);
 };
 
 let removeCompany = async (request: Request) => {
