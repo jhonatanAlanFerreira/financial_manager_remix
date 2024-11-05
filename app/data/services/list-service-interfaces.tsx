@@ -43,4 +43,13 @@ export type FindManyArgs =
   | Prisma.TransactionClassificationFindManyArgs
   | Prisma.IncomeFindManyArgs;
 
+export type WhereInputs =
+  | Prisma.AccountWhereInput
+  | Prisma.UserWhereInput
+  | Prisma.CompanyWhereInput
+  | Prisma.ExpenseWhereInput
+  | Prisma.TransactionWhereInput
+  | Prisma.TransactionClassificationWhereInput
+  | Prisma.IncomeWhereInput;
+
 export type AdditionalArgs = Omit<FindManyArgs, "where" | "skip" | "take">;

@@ -34,13 +34,15 @@ export async function list(
     Company,
     Prisma.CompanyFindManyArgs,
     Prisma.CompanyCountArgs,
-    CompanyIncludeOptions
+    CompanyIncludeOptions,
+    Prisma.CompanyWhereInput
   >(
     prisma.company.findMany,
     prisma.company.count,
     { page, pageSize },
     restParams,
-    companyIncludes
+    companyIncludes,
+    { user_id: user.id }
   );
 }
 

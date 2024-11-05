@@ -4,6 +4,7 @@ import {
   CountArgs,
   FindManyArgs,
   Models,
+  WhereInputs,
 } from "~/data/services/list-service-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 export function buildWhereClause(
@@ -36,13 +37,15 @@ export async function paginate<
   Model extends Models,
   FindManyArg extends FindManyArgs,
   CountArg extends CountArgs,
-  IncludeOption extends string
+  IncludeOption extends string,
+  WhereType extends WhereInputs
 >(
   findManyQuery: (findManyArg: FindManyArg) => Promise<Model[]>,
   countQuery: (countArg: CountArg) => Promise<number>,
   paginationParams: PaginationParamsInterface = { page: 1, pageSize: "all" },
   whereParams?: WhereParamsInterface,
-  includes?: IncludeOption[]
+  includes?: IncludeOption[],
+  additionalWhere?: WhereType
 ): Promise<{
   data: Model[];
   pageInfo: {
@@ -61,13 +64,15 @@ export async function paginate<
 
   const whereClause = buildWhereClause(whereParams);
 
+  const finalWhereClause = { ...whereClause, ...additionalWhere };
+
   const includeQuery = includes?.reduce(
     (acc, include) => ({ ...acc, [include]: true }),
     {} as Record<string, boolean>
   );
 
   const finalQuery = {
-    where: whereClause,
+    where: finalWhereClause,
     skip,
     take,
     include: includeQuery,
@@ -75,7 +80,7 @@ export async function paginate<
 
   const data = await findManyQuery(finalQuery);
   const totalData = await countQuery({
-    where: whereClause,
+    where: finalWhereClause,
   } as CountArg);
 
   const totalPages =
