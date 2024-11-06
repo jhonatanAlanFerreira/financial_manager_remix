@@ -1,5 +1,4 @@
 paths:
-
   /api/login:
     post:
       tags:
@@ -24,21 +23,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      login:
-                        type: string
-                      accountant_balance:
-                        type: number
-                  message:
-                    type: string
+                $ref: "#/components/schemas/User"
+                message:
+                  type: string
         400:
           description: Bad Request
         401:
@@ -76,12 +63,16 @@ paths:
               properties:
                 name:
                   type: string
+                  default: ""
                 login:
                   type: string
+                  default: ""
                 password:
                   type: string
+                  default: ""
                 passwordRepeat:
                   type: string
+                  default: ""
       responses:
         201:
           description: Login created
@@ -91,16 +82,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      login:
-                        type: string
-                      accountant_balance:
-                        type: number
+                    $ref: "#/components/schemas/User"
                   message:
                     type: string
         400:

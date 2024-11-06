@@ -64,16 +64,7 @@ paths:
                             $ref: "#/components/schemas/Account"
                           nullable: true
                   pageInfo:
-                    type: object
-                    properties:
-                      currentPage:
-                        type: integer
-                      pageSize:
-                        type: integer
-                      totalData:
-                        type: integer
-                      totalPages:
-                        type: integer
+                    $ref: "#/components/schemas/PageInfo"
         400:
           description: Bad Request
         401:

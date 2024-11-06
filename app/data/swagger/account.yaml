@@ -1,6 +1,5 @@
 paths:
   /api/account:
-  
     get:
       tags:
         - Accounting Services
@@ -44,32 +43,9 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        user_id:
-                          type: string
-                        is_personal:
-                          type: boolean
-                        company_id:
-                          type: string
-                          nullable: true
-                        balance:
-                          type: integer
+                      $ref: "#/components/schemas/Account"
                   pageInfo:
-                    type: object
-                    properties:
-                      currentPage:
-                        type: integer
-                      pageSize:
-                        type: integer
-                      totalData:
-                        type: integer
-                      totalPages:
-                        type: integer
+                    $ref: "#/components/schemas/PageInfo"
         400:
           description: Bad Request
         401:
@@ -88,10 +64,12 @@ paths:
               properties:
                 name:
                   type: string
+                  default: ""
                 balance:
                   type: integer
                 company:
                   type: string
+                  default: ""
       responses:
         201:
           description: Account created
@@ -101,20 +79,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      user_id:
-                        type: string
-                      is_personal:
-                        type: boolean
-                      balance:
-                        type: integer
-                      company_id:
-                        type: string
+                    $ref: "#/components/schemas/Account"
                   message:
                     type: string
         400:
@@ -166,6 +131,7 @@ paths:
               properties:
                 name:
                   type: string
+                  default: ""
                 balance:
                   type: integer
       responses:
@@ -177,20 +143,7 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      user_id:
-                        type: string
-                      is_personal:
-                        type: boolean
-                      balance:
-                        type: integer
-                      company_id:
-                        type: string
+                    $ref: "#/components/schemas/Account"
                   message:
                     type: string
         400:
