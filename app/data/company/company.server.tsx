@@ -49,7 +49,7 @@ export async function list(
 export async function create(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface<Company | any>> {
+): Promise<ServerResponseInterface<Company>> {
   const serverError = await companyCreateValidator(data, user);
 
   if (serverError) {
@@ -76,15 +76,13 @@ export async function update(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ServerResponseInterface<Company | any>> {
-  //WIP
-  const dataIsValid = await companyUpdateValidator(data, user, companyId);
+): Promise<ServerResponseInterface<Company>> {
+  const serverError = await companyUpdateValidator(data, user, companyId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      //error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -105,13 +103,12 @@ export async function remove(
   companyId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await companyDeleteValidator(user, companyId);
+  const serverError = await companyDeleteValidator(user, companyId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      //error: true, WIP
-      message: "Company not found",
-      data: dataIsValid,
+      errors: serverError,
+      message: "There are some errors in your form",
     };
   }
 

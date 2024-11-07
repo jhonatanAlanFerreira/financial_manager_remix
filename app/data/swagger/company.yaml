@@ -84,3 +84,65 @@ paths:
           description: Bad Request
         401:
           description: Unauthorized
+
+    patch:
+      tags:
+        - Company Services
+      summary: Update a company
+      parameters:
+        - in: query
+          name: companyId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+      responses:
+        200:
+          description: Company updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Company"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Company Services
+      summary: Delete a company
+      parameters:
+        - in: query
+          name: companyId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Company deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized

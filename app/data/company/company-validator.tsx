@@ -6,7 +6,11 @@ import {
 import { prisma } from "~/data/database/database.server";
 import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import { validatePaginationParams } from "~/data/services/validators";
+import {
+  validateCompany,
+  validateIdFormat,
+  validatePaginationParams,
+} from "~/data/services/validators";
 
 export async function companyCreateValidator(
   data: CompanyCreateRequestInterface,
@@ -43,38 +47,32 @@ export async function companyCreateValidator(
 export async function companyDeleteValidator(
   user: User,
   companyId: string
-): Promise<any> {
-  //WIP
-  const companyExistis = await prisma.company.findFirst({
-    where: {
-      id: companyId,
-      user_id: user.id,
-    },
-  });
-
-  if (!companyExistis) {
-    return {
-      isValid: false,
-      errors: {
-        id: "Company not found",
-      },
-    };
+): Promise<ServerResponseErrorInterface | null> {
+  const companyErrors = await validateCompany(companyId, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function companyUpdateValidator(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(companyId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid company ID format",
+      },
+    };
+  }
+
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
@@ -90,7 +88,7 @@ export async function companyUpdateValidator(
 
   if (!company) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Company not found",
       },
@@ -107,16 +105,14 @@ export async function companyUpdateValidator(
 
   if (companyExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This company already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function listCompaniesValidator(

@@ -49,14 +49,7 @@ let removeCompany = async (request: Request) => {
   const user = await requireUserSession(request);
   const companyId = String(new URL(request.url).searchParams.get("companyId"));
 
-  const res = await remove(companyId, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return remove(companyId, user);
 };
 
 let updateCompany = async (request: Request) => {
@@ -68,11 +61,5 @@ let updateCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  const res = await update(data, user, companyId);
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return update(data, user, companyId);
 };

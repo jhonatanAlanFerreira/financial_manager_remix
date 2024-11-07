@@ -87,31 +87,6 @@ paths:
         401:
           description: Unauthorized
 
-    delete:
-      tags:
-        - Accounting Services
-      summary: Delete an account
-      parameters:
-        - in: query
-          name: accountId
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Account deleted
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        404:
-          description: Account not found
-        401:
-          description: Unauthorized
-
     patch:
       tags:
         - Accounting Services
@@ -148,5 +123,30 @@ paths:
                     type: string
         400:
           description: Bad Request
+        401:
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Accounting Services
+      summary: Delete an account
+      parameters:
+        - in: query
+          name: accountId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Account deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        404:
+          description: Account not found
         401:
           description: Unauthorized
