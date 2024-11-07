@@ -28,6 +28,28 @@ components:
         accountant_balance:
           type: number
 
+    Company:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        expense_ids:
+          type: array
+          items:
+            type: string
+        income_ids:
+          type: array
+          items:
+            type: string
+        transaction_classification_ids:
+          type: array
+          items:
+            type: string
+
     PageInfo:
       type: object
       properties:
