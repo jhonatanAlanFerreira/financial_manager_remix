@@ -78,20 +78,18 @@ export async function update(
   user: User,
   data: ClassificationUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await classificationUpdateValidator(
+  const serverError = await classificationUpdateValidator(
     data,
     user,
     classificationId
   );
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
-
   const res = await prisma.transactionClassification.update({
     data: {
       name: data.name,

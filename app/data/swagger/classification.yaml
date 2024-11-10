@@ -42,3 +42,52 @@ paths:
           description: Bad Request
         401:
           description: Unauthorized
+
+    patch:
+      tags:
+        - Classification Services
+      summary: Update a classification
+      parameters:
+        - in: query
+          name: classificationId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                companies:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
+                is_personal:
+                  type: boolean
+                  default: false
+                is_income:
+                  type: boolean
+                  default: false
+      responses:
+        200:
+          description: Classification updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Classification"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized

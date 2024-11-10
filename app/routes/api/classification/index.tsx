@@ -63,21 +63,12 @@ let updateClassification = async (request: Request) => {
 
   const data: ClassificationUpdateRequestInterface = {
     name: String(body.get("name") || ""),
-    is_income: !!body.get("is_income"),
-    is_personal: !!body.get("is_personal"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_income: body.get("is_income") == "true",
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await update(classificationId, user, data);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return update(classificationId, user, data);
 };
 
 export let loader = async ({ request }: LoaderFunctionArgs) => {
