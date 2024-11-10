@@ -69,3 +69,19 @@ export async function validateCompany(
 
   return null;
 }
+
+export async function validateCompanies(
+  companyIds: string[] | undefined,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  if (companyIds && companyIds.length > 0) {
+    for (const companyId of companyIds) {
+      const error = await validateCompany(companyId, user);
+      if (error) {
+        return error;
+      }
+    }
+  }
+
+  return null;
+}

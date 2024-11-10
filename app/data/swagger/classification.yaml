@@ -1,0 +1,44 @@
+paths:
+  /api/classification:
+    post:
+      tags:
+        - Classification Services
+      summary: Create a new classification
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                companies:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
+                is_personal:
+                  type: boolean
+                  default: false
+                is_income:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: Classification created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Classification"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized

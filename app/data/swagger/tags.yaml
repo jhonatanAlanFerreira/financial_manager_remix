@@ -7,3 +7,5 @@ tags:
     description: API for managing accounts and financial data
   - name: Company Services
     description: API for managing company-related data
+  - name: Classification Services
+    description: API for managing classifications

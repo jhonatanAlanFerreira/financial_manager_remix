@@ -20,13 +20,12 @@ export async function create(
   data: ClassificationCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await classificationCreateValidator(data, user);
+  const serverError = await classificationCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-     // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -35,8 +34,7 @@ export async function create(
       name: data.name,
       user_id: user.id,
       is_income: data.is_income,
-      is_personal_transaction_classification:
-        data.is_personal_transaction_classification,
+      is_personal: data.is_personal,
       company_ids: data.companies,
     },
   });
@@ -58,7 +56,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-     // error: true, WIP
+      // error: true, WIP
       message: "Classification not found",
       data: dataIsValid,
     };
@@ -88,7 +86,7 @@ export async function update(
 
   if (!dataIsValid.isValid) {
     return {
-     // error: true, WIP
+      // error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -99,8 +97,7 @@ export async function update(
       name: data.name,
       user_id: user.id,
       is_income: data.is_income,
-      is_personal_transaction_classification:
-        data.is_personal_transaction_classification,
+      is_personal: data.is_personal,
       company_ids: data.companies,
     },
     where: {
@@ -130,7 +127,7 @@ export async function list(
     user_id: user.id,
   };
 
-  whereClause.is_personal_transaction_classification =
+  whereClause.is_personal =
     params.is_personal_or_company !== "all"
       ? params.is_personal_or_company === "personal"
       : undefined;

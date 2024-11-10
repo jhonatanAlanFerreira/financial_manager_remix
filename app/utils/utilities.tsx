@@ -81,3 +81,16 @@ export function parseIncludes<T extends readonly string[]>(
       includeOptions.includes(value as T[number])
     );
 }
+
+export function getArrayFromFormData(
+  formData: FormData,
+  paramName: string
+): string[] {
+  const paramValue = formData.get(paramName);
+
+  if (paramValue && paramValue !== "null") {
+    return formData.getAll(paramName) as string[];
+  }
+
+  return [];
+}

@@ -11,6 +11,7 @@ import {
   remove,
   update,
 } from "~/data/classification/classification.server";
+import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -29,23 +30,12 @@ let createClassification = async (request: Request) => {
 
   const data: ClassificationCreateRequestInterface = {
     name: String(body.get("name") || ""),
-    is_income: !!body.get("is_income"),
-    is_personal_transaction_classification: !!body.get(
-      "is_personal_transaction_classification"
-    ),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_income: body.get("is_income") == "true",
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return create(data, user);
 };
 
 let removeClassification = async (request: Request) => {
@@ -74,9 +64,7 @@ let updateClassification = async (request: Request) => {
   const data: ClassificationUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     is_income: !!body.get("is_income"),
-    is_personal_transaction_classification: !!body.get(
-      "is_personal_transaction_classification"
-    ),
+    is_personal: !!body.get("is_personal"),
     companies: body.get("companies")
       ? (body.getAll("companies") as string[])
       : [],
