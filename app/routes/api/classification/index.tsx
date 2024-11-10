@@ -44,14 +44,7 @@ let removeClassification = async (request: Request) => {
     new URL(request.url).searchParams.get("classificationId")
   );
 
-  const res = await remove(classificationId, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return remove(classificationId, user);
 };
 
 let updateClassification = async (request: Request) => {

@@ -91,3 +91,30 @@ paths:
           description: Bad Request
         401:
           description: Unauthorized
+
+    delete:
+      tags:
+        - Classification Services
+      summary: Delete a classification
+      parameters:
+        - in: query
+          name: classificationId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Classification deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Classification not found

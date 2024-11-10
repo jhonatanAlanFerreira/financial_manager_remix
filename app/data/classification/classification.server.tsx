@@ -49,16 +49,15 @@ export async function remove(
   classificationId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await classificationDeleteValidator(
+  const serverError = await classificationDeleteValidator(
     user,
     classificationId
   );
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
-      message: "Classification not found",
-      data: dataIsValid,
+      errors: serverError,
+      message: "There are some invalid params",
     };
   }
 

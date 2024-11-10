@@ -62,8 +62,16 @@ export async function classificationCreateValidator(
 export async function classificationDeleteValidator(
   user: User,
   classificationId: string
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(classificationId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid classification ID format",
+      },
+    };
+  }
+
   const classificationExistis =
     await prisma.transactionClassification.findFirst({
       where: {
@@ -74,16 +82,14 @@ export async function classificationDeleteValidator(
 
   if (!classificationExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Classification not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function classificationUpdateValidator(

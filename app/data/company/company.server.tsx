@@ -108,7 +108,7 @@ export async function remove(
   if (serverError) {
     return {
       errors: serverError,
-      message: "There are some errors in your form",
+      message: "There are some invalid params",
     };
   }
 
