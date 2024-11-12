@@ -8,7 +8,7 @@ import { ClassificationIncludeOptions } from "~/data/classification/classificati
 export interface ClassificationLoaderParamsInterface
   extends PaginationParamsInterface {
   name: string | undefined;
-  company: string | undefined;
+  has_company: string | undefined;
   is_personal_or_company: IsPersonalOrCompanyType;
   is_income_or_expense: IsIncomeOrExpenseType;
   extends?: ClassificationIncludeOptions[];
