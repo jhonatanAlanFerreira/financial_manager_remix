@@ -8,6 +8,7 @@ import {
   classificationCreateValidator,
   classificationDeleteValidator,
   classificationUpdateValidator,
+  listClassificationsValidator,
 } from "~/data/classification/classification-validator";
 import { prisma } from "~/data/database/database.server";
 import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
@@ -110,7 +111,14 @@ export async function list(
   user: User,
   params: ClassificationLoaderParamsInterface
 ): Promise<ServerResponseInterface<TransactionClassification[]>> {
-  //Validators WIP
+  const serverError = await listClassificationsValidator(params, user);
+
+  if (serverError) {
+    return {
+      errors: serverError,
+      message: "There are some invalid params",
+    };
+  }
 
   const {
     page,

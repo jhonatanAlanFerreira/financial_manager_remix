@@ -7,8 +7,11 @@ import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import {
   validateCompanies,
+  validateCompany,
   validateIdFormat,
+  validatePaginationParams,
 } from "~/data/services/validators";
+import { ClassificationLoaderParamsInterface } from "./classification-query-params-interfaces";
 
 export async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
@@ -163,6 +166,23 @@ export async function classificationUpdateValidator(
         name: "This classification already exists",
       },
     };
+  }
+
+  return null;
+}
+
+export async function listClassificationsValidator(
+  params: ClassificationLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = validateCompany(params.has_company, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   return null;
