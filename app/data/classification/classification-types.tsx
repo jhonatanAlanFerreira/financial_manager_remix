@@ -1,8 +1,3 @@
-import { Prisma } from "@prisma/client";
-
-export type ClassificationWithCompanyType =
-  Prisma.TransactionClassificationGetPayload<{
-    include: {
-      companies: true;
-    };
-  }>;
+export const classificationIncludeOptions = ["transactions"] as const;
+export type ClassificationIncludeOptions =
+  (typeof classificationIncludeOptions)[number];

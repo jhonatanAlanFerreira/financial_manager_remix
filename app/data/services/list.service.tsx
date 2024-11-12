@@ -1,6 +1,5 @@
 import { WhereParamsInterface } from "~/shared/where-params-interface";
 import {
-  AdditionalArgs,
   CountArgs,
   FindManyArgs,
   Models,
@@ -17,8 +16,8 @@ export function buildWhereClause(
       whereClause.name = { contains: params.name, mode: "insensitive" };
     }
 
-    if (params.company_id) {
-      whereClause.company_id = params.company_id;
+    if (params.company) {
+      whereClause.company_id = params.company;
     }
 
     if (
@@ -27,6 +26,11 @@ export function buildWhereClause(
     ) {
       whereClause.is_personal =
         params.is_personal_or_company === "personal" ? true : false;
+    }
+
+    if (params.is_income_or_expense && params.is_income_or_expense !== "all") {
+      whereClause.is_income =
+        params.is_income_or_expense === "income" ? true : false;
     }
   }
 

@@ -72,6 +72,13 @@ components:
         is_income:
           type: boolean
 
+    # WIP
+    Transaction: 
+      type: object
+      properties:
+        id: 
+          type: string
+
     PageInfo:
       type: object
       properties:

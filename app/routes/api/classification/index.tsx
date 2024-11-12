@@ -5,13 +5,18 @@ import {
   ClassificationCreateRequestInterface,
   ClassificationUpdateRequestInterface,
 } from "~/data/classification/classification-request-interfaces";
+import { classificationIncludeOptions } from "~/data/classification/classification-types";
 import {
   create,
   list,
   remove,
   update,
 } from "~/data/classification/classification.server";
-import { getArrayFromFormData } from "~/utils/utilities";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
+import { getArrayFromFormData, parseIncludes } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -71,18 +76,17 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
   const params: ClassificationLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
+    extends: parseIncludes(url, classificationIncludeOptions),
     is_income_or_expense:
-      (url.searchParams.get("is_income_or_expense") as
-        | "expense"
-        | "income"
-        | "all") || "all",
+      (url.searchParams.get("is_income_or_expense") as IsIncomeOrExpenseType) ||
+      "all",
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
   };
+
   return list(user, params);
 };

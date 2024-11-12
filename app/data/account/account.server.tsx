@@ -62,7 +62,9 @@ export async function list(
     prisma.account.findMany,
     prisma.account.count,
     { page, pageSize },
-    restParams
+    restParams,
+    [],
+    { user_id: user.id }
   );
 }
 
