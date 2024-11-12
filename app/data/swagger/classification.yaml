@@ -1,5 +1,61 @@
 paths:
   /api/classification:
+    get:
+      tags:
+        - Classification Services
+      summary: Retrieve a list of classifications
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: company
+          schema:
+            type: string
+        - in: query
+          name: is_personal_or_company
+          schema:
+            type: string
+            enum: [all, personal, company]
+            default: all
+        - in: query
+          name: is_income_or_expense
+          schema:
+            type: string
+            enum: [all, income, expense]
+            default: all
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "transactions"
+      responses:
+        200:
+          description: A list of classifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Classification"
+                        - type: object
+                          properties:
+                            transactions:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/Transaction"
+                  pageInfo:
+                    $ref: "#/components/schemas/PageInfo"
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
     post:
       tags:
         - Classification Services
@@ -118,59 +174,3 @@ paths:
           description: Unauthorized
         404:
           description: Classification not found
-
-    get:
-      tags:
-        - Classification Services
-      summary: Retrieve a list of classifications
-      parameters:
-        - in: query
-          name: name
-          schema:
-            type: string
-        - in: query
-          name: company
-          schema:
-            type: string
-        - in: query
-          name: is_personal_or_company
-          schema:
-            type: string
-            enum: [all, personal, company]
-            default: all
-        - in: query
-          name: is_income_or_expense
-          schema:
-            type: string
-            enum: [all, income, expense]
-            default: all
-        - in: query
-          name: extends
-          schema:
-            type: string
-            example: "transactions"
-      responses:
-        200:
-          description: A list of classifications
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      allOf:
-                        - $ref: "#/components/schemas/Classification"
-                        - type: object
-                          properties:
-                            transactions:
-                              type: array
-                              items:
-                                $ref: "#/components/schemas/Transaction"
-                  pageInfo:
-                    $ref: "#/components/schemas/PageInfo"
-        400:
-          description: Bad Request
-        401:
-          description: Unauthorized
