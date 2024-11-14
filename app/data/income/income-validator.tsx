@@ -4,65 +4,61 @@ import {
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { validateCompanies } from "~/data/services/validators";
 
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,
   user: User
-): Promise<any> { //WIP
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        empty: "Personal income can not have companies",
       },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
+    };
+  }
+
+  const companyErrors = validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const incomeExists = await prisma.income.findFirst({
     where: {
-        name: data.name,
-        user_id: user.id,
-        is_personal_income: data.is_personal_income,
+      name: data.name,
+      user_id: user.id,
+      is_personal: data.is_personal,
     },
   });
 
   if (incomeExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This income already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function incomeDeleteValidator(
   user: User,
   incomeId: string
-): Promise<any> { //WIP
+): Promise<any> {
+  //WIP
   const incomeExistis = await prisma.income.findFirst({
     where: {
       id: incomeId,
@@ -88,7 +84,8 @@ export async function incomeUpdateValidator(
   data: IncomeUpdateRequestInterface,
   user: User,
   incomeId: string
-): Promise<any> { //WIP
+): Promise<any> {
+  //WIP
   if (!data.name) {
     return {
       isValid: false,
@@ -139,7 +136,7 @@ export async function incomeUpdateValidator(
         { id: { not: incomeId } },
         { name: data.name },
         { user_id: user.id },
-        { is_personal_income: data.is_personal_income },
+        { is_personal: data.is_personal },
       ],
     },
   });

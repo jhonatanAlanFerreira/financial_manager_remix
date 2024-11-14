@@ -19,23 +19,21 @@ export async function create(
   data: IncomeCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await incomeCreateValidator(data, user);
+  const serverError = await incomeCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
-
   const income = await prisma.income.create({
     data: {
       name: data.name,
       user_id: user.id,
       company_ids: data.companies,
       amount: data.amount,
-      is_personal_income: data.is_personal_income,
+      is_personal: data.is_personal,
     },
   });
 
@@ -57,7 +55,7 @@ export async function list(
     user_id: user.id,
   };
 
-  whereClause.is_personal_income =
+  whereClause.is_personal =
     params.is_personal_or_company !== "all"
       ? params.is_personal_or_company === "personal"
       : undefined;
@@ -115,7 +113,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-     // error: true, WIP
+      // error: true, WIP
       message: "Income not found",
       data: dataIsValid,
     };
@@ -141,7 +139,7 @@ export async function update(
 
   if (!dataIsValid.isValid) {
     return {
-     // error: true, WIP
+      // error: true, WIP
       message: "There are some errors in your form",
       data: dataIsValid,
     };
@@ -153,7 +151,7 @@ export async function update(
       user_id: user.id,
       company_ids: data.companies,
       amount: data.amount,
-      is_personal_income: data.is_personal_income,
+      is_personal: data.is_personal,
     },
     where: {
       id: incomeId,

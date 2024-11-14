@@ -6,6 +6,7 @@ import {
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
+import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -45,20 +46,11 @@ let createIncome = async (request: Request) => {
   const data: IncomeCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_income: !!body.get("is_personal_income"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return create(data, user);
 };
 
 let removeIncome = async (request: Request) => {
@@ -82,10 +74,8 @@ let updateIncome = async (request: Request) => {
   const data: IncomeUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_income: !!body.get("is_personal_income"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: !!body.get("is_personal"),
+    companies: getArrayFromFormData(body, "companies"),
   };
 
   const res = await update(incomeId, user, data);

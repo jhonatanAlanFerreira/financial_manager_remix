@@ -9,3 +9,5 @@ tags:
     description: API for managing company-related data
   - name: Classification Services
     description: API for managing classifications
+  - name: Income Services
+    description: API for managing Incomes
