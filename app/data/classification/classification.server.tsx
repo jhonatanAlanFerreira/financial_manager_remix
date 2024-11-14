@@ -138,7 +138,7 @@ export async function list(
     prisma.transactionClassification.count,
     { page, pageSize },
     restParams,
-    classificationIncludes,
-    { user_id: user.id }
+    { user_id: user.id },
+    classificationIncludes
   );
 }

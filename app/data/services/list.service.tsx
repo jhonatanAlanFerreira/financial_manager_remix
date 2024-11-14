@@ -52,8 +52,8 @@ export async function paginate<
   countQuery: (countArg: CountArg) => Promise<number>,
   paginationParams: PaginationParamsInterface = { page: 1, pageSize: "all" },
   whereParams?: WhereParamsInterface,
-  includes?: IncludeOption[],
-  additionalWhere?: WhereType
+  additionalWhere?: WhereType,
+  includes?: IncludeOption[]
 ): Promise<{
   data: Model[];
   pageInfo: {

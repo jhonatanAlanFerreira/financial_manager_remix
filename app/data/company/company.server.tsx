@@ -41,8 +41,8 @@ export async function list(
     prisma.company.count,
     { page, pageSize },
     restParams,
-    companyIncludes,
-    { user_id: user.id }
+    { user_id: user.id },
+    companyIncludes
   );
 }
 

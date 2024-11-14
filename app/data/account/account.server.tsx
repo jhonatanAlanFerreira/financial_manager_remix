@@ -63,7 +63,6 @@ export async function list(
     prisma.account.count,
     { page, pageSize },
     restParams,
-    [],
     { user_id: user.id }
   );
 }
