@@ -74,16 +74,9 @@ let updateIncome = async (request: Request) => {
   const data: IncomeUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal: !!body.get("is_personal"),
+    is_personal: body.get("is_personal") == "true",
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await update(incomeId, user, data);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return update(incomeId, user, data);
 };

@@ -27,6 +27,7 @@ export async function create(
       message: "There are some errors in your form",
     };
   }
+
   const income = await prisma.income.create({
     data: {
       name: data.name,
@@ -135,13 +136,12 @@ export async function update(
   user: User,
   data: IncomeUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await incomeUpdateValidator(data, user, incomeId);
+  const serverError = await incomeUpdateValidator(data, user, incomeId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
