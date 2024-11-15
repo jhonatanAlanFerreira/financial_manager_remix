@@ -12,6 +12,7 @@ import {
   remove,
   update,
 } from "~/data/classification/classification.server";
+import { createResponse } from "~/data/services/responses";
 import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
@@ -40,7 +41,7 @@ let createClassification = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return create(data, user);
+  return createResponse(await create(data, user));
 };
 
 let removeClassification = async (request: Request) => {

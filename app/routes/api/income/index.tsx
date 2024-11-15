@@ -6,6 +6,7 @@ import {
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
+import { createResponse } from "~/data/services/responses";
 import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -50,7 +51,7 @@ let createIncome = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return create(data, user);
+  return createResponse(await create(data, user));
 };
 
 let removeIncome = async (request: Request) => {

@@ -8,6 +8,7 @@ import {
 import { create, list, remove, update } from "~/data/company/company.server";
 import { parseIncludes } from "~/utils/utilities";
 import { companyIncludeOptions } from "~/data/company/company-types";
+import { createResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -42,7 +43,7 @@ let createCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  return create(data, user);
+  return createResponse(await create(data, user));
 };
 
 let removeCompany = async (request: Request) => {

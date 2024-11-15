@@ -7,6 +7,7 @@ import {
 } from "~/data/account/account-request-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
+import { createResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -47,7 +48,7 @@ let createAccount = async (request: Request) => {
     company: String(body.get("company") || ""),
   };
 
-  return create(data, user);
+  return createResponse(await create(data, user));
 };
 
 let removeAccount = async (request: Request) => {
