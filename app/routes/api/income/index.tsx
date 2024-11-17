@@ -6,7 +6,7 @@ import {
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
 import { create, list, remove, update } from "~/data/income/income.server";
-import { createResponse } from "~/data/services/responses";
+import { sendResponse } from "~/data/services/responses";
 import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -37,7 +37,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
         | "personal"
         | "company") || "all",
   };
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };
 
 let createIncome = async (request: Request) => {
@@ -51,14 +51,14 @@ let createIncome = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return createResponse(await create(data, user));
+  return sendResponse(await create(data, user));
 };
 
 let removeIncome = async (request: Request) => {
   const user = await requireUserSession(request);
   const incomeId = String(new URL(request.url).searchParams.get("incomeId"));
 
-  return remove(incomeId, user);
+  return sendResponse(await remove(incomeId, user));
 };
 
 let updateIncome = async (request: Request) => {
@@ -73,5 +73,5 @@ let updateIncome = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return update(incomeId, user, data);
+  return sendResponse(await update(incomeId, user, data));
 };

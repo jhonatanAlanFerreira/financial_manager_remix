@@ -12,7 +12,7 @@ import {
   remove,
   update,
 } from "~/data/classification/classification.server";
-import { createResponse } from "~/data/services/responses";
+import { sendResponse } from "~/data/services/responses";
 import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
@@ -41,7 +41,7 @@ let createClassification = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return createResponse(await create(data, user));
+  return sendResponse(await create(data, user));
 };
 
 let removeClassification = async (request: Request) => {
@@ -50,7 +50,7 @@ let removeClassification = async (request: Request) => {
     new URL(request.url).searchParams.get("classificationId")
   );
 
-  return remove(classificationId, user);
+  return sendResponse(await remove(classificationId, user));
 };
 
 let updateClassification = async (request: Request) => {
@@ -67,7 +67,7 @@ let updateClassification = async (request: Request) => {
     companies: getArrayFromFormData(body, "companies"),
   };
 
-  return update(classificationId, user, data);
+  return sendResponse(await update(classificationId, user, data));
 };
 
 export let loader = async ({ request }: LoaderFunctionArgs) => {
@@ -89,5 +89,5 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       ) as IsPersonalOrCompanyType) || "all",
   };
 
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };

@@ -1,7 +1,7 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { SignupRequestInterface } from "~/data/auth/auth-request-interfaces";
 import { signup } from "~/data/auth/auth.server";
-import { createResponse } from "~/data/services/responses";
+import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
@@ -17,5 +17,5 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     passwordRepeat: String(body.get("passwordRepeat")),
   };
 
-  return createResponse(await signup(data));
+  return sendResponse(await signup(data));
 };

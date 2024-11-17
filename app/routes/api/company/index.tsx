@@ -8,7 +8,7 @@ import {
 import { create, list, remove, update } from "~/data/company/company.server";
 import { parseIncludes } from "~/utils/utilities";
 import { companyIncludeOptions } from "~/data/company/company-types";
-import { createResponse } from "~/data/services/responses";
+import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -32,7 +32,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     extends: parseIncludes(url, companyIncludeOptions),
   };
 
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };
 
 let createCompany = async (request: Request) => {
@@ -43,14 +43,14 @@ let createCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  return createResponse(await create(data, user));
+  return sendResponse(await create(data, user));
 };
 
 let removeCompany = async (request: Request) => {
   const user = await requireUserSession(request);
   const companyId = String(new URL(request.url).searchParams.get("companyId"));
 
-  return remove(companyId, user);
+  return sendResponse(await remove(companyId, user));
 };
 
 let updateCompany = async (request: Request) => {
@@ -62,5 +62,5 @@ let updateCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  return update(data, user, companyId);
+  return sendResponse(await update(data, user, companyId));
 };

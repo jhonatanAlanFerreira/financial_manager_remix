@@ -4,6 +4,7 @@ export interface ServerResponseInterface<T = any> {
   errors?: ServerResponseErrorInterface;
   message?: string;
   data?: T;
+  code?: number;
   pageInfo?: {
     totalData: number;
     totalPages: number;

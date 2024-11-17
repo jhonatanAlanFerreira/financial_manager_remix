@@ -7,7 +7,7 @@ import {
 } from "~/data/account/account-request-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
-import { createResponse } from "~/data/services/responses";
+import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -35,7 +35,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
   };
 
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };
 
 let createAccount = async (request: Request) => {
@@ -48,14 +48,14 @@ let createAccount = async (request: Request) => {
     company: String(body.get("company") || ""),
   };
 
-  return createResponse(await create(data, user));
+  return sendResponse(await create(data, user));
 };
 
 let removeAccount = async (request: Request) => {
   const user = await requireUserSession(request);
   const accountId = String(new URL(request.url).searchParams.get("accountId"));
 
-  return remove(accountId, user);
+  return sendResponse(await remove(accountId, user));
 };
 
 let updateAccount = async (request: Request) => {
@@ -68,5 +68,5 @@ let updateAccount = async (request: Request) => {
     balance: +(body.get("balance") || 0),
   };
 
-  return update(accountId, user, data);
+  return sendResponse(await update(accountId, user, data));
 };
