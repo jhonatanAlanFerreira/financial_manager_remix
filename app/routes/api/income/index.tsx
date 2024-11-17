@@ -58,13 +58,7 @@ let removeIncome = async (request: Request) => {
   const user = await requireUserSession(request);
   const incomeId = String(new URL(request.url).searchParams.get("incomeId"));
 
-  const res = await remove(incomeId, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-  return new Response(JSON.stringify(res), { status });
+  return remove(incomeId, user);
 };
 
 let updateIncome = async (request: Request) => {

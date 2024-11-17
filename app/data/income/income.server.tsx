@@ -110,13 +110,12 @@ export async function remove(
   incomeId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await incomeDeleteValidator(user, incomeId);
+  const serverError = await incomeDeleteValidator(user, incomeId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
-      message: "Income not found",
-      data: dataIsValid,
+      errors: serverError,
+      message: "There are some invalid params",
     };
   }
 

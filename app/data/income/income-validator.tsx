@@ -60,8 +60,16 @@ export async function incomeCreateValidator(
 export async function incomeDeleteValidator(
   user: User,
   incomeId: string
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(incomeId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid income ID format",
+      },
+    };
+  }
+
   const incomeExistis = await prisma.income.findFirst({
     where: {
       id: incomeId,
@@ -71,16 +79,14 @@ export async function incomeDeleteValidator(
 
   if (!incomeExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Income not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function incomeUpdateValidator(
