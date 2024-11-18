@@ -36,6 +36,16 @@ export function buildWhereClause(
       whereClause.is_income =
         params.is_income_or_expense === "income" ? true : false;
     }
+
+    if (params.amount_greater || params.amount_less) {
+      whereClause.amount = {};
+      if (params.amount_greater) {
+        whereClause.amount.gte = params.amount_greater;
+      }
+      if (params.amount_less) {
+        whereClause.amount.lte = params.amount_less;
+      }
+    }
   }
 
   return whereClause;

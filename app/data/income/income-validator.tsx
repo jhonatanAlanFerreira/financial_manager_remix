@@ -7,8 +7,12 @@ import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import {
   validateCompanies,
+  validateCompany,
   validateIdFormat,
+  validateNumber,
+  validatePaginationParams,
 } from "~/data/services/validators";
+import { IncomeLoaderParamsInterface } from "./income-query-params-interfaces";
 
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,
@@ -158,6 +162,41 @@ export async function incomeUpdateValidator(
       errorCode: 400,
       errors: {
         name: "This income already exists",
+      },
+    };
+  }
+
+  return null;
+}
+
+export async function incomeListValidator(
+  params: IncomeLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = await validateCompany(params.has_company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  if (!validateNumber(params.amount_greater)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_greater: "Amount must be a valid number",
+      },
+    };
+  }
+
+  if (!validateNumber(params.amount_less)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_less: "Amount must be a valid number",
       },
     };
   }
