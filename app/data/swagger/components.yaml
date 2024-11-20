@@ -97,6 +97,24 @@ components:
         amount:
           type: integer
 
+    Expense:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        company_ids:
+          type: array
+          items:
+            type: string
+        is_personal:
+          type: boolean
+        amount:
+          type: integer
+
     PageInfo:
       type: object
       properties:

@@ -11,3 +11,5 @@ tags:
     description: API for managing classifications
   - name: Income Services
     description: API for managing Incomes
+  - name: Expense Services
+    description: API for managing Expenses

@@ -19,13 +19,12 @@ export async function create(
   data: ExpenseCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseCreateValidator(data, user);
+  const serverError = await expenseCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -33,7 +32,7 @@ export async function create(
     data: {
       name: data.name,
       amount: data.amount,
-      is_personal_expense: data.is_personal_expense,
+      is_personal: data.is_personal,
       user_id: user.id,
       company_ids: data.companies,
     },
@@ -57,7 +56,7 @@ export async function list(
     user_id: user.id,
   };
 
-  whereClause.is_personal_expense =
+  whereClause.is_personal =
     params.is_personal_or_company !== "all"
       ? params.is_personal_or_company === "personal"
       : undefined;
@@ -115,7 +114,7 @@ export async function remove(
 
   if (!dataIsValid.isValid) {
     return {
-     // error: true, WIP
+      // error: true, WIP
       message: "Expense not found",
       data: dataIsValid,
     };
@@ -151,7 +150,7 @@ export async function update(
     data: {
       name: data.name,
       amount: data.amount,
-      is_personal_expense: data.is_personal_expense,
+      is_personal: data.is_personal,
       user_id: user.id,
       company_ids: data.companies,
     },

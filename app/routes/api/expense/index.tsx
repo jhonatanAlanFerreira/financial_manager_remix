@@ -6,6 +6,8 @@ import {
   ExpenseUpdateRequestInterface,
 } from "~/data/expense/expense-request-interfaces";
 import { create, list, remove, update } from "~/data/expense/expense.server";
+import { sendResponse } from "~/data/services/responses";
+import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -45,20 +47,11 @@ let createExpense = async (request: Request) => {
   const data: ExpenseCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_expense: !!body.get("is_personal_expense"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeExpense = async (request: Request) => {
@@ -83,18 +76,9 @@ let updateExpense = async (request: Request) => {
   const data: ExpenseUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_expense: !!body.get("is_personal_expense"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await update(expenseId, user, data);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(expenseId, user, data));
 };
