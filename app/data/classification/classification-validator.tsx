@@ -54,7 +54,7 @@ export async function classificationCreateValidator(
     };
   }
 
-  const companyErrors = validateCompanies(data.companies, user);
+  const companyErrors = await validateCompanies(data.companies, user);
   if (companyErrors) {
     return companyErrors;
   }
@@ -143,7 +143,7 @@ export async function classificationUpdateValidator(
     };
   }
 
-  const companyErrors = validateCompanies(data.companies, user);
+  const companyErrors = await validateCompanies(data.companies, user);
   if (companyErrors) {
     return companyErrors;
   }

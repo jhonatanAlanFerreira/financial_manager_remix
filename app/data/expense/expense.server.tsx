@@ -136,13 +136,12 @@ export async function update(
   user: User,
   data: ExpenseUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
+  const serverError = await expenseUpdateValidator(expenseId, user, data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 

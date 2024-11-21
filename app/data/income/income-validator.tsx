@@ -36,7 +36,7 @@ export async function incomeCreateValidator(
     };
   }
 
-  const companyErrors = validateCompanies(data.companies, user);
+  const companyErrors = await validateCompanies(data.companies, user);
   if (companyErrors) {
     return companyErrors;
   }
@@ -141,7 +141,7 @@ export async function incomeUpdateValidator(
     };
   }
 
-  const companyErrors = validateCompanies(data.companies, user);
+  const companyErrors = await validateCompanies(data.companies, user);
   if (companyErrors) {
     return companyErrors;
   }

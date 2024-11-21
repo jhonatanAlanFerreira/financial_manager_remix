@@ -5,7 +5,10 @@ import {
 } from "~/data/expense/expense-request-interfaces";
 import { prisma } from "~/data/database/database.server";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import { validateCompanies } from "~/data/services/validators";
+import {
+  validateCompanies,
+  validateIdFormat,
+} from "~/data/services/validators";
 
 export async function expenseCreateValidator(
   data: ExpenseCreateRequestInterface,
@@ -29,7 +32,7 @@ export async function expenseCreateValidator(
     };
   }
 
-  const companyErrors = validateCompanies(data.companies, user);
+  const companyErrors = await validateCompanies(data.companies, user);
   if (companyErrors) {
     return companyErrors;
   }
@@ -84,15 +87,37 @@ export async function expenseUpdateValidator(
   expenseId: string,
   user: User,
   data: ExpenseUpdateRequestInterface
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(expenseId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid expense ID format",
+      },
+    };
+  }
+
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         empty: "Name can not be empty",
       },
     };
+  }
+
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        empty: "Personal expense can not have companies",
+      },
+    };
+  }
+
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const expense = await prisma.expense.findFirst({
@@ -104,30 +129,11 @@ export async function expenseUpdateValidator(
 
   if (!expense) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Expense not found",
       },
     };
-  }
-
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
   }
 
   const expenseExists = await prisma.expense.findFirst({
@@ -143,14 +149,12 @@ export async function expenseUpdateValidator(
 
   if (expenseExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This expense already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
