@@ -60,8 +60,16 @@ export async function expenseCreateValidator(
 export async function expenseDeleteValidator(
   user: User,
   expenseId: string
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(expenseId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid expense ID format",
+      },
+    };
+  }
+
   const expenseExistis = await prisma.expense.findFirst({
     where: {
       id: expenseId,
@@ -71,16 +79,14 @@ export async function expenseDeleteValidator(
 
   if (!expenseExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Expense not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function expenseUpdateValidator(

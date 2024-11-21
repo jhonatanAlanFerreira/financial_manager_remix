@@ -91,3 +91,30 @@ paths:
           description: Unauthorized
         404:
           description: Expense not found
+
+    delete:
+      tags:
+        - Expense Services
+      summary: Delete an expense
+      parameters:
+        - in: query
+          name: expenseId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Expense deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Expense not found

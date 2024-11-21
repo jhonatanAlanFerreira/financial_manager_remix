@@ -110,13 +110,12 @@ export async function remove(
   expenseId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseDeleteValidator(user, expenseId);
+  const serverError = await expenseDeleteValidator(user, expenseId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
-      message: "Expense not found",
-      data: dataIsValid,
+      errors: serverError,
+      message: "There are some invalid params",
     };
   }
 

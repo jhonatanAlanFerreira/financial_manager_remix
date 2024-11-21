@@ -58,14 +58,7 @@ let removeExpense = async (request: Request) => {
   const user = await requireUserSession(request);
   const expenseId = String(new URL(request.url).searchParams.get("expenseId"));
 
-  const res = await remove(expenseId, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(expenseId, user));
 };
 
 let updateExpense = async (request: Request) => {
