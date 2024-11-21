@@ -1,5 +1,64 @@
 paths:
   /api/expense:
+    get:
+      tags:
+        - Expense Services
+      summary: Retrieve a list of expenses
+      parameters:
+        - in: query
+          name: company
+          schema:
+            type: string
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: amount_greater
+          schema:
+            type: number
+        - in: query
+          name: amount_less
+          schema:
+            type: number
+        - in: query
+          name: is_personal_or_company
+          schema:
+            type: string
+            enum: [all, personal, company]
+            default: all
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            oneOf:
+              - type: integer
+                default: 10
+              - type: string
+                enum: ["all"]
+      responses:
+        200:
+          description: A list of expenses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Expense"
+                  pageInfo:
+                    $ref: "#/components/schemas/PageInfo"
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
     post:
       tags:
         - Expense Services

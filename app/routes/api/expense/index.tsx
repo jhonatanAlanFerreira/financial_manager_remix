@@ -7,6 +7,7 @@ import {
 } from "~/data/expense/expense-request-interfaces";
 import { create, list, remove, update } from "~/data/expense/expense.server";
 import { sendResponse } from "~/data/services/responses";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -29,15 +30,14 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    has_company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
   };
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };
 
 let createExpense = async (request: Request) => {
