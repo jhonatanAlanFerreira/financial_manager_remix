@@ -7,7 +7,7 @@ export interface TransactionCreateRequestInterface {
   account: string;
   classifications: string[];
   transaction_date: string;
-  is_personal_transaction: boolean;
+  is_personal: boolean;
   is_income: boolean;
 }
 

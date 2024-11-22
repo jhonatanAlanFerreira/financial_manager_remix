@@ -1,5 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { sendResponse } from "~/data/services/responses";
 import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import {
   TransactionCreateRequestInterface,
@@ -11,6 +12,7 @@ import {
   remove,
   update,
 } from "~/data/transaction/transaction.server";
+import { getArrayFromFormData } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -30,26 +32,17 @@ let createTransaction = async (request: Request) => {
   const data: TransactionCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: body.get("company") ? String(body.get("company")) : null,
-    expense: body.get("expense") ? String(body.get("expense")) : null,
-    income: body.get("income") ? String(body.get("income")) : null,
-    account: String(body.get("account")),
-    classifications: body.get("classifications")
-      ? (body.getAll("classifications") as string[])
-      : [],
+    company: String(body.get("company") || ""),
+    expense: String(body.get("expense") || ""),
+    income: String(body.get("income") || ""),
+    account: String(body.get("account") || ""),
+    classifications: getArrayFromFormData(body, "classifications"),
     transaction_date: String(body.get("transaction_date") || ""),
-    is_personal_transaction: !!body.get("is_personal_transaction"),
-    is_income: !!body.get("is_income"),
+    is_personal: body.get("is_personal") == "true",
+    is_income: body.get("is_income") == "true",
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeTransaction = async (request: Request) => {
@@ -78,26 +71,17 @@ let updateTransaction = async (request: Request) => {
   const data: TransactionUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: body.get("company") ? String(body.get("company")) : null,
-    expense: body.get("expense") ? String(body.get("expense")) : null,
-    income: body.get("income") ? String(body.get("income")) : null,
-    account: String(body.get("account")),
-    classifications: body.get("classifications")
-      ? (body.getAll("classifications") as string[])
-      : [],
+    company: String(body.get("company") || ""),
+    expense: String(body.get("expense") || ""),
+    income: String(body.get("income") || ""),
+    account: String(body.get("account") || ""),
+    classifications: getArrayFromFormData(body, "classifications"),
     transaction_date: String(body.get("transaction_date") || ""),
-    is_personal_transaction: !!body.get("is_personal_transaction"),
-    is_income: !!body.get("is_income"),
+    is_personal: body.get("is_personal") == "true",
+    is_income: body.get("is_income") == "true",
   };
 
-  const res = await update(transactionId, user, data);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(transactionId, user, data));
 };
 
 export let loader = async ({ request }: LoaderFunctionArgs) => {
