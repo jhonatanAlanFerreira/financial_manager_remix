@@ -69,7 +69,7 @@ export async function accountRemoveValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid account ID format",
+        accountId: "Invalid account ID format",
       },
     };
   }

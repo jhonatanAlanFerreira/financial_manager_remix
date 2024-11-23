@@ -149,13 +149,12 @@ export async function remove(
   transactionId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionDeleteValidator(user, transactionId);
+  const serverError = await transactionDeleteValidator(user, transactionId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
-      message: "Transaction not found",
-      data: dataIsValid,
+      errors: serverError,
+      message: "There are some invalid params",
     };
   }
 
@@ -163,20 +162,13 @@ export async function remove(
     where: { id: transactionId },
   });
 
-  if (!transaction) {
-    return {
-      // error: true, WIP
-      message: "Transaction not found",
-    };
-  }
-
   await prisma.account.update({
-    where: { id: transaction.account_id },
+    where: { id: transaction?.account_id },
     data: {
       balance: {
-        increment: transaction.is_income
-          ? -transaction.amount
-          : transaction.amount,
+        increment: transaction?.is_income
+          ? -transaction?.amount
+          : transaction?.amount,
       },
     },
   });

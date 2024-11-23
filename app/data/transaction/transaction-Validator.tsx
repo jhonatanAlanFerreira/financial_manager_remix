@@ -155,8 +155,16 @@ export async function transactionCreateValidator(
 export async function transactionDeleteValidator(
   user: User,
   transactionId: string
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(transactionId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        transactionId: "Invalid Transaction ID format",
+      },
+    };
+  }
+
   const transactionExistis = await prisma.transaction.findFirst({
     where: {
       id: transactionId,
@@ -166,16 +174,14 @@ export async function transactionDeleteValidator(
 
   if (!transactionExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Transaction not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function transactionUpdateValidator(

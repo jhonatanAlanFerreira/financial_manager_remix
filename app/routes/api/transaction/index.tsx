@@ -51,14 +51,7 @@ let removeTransaction = async (request: Request) => {
     new URL(request.url).searchParams.get("transactionId")
   );
 
-  const res = await remove(transactionId, user);
-
-  let status: number;
-
-  //WIP
-  status = 200;
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(transactionId, user));
 };
 
 let updateTransaction = async (request: Request) => {

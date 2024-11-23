@@ -118,3 +118,30 @@ paths:
           description: Unauthorized
         404:
           description: Transaction not found
+
+    delete:
+      tags:
+        - Transaction Services
+      summary: Delete an transaction
+      parameters:
+        - in: query
+          name: transactionId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Transaction deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Transaction not found
