@@ -12,6 +12,7 @@ import {
   validateMultipleIdsFormat,
   validateNumber,
 } from "~/data/services/validators";
+import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 
 export async function transactionCreateValidator(
   data: TransactionCreateRequestInterface,
@@ -345,5 +346,48 @@ export async function transactionUpdateValidator(
       },
     };
   }
+  return null;
+}
+
+export async function transactionListValidator(
+  params: TransactionLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(params.account)) {
+    return {
+      errorCode: 400,
+      errors: {
+        account: "Invalid Account ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.company)) {
+    return {
+      errorCode: 400,
+      errors: {
+        expense: "Invalid company ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.expense)) {
+    return {
+      errorCode: 400,
+      errors: {
+        expense: "Invalid expense ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.classification)) {
+    return {
+      errorCode: 400,
+      errors: {
+        classifications: "Invalid classification ID format",
+      },
+    };
+  }
+
   return null;
 }

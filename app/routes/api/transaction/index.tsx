@@ -12,6 +12,10 @@ import {
   remove,
   update,
 } from "~/data/transaction/transaction.server";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 import { getArrayFromFormData, getOptionalField } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -86,23 +90,22 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
-    date_after: url.searchParams.get("date_after"),
-    date_before: url.searchParams.get("date_before"),
-    expense: url.searchParams.get("expense"),
-    income: url.searchParams.get("income"),
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    date_after: url.searchParams.get("date_after") || undefined,
+    date_before: url.searchParams.get("date_before") || undefined,
+    expense: url.searchParams.get("expense") || undefined,
+    income: url.searchParams.get("income") || undefined,
+    account: url.searchParams.get("account") || undefined,
+    classification: url.searchParams.get("classification") || undefined,
+    company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
     is_income_or_expense:
-      (url.searchParams.get("is_income_or_expense") as
-        | "expense"
-        | "income"
-        | "all") || "all",
+      (url.searchParams.get("is_income_or_expense") as IsIncomeOrExpenseType) ||
+      "all",
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
   };
 
-  return list(user, params);
+  return sendResponse(await list(user, params));
 };

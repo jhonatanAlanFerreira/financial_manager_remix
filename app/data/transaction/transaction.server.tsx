@@ -2,7 +2,6 @@ import { Prisma, Transaction, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
 import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
@@ -10,88 +9,37 @@ import {
 import {
   transactionCreateValidator,
   transactionDeleteValidator,
+  transactionListValidator,
   transactionUpdateValidator,
 } from "~/data/transaction/transaction-Validator";
-
-type TransactionWhereInput = Prisma.TransactionWhereInput;
+import { paginate } from "~/data/services/list.service";
 
 export async function list(
   user: User,
   params: TransactionLoaderParamsInterface
-): Promise<ServerResponseInterface<TransactionsWithTotalsInterface>> {
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+): Promise<ServerResponseInterface<Transaction[]>> {
+  const serverError = await transactionListValidator(params, user);
 
-  const whereClause: TransactionWhereInput = {
-    user_id: user.id,
-    is_personal:
-      params.is_personal_or_company !== "all"
-        ? params.is_personal_or_company === "personal"
-        : undefined,
-    is_income:
-      params.is_income_or_expense !== "all"
-        ? params.is_income_or_expense === "income"
-        : undefined,
-    name: params.name
-      ? { contains: params.name, mode: "insensitive" }
-      : undefined,
-    transaction_date: {
-      gte: params.date_after || undefined,
-      lte: params.date_before || undefined,
-    },
-    amount: {
-      gte: params.amount_greater || undefined,
-      lte: params.amount_less || undefined,
-    },
-    income_id: params.income || undefined,
-    expense_id: params.expense || undefined,
-    company_id: params.company || undefined,
-  };
+  if (serverError) {
+    return {
+      errors: serverError,
+      message: "There are some invalid params",
+    };
+  }
 
-  const [totalData, totalExpense, totalIncome] = await prisma.$transaction([
-    prisma.transaction.count({ where: whereClause }),
-    prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { ...whereClause, is_income: false },
-    }),
-    prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { ...whereClause, is_income: true },
-    }),
-  ]);
+  const { page, pageSize, ...restParams } = params;
 
-  const transactions = await prisma.transaction.findMany({
-    where: whereClause,
-    skip,
-    take,
-  });
-
-  const totalExpenseValue = totalExpense._sum.amount || 0;
-  const totalIncomeValue = totalIncome._sum.amount || 0;
-
-  const finalExpenseValue =
-    params.is_income_or_expense === "income" ? 0 : totalExpenseValue;
-  const finalIncomeValue =
-    params.is_income_or_expense === "expense" ? 0 : totalIncomeValue;
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
-
-  return {
-    data: {
-      transactions,
-      totalExpenseValue: finalExpenseValue,
-      totalIncomeValue: finalIncomeValue,
-    },
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
-    },
-  };
+  return paginate<
+    Transaction,
+    Prisma.TransactionFindManyArgs,
+    Prisma.TransactionCountArgs
+  >(
+    prisma.transaction.findMany,
+    prisma.transaction.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id }
+  );
 }
 
 export async function create(

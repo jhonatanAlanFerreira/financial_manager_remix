@@ -16,6 +16,22 @@ export function buildWhereClause(
       whereClause.name = { contains: params.name, mode: "insensitive" };
     }
 
+    if (params.income) {
+      whereClause.income_id = params.income;
+    }
+
+    if (params.account) {
+      whereClause.account_id = params.account;
+    }
+
+    if (params.classification) {
+      whereClause.transaction_classification = params.classification;
+    }
+
+    if (params.expense) {
+      whereClause.expense_id = params.expense;
+    }
+
     if (params.company) {
       whereClause.company_id = params.company;
     }
@@ -44,6 +60,16 @@ export function buildWhereClause(
       }
       if (params.amount_less) {
         whereClause.amount.lte = params.amount_less;
+      }
+    }
+
+    if (params.date_after || params.date_before) {
+      whereClause.date = {};
+      if (params.date_after) {
+        whereClause.date.gte = params.date_after;
+      }
+      if (params.date_before) {
+        whereClause.date.lte = params.date_before;
       }
     }
   }

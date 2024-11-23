@@ -1,15 +1,21 @@
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 
 export interface TransactionLoaderParamsInterface
   extends PaginationParamsInterface {
-  name: string | null;
-  is_personal_or_company: "personal" | "company" | "all";
-  is_income_or_expense: "income" | "expense" | "all";
-  date_after: string | null;
-  date_before: string | null;
-  amount_greater: number | null;
-  amount_less: number | null;
-  income: string | null;
-  expense: string | null;
-  company: string | null;
+  name: string | undefined;
+  is_personal_or_company: IsPersonalOrCompanyType;
+  is_income_or_expense: IsIncomeOrExpenseType;
+  date_after: string | undefined;
+  date_before: string | undefined;
+  amount_greater: number | undefined;
+  amount_less: number | undefined;
+  income: string | undefined;
+  expense: string | undefined;
+  company: string | undefined;
+  account: string | undefined;
+  classification: string | undefined;
 }
