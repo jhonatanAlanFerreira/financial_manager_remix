@@ -1,9 +1,12 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, Transaction, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
 import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
-import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
+import {
+  TransactionCreateRequestInterface,
+  TransactionUpdateRequestInterface,
+} from "~/data/transaction/transaction-request-interfaces";
 import {
   transactionCreateValidator,
   transactionDeleteValidator,
@@ -22,7 +25,7 @@ export async function list(
 
   const whereClause: TransactionWhereInput = {
     user_id: user.id,
-    is_personal_transaction:
+    is_personal:
       params.is_personal_or_company !== "all"
         ? params.is_personal_or_company === "personal"
         : undefined,
@@ -94,14 +97,13 @@ export async function list(
 export async function create(
   data: TransactionCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionCreateValidator(data, user);
+): Promise<ServerResponseInterface<Transaction>> {
+  const serverError = await transactionCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -109,14 +111,7 @@ export async function create(
     where: { id: data.account },
   });
 
-  if (!account) {
-    return {
-      // error: true, WIP
-      message: "Account not found",
-    };
-  }
-
-  let newBalance = account.balance || 0;
+  let newBalance = account?.balance || 0;
   if (data.is_income) {
     newBalance += data.amount;
   } else {
@@ -133,7 +128,7 @@ export async function create(
       expense_id: data.expense,
       income_id: data.income,
       is_income: data.is_income,
-      is_personal_transaction: data.is_personal_transaction,
+      is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
       user_id: user.id,
     },
@@ -250,7 +245,7 @@ export async function update(
       expense_id: data.expense,
       income_id: data.income,
       is_income: data.is_income,
-      is_personal_transaction: data.is_personal_transaction,
+      is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
     },
     where: { id: transactionId },

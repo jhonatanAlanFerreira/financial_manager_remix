@@ -25,6 +25,10 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
+function getOptionalField(body: FormData, field: string): string | undefined {
+  return body.get(field) ? String(body.get(field)) : undefined;
+}
+
 let createTransaction = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
@@ -32,9 +36,9 @@ let createTransaction = async (request: Request) => {
   const data: TransactionCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: String(body.get("company") || ""),
-    expense: String(body.get("expense") || ""),
-    income: String(body.get("income") || ""),
+    company: getOptionalField(body, 'company'),
+    expense: getOptionalField(body, 'expense'),
+    income: getOptionalField(body, 'income'),
     account: String(body.get("account") || ""),
     classifications: getArrayFromFormData(body, "classifications"),
     transaction_date: String(body.get("transaction_date") || ""),

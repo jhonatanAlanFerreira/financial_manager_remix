@@ -8,8 +8,12 @@ export function validateNumber(value: any) {
   return !isNaN(Number(value)) && typeof Number(value) === "number";
 }
 
-export function validateIdFormat(id: any) {
-  return ObjectId.isValid(id);
+export function validateIdFormat(id: any | undefined) {
+  return id === undefined || ObjectId.isValid(id);
+}
+
+export function validateMultipleIdsFormat(ids: any[] | undefined) {
+  return ids?.every((id) => validateIdFormat(id));
 }
 
 export function validatePaginationParams(

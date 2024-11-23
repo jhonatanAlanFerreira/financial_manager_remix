@@ -10,6 +10,8 @@ tags:
   - name: Classification Services
     description: API for managing classifications
   - name: Income Services
-    description: API for managing Incomes
+    description: API for managing incomes
   - name: Expense Services
-    description: API for managing Expenses
+    description: API for managing expenses
+  - name: Transaction Services
+    description: API for managing transactions

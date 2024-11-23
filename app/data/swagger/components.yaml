@@ -72,12 +72,39 @@ components:
         is_income:
           type: boolean
 
-    # WIP
     Transaction:
       type: object
       properties:
         id:
           type: string
+        name:
+          type: string
+        amount:
+          type: number
+        transaction_date:
+          type: string
+          format: date
+        user_id:
+          type: string
+        company_id:
+          type: string
+          nullable: true
+        transaction_classification_ids:
+          type: array
+          items:
+            type: string
+        expense_id:
+          type: string
+          nullable: true
+        income_id:
+          type: string
+          nullable: true
+        account_id:
+          type: string
+        is_personal:
+          type: boolean
+        is_income:
+          type: boolean
 
     Income:
       type: object

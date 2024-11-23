@@ -1,0 +1,57 @@
+paths:
+  /api/transaction:
+    post:
+      tags:
+        - Transaction Services
+      summary: Create a new transaction
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                company:
+                  type: string
+                  default: ""
+                expense:
+                  type: string
+                  default: ""
+                income:
+                  type: string
+                  default: ""
+                account:
+                  type: string
+                  default: ""
+                is_personal_or_company:
+                  type: string
+                  enum: [all, personal, company]
+                  default: all
+                is_income:
+                  type: boolean
+                  default: false
+                transaction_date:
+                  type: string
+                  format: date
+      responses:
+        201:
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Transaction"
+                  message:
+                    type: string
+                    example: "Transaction successfully created."
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
