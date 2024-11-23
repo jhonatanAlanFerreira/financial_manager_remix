@@ -12,7 +12,7 @@ import {
   remove,
   update,
 } from "~/data/transaction/transaction.server";
-import { getArrayFromFormData } from "~/utils/utilities";
+import { getArrayFromFormData, getOptionalField } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -25,10 +25,6 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-function getOptionalField(body: FormData, field: string): string | undefined {
-  return body.get(field) ? String(body.get(field)) : undefined;
-}
-
 let createTransaction = async (request: Request) => {
   const user = await requireUserSession(request);
   const body = await request.formData();
@@ -36,9 +32,9 @@ let createTransaction = async (request: Request) => {
   const data: TransactionCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: getOptionalField(body, 'company'),
-    expense: getOptionalField(body, 'expense'),
-    income: getOptionalField(body, 'income'),
+    company: getOptionalField(body, "company"),
+    expense: getOptionalField(body, "expense"),
+    income: getOptionalField(body, "income"),
     account: String(body.get("account") || ""),
     classifications: getArrayFromFormData(body, "classifications"),
     transaction_date: String(body.get("transaction_date") || ""),
@@ -75,9 +71,9 @@ let updateTransaction = async (request: Request) => {
   const data: TransactionUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: String(body.get("company") || ""),
-    expense: String(body.get("expense") || ""),
-    income: String(body.get("income") || ""),
+    company: getOptionalField(body, "company"),
+    expense: getOptionalField(body, "expense"),
+    income: getOptionalField(body, "income"),
     account: String(body.get("account") || ""),
     classifications: getArrayFromFormData(body, "classifications"),
     transaction_date: String(body.get("transaction_date") || ""),

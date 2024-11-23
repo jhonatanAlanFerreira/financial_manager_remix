@@ -197,17 +197,16 @@ export async function update(
   user: User,
   data: TransactionUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionUpdateValidator(
+  const serverError = await transactionUpdateValidator(
     transactionId,
     user,
     data
   );
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      // error: true, WIP
+      errors: serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -215,20 +214,13 @@ export async function update(
     where: { id: transactionId },
   });
 
-  if (!existingTransaction) {
-    return {
-      // error: true, WIP
-      message: "Transaction not found",
-    };
-  }
-
-  const adjustmentAmount = data.amount - existingTransaction.amount;
-  const adjustment = existingTransaction.is_income
+  const adjustmentAmount = data.amount - (existingTransaction?.amount || 0);
+  const adjustment = existingTransaction?.is_income
     ? adjustmentAmount
     : -adjustmentAmount;
 
   await prisma.account.update({
-    where: { id: existingTransaction.account_id },
+    where: { id: existingTransaction?.account_id },
     data: {
       balance: {
         increment: adjustment,

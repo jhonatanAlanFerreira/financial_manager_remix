@@ -62,6 +62,15 @@ export async function transactionCreateValidator(
     };
   }
 
+  if (data.is_personal && data.company) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount: "Persoanl transaction can not have company",
+      },
+    };
+  }
+
   const account = await prisma.account.findUnique({
     where: { id: data.account, user_id: user.id },
   });
@@ -79,8 +88,6 @@ export async function transactionCreateValidator(
   if (companyErrors) {
     return companyErrors;
   }
-
-  console.log('?? ' + undefined)
 
   if (!validateIdFormat(data.expense)) {
     return {
@@ -175,8 +182,83 @@ export async function transactionUpdateValidator(
   transactionId: string,
   user: User,
   data: TransactionUpdateRequestInterface
-): Promise<any> {
-  //WIP
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(transactionId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Invalid transaction ID format",
+      },
+    };
+  }
+
+  if (!data.name) {
+    return {
+      errorCode: 400,
+      errors: {
+        name: "Name can not be empty",
+      },
+    };
+  }
+
+  if (!data.transaction_date) {
+    return {
+      errorCode: 400,
+      errors: {
+        date: "Date can not be empty",
+      },
+    };
+  }
+
+  if (!data.amount) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount: "Amount can not be empty",
+      },
+    };
+  }
+
+  if (data.is_personal && data.company) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount: "Persoanl transaction can not have company",
+      },
+    };
+  }
+
+  if (!validateNumber(data.amount)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount: "Amount must be a valid number",
+      },
+    };
+  }
+
+  if (!validateIdFormat(data.account)) {
+    return {
+      errorCode: 400,
+      errors: {
+        account: "Invalid Account ID format",
+      },
+    };
+  }
+
+  const account = await prisma.account.findUnique({
+    where: { id: data.account, user_id: user.id },
+  });
+
+  if (!account) {
+    return {
+      errorCode: 404,
+      errors: {
+        account: "Account not found",
+      },
+    };
+  }
+
   const transaction = await prisma.transaction.findFirst({
     where: {
       id: transactionId,
@@ -186,48 +268,26 @@ export async function transactionUpdateValidator(
 
   if (!transaction) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
         id: "Transaction not found",
       },
     };
   }
 
-  if (!data.name) {
+  const companyErrors = await validateCompany(data.company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  if (!validateIdFormat(data.expense)) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        name: "Name can not be empty",
+        expense: "Invalid expense ID format",
       },
     };
   }
-
-  if (!data.transaction_date) {
-    return {
-      isValid: false,
-      errors: {
-        date: "Date can not be empty",
-      },
-    };
-  }
-
-  if (!data.amount) {
-    return {
-      isValid: false,
-      errors: {
-        amount: "Amount can not be empty",
-      },
-    };
-  }
-
-  const validCompany = data.company
-    ? prisma.company.findFirst({
-        where: {
-          id: data.company,
-          user_id: user.id,
-        },
-      })
-    : true;
 
   const validExpense = data.expense
     ? prisma.expense.findFirst({
@@ -237,6 +297,24 @@ export async function transactionUpdateValidator(
         },
       })
     : true;
+
+  if (!validExpense) {
+    return {
+      errorCode: 400,
+      errors: {
+        expenses: "Invalid expense",
+      },
+    };
+  }
+
+  if (!validateMultipleIdsFormat(data.classifications)) {
+    return {
+      errorCode: 400,
+      errors: {
+        classifications: "There are some invalid classification ID formats",
+      },
+    };
+  }
 
   let validClassifications = true;
   if (data.classifications?.length) {
@@ -253,20 +331,13 @@ export async function transactionUpdateValidator(
       classificationsFromSameUser.length == data.classifications.length;
   }
 
-  const ValidTransactionData = (
-    await Promise.all([validCompany, validExpense, validClassifications])
-  ).every((isValid) => isValid);
-
-  if (!ValidTransactionData) {
+  if (!validClassifications) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        invalid_fields: "There are invalid fields",
+        classifications: "There are some invalid classifications",
       },
     };
   }
-
-  return {
-    isValid: true,
-  };
+  return null;
 }

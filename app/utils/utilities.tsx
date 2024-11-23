@@ -94,3 +94,10 @@ export function getArrayFromFormData(
 
   return [];
 }
+
+export function getOptionalField(
+  body: FormData,
+  field: string
+): string | undefined {
+  return body.get(field) ? String(body.get(field)) : undefined;
+}

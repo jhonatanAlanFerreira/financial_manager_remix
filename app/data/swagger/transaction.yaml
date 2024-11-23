@@ -55,3 +55,66 @@ paths:
           description: Bad Request
         401:
           description: Unauthorized
+
+    patch:
+      tags:
+        - Transaction Services
+      summary: Update a transaction
+      parameters:
+        - in: query
+          name: transactionId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                company:
+                  type: string
+                  default: ""
+                expense:
+                  type: string
+                  default: ""
+                income:
+                  type: string
+                  default: ""
+                account:
+                  type: string
+                  default: ""
+                is_personal_or_company:
+                  type: string
+                  enum: [all, personal, company]
+                  default: all
+                is_income:
+                  type: boolean
+                  default: false
+                transaction_date:
+                  type: string
+                  format: date
+      responses:
+        200:
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Transaction"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Transaction not found
