@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { SignupRequestInterface } from "~/data/auth/auth-request-interfaces";
-import { signup } from "~/data/auth/auth.server";
+import { createUserSession, signup } from "~/data/auth/auth.server";
 import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -17,5 +17,9 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     passwordRepeat: String(body.get("passwordRepeat")),
   };
 
-  return sendResponse(await signup(data));
+  const res = await signup(data);
+
+  return sendResponse(res, [
+    ["Set-Cookie", await createUserSession(res.data.id)],
+  ]);
 };
