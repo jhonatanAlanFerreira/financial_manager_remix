@@ -1,7 +1,7 @@
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export interface ServerResponseInterface<T = any> {
-  errors?: ServerResponseErrorInterface;
+  serverError?: ServerResponseErrorInterface;
   message?: string;
   data?: T;
   code?: number;

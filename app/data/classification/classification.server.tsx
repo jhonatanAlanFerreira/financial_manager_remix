@@ -23,7 +23,7 @@ export async function create(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some errors in your form",
     };
   }
@@ -55,7 +55,7 @@ export async function remove(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some invalid params",
     };
   }
@@ -84,7 +84,7 @@ export async function update(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some errors in your form",
     };
   }
@@ -115,7 +115,7 @@ export async function list(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some invalid params",
     };
   }

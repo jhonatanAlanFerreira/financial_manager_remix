@@ -81,7 +81,7 @@ export async function signup(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some errors in your form",
     };
   }
@@ -147,7 +147,7 @@ export async function login(
 
   if (serverError) {
     return {
-      errors: serverError,
+      serverError,
       message: "There are some errors in your form",
     };
   }
@@ -160,7 +160,7 @@ export async function login(
 
   if (!user) {
     return {
-      errors: {
+      serverError: {
         errorCode: 401,
       },
       message: "Login or password is invalid",
@@ -171,7 +171,7 @@ export async function login(
 
   if (!validPass) {
     return {
-      errors: {
+      serverError: {
         errorCode: 401,
       },
       message: "Login or password is invalid",

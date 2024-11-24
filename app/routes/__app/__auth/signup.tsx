@@ -7,12 +7,12 @@ import { Icon } from "~/components/icon/icon";
 import { InputPassword } from "~/components/inputs/input-password/input-password";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { NavigationLoader } from "~/components/navigation-loader/navigation-loader";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export default function Signup() {
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({ errors: {} });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -32,7 +32,7 @@ export default function Signup() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -69,21 +69,21 @@ export default function Signup() {
                 label="Login"
                 name="login"
                 required
-                errorMessage={responseErrors?.data?.errors?.["login"]}
+                errorMessage={responseErrors?.errors?.["login"]}
               ></InputText>
               <InputPassword
                 showEyeIcon={true}
                 label="Password"
                 name="password"
                 required
-                errorMessage={responseErrors?.data?.errors?.["password"]}
+                errorMessage={responseErrors?.errors?.["password"]}
               ></InputPassword>
               <InputPassword
                 showEyeIcon={true}
                 label="Repeat Password"
                 name="passwordRepeat"
                 required
-                errorMessage={responseErrors?.data?.errors?.["password"]}
+                errorMessage={responseErrors?.errors?.["password"]}
               ></InputPassword>
             </Form>
             <div>

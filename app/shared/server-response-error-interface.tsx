@@ -1,5 +1,5 @@
 export interface ServerResponseErrorInterface {
-  errorCode: number;
+  errorCode?: number;
   errors?: {
     [key: string]: string;
   };
