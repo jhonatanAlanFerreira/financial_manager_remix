@@ -216,7 +216,7 @@ export default function Transactions() {
   };
 
   const getTransactionType = (transaction: Transaction) => {
-    return transaction.is_personal_transaction
+    return transaction.is_personal
       ? "Personal Transaction"
       : "Company Transaction";
   };
@@ -369,7 +369,7 @@ export default function Transactions() {
       id: transaction.id,
       amount: transaction.amount,
       is_income: transaction.is_income,
-      is_personal_transaction: transaction.is_personal_transaction,
+      is_personal_transaction: transaction.is_personal,
       name: transaction.name,
       transaction_date: transaction.transaction_date,
       classifications:

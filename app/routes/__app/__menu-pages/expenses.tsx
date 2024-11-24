@@ -200,7 +200,7 @@ export default function Expenses() {
   };
 
   const getExpenseType = (expense: Expense) => {
-    return expense.is_personal_expense ? "Personal Expense" : "Company Expense";
+    return expense.is_personal ? "Personal Expense" : "Company Expense";
   };
 
   const removeExpense = async () => {
@@ -233,7 +233,7 @@ export default function Expenses() {
     mainForm.setValues({
       id: expense.id,
       amount: expense.amount,
-      is_personal_expense: expense.is_personal_expense,
+      is_personal_expense: expense.is_personal,
       name: expense.name,
       companies:
         companies.data?.filter((company) =>

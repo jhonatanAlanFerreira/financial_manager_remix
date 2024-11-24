@@ -203,7 +203,7 @@ export default function Classifications() {
   };
 
   const getClassificationType = (classification: TransactionClassification) => {
-    return classification.is_personal_transaction_classification
+    return classification.is_personal
       ? "Personal Transaction Classification"
       : "Company Transaction Classification";
   };
@@ -241,7 +241,7 @@ export default function Classifications() {
       id: classification.id,
       name: classification.name,
       is_personal_transaction_classification:
-        classification.is_personal_transaction_classification,
+        classification.is_personal,
       is_income: classification.is_income,
       companies:
         companies.data?.filter((company) =>

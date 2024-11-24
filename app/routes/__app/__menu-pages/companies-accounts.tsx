@@ -29,7 +29,7 @@ export default function Companies() {
     ServerResponseInterface<CompanyWithAccountsType[]>
   >({});
   const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
+    ServerResponseInterface<any>
   >({});
   const [userAccounts, setUserAccounts] = useState<
     ServerResponseInterface<Account[]>

@@ -226,7 +226,7 @@ export default function Incomes() {
   };
 
   const getIncomeType = (income: Income) => {
-    return income.is_personal_income ? "Personal Income" : "Company Income";
+    return income.is_personal ? "Personal Income" : "Company Income";
   };
 
   const onClickAdd = () => {
@@ -258,7 +258,7 @@ export default function Incomes() {
     mainForm.setValues({
       id: income.id,
       amount: income.amount,
-      is_personal_income: income.is_personal_income,
+      is_personal_income: income.is_personal,
       name: income.name,
       companies:
         companies.data?.filter((company) =>
