@@ -22,7 +22,7 @@ export async function expenseCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -31,7 +31,7 @@ export async function expenseCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal expense can not have companies",
+        personal: "Personal expense can not have companies",
       },
     };
   }
@@ -69,7 +69,7 @@ export async function expenseDeleteValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid expense ID format",
+        expenseId: "Invalid expense ID format",
       },
     };
   }
@@ -85,7 +85,7 @@ export async function expenseDeleteValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Expense not found",
+        expenseId: "Expense not found",
       },
     };
   }
@@ -102,7 +102,7 @@ export async function expenseUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid expense ID format",
+        expenseId: "Invalid expense ID format",
       },
     };
   }
@@ -111,7 +111,7 @@ export async function expenseUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -120,7 +120,7 @@ export async function expenseUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal expense can not have companies",
+        is_personal: "Personal expense can not have companies",
       },
     };
   }
@@ -141,7 +141,7 @@ export async function expenseUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Expense not found",
+        expenseId: "Expense not found",
       },
     };
   }

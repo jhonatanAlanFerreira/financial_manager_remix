@@ -20,7 +20,7 @@ export async function companyCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -65,7 +65,7 @@ export async function companyUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid company ID format",
+        companyId: "Invalid company ID format",
       },
     };
   }
@@ -74,7 +74,7 @@ export async function companyUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -90,7 +90,7 @@ export async function companyUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Company not found",
+        companyId: "Company not found",
       },
     };
   }

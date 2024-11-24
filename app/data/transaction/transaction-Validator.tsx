@@ -67,7 +67,7 @@ export async function transactionCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        amount: "Persoanl transaction can not have company",
+        is_personal: "Persoanl transaction can not have company",
       },
     };
   }
@@ -112,7 +112,7 @@ export async function transactionCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        expenses: "Invalid expense",
+        expense: "Invalid expense",
       },
     };
   }
@@ -177,7 +177,7 @@ export async function transactionDeleteValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Transaction not found",
+        transactionId: "Transaction not found",
       },
     };
   }
@@ -194,7 +194,7 @@ export async function transactionUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid transaction ID format",
+        transactionId: "Invalid transaction ID format",
       },
     };
   }
@@ -230,7 +230,7 @@ export async function transactionUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        amount: "Persoanl transaction can not have company",
+        is_personal: "Persoanl transaction can not have company",
       },
     };
   }
@@ -277,7 +277,7 @@ export async function transactionUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Transaction not found",
+        transactionId: "Transaction not found",
       },
     };
   }
@@ -309,7 +309,7 @@ export async function transactionUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        expenses: "Invalid expense",
+        expense: "Invalid expense",
       },
     };
   }
@@ -366,7 +366,7 @@ export async function transactionListValidator(
     return {
       errorCode: 400,
       errors: {
-        expense: "Invalid company ID format",
+        company: "Invalid company ID format",
       },
     };
   }
@@ -384,7 +384,7 @@ export async function transactionListValidator(
     return {
       errorCode: 400,
       errors: {
-        classifications: "Invalid classification ID format",
+        classification: "Invalid classification ID format",
       },
     };
   }

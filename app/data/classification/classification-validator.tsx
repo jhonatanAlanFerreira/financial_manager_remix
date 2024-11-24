@@ -21,7 +21,7 @@ export async function classificationCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -30,7 +30,7 @@ export async function classificationCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal classification can not have companies",
+        is_personal: "Personal classification can not have companies",
       },
     };
   }
@@ -70,7 +70,7 @@ export async function classificationDeleteValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid classification ID format",
+        classificationId: "Invalid classification ID format",
       },
     };
   }
@@ -87,7 +87,7 @@ export async function classificationDeleteValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Classification not found",
+        classificationId: "Classification not found",
       },
     };
   }
@@ -104,7 +104,7 @@ export async function classificationUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -113,7 +113,7 @@ export async function classificationUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid classification ID format",
+        classificationId: "Invalid classification ID format",
       },
     };
   }
@@ -122,7 +122,7 @@ export async function classificationUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal classification can not have companies",
+        is_personal: "Personal classification can not have companies",
       },
     };
   }
@@ -138,7 +138,7 @@ export async function classificationUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Classification not found",
+        classificationId: "Classification not found",
       },
     };
   }

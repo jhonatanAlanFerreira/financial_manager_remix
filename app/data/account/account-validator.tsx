@@ -21,7 +21,7 @@ export async function accountCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -85,7 +85,7 @@ export async function accountRemoveValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Account not found",
+        accountId: "Account not found",
       },
     };
   }
@@ -102,7 +102,7 @@ export async function accountUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid account ID format",
+        accountId: "Invalid account ID format",
       },
     };
   }
@@ -120,7 +120,7 @@ export async function accountUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -136,7 +136,7 @@ export async function accountUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Account not found",
+        accountId: "Account not found",
       },
     };
   }

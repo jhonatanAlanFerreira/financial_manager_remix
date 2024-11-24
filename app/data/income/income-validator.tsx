@@ -22,7 +22,7 @@ export async function incomeCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -31,7 +31,7 @@ export async function incomeCreateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal income can not have companies",
+        personal: "Personal income can not have companies",
       },
     };
   }
@@ -69,7 +69,7 @@ export async function incomeDeleteValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid income ID format",
+        incomeId: "Invalid income ID format",
       },
     };
   }
@@ -85,7 +85,7 @@ export async function incomeDeleteValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Income not found",
+        incomeId: "Income not found",
       },
     };
   }
@@ -102,7 +102,7 @@ export async function incomeUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -111,7 +111,7 @@ export async function incomeUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        balance: "Invalid income ID format",
+        incomeId: "Invalid income ID format",
       },
     };
   }
@@ -120,7 +120,7 @@ export async function incomeUpdateValidator(
     return {
       errorCode: 400,
       errors: {
-        empty: "Personal income can not have companies",
+        is_personal: "Personal income can not have companies",
       },
     };
   }
@@ -136,7 +136,7 @@ export async function incomeUpdateValidator(
     return {
       errorCode: 404,
       errors: {
-        id: "Income not found",
+        incomeId: "Income not found",
       },
     };
   }
