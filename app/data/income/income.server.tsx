@@ -56,14 +56,15 @@ export async function list(
     };
   }
 
-  const { page, pageSize, ...restParams } = params;
+  const { page, pageSize, extends: incomeIncludes, ...restParams } = params;
 
   return paginate<Income, Prisma.IncomeFindManyArgs, Prisma.IncomeCountArgs>(
     prisma.income.findMany,
     prisma.income.count,
     { page, pageSize },
     restParams,
-    { user_id: user.id }
+    { user_id: user.id },
+    incomeIncludes
   );
 }
 

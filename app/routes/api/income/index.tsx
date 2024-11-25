@@ -5,10 +5,11 @@ import {
   IncomeCreateRequestInterface,
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
+import { incomeIncludeOptions } from "~/data/income/income-types";
 import { create, list, remove, update } from "~/data/income/income.server";
 import { sendResponse } from "~/data/services/responses";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
-import { getArrayFromFormData } from "~/utils/utilities";
+import { getArrayFromFormData, parseIncludes } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -36,6 +37,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       (url.searchParams.get(
         "is_personal_or_company"
       ) as IsPersonalOrCompanyType) || "all",
+    extends: parseIncludes(url, incomeIncludeOptions),
   };
   return sendResponse(await list(user, params));
 };

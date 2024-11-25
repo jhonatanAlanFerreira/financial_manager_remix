@@ -19,13 +19,13 @@ import { PrimaryButton } from "~/components/buttons/primary-button/primary-butto
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
-import { IncomeWithCompaniesType } from "~/data/income/income-types";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   IncomeFiltersFormInterface,
   IncomeFormInterface,
 } from "~/components/page-components/income/income-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { IncomeWithRelationsInterface } from "~/data/income/income-types";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -42,7 +42,9 @@ export default function Incomes() {
   >({});
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
-  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
+  const [incomes, setIncomes] = useState<
+    ServerResponseInterface<IncomeWithRelationsInterface[]>
+  >({});
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -51,7 +53,7 @@ export default function Incomes() {
 
   const { companyData, incomeData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    incomeData: ServerResponseInterface<IncomeWithCompaniesType[]>;
+    incomeData: ServerResponseInterface<IncomeWithRelationsInterface[]>;
   }>();
 
   const mainForm = useFormik<IncomeFormInterface>({
@@ -60,7 +62,7 @@ export default function Incomes() {
       name: "",
       amount: 0,
       companies: [],
-      is_personal_income: false,
+      is_personal: false,
     },
     onSubmit: () => {},
   });
@@ -104,7 +106,7 @@ export default function Incomes() {
 
   useEffect(() => {
     mainForm.setFieldValue("companies", null);
-  }, [mainForm.values.is_personal_income]);
+  }, [mainForm.values.is_personal]);
 
   useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
@@ -175,11 +177,9 @@ export default function Incomes() {
   const loadIncomes = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponseInterface<Income[]>>(
-        `/api/income?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
+      const res = await axios.get<
+        ServerResponseInterface<IncomeWithRelationsInterface[]>
+      >(`/api/income?${paginationParams()}&${searchParams}&extends=companies`);
       setCurrentPage(res.data.pageInfo?.currentPage || 1);
       setTotalPages(res.data.pageInfo?.totalPages || 1);
 
@@ -245,7 +245,7 @@ export default function Incomes() {
     setOpenRemoveModal(true);
   };
 
-  const onClickUpdate = (income: Income) => {
+  const onClickUpdate = (income: IncomeWithRelationsInterface) => {
     setFormValues(income);
     setOpenAddModal(true);
   };
@@ -254,17 +254,8 @@ export default function Incomes() {
     mainForm.setFieldValue("companies", companies);
   };
 
-  const setFormValues = (income: Income) => {
-    mainForm.setValues({
-      id: income.id,
-      amount: income.amount,
-      is_personal_income: income.is_personal,
-      name: income.name,
-      companies:
-        companies.data?.filter((company) =>
-          income.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (income: IncomeWithRelationsInterface) => {
+    mainForm.setValues(income);
   };
 
   const onFilterFormSubmit = async () => {
@@ -436,14 +427,14 @@ export default function Incomes() {
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_income"
-                  id="is_personal_income"
+                  name="is_personal"
+                  id="is_personal"
                   onChange={mainForm.handleChange}
-                  checked={mainForm.values.is_personal_income}
+                  checked={mainForm.values.is_personal}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_income"
+                  htmlFor="is_personal"
                 >
                   Use as personal income
                 </label>
@@ -465,7 +456,7 @@ export default function Incomes() {
                 value={mainForm.values.amount || 0}
                 onChange={mainForm.handleChange}
               ></InputText>
-              {!mainForm.values.is_personal_income && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isMulti
                   isClearable
