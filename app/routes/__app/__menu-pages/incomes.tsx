@@ -25,6 +25,7 @@ import {
   IncomeFiltersFormInterface,
   IncomeFormInterface,
 } from "~/components/page-components/income/income-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -39,9 +40,8 @@ export default function Incomes() {
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -452,7 +452,7 @@ export default function Incomes() {
                 label="Name *"
                 name="name"
                 required
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
               ></InputText>
@@ -623,7 +623,9 @@ export default function Incomes() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const companyData = await (await companyLoader(request)).json();
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
   };
 }
