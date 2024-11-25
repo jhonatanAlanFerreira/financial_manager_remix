@@ -12,7 +12,7 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export default function Signup() {
   const [responseErrors, setResponseErrors] =
-    useState<ServerResponseErrorInterface>({ errors: {} });
+    useState<ServerResponseErrorInterface>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 

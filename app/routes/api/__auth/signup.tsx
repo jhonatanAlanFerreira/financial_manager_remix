@@ -20,6 +20,6 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   const res = await signup(data);
 
   return sendResponse(res, [
-    ["Set-Cookie", await createUserSession(res.data.id)],
+    ["Set-Cookie", await createUserSession(res.data?.id)],
   ]);
 };
