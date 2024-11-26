@@ -5,10 +5,11 @@ import {
   ExpenseCreateRequestInterface,
   ExpenseUpdateRequestInterface,
 } from "~/data/expense/expense-request-interfaces";
+import { expenseIncludeOptions } from "~/data/expense/expense-types";
 import { create, list, remove, update } from "~/data/expense/expense.server";
 import { sendResponse } from "~/data/services/responses";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
-import { getArrayFromFormData } from "~/utils/utilities";
+import { getArrayFromFormData, parseIncludes } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -36,6 +37,7 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       (url.searchParams.get(
         "is_personal_or_company"
       ) as IsPersonalOrCompanyType) || "all",
+    extends: parseIncludes(url, expenseIncludeOptions),
   };
   return sendResponse(await list(user, params));
 };

@@ -24,6 +24,8 @@ import {
   ExpenseFiltersFormInterface,
   ExpenseFormInterface,
 } from "~/components/page-components/expense/expense-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ExpenseWithRelationsInterface } from "~/data/expense/expense-types";
 
 export default function Expenses() {
   const { setTitle } = useTitle();
@@ -35,20 +37,19 @@ export default function Expenses() {
   const [searchParams, setSearchParams] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
-    {}
-  );
+  const [expenses, setExpenses] = useState<
+    ServerResponseInterface<ExpenseWithRelationsInterface[]>
+  >({});
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [loading, setLoading] = useState<boolean>(true);
 
   const { expenseData, companyData } = useLoaderData<{
-    expenseData: ServerResponseInterface<Expense[]>;
+    expenseData: ServerResponseInterface<ExpenseWithRelationsInterface[]>;
     companyData: ServerResponseInterface<Company[]>;
   }>();
 
@@ -58,7 +59,7 @@ export default function Expenses() {
       name: "",
       amount: 0,
       companies: [],
-      is_personal_expense: false,
+      is_personal: false,
     },
     onSubmit: () => {},
   });
@@ -128,11 +129,9 @@ export default function Expenses() {
   const loadExpenses = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponseInterface<Expense[]>>(
-        `/api/expense?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
+      const res = await axios.get<
+        ServerResponseInterface<ExpenseWithRelationsInterface[]>
+      >(`/api/expense?${paginationParams()}&${searchParams}&extends=companies`);
 
       setCurrentPage(res.data.pageInfo?.currentPage || 1);
       setTotalPages(res.data.pageInfo?.totalPages || 1);
@@ -159,7 +158,7 @@ export default function Expenses() {
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formData = prepareFormData(event.currentTarget);
     let axiosRequest;
     let loadingMessage;
 
@@ -187,7 +186,7 @@ export default function Expenses() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -229,17 +228,8 @@ export default function Expenses() {
     );
   };
 
-  const setFormValues = (expense: Expense) => {
-    mainForm.setValues({
-      id: expense.id,
-      amount: expense.amount,
-      is_personal_expense: expense.is_personal,
-      name: expense.name,
-      companies:
-        companies.data?.filter((company) =>
-          expense.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (expense: ExpenseWithRelationsInterface) => {
+    mainForm.setValues(expense);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
@@ -251,7 +241,7 @@ export default function Expenses() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (expense: Expense) => {
+  const onClickUpdate = (expense: ExpenseWithRelationsInterface) => {
     setFormValues(expense);
     setOpenAddModal(true);
   };
@@ -293,6 +283,16 @@ export default function Expenses() {
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+
+    return formData;
   };
 
   return (
@@ -440,14 +440,14 @@ export default function Expenses() {
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_expense"
-                  id="is_personal_expense"
-                  checked={mainForm.values.is_personal_expense}
+                  name="is_personal"
+                  id="is_personal"
+                  checked={mainForm.values.is_personal}
                   onChange={mainForm.handleChange}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_expense"
+                  htmlFor="is_personal"
                 >
                   Use as personal expense
                 </label>
@@ -458,7 +458,7 @@ export default function Expenses() {
                 required
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
               <InputText
                 label="Amount"
@@ -469,7 +469,7 @@ export default function Expenses() {
                 value={mainForm.values.amount || 0}
                 onChange={mainForm.handleChange}
               ></InputText>
-              {!mainForm.values.is_personal_expense && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -627,7 +627,9 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const companyData = await (await companyLoader(request)).json();
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
   };
 }

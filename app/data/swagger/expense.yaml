@@ -40,6 +40,11 @@ paths:
                 default: 10
               - type: string
                 enum: ["all"]
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "companies"
       responses:
         200:
           description: A list of expenses
@@ -51,7 +56,15 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Expense"
+                      allOf:
+                        - $ref: "#/components/schemas/Expense"
+                        - type: object
+                          properties:
+                            companies:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/Company"
+                          nullable: true
                   pageInfo:
                     $ref: "#/components/schemas/PageInfo"
         400:
