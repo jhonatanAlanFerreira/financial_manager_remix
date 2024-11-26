@@ -134,7 +134,8 @@ export default function Incomes() {
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formData = prepareFormData(event.currentTarget);
+
     let axiosRequest;
     let loadingMessage;
 
@@ -284,6 +285,16 @@ export default function Incomes() {
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+
+    return formData;
   };
 
   return (
