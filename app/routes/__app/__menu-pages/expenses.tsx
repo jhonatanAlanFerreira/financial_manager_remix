@@ -122,6 +122,7 @@ export default function Expenses() {
 
   useEffect(() => {
     if (reloadExpenses) {
+      setReloadExpenses(false);
       loadExpenses();
     }
   }, [searchParams]);
