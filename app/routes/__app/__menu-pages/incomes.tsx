@@ -163,7 +163,7 @@ export default function Incomes() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
