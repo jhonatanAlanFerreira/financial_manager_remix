@@ -24,6 +24,8 @@ import {
   ClassificationFiltersFormInterface,
   ClassificationFormInterface,
 } from "~/components/page-components/classification/classification-finterfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ClassificationWithRelationsInterface } from "~/data/classification/classification-types";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -37,20 +39,21 @@ export default function Classifications() {
   const [searchParams, setSearchParams] = useState<String>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
-    ServerResponseInterface<TransactionClassification[]>
+    ServerResponseInterface<ClassificationWithRelationsInterface[]>
   >({});
 
   const { companyData, classificationData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    classificationData: ServerResponseInterface<TransactionClassification[]>;
+    classificationData: ServerResponseInterface<
+      ClassificationWithRelationsInterface[]
+    >;
   }>();
 
   const mainForm = useFormik<ClassificationFormInterface>({
@@ -58,7 +61,7 @@ export default function Classifications() {
       id: "",
       name: "",
       companies: [],
-      is_personal_transaction_classification: false,
+      is_personal: false,
       is_income: false,
     },
     onSubmit: () => {},
@@ -121,6 +124,10 @@ export default function Classifications() {
   }, [searchParams]);
 
   useEffect(() => {
+    mainForm.setFieldValue("companies", null);
+  }, [mainForm.values.is_personal]);
+
+  useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
       filterForm.setFieldValue("company", null);
     }
@@ -130,11 +137,9 @@ export default function Classifications() {
     try {
       setLoading(true);
       const res = await axios.get<
-        ServerResponseInterface<TransactionClassification[]>
+        ServerResponseInterface<ClassificationWithRelationsInterface[]>
       >(
-        `/api/classification?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
+        `/api/classification?${paginationParams()}&${searchParams}&extends=companies`
       );
 
       setCurrentPage(res.data.pageInfo?.currentPage || 1);
@@ -162,7 +167,7 @@ export default function Classifications() {
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
+    const formData = prepareFormData(event.currentTarget);
     let axiosRequest;
     let loadingMessage;
 
@@ -190,7 +195,7 @@ export default function Classifications() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -236,18 +241,10 @@ export default function Classifications() {
     );
   };
 
-  const setFormValues = (classification: TransactionClassification) => {
-    mainForm.setValues({
-      id: classification.id,
-      name: classification.name,
-      is_personal_transaction_classification:
-        classification.is_personal,
-      is_income: classification.is_income,
-      companies:
-        companies.data?.filter((company) =>
-          classification.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (
+    classification: ClassificationWithRelationsInterface
+  ) => {
+    mainForm.setValues(classification);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
@@ -259,7 +256,9 @@ export default function Classifications() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (classification: TransactionClassification) => {
+  const onClickUpdate = (
+    classification: ClassificationWithRelationsInterface
+  ) => {
     setFormValues(classification);
     setOpenAddModal(true);
   };
@@ -305,6 +304,20 @@ export default function Classifications() {
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+    formData.set(
+      "is_income",
+      formData.get("is_income") == "on" ? "true" : "false"
+    );
+
+    return formData;
   };
 
   return (
@@ -450,17 +463,15 @@ export default function Classifications() {
               <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4 mb-6">
                 <div>
                   <Checkbox
-                    name="is_personal_transaction_classification"
-                    id="is_personal_transaction_classification"
+                    name="is_personal"
+                    id="is_personal"
                     className="relative top-1"
-                    checked={
-                      mainForm.values.is_personal_transaction_classification
-                    }
+                    checked={mainForm.values.is_personal}
                     onChange={mainForm.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
-                    htmlFor="is_personal_transaction_classification"
+                    htmlFor="is_personal"
                   >
                     Use as personal classification
                   </label>
@@ -503,9 +514,9 @@ export default function Classifications() {
                 required
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
-              {!mainForm.values.is_personal_transaction_classification && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isClearable
                   isMulti
@@ -706,7 +717,9 @@ export default function Classifications() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const companyData = await (await companyLoader(request)).json();
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
   };
 }
