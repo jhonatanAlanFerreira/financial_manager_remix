@@ -14,8 +14,10 @@ import { Loader } from "~/components/loader/loader";
 import { AccountDropdown } from "~/components/page-components/company-accounts/account-dropdown";
 import { CompanyFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
-import { CompanyWithAccountsType } from "~/data/company/company-types";
+import { CompanyWithRelationsInterface } from "~/data/company/company-types";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
+import { loader as companyLoader } from "~/routes/api/company/index";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export default function Companies() {
@@ -26,17 +28,17 @@ export default function Companies() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<
-    ServerResponseInterface<CompanyWithAccountsType[]>
+    ServerResponseInterface<CompanyWithRelationsInterface[]>
   >({});
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any>
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [userAccounts, setUserAccounts] = useState<
     ServerResponseInterface<Account[]>
   >({});
 
-  const { userAccountData } = useLoaderData<{
+  const { userAccountData, companyData } = useLoaderData<{
     userAccountData: ServerResponseInterface<Account[]>;
+    companyData: ServerResponseInterface<CompanyWithRelationsInterface[]>;
   }>();
 
   const formik = useFormik<CompanyFormInterface>({
@@ -59,14 +61,13 @@ export default function Companies() {
   }, []);
 
   useEffect(() => {
-    loadCompanies();
-  }, []);
-
-  useEffect(() => {
     if (userAccountData) {
       setUserAccounts(userAccountData);
     }
-  }, [userAccountData]);
+    if (companyData) {
+      setCompanies(companyData);
+    }
+  }, [userAccountData, companyData]);
 
   const loadUserAccounts = async () => {
     setLoading(true);
@@ -78,7 +79,7 @@ export default function Companies() {
   const loadCompanies = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/company?with_accounts=true`);
+      const res = await axios.get(`/api/company?extends=accounts`);
 
       setCompanies(res.data);
       setLoading(false);
@@ -297,7 +298,7 @@ export default function Companies() {
                 required
                 value={formik.values.name}
                 onChange={formik.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
             </Form>
           </div>
@@ -318,7 +319,13 @@ export default function Companies() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const [userAccountData, companyData] = await Promise.all([
+    userAccountLoader(request).then((res) => res.json()),
+    companyLoader(request).then((res) => res.json()),
+  ]);
+
   return {
-    userAccountData: await userAccountLoader(request),
+    userAccountData,
+    companyData,
   };
 }
