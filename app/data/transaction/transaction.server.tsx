@@ -70,7 +70,7 @@ export async function create(
     data: {
       name: data.name,
       amount: data.amount,
-      transaction_date: data.transaction_date,
+      date: data.date,
       company_id: data.company,
       account_id: data.account,
       expense_id: data.expense,
@@ -172,7 +172,7 @@ export async function update(
     data: {
       name: data.name,
       amount: data.amount,
-      transaction_date: data.transaction_date,
+      date: data.date,
       company_id: data.company,
       expense_id: data.expense,
       income_id: data.income,

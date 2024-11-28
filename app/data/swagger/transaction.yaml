@@ -140,7 +140,7 @@ paths:
                 is_income:
                   type: boolean
                   default: false
-                transaction_date:
+                date:
                   type: string
                   format: date
       responses:
@@ -202,7 +202,7 @@ paths:
                 is_income:
                   type: boolean
                   default: false
-                transaction_date:
+                date:
                   type: string
                   format: date
       responses:

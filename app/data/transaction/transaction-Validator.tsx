@@ -27,7 +27,7 @@ export async function transactionCreateValidator(
     };
   }
 
-  if (!data.transaction_date) {
+  if (!data.date) {
     return {
       errorCode: 400,
       errors: {
@@ -208,7 +208,7 @@ export async function transactionUpdateValidator(
     };
   }
 
-  if (!data.transaction_date) {
+  if (!data.date) {
     return {
       errorCode: 400,
       errors: {

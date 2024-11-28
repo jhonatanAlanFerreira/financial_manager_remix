@@ -41,6 +41,7 @@ import {
   TransactionsWithTotalsInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -75,9 +76,8 @@ export default function Transactions() {
     {}
   );
 
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
 
   const {
     companyData,
@@ -371,7 +371,7 @@ export default function Transactions() {
       is_income: transaction.is_income,
       is_personal_transaction: transaction.is_personal,
       name: transaction.name,
-      transaction_date: transaction.transaction_date,
+      transaction_date: transaction.date,
       classifications:
         classifications.data?.filter((classification) =>
           transaction.transaction_classification_ids.includes(classification.id)
@@ -488,7 +488,7 @@ export default function Transactions() {
                 </td>
 
                 <td className="py-2 px-4 border-b border-r">
-                  {formatDate(transaction.transaction_date)}
+                  {formatDate(transaction.date)}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.amount}

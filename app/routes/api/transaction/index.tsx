@@ -41,7 +41,7 @@ let createTransaction = async (request: Request) => {
     income: getOptionalField(body, "income"),
     account: String(body.get("account") || ""),
     classifications: getArrayFromFormData(body, "classifications"),
-    transaction_date: String(body.get("transaction_date") || ""),
+    date: String(body.get("date") || ""),
     is_personal: body.get("is_personal") == "true",
     is_income: body.get("is_income") == "true",
   };
@@ -73,7 +73,7 @@ let updateTransaction = async (request: Request) => {
     income: getOptionalField(body, "income"),
     account: String(body.get("account") || ""),
     classifications: getArrayFromFormData(body, "classifications"),
-    transaction_date: String(body.get("transaction_date") || ""),
+    date: String(body.get("date") || ""),
     is_personal: body.get("is_personal") == "true",
     is_income: body.get("is_income") == "true",
   };
