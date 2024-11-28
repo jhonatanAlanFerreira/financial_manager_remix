@@ -10,9 +10,6 @@ import { NavigationLoader } from "~/components/navigation-loader/navigation-load
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export default function Login() {
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -32,7 +29,6 @@ export default function Login() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -63,18 +59,12 @@ export default function Login() {
           </div>
           <div>
             <Form method="post" id="login-form" onSubmit={formSubmit}>
-              <InputText
-                label="Login"
-                name="login"
-                required
-                errorMessage={responseErrors?.data?.errors?.["login"]}
-              ></InputText>
+              <InputText label="Login" name="login" required></InputText>
               <InputPassword
                 showEyeIcon={true}
                 label="Password"
                 name="password"
                 required
-                errorMessage={responseErrors?.data?.errors?.["password"]}
               ></InputPassword>
             </Form>
             <div>
