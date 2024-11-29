@@ -321,7 +321,11 @@ export default function Companies() {
 export async function loader(request: LoaderFunctionArgs) {
   const [userAccountData, companyData] = await Promise.all([
     userAccountLoader(request).then((res) => res.json()),
-    companyLoader(request, { extends: ["accounts"] }).then((res) => res.json()),
+    companyLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["accounts"],
+    }).then((res) => res.json()),
   ]);
 
   return {

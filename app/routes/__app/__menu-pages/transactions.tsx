@@ -17,6 +17,7 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
+import { loader as transactionLoader } from "~/routes/api/transaction/index";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { Icon } from "~/components/icon/icon";
 import {
@@ -59,9 +60,15 @@ export default function Transactions() {
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
 
+  //TODO: Transactions and totals
+  // const [transactions, setTransactions] = useState<
+  //   ServerResponseInterface<TransactionsWithTotalsInterface>
+  // >({});
+
   const [transactions, setTransactions] = useState<
-    ServerResponseInterface<TransactionsWithTotalsInterface>
+    ServerResponseInterface<Transaction[]>
   >({});
+
   const [classifications, setClassifications] = useState<
     ServerResponseInterface<TransactionClassification[]>
   >({});
@@ -88,7 +95,7 @@ export default function Transactions() {
     userAccountData,
   } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
+    transactionData: ServerResponseInterface<Transaction[]>;
     expenseData: ServerResponseInterface<Expense[]>;
     classificationData: ServerResponseInterface<TransactionClassification[]>;
     incomeData: ServerResponseInterface<Income[]>;
@@ -224,9 +231,7 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<TransactionsWithTotalsInterface>
-      >(
+      const res = await axios.get<ServerResponseInterface<Transaction[]>>(
         `/api/transaction?${searchParams}${
           searchParams ? "&" : ""
         }${paginationParams()}`
@@ -239,12 +244,13 @@ export default function Transactions() {
       setTotalPages(data.pageInfo?.totalPages || 1);
       setCurrentPage(data.pageInfo?.currentPage || 1);
 
-      setTotalExpenseValue(data.data?.totalExpenseValue || 0);
-      setTotalIncomeValue(data.data?.totalIncomeValue || 0);
+      //TODO:
+      // setTotalExpenseValue(data.data?.totalExpenseValue || 0);
+      // setTotalIncomeValue(data.data?.totalIncomeValue || 0);
 
       setLoading(false);
 
-      if (!data.data?.transactions.length) {
+      if (!data.data?.length) {
         setCurrentPage(res.data.pageInfo?.totalPages || 1);
       }
     } catch (error) {
@@ -444,14 +450,14 @@ export default function Transactions() {
             </tr>
           </thead>
           <tbody>
-            {!transactions.data?.transactions.length && (
+            {!transactions.data?.length && (
               <tr>
                 <td className="py-2 px-4" colSpan={4}>
                   There are no data yet
                 </td>
               </tr>
             )}
-            {transactions.data?.transactions.map((transaction, index) => (
+            {transactions.data?.map((transaction, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.name}
@@ -621,19 +627,28 @@ export default function Transactions() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([
-    companyLoader(request),
-    expenseLoader(request),
-    classificationLoader(request),
-    incomeLoader(request),
-    userAccountLoader(request),
+  const [
+    companyData,
+    expenseData,
+    classificationData,
+    incomeData,
+    userAccountData,
+    transactionData,
+  ] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    expenseLoader(request).then((res) => res.json()),
+    classificationLoader(request).then((res) => res.json()),
+    incomeLoader(request).then((res) => res.json()),
+    userAccountLoader(request).then((res) => res.json()),
+    transactionLoader(request).then((res) => res.json()),
   ]);
 
   return {
-    companyData: res[0],
-    expenseData: res[1],
-    classificationData: res[2],
-    incomeData: res[3],
-    userAccountData: res[4],
+    companyData,
+    expenseData,
+    classificationData,
+    incomeData,
+    userAccountData,
+    transactionData,
   };
 }

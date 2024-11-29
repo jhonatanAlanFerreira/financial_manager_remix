@@ -339,7 +339,7 @@ export function TransactionAdd({
                 step={0.01}
                 min={0.01}
                 required
-                errorMessage={responseErrors?.data?.errors?.["amount"]}
+                errorMessage={responseErrors?.errors?.["amount"]}
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>
@@ -437,7 +437,7 @@ export function TransactionAdd({
                 step={0.01}
                 min={0.01}
                 required
-                errorMessage={responseErrors?.data?.errors?.["amount"]}
+                errorMessage={responseErrors?.errors?.["amount"]}
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>

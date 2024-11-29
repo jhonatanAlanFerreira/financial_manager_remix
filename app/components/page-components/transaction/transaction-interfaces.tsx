@@ -7,7 +7,7 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { FormikProps } from "formik";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export interface TransactionFiltersFormInterface {
   name: string;
@@ -43,7 +43,7 @@ export interface TransactionAddPropsInterface {
   formik: FormikProps<TransactionFormInterface>;
   skipEffect: boolean;
   isSubmitting: boolean;
-  responseErrors: ServerResponseInterface<any>; //WIP
+  responseErrors: ServerResponseErrorInterface;
   companies: Company[];
   expenses: Expense[];
   incomes: Income[];
