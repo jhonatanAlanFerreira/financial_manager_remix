@@ -21,7 +21,10 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: CompanyLoaderParamsInterface
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -32,7 +35,12 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     extends: parseIncludes(url, companyIncludeOptions),
   };
 
-  return sendResponse(await list(user, params));
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };
 
 let createCompany = async (request: Request) => {

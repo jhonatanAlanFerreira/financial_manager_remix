@@ -55,7 +55,7 @@ model Transaction {
   id                             String                      @id @default(auto()) @map("_id") @db.ObjectId
   name                           String
   amount                         Float
-  transaction_date               String
+  date               String
   user_id                        String                      @db.ObjectId
   user                           User                        @relation(fields: [user_id], references: [id])
   company_id                     String?                     @db.ObjectId

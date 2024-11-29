@@ -3,6 +3,6 @@ import { CompanyIncludeOptions } from "~/data/company/company-types";
 
 export interface CompanyLoaderParamsInterface
   extends PaginationParamsInterface {
-  name: string | undefined;
+  name?: string | undefined;
   extends?: CompanyIncludeOptions[];
 }

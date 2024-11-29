@@ -127,7 +127,7 @@ export default function Companies() {
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -321,7 +321,7 @@ export default function Companies() {
 export async function loader(request: LoaderFunctionArgs) {
   const [userAccountData, companyData] = await Promise.all([
     userAccountLoader(request).then((res) => res.json()),
-    companyLoader(request).then((res) => res.json()),
+    companyLoader(request, { extends: ["accounts"] }).then((res) => res.json()),
   ]);
 
   return {

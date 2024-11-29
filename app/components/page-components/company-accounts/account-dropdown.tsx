@@ -15,6 +15,7 @@ import {
   AccountDropdownPropsInterface,
   AccountFormInterface,
 } from "~/components/page-components/company-accounts/company-accounts-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export function AccountDropdown({
   company,
@@ -26,10 +27,8 @@ export function AccountDropdown({
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<any> //WIP
-  >({});
-
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const formik = useFormik<AccountFormInterface>({
     initialValues: {
       id: "",
@@ -73,7 +72,7 @@ export function AccountDropdown({
         },
         error: (error) => {
           if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
+            setResponseErrors(error.response?.data.serverError);
             return (
               error.response?.data.message ||
               "Sorry, unexpected error. Be back soon"
@@ -213,7 +212,7 @@ export function AccountDropdown({
                 required
                 value={formik.values.name}
                 onChange={formik.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
               <InputText
                 label="Balance"
