@@ -13,11 +13,15 @@ import {
   transactionUpdateValidator,
 } from "~/data/transaction/transaction-Validator";
 import { paginate } from "~/data/services/list.service";
+import {
+  TransactionsWithTotalsInterface,
+  TransactionWithRelationsInterface,
+} from "./transaction-types";
 
 export async function list(
   user: User,
   params: TransactionLoaderParamsInterface
-): Promise<ServerResponseInterface<Transaction[]>> {
+): Promise<ServerResponseInterface<TransactionsWithTotalsInterface>> {
   const serverError = await transactionListValidator(params, user);
 
   if (serverError) {
@@ -34,7 +38,7 @@ export async function list(
     ...restParams
   } = params;
 
-  return paginate<
+  const transactions = await paginate<
     Transaction,
     Prisma.TransactionFindManyArgs,
     Prisma.TransactionCountArgs
@@ -46,6 +50,15 @@ export async function list(
     { user_id: user.id },
     transactionIncludes
   );
+
+  return {
+    ...transactions,
+    data: {
+      transactions: transactions.data as TransactionWithRelationsInterface[],
+      totalExpenseValue: 0, //WIP
+      totalIncomeValue: 0, //WIP
+    },
+  };
 }
 
 export async function create(

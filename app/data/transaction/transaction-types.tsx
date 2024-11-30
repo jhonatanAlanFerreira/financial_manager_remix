@@ -15,6 +15,12 @@ export interface TransactionWithRelationsInterface extends Transaction {
   account: Account;
 }
 
+export interface TransactionsWithTotalsInterface {
+  transactions: TransactionWithRelationsInterface[];
+  totalExpenseValue: number;
+  totalIncomeValue: number;
+}
+
 export const transactionIncludeOptions = [
   "company",
   "transaction_classifications",

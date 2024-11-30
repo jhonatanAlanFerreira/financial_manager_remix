@@ -42,7 +42,10 @@ import {
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import { TransactionWithRelationsInterface } from "~/data/transaction/transaction-types";
+import {
+  TransactionsWithTotalsInterface,
+  TransactionWithRelationsInterface,
+} from "~/data/transaction/transaction-types";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -60,13 +63,8 @@ export default function Transactions() {
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
 
-  //TODO: Transactions and totals
-  // const [transactions, setTransactions] = useState<
-  //   ServerResponseInterface<TransactionsWithTotalsInterface>
-  // >({});
-
   const [transactions, setTransactions] = useState<
-    ServerResponseInterface<TransactionWithRelationsInterface[]>
+    ServerResponseInterface<TransactionsWithTotalsInterface>
   >({});
 
   const [classifications, setClassifications] = useState<
@@ -95,9 +93,7 @@ export default function Transactions() {
     userAccountData,
   } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    transactionData: ServerResponseInterface<
-      TransactionWithRelationsInterface[]
-    >;
+    transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
     expenseData: ServerResponseInterface<Expense[]>;
     classificationData: ServerResponseInterface<TransactionClassification[]>;
     incomeData: ServerResponseInterface<Income[]>;
@@ -167,6 +163,8 @@ export default function Transactions() {
     }
     if (transactionData) {
       setTransactions(transactionData);
+      setTotalIncomeValue(transactionData.data?.totalIncomeValue || 0);
+      setTotalExpenseValue(transactionData.data?.totalExpenseValue || 0);
     }
     if (incomeData) {
       setIncomes(incomeData);
@@ -218,7 +216,7 @@ export default function Transactions() {
     try {
       setLoading(true);
       const res = await axios.get<
-        ServerResponseInterface<TransactionWithRelationsInterface[]>
+        ServerResponseInterface<TransactionsWithTotalsInterface>
       >(
         `/api/transaction?${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`
       );
@@ -230,13 +228,12 @@ export default function Transactions() {
       setTotalPages(data.pageInfo?.totalPages || 1);
       setCurrentPage(data.pageInfo?.currentPage || 1);
 
-      //TODO:
-      // setTotalExpenseValue(data.data?.totalExpenseValue || 0);
-      // setTotalIncomeValue(data.data?.totalIncomeValue || 0);
+      setTotalExpenseValue(data.data?.totalExpenseValue || 0);
+      setTotalIncomeValue(data.data?.totalIncomeValue || 0);
 
       setLoading(false);
 
-      if (!data.data?.length) {
+      if (!data.data?.transactions.length) {
         setCurrentPage(res.data.pageInfo?.totalPages || 1);
       }
     } catch (error) {
@@ -418,14 +415,14 @@ export default function Transactions() {
             </tr>
           </thead>
           <tbody>
-            {!transactions.data?.length && (
+            {!transactions.data?.transactions.length && (
               <tr>
                 <td className="py-2 px-4" colSpan={4}>
                   There are no data yet
                 </td>
               </tr>
             )}
-            {transactions.data?.map((transaction, index) => (
+            {transactions.data?.transactions.map((transaction, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.name}
