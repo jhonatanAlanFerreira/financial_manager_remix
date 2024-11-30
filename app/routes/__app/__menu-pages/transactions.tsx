@@ -208,18 +208,6 @@ export default function Transactions() {
     );
   };
 
-  const getCompanyNameFromTransaction = (transaction: Transaction) => {
-    return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
-  };
-
-  const getExpenseNameFromTransaction = (transaction: Transaction) => {
-    return expenses?.data?.find((e) => e.id == transaction.expense_id)?.name;
-  };
-
-  const getIncomeNameFromTransaction = (transaction: Transaction) => {
-    return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
-  };
-
   const getTransactionType = (transaction: Transaction) => {
     return transaction.is_personal
       ? "Personal Transaction"
@@ -447,30 +435,24 @@ export default function Transactions() {
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getCompanyNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.company?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getCompanyNameFromTransaction(transaction) || "Not set"}
+                  {transaction.company?.name || "Not set"}
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getExpenseNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.expense?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getExpenseNameFromTransaction(transaction) || "Not set"}
+                  {transaction.expense?.name || "Not set"}
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getIncomeNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.income?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getIncomeNameFromTransaction(transaction) || "Not set"}
+                  {transaction.income?.name || "Not set"}
                 </td>
 
                 <td className="py-2 px-4 border-b border-r">
