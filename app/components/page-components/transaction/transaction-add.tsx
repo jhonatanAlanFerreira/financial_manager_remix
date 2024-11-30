@@ -295,6 +295,7 @@ export function TransactionAdd({
               )}
               <InputSelect
                 isClearable
+                required
                 className="mb-8"
                 placeholder="Account"
                 options={filteredAccounts}
@@ -393,6 +394,7 @@ export function TransactionAdd({
               )}
               <InputSelect
                 isClearable
+                required
                 className="mb-8"
                 placeholder="Account"
                 options={filteredAccounts}

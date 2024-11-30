@@ -267,10 +267,7 @@ export default function Transactions() {
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    if (mainForm.values.is_income) {
-      formData.set("is_income", "on");
-    }
+    const formData = prepareFormData(event.currentTarget);
 
     let axiosRequest;
     let loadingMessage;
@@ -370,6 +367,17 @@ export default function Transactions() {
   const setFormValues = (transaction: TransactionWithRelationsInterface) => {
     setSkipEffect(true);
     mainForm.setValues(transaction);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+    formData.set("is_income", mainForm.values.is_income ? "true" : "false");
+
+    return formData;
   };
 
   return (
