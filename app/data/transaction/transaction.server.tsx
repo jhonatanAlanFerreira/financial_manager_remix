@@ -17,6 +17,7 @@ import {
   TransactionsWithTotalsInterface,
   TransactionWithRelationsInterface,
 } from "./transaction-types";
+import { buildWhereClause } from "~/data/services/list.service";
 
 export async function list(
   user: User,
@@ -51,12 +52,14 @@ export async function list(
     transactionIncludes
   );
 
+  const totals = await calculateTotals(user, params);
+
   return {
     ...transactions,
     data: {
       transactions: transactions.data as TransactionWithRelationsInterface[],
-      totalExpenseValue: 0, //WIP
-      totalIncomeValue: 0, //WIP
+      totalExpenseValue: totals.totalExpenseValue,
+      totalIncomeValue: totals.totalIncomeValue,
     },
   };
 }
@@ -205,5 +208,31 @@ export async function update(
   return {
     data: updatedTransaction,
     message: "Transaction was updated successfully",
+  };
+}
+
+async function calculateTotals(
+  user: User,
+  filters: TransactionLoaderParamsInterface
+): Promise<{ totalExpenseValue: number; totalIncomeValue: number }> {
+  const whereClause = {
+    ...buildWhereClause(filters),
+    user_id: user.id,
+  };
+
+  const [totalExpense, totalIncome] = await prisma.$transaction([
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: false },
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: true },
+    }),
+  ]);
+
+  return {
+    totalExpenseValue: totalExpense._sum.amount || 0,
+    totalIncomeValue: totalIncome._sum.amount || 0,
   };
 }
