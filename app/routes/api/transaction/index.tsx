@@ -6,6 +6,7 @@ import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
 } from "~/data/transaction/transaction-request-interfaces";
+import { transactionIncludeOptions } from "~/data/transaction/transaction-types";
 import {
   create,
   list,
@@ -16,7 +17,11 @@ import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
-import { getArrayFromFormData, getOptionalField } from "~/utils/utilities";
+import {
+  getArrayFromFormData,
+  getOptionalField,
+  parseIncludes,
+} from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -81,7 +86,10 @@ let updateTransaction = async (request: Request) => {
   return sendResponse(await update(transactionId, user, data));
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<TransactionLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -105,7 +113,13 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       (url.searchParams.get(
         "is_personal_or_company"
       ) as IsPersonalOrCompanyType) || "all",
+    extends: parseIncludes(url, transactionIncludeOptions),
   };
 
-  return sendResponse(await list(user, params));
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };

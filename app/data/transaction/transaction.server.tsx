@@ -27,7 +27,12 @@ export async function list(
     };
   }
 
-  const { page, pageSize, ...restParams } = params;
+  const {
+    page,
+    pageSize,
+    extends: transactionIncludes,
+    ...restParams
+  } = params;
 
   return paginate<
     Transaction,
@@ -38,7 +43,8 @@ export async function list(
     prisma.transaction.count,
     { page, pageSize },
     restParams,
-    { user_id: user.id }
+    { user_id: user.id },
+    transactionIncludes
   );
 }
 

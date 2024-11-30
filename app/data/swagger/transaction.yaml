@@ -77,6 +77,11 @@ paths:
                 default: 10
               - type: string
                 enum: ["all"]
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "company,transaction_classifications,expense,income,account"
       responses:
         200:
           description: List of transactions
@@ -155,7 +160,6 @@ paths:
                     $ref: "#/components/schemas/Transaction"
                   message:
                     type: string
-                    example: "Transaction successfully created."
         400:
           description: Bad Request
         401:

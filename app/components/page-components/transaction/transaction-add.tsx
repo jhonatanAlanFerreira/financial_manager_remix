@@ -71,7 +71,7 @@ export function TransactionAdd({
   const onClassificationsChange = (
     classifications: TransactionClassification[]
   ) => {
-    formik.setFieldValue("classifications", classifications);
+    formik.setFieldValue("transaction_classifications", classifications);
   };
 
   const runFilters = () => {
@@ -97,7 +97,7 @@ export function TransactionAdd({
     formik.setFieldValue("classifications", null);
 
     runFilters();
-  }, [formik.values.is_personal_transaction]);
+  }, [formik.values.is_personal]);
 
   useEffect(() => {
     if (skipEffect) {
@@ -152,7 +152,7 @@ export function TransactionAdd({
     if (expenses) {
       setFilteredExpenses(
         expenses.filter((expense) => {
-          const transactionTypeFilter = formik.values.is_personal_transaction
+          const transactionTypeFilter = formik.values.is_personal
             ? expense.is_personal
             : true;
 
@@ -170,7 +170,7 @@ export function TransactionAdd({
     if (classifications) {
       setFilteredClassifications(
         classifications.filter((classification) => {
-          const transactionTypeFilter = formik.values.is_personal_transaction
+          const transactionTypeFilter = formik.values.is_personal
             ? classification.is_personal
             : true;
 
@@ -191,7 +191,7 @@ export function TransactionAdd({
     if (incomes) {
       setFilteredIncomes(
         incomes.filter((income) => {
-          const incomeTypeFilter = formik.values.is_personal_transaction
+          const incomeTypeFilter = formik.values.is_personal
             ? income.is_personal
             : true;
 
@@ -209,7 +209,7 @@ export function TransactionAdd({
     if (accounts) {
       setFilteredAccounts(
         accounts.filter((account) => {
-          const transactionTypeFilter = formik.values.is_personal_transaction
+          const transactionTypeFilter = formik.values.is_personal
             ? account.is_personal
             : true;
 
@@ -268,19 +268,19 @@ export function TransactionAdd({
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_transaction"
-                  id="is_personal_transaction"
+                  name="is_personal"
+                  id="is_personal"
                   onChange={formik.handleChange}
-                  checked={formik.values.is_personal_transaction}
+                  checked={formik.values.is_personal}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_transaction"
+                  htmlFor="is_personal"
                 >
                   Personal transaction
                 </label>
               </div>
-              {!formik.values.is_personal_transaction && (
+              {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
@@ -326,11 +326,11 @@ export function TransactionAdd({
               ></InputText>
               <InputText
                 label="Date *"
-                name="transaction_date"
+                name="date"
                 type="date"
                 required
                 onChange={formik.handleChange}
-                value={formik.values.transaction_date}
+                value={formik.values.date}
               ></InputText>
               <InputText
                 label="Amount *"
@@ -355,7 +355,7 @@ export function TransactionAdd({
                 onChange={(event) =>
                   onClassificationsChange(event as TransactionClassification[])
                 }
-                value={formik.values.classifications}
+                value={formik.values.transaction_classifications}
               ></InputSelect>
             </Form>
           </div>
@@ -366,19 +366,19 @@ export function TransactionAdd({
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_transaction"
-                  id="is_personal_transaction"
+                  name="is_personal"
+                  id="is_personal"
                   onChange={formik.handleChange}
-                  checked={formik.values.is_personal_transaction}
+                  checked={formik.values.is_personal}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_transaction"
+                  htmlFor="is_personal"
                 >
                   Personal transaction
                 </label>
               </div>
-              {!formik.values.is_personal_transaction && (
+              {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
@@ -424,11 +424,11 @@ export function TransactionAdd({
               ></InputText>
               <InputText
                 label="Date *"
-                name="transaction_date"
+                name="date"
                 type="date"
                 required
                 onChange={formik.handleChange}
-                value={formik.values.transaction_date}
+                value={formik.values.date}
               ></InputText>
               <InputText
                 label="Amount *"
@@ -453,7 +453,7 @@ export function TransactionAdd({
                 onChange={(event) =>
                   onClassificationsChange(event as TransactionClassification[])
                 }
-                value={formik.values.classifications}
+                value={formik.values.transaction_classifications}
               ></InputSelect>
             </Form>
           </div>

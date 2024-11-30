@@ -23,7 +23,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
 
 export let loader = async (
   { request }: LoaderFunctionArgs,
-  overrideParams?: CompanyLoaderParamsInterface
+  overrideParams?: Partial<CompanyLoaderParamsInterface>
 ) => {
   const user = await requireUserSession(request);
 

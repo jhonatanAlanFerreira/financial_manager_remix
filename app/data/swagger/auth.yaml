@@ -13,10 +13,8 @@ paths:
               properties:
                 login:
                   type: string
-                  example: "admin"
                 password:
                   type: string
-                  example: "password"
       responses:
         200:
           description: Login succeeded

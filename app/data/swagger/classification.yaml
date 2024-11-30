@@ -29,7 +29,7 @@ paths:
           name: extends
           schema:
             type: string
-            example: "transactions, companies"
+            example: "transactions,companies"
       responses:
         200:
           description: A list of classifications

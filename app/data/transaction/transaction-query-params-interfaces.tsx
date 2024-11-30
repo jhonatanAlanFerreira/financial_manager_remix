@@ -3,6 +3,7 @@ import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
+import { TransactionIncludeOptions } from "~/data/transaction/transaction-types";
 
 export interface TransactionLoaderParamsInterface
   extends PaginationParamsInterface {
@@ -18,4 +19,5 @@ export interface TransactionLoaderParamsInterface
   company: string | undefined;
   account: string | undefined;
   classification: string | undefined;
+  extends?: TransactionIncludeOptions[];
 }

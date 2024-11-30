@@ -39,10 +39,10 @@ import { TransactionFilters } from "~/components/page-components/transaction/tra
 import {
   TransactionFiltersFormInterface,
   TransactionFormInterface,
-  TransactionsWithTotalsInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { TransactionWithRelationsInterface } from "~/data/transaction/transaction-types";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -66,7 +66,7 @@ export default function Transactions() {
   // >({});
 
   const [transactions, setTransactions] = useState<
-    ServerResponseInterface<Transaction[]>
+    ServerResponseInterface<TransactionWithRelationsInterface[]>
   >({});
 
   const [classifications, setClassifications] = useState<
@@ -95,7 +95,9 @@ export default function Transactions() {
     userAccountData,
   } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    transactionData: ServerResponseInterface<Transaction[]>;
+    transactionData: ServerResponseInterface<
+      TransactionWithRelationsInterface[]
+    >;
     expenseData: ServerResponseInterface<Expense[]>;
     classificationData: ServerResponseInterface<TransactionClassification[]>;
     incomeData: ServerResponseInterface<Income[]>;
@@ -109,10 +111,10 @@ export default function Transactions() {
       company: null,
       expense: null,
       account: null,
-      transaction_date: todayFormatedDate(),
+      date: todayFormatedDate(),
       amount: 0,
-      classifications: [],
-      is_personal_transaction: false,
+      transaction_classifications: [],
+      is_personal: false,
       income: null,
       name: "",
     },
@@ -139,8 +141,6 @@ export default function Transactions() {
   });
 
   useEffect(() => {
-    buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Transactions",
       pageTooltipMessage:
@@ -166,8 +166,6 @@ export default function Transactions() {
       setAccounts(userAccountData);
     }
     if (transactionData) {
-      setCurrentPage(transactionData.pageInfo?.currentPage || 0);
-      setTotalPages(transactionData.pageInfo?.totalPages || 0);
       setTransactions(transactionData);
     }
     if (incomeData) {
@@ -231,10 +229,10 @@ export default function Transactions() {
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<ServerResponseInterface<Transaction[]>>(
-        `/api/transaction?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
+      const res = await axios.get<
+        ServerResponseInterface<TransactionWithRelationsInterface[]>
+      >(
+        `/api/transaction?${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`
       );
 
       const { data } = res;
@@ -359,7 +357,7 @@ export default function Transactions() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (transaction: Transaction) => {
+  const onClickUpdate = (transaction: TransactionWithRelationsInterface) => {
     setFormValues(transaction);
     setOpenAddModal(true);
   };
@@ -369,35 +367,9 @@ export default function Transactions() {
     setOpenRemoveModal(true);
   };
 
-  const setFormValues = (transaction: Transaction) => {
+  const setFormValues = (transaction: TransactionWithRelationsInterface) => {
     setSkipEffect(true);
-    mainForm.setValues({
-      id: transaction.id,
-      amount: transaction.amount,
-      is_income: transaction.is_income,
-      is_personal_transaction: transaction.is_personal,
-      name: transaction.name,
-      transaction_date: transaction.date,
-      classifications:
-        classifications.data?.filter((classification) =>
-          transaction.transaction_classification_ids.includes(classification.id)
-        ) || [],
-      company:
-        companies.data?.find(
-          (company) => company.id == transaction.company_id
-        ) || null,
-      expense:
-        expenses.data?.find(
-          (expense) => expense.id == transaction.expense_id
-        ) || null,
-      income:
-        incomes.data?.find((income) => income.id == transaction.income_id) ||
-        null,
-      account:
-        accounts.data?.find(
-          (account) => account.id == transaction.account_id
-        ) || null,
-    });
+    mainForm.setValues(transaction);
   };
 
   return (
@@ -640,7 +612,17 @@ export async function loader(request: LoaderFunctionArgs) {
     classificationLoader(request).then((res) => res.json()),
     incomeLoader(request).then((res) => res.json()),
     userAccountLoader(request).then((res) => res.json()),
-    transactionLoader(request).then((res) => res.json()),
+    transactionLoader(request, {
+      extends: [
+        "account",
+        "company",
+        "expense",
+        "income",
+        "transaction_classifications",
+      ],
+      date_after: firstDayOfCurrentMonth(),
+      date_before: lastDayOfCurrentMonth(),
+    }).then((res) => res.json()),
   ]);
 
   return {

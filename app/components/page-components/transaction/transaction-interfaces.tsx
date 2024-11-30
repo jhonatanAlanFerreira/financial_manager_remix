@@ -24,11 +24,11 @@ export interface TransactionFiltersFormInterface {
 
 export interface TransactionFormInterface {
   id: string;
-  transaction_date: string;
+  date: string;
   amount: number;
-  is_personal_transaction: boolean;
+  is_personal: boolean;
   is_income: boolean;
-  classifications: TransactionClassification[];
+  transaction_classifications: TransactionClassification[];
   income: Income | null;
   company: Company | null;
   expense: Expense | null;
