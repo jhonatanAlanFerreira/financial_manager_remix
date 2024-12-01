@@ -231,8 +231,17 @@ async function calculateTotals(
     }),
   ]);
 
+  const totalExpenseValue =
+    filters.is_income_or_expense === "income"
+      ? 0
+      : totalExpense._sum.amount || 0;
+  const totalIncomeValue =
+    filters.is_income_or_expense === "expense"
+      ? 0
+      : totalIncome._sum.amount || 0;
+
   return {
-    totalExpenseValue: totalExpense._sum.amount || 0,
-    totalIncomeValue: totalIncome._sum.amount || 0,
+    totalExpenseValue,
+    totalIncomeValue,
   };
 }

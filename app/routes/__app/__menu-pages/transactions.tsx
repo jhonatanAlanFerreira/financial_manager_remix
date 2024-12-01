@@ -57,7 +57,7 @@ export default function Transactions() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [skipEffect, setSkipEffect] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
@@ -165,6 +165,7 @@ export default function Transactions() {
       setTransactions(transactionData);
       setTotalIncomeValue(transactionData.data?.totalIncomeValue || 0);
       setTotalExpenseValue(transactionData.data?.totalExpenseValue || 0);
+      setTotalPages(transactionData.pageInfo?.totalPages || 0);
     }
     if (incomeData) {
       setIncomes(incomeData);
@@ -600,6 +601,8 @@ export async function loader(request: LoaderFunctionArgs) {
     incomeLoader(request).then((res) => res.json()),
     userAccountLoader(request).then((res) => res.json()),
     transactionLoader(request, {
+      page: 1,
+      pageSize: 10,
       extends: [
         "account",
         "company",
