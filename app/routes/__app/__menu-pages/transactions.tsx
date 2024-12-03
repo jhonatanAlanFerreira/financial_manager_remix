@@ -57,11 +57,17 @@ export default function Transactions() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [skipEffect, setSkipEffect] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const [transactions, setTransactions] = useState<
     ServerResponseInterface<TransactionsWithTotalsInterface>
@@ -181,10 +187,10 @@ export default function Transactions() {
   ]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadTransactions();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -227,7 +233,10 @@ export default function Transactions() {
       setTransactions(data);
 
       setTotalPages(data.pageInfo?.totalPages || 1);
-      setCurrentPage(data.pageInfo?.currentPage || 1);
+      setPaginationState({
+        reload: false,
+        page: data.pageInfo?.currentPage || 1,
+      });
 
       setTotalExpenseValue(data.data?.totalExpenseValue || 0);
       setTotalIncomeValue(data.data?.totalIncomeValue || 0);
@@ -235,7 +244,10 @@ export default function Transactions() {
       setLoading(false);
 
       if (!data.data?.transactions.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+        setPaginationState({
+          reload: false,
+          page: data.pageInfo?.totalPages || 1,
+        });
       }
     } catch (error) {
       if (isAxiosError(error)) {
@@ -299,12 +311,16 @@ export default function Transactions() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadTransactions();
+    if (paginationState.page == 1) {
+      loadTransactions();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -493,10 +509,10 @@ export default function Transactions() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}
 
