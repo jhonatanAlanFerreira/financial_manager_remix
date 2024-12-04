@@ -214,6 +214,17 @@ export default function Incomes() {
     }
   };
 
+  const adjustPaginationBeforeReload = () => {
+    const { data } = incomes;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadIncomes();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
+  };
+
   const removeIncome = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
@@ -221,7 +232,7 @@ export default function Incomes() {
     toast.promise(axios.delete(`/api/income?incomeId=${mainForm.values.id}`), {
       loading: "Deleting income",
       success: (res: AxiosResponse<ServerResponseInterface>) => {
-        loadIncomes();
+        adjustPaginationBeforeReload();
         return res.data.message as string;
       },
       error: (error) => {

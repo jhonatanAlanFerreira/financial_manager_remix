@@ -218,6 +218,17 @@ export default function Expenses() {
     return expense.is_personal ? "Personal Expense" : "Company Expense";
   };
 
+  const adjustPaginationBeforeReload = () => {
+    const { data } = expenses;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadExpenses();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
+  };
+
   const removeExpense = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
@@ -227,12 +238,7 @@ export default function Expenses() {
       {
         loading: "Deleting expense",
         success: (res: AxiosResponse<ServerResponseInterface>) => {
-          if (paginationState.page == 1) {
-            loadExpenses();
-          } else {
-            setPaginationState({ reload: true, page: 1 });
-          }
-
+          adjustPaginationBeforeReload();
           return res.data.message as string;
         },
         error: (error) => {

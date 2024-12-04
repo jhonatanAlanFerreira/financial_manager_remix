@@ -325,6 +325,17 @@ export default function Transactions() {
     } as any).toString();
   };
 
+  const adjustPaginationBeforeReload = () => {
+    const { data } = transactions;
+    const hasMinimalData = data?.transactions && data?.transactions.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadTransactions();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
+  };
+
   const removeTransaction = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
@@ -334,7 +345,7 @@ export default function Transactions() {
       {
         loading: "Deleting transaction",
         success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadTransactions();
+          adjustPaginationBeforeReload();
           return res.data.message as string;
         },
         error: (error) => {
