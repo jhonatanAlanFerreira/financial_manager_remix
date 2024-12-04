@@ -7,6 +7,7 @@ import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { Company, Expense } from "@prisma/client";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
@@ -35,7 +36,6 @@ export default function Expenses() {
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [reloadExpenses, setReloadExpenses] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [expenses, setExpenses] = useState<
     ServerResponseInterface<ExpenseWithRelationsInterface[]>
@@ -47,6 +47,13 @@ export default function Expenses() {
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponseInterface<ExpenseWithRelationsInterface[]>;
@@ -80,7 +87,6 @@ export default function Expenses() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Expenses",
       pageTooltipMessage:
@@ -94,7 +100,6 @@ export default function Expenses() {
 
   useEffect(() => {
     if (expenseData) {
-      setCurrentPage(expenseData.pageInfo?.currentPage || 0);
       setTotalPages(expenseData.pageInfo?.totalPages || 0);
       setExpenses(expenseData);
     }
@@ -105,10 +110,10 @@ export default function Expenses() {
   }, [expenseData, companyData]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadExpenses();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     mainForm.setFieldValue("companies", null);
@@ -138,14 +143,20 @@ export default function Expenses() {
         ServerResponseInterface<ExpenseWithRelationsInterface[]>
       >(`/api/expense?${paginationParams()}&${searchParams}&extends=companies`);
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setPaginationState({
+        reload: false,
+        page: res.data.pageInfo?.currentPage || 1,
+      });
       setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setExpenses(res.data);
       setLoading(false);
 
       if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+        setPaginationState({
+          reload: false,
+          page: res.data.pageInfo?.totalPages || 1,
+        });
       }
     } catch (error) {
       if (isAxiosError(error)) {
@@ -216,7 +227,12 @@ export default function Expenses() {
       {
         loading: "Deleting expense",
         success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadExpenses();
+          if (paginationState.page == 1) {
+            loadExpenses();
+          } else {
+            setPaginationState({ reload: true, page: 1 });
+          }
+
           return res.data.message as string;
         },
         error: (error) => {
@@ -268,7 +284,11 @@ export default function Expenses() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadExpenses();
+    if (paginationState.page == 1) {
+      loadExpenses();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const buildSearchParamsUrl = () => {
@@ -281,7 +301,7 @@ export default function Expenses() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -390,10 +410,12 @@ export default function Expenses() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => {
+            setPaginationState({ reload: true, page });
+          }}
         ></Pagination>
       )}
 
@@ -632,9 +654,17 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const companyData = await (await companyLoader(request)).json();
+  const [companyData, expenseData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    expenseLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    }).then((res) => res.json()),
+  ]);
 
   return {
     companyData,
+    expenseData,
   };
 }
