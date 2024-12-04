@@ -10,6 +10,7 @@ import { Icon } from "~/components/icon/icon";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as incomeLoader } from "~/routes/api/income/index";
 import { Pagination } from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -45,8 +46,14 @@ export default function Incomes() {
   const [incomes, setIncomes] = useState<
     ServerResponseInterface<IncomeWithRelationsInterface[]>
   >({});
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -80,7 +87,6 @@ export default function Incomes() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Incomes",
       pageTooltipMessage:
@@ -97,7 +103,6 @@ export default function Incomes() {
       setCompanies(companyData);
     }
     if (incomeData) {
-      setCurrentPage(incomeData.pageInfo?.currentPage || 0);
       setTotalPages(incomeData.pageInfo?.totalPages || 0);
       setIncomes(incomeData);
     }
@@ -115,10 +120,10 @@ export default function Incomes() {
   }, [filterForm.values.is_personal_or_company]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadIncomes();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -181,14 +186,20 @@ export default function Incomes() {
       const res = await axios.get<
         ServerResponseInterface<IncomeWithRelationsInterface[]>
       >(`/api/income?${paginationParams()}&${searchParams}&extends=companies`);
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setPaginationState({
+        reload: false,
+        page: res.data.pageInfo?.currentPage || 1,
+      });
       setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setIncomes(res.data);
       setLoading(false);
 
       if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+        setPaginationState({
+          reload: false,
+          page: res.data.pageInfo?.totalPages || 1,
+        });
       }
     } catch (error) {
       if (isAxiosError(error)) {
@@ -261,7 +272,11 @@ export default function Incomes() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadIncomes();
+    if (paginationState.page == 1) {
+      loadIncomes();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const onCompanyFilterChange = (company: Company) => {
@@ -270,7 +285,7 @@ export default function Incomes() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -383,10 +398,12 @@ export default function Incomes() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => {
+            setPaginationState({ reload: true, page });
+          }}
         ></Pagination>
       )}
 
@@ -626,8 +643,16 @@ export default function Incomes() {
 
 export async function loader(request: LoaderFunctionArgs) {
   const companyData = await (await companyLoader(request)).json();
+  const incomeData = await (
+    await incomeLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    })
+  ).json();
 
   return {
     companyData,
+    incomeData,
   };
 }
