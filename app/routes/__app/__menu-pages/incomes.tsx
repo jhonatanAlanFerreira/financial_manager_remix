@@ -642,14 +642,14 @@ export default function Incomes() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const companyData = await (await companyLoader(request)).json();
-  const incomeData = await (
-    await incomeLoader(request, {
+  const [companyData, incomeData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    incomeLoader(request, {
       page: 1,
       pageSize: 10,
       extends: ["companies"],
-    })
-  ).json();
+    }).then((res) => res.json()),
+  ]);
 
   return {
     companyData,
