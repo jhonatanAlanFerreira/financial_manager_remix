@@ -70,7 +70,10 @@ let updateClassification = async (request: Request) => {
   return sendResponse(await update(classificationId, user, data));
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<ClassificationLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -89,5 +92,10 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       ) as IsPersonalOrCompanyType) || "all",
   };
 
-  return sendResponse(await list(user, params));
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };

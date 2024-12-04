@@ -8,6 +8,7 @@ import { Modal } from "react-responsive-modal";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
 import { queryParamsFromObject } from "~/utils/utilities";
@@ -37,7 +38,6 @@ export default function Classifications() {
   const [reloadClassification, setReloadClassification] =
     useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<String>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
@@ -48,6 +48,13 @@ export default function Classifications() {
   const [classifications, setClassifications] = useState<
     ServerResponseInterface<ClassificationWithRelationsInterface[]>
   >({});
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const { companyData, classificationData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
@@ -82,7 +89,6 @@ export default function Classifications() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Incomes & Expenses Classifications",
       pageTooltipMessage:
@@ -99,7 +105,6 @@ export default function Classifications() {
       setCompanies(companyData);
     }
     if (classificationData) {
-      setCurrentPage(classificationData.pageInfo?.currentPage || 0);
       setTotalPages(classificationData.pageInfo?.totalPages || 0);
       setClassifications(classificationData);
     }
@@ -107,10 +112,10 @@ export default function Classifications() {
   }, [companyData, classificationData]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadClassifications();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -142,14 +147,20 @@ export default function Classifications() {
         `/api/classification?${paginationParams()}&${searchParams}&extends=companies`
       );
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
+      setPaginationState({
+        reload: false,
+        page: res.data.pageInfo?.currentPage || 1,
+      });
       setTotalPages(res.data.pageInfo?.totalPages || 1);
 
       setClassifications(res.data);
       setLoading(false);
 
       if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+        setPaginationState({
+          reload: false,
+          page: res.data.pageInfo?.totalPages || 1,
+        });
       }
     } catch (error) {
       if (isAxiosError(error)) {
@@ -213,6 +224,17 @@ export default function Classifications() {
       : "Company Transaction Classification";
   };
 
+  const adjustPaginationBeforeReload = () => {
+    const { data } = classifications;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadClassifications();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
+  };
+
   const removeClassification = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
@@ -224,7 +246,7 @@ export default function Classifications() {
       {
         loading: "Deleting classification",
         success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadClassifications();
+          adjustPaginationBeforeReload();
           return res.data.message as string;
         },
         error: (error) => {
@@ -280,9 +302,12 @@ export default function Classifications() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadClassifications();
+    if (paginationState.page == 1) {
+      loadClassifications();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
-
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -293,7 +318,7 @@ export default function Classifications() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -406,10 +431,10 @@ export default function Classifications() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}
 
@@ -717,9 +742,17 @@ export default function Classifications() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const companyData = await (await companyLoader(request)).json();
+  const [companyData, classificationData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    classificationLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    }).then((res) => res.json()),
+  ]);
 
   return {
     companyData,
+    classificationData,
   };
 }
