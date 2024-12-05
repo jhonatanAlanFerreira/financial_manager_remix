@@ -93,7 +93,22 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Transaction"
+                      allOf:
+                        - $ref: "#/components/schemas/Transaction"
+                        - type: object
+                          properties:
+                            company:
+                              $ref: "#/components/schemas/Company"
+                            transaction_classifications:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/Classification"
+                            expense:
+                              $ref: "#/components/schemas/Expense"
+                            income:
+                              $ref: "#/components/schemas/Income"
+                            account:
+                              $ref: "#/components/schemas/Account"
                   pageInfo:
                     type: object
                     properties:
