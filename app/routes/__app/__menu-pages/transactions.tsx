@@ -46,6 +46,7 @@ import {
   TransactionsWithTotalsInterface,
   TransactionWithRelationsInterface,
 } from "~/data/transaction/transaction-types";
+import { createOrUpdateTransaction } from "~/data/frontend-services/transactions";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -264,49 +265,23 @@ export default function Transactions() {
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = prepareFormData(event.currentTarget);
-
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/transaction?transactionId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating transaction";
-    } else {
-      axiosRequest = axios.post("/api/transaction", formData);
-      loadingMessage = "Creating transaction";
-    }
-
-    mainForm.resetForm();
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadTransactions();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => {
+    createOrUpdateTransaction(formData, {
+      onSuccess: () => {
+        mainForm.resetForm();
+        setOpenAddModal(false);
+        loadTransactions();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
         setTimeout(() => setIsSubmitting(false), 500);
-      });
+      },
+    });
   };
 
   const onFilterFormSubmit = async () => {
@@ -389,6 +364,8 @@ export default function Transactions() {
       formData.get("is_personal") == "on" ? "true" : "false"
     );
     formData.set("is_income", mainForm.values.is_income ? "true" : "false");
+
+    formData.set("id", mainForm.values.id);
 
     return formData;
   };

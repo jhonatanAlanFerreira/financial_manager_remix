@@ -11,7 +11,7 @@ import {
   transactionDeleteValidator,
   transactionListValidator,
   transactionUpdateValidator,
-} from "~/data/transaction/transaction-Validator";
+} from "~/data/transaction/transaction-validator";
 import { paginate } from "~/data/services/list.service";
 import {
   TransactionsWithTotalsInterface,
