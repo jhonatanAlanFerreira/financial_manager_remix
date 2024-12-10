@@ -3,7 +3,6 @@ import {
   Company,
   Expense,
   Income,
-  Transaction,
   TransactionClassification,
 } from "@prisma/client";
 import { FormikProps } from "formik";
@@ -57,10 +56,4 @@ export interface TransactionFiltersPropsInterface {
   incomes: Income[];
   formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
-}
-
-export interface TransactionsWithTotalsInterface {
-  transactions: Transaction[];
-  totalIncomeValue: number;
-  totalExpenseValue: number;
 }

@@ -1,6 +1,7 @@
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
 
 export const createOrUpdateTransaction = async (
   formData: FormData,
@@ -46,5 +47,72 @@ export const createOrUpdateTransaction = async (
         },
       }
     )
+    .finally(onFinally);
+};
+
+export const fetchTransactions = async (
+  params: string,
+  callbacks: {
+    onSuccess: (
+      data: ServerResponseInterface<TransactionsWithTotalsInterface>,
+      totalPages: number
+    ) => void;
+    onError: () => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  try {
+    const res = await axios.get<
+      ServerResponseInterface<TransactionsWithTotalsInterface>
+    >(`/api/transaction?${params}`);
+    const { data } = res;
+
+    onSuccess(data, data.pageInfo?.totalPages || 1);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      toast.error(
+        error.response?.data.message || "Sorry, unexpected error. Be back soon"
+      );
+    } else {
+      toast.error("Sorry, unexpected error. Be back soon");
+    }
+    onError();
+  } finally {
+    onFinally();
+  }
+};
+
+export const deleteTransaction = async (
+  transactionId: string,
+  callbacks: {
+    onSuccess: () => void;
+    onError: () => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  toast
+    .promise(axios.delete(`/api/transaction?transactionId=${transactionId}`), {
+      loading: "Deleting transaction",
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
+        onSuccess();
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
+        }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    })
+    .catch(() => {
+      onError();
+    })
     .finally(onFinally);
 };

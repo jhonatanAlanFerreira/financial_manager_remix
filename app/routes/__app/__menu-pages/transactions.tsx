@@ -8,9 +8,7 @@ import {
 } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
@@ -46,7 +44,11 @@ import {
   TransactionsWithTotalsInterface,
   TransactionWithRelationsInterface,
 } from "~/data/transaction/transaction-types";
-import { createOrUpdateTransaction } from "~/data/frontend-services/transactions";
+import {
+  createOrUpdateTransaction,
+  deleteTransaction,
+  fetchTransactions,
+} from "~/data/frontend-services/transactions";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -221,46 +223,25 @@ export default function Transactions() {
   };
 
   const loadTransactions = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<TransactionsWithTotalsInterface>
-      >(
-        `/api/transaction?${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`
-      );
-
-      const { data } = res;
-
-      setTransactions(data);
-
-      setTotalPages(data.pageInfo?.totalPages || 1);
-      setPaginationState({
-        reload: false,
-        page: data.pageInfo?.currentPage || 1,
-      });
-
-      setTotalExpenseValue(data.data?.totalExpenseValue || 0);
-      setTotalIncomeValue(data.data?.totalIncomeValue || 0);
-
-      setLoading(false);
-
-      if (!data.data?.transactions.length) {
-        setPaginationState({
-          reload: false,
-          page: data.pageInfo?.totalPages || 1,
-        });
+    await fetchTransactions(
+      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`,
+      {
+        onSuccess: (data, totalPages) => {
+          setTransactions(data);
+          setTotalPages(totalPages);
+          setTotalExpenseValue(data.data?.totalExpenseValue || 0);
+          setTotalIncomeValue(data.data?.totalIncomeValue || 0);
+          if (!data.data?.transactions.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => setLoading(false),
+        onFinally: () => setLoading(false),
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -312,29 +293,14 @@ export default function Transactions() {
   };
 
   const removeTransaction = async () => {
-    setOpenRemoveModal(false);
-    setLoading(true);
-
-    toast.promise(
-      axios.delete(`/api/transaction?transactionId=${mainForm.values.id}`),
-      {
-        loading: "Deleting transaction",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          adjustPaginationBeforeReload();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      }
-    );
+    await deleteTransaction(mainForm.values.id, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
+        setOpenRemoveModal(false);
+      },
+      onError: () => setLoading(false),
+      onFinally: () => setLoading(false),
+    });
   };
 
   const onClickAdd = () => {
