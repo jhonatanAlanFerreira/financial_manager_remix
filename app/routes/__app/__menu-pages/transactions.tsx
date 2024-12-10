@@ -48,7 +48,7 @@ import {
   createOrUpdateTransaction,
   deleteTransaction,
   fetchTransactions,
-} from "~/data/frontend-services/transactions";
+} from "~/data/frontend-services/transactions-service";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
