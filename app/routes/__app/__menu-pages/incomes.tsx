@@ -27,6 +27,11 @@ import {
 } from "~/components/page-components/income/income-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { IncomeWithRelationsInterface } from "~/data/income/income-types";
+import {
+  createOrUpdateIncome,
+  deleteIncome,
+  fetchIncomes,
+} from "~/data/frontend-services/income-service";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -138,80 +143,53 @@ export default function Incomes() {
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = prepareFormData(event.currentTarget);
-
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/income?incomeId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating income";
-    } else {
-      axiosRequest = axios.post("/api/income", formData);
-      loadingMessage = "Creating income";
-    }
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadIncomes();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateIncome(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadIncomes();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   const loadIncomes = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<IncomeWithRelationsInterface[]>
-      >(`/api/income?${paginationParams()}&${searchParams}&extends=companies`);
-      setPaginationState({
-        reload: false,
-        page: res.data.pageInfo?.currentPage || 1,
-      });
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
+    setLoading(true);
 
-      setIncomes(res.data);
-      setLoading(false);
+    await fetchIncomes(
+      { paginationParams: paginationParams(), searchParams },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setIncomes(data);
 
-      if (!res.data.data?.length) {
-        setPaginationState({
-          reload: false,
-          page: res.data.pageInfo?.totalPages || 1,
-        });
+          if (!data.data?.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const adjustPaginationBeforeReload = () => {
@@ -229,21 +207,15 @@ export default function Incomes() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/income?incomeId=${mainForm.values.id}`), {
-      loading: "Deleting income",
-      success: (res: AxiosResponse<ServerResponseInterface>) => {
+    await deleteIncome(mainForm.values.id, {
+      onSuccess: () => {
         adjustPaginationBeforeReload();
-        return res.data.message as string;
       },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
       },
     });
   };
@@ -319,6 +291,8 @@ export default function Incomes() {
       "is_personal",
       formData.get("is_personal") == "on" ? "true" : "false"
     );
+
+    formData.set("id", mainForm.values.id);
 
     return formData;
   };
