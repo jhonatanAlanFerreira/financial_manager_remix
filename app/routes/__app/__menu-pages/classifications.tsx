@@ -1,9 +1,7 @@
 import { Company, TransactionClassification } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
@@ -27,6 +25,11 @@ import {
 } from "~/components/page-components/classification/classification-finterfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ClassificationWithRelationsInterface } from "~/data/classification/classification-types";
+import {
+  createOrUpdateClassification,
+  deleteClassification,
+  fetchClassifications,
+} from "~/data/frontend-services/classification-service";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -37,7 +40,7 @@ export default function Classifications() {
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [reloadClassification, setReloadClassification] =
     useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<String>("");
+  const [searchParams, setSearchParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
@@ -139,83 +142,58 @@ export default function Classifications() {
   }, [filterForm.values.is_personal_or_company]);
 
   const loadClassifications = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<ClassificationWithRelationsInterface[]>
-      >(
-        `/api/classification?${paginationParams()}&${searchParams}&extends=companies`
-      );
+    setLoading(true);
 
-      setPaginationState({
-        reload: false,
-        page: res.data.pageInfo?.currentPage || 1,
-      });
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
+    await fetchClassifications(
+      {
+        paginationParams: paginationParams(),
+        searchParams,
+        extends: "companies",
+      },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setClassifications(data);
 
-      setClassifications(res.data);
-      setLoading(false);
-
-      if (!res.data.data?.length) {
-        setPaginationState({
-          reload: false,
-          page: res.data.pageInfo?.totalPages || 1,
-        });
+          if (!data.data?.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = prepareFormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/classification?classificationId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating classification";
-    } else {
-      axiosRequest = axios.post("/api/classification", formData);
-      loadingMessage = "Creating classification";
-    }
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadClassifications();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateClassification(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadClassifications();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   const getClassificationType = (classification: TransactionClassification) => {
@@ -239,28 +217,17 @@ export default function Classifications() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(
-      axios.delete(
-        `/api/classification?classificationId=${mainForm.values.id}`
-      ),
-      {
-        loading: "Deleting classification",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          adjustPaginationBeforeReload();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      }
-    );
+    await deleteClassification(mainForm.values.id as string, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
+      },
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   const setFormValues = (
@@ -341,6 +308,8 @@ export default function Classifications() {
       "is_income",
       formData.get("is_income") == "on" ? "true" : "false"
     );
+
+    formData.set("id", mainForm.values.id);
 
     return formData;
   };
