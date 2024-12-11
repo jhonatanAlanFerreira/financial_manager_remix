@@ -1,8 +1,6 @@
 import { Modal } from "react-responsive-modal";
 import { useEffect, useState } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
-import toast from "react-hot-toast";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Loader } from "~/components/loader/loader";
@@ -27,6 +25,11 @@ import {
 } from "~/components/page-components/expense/expense-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ExpenseWithRelationsInterface } from "~/data/expense/expense-types";
+import {
+  createOrUpdateExpense,
+  deleteExpense,
+  fetchExpenses,
+} from "~/data/frontend-services/expense-service";
 
 export default function Expenses() {
   const { setTitle } = useTitle();
@@ -137,81 +140,45 @@ export default function Expenses() {
   }, [searchParams]);
 
   const loadExpenses = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<ExpenseWithRelationsInterface[]>
-      >(`/api/expense?${paginationParams()}&${searchParams}&extends=companies`);
-
-      setPaginationState({
-        reload: false,
-        page: res.data.pageInfo?.currentPage || 1,
-      });
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
-
-      setExpenses(res.data);
-      setLoading(false);
-
-      if (!res.data.data?.length) {
-        setPaginationState({
-          reload: false,
-          page: res.data.pageInfo?.totalPages || 1,
-        });
+    await fetchExpenses(
+      { paginationParams: paginationParams(), searchParams },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setExpenses(data);
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = prepareFormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/expense?expenseId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating expense";
-    } else {
-      axiosRequest = axios.post("/api/expense", formData);
-      loadingMessage = "Creating expense";
-    }
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadExpenses();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    createOrUpdateExpense(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadExpenses();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setIsSubmitting(false);
+      },
+    });
   };
 
   const getExpenseType = (expense: Expense) => {
@@ -233,26 +200,21 @@ export default function Expenses() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(
-      axios.delete(`/api/expense?expenseId=${mainForm.values.id}`),
-      {
-        loading: "Deleting expense",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
+    try {
+      await deleteExpense(mainForm.values.id, {
+        onSuccess: () => {
           adjustPaginationBeforeReload();
-          return res.data.message as string;
+          setLoading(false);
         },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
+        onError: () => {
+          setLoading(false);
         },
-      }
-    );
+        onFinally: () => setLoading(false),
+      });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setLoading(false);
+    }
   };
 
   const setFormValues = (expense: ExpenseWithRelationsInterface) => {
@@ -322,6 +284,8 @@ export default function Expenses() {
       "is_personal",
       formData.get("is_personal") == "on" ? "true" : "false"
     );
+
+    formData.set("id", mainForm.values.id);
 
     return formData;
   };

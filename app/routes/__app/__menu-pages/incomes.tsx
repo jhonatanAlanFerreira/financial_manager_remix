@@ -1,10 +1,8 @@
 import { Company, Income } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Icon } from "~/components/icon/icon";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
