@@ -1,10 +1,8 @@
 import { Account, Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Accordion } from "~/components/accordion/accordion";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
@@ -18,9 +16,10 @@ import { CompanyWithRelationsInterface } from "~/data/company/company-types";
 import {
   createOrUpdateCompany,
   deleteCompany,
+  fetchAccounts,
   fetchCompanies,
 } from "~/data/frontend-services/company-account-service";
-import { loader as userAccountLoader } from "~/routes/api/account/index";
+import { loader as accountLoader } from "~/routes/api/account/index";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
@@ -76,9 +75,24 @@ export default function Companies() {
 
   const loadUserAccounts = async () => {
     setLoading(true);
-    const res = await axios.get(`/api/account`);
-    setUserAccounts(res.data);
-    setLoading(false);
+
+    await fetchAccounts(
+      {
+        paginationParams: "is_personal_or_company=personal",
+        searchParams: "",
+      },
+      {
+        onSuccess: (data) => {
+          setUserAccounts(data);
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -287,7 +301,11 @@ export default function Companies() {
 
 export async function loader(request: LoaderFunctionArgs) {
   const [userAccountData, companyData] = await Promise.all([
-    userAccountLoader(request).then((res) => res.json()),
+    accountLoader(request, {
+      page: 1,
+      pageSize: "all",
+      is_personal_or_company: "personal",
+    }).then((res) => res.json()),
     companyLoader(request, {
       extends: ["accounts"],
     }).then((res) => res.json()),

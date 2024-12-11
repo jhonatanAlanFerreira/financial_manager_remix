@@ -1,6 +1,7 @@
 import { toast } from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { Account } from "@prisma/client";
 
 export const createOrUpdateCompany = async (
   companyId: string | null,
@@ -87,4 +88,36 @@ export const deleteCompany = async (
       },
     })
     .finally(onFinally);
+};
+
+export const fetchAccounts = async (
+  params: {
+    paginationParams: string;
+    searchParams: string;
+  },
+  callbacks: {
+    onSuccess: (data: ServerResponseInterface<Account[]>) => void;
+    onError: (errorMessage: string) => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { paginationParams, searchParams } = params;
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  const url = `/api/account?${paginationParams}&${searchParams}`;
+
+  try {
+    const res = await axios.get<ServerResponseInterface<Account[]>>(url);
+    onSuccess(res.data);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      onError(
+        error.response?.data.message || "Sorry, unexpected error. Be back soon"
+      );
+    } else {
+      onError("Sorry, unexpected error. Be back soon");
+    }
+  } finally {
+    onFinally();
+  }
 };
