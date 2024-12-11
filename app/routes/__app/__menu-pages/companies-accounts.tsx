@@ -15,6 +15,11 @@ import { AccountDropdown } from "~/components/page-components/company-accounts/a
 import { CompanyFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
 import { CompanyWithRelationsInterface } from "~/data/company/company-types";
+import {
+  createOrUpdateCompany,
+  deleteCompany,
+  fetchCompanies,
+} from "~/data/frontend-services/company-account-service";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
@@ -76,88 +81,50 @@ export default function Companies() {
     setLoading(false);
   };
 
-  const loadCompanies = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`/api/company?extends=accounts`);
-
-      setCompanies(res.data);
-      setLoading(false);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
-  };
-
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (formik.values.id) {
-      axiosRequest = axios.patch(
-        `/api/company?companyId=${formik.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating company";
-    } else {
-      axiosRequest = axios.post("/api/company", formData);
-      loadingMessage = "Creating company";
-    }
 
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadCompanies();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateCompany(formik.values.id, formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadCompanies();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
+  };
+
+  const loadCompanies = async () => {
+    setLoading(true);
+    const res = await fetchCompanies();
+    if (res) {
+      setCompanies(res);
+    }
+    setLoading(false);
   };
 
   const removeCompany = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/company?companyId=${formik.values.id}`), {
-      loading: "Deleting company",
-      success: (res: AxiosResponse<ServerResponseInterface>) => {
+    await deleteCompany(formik.values.id, {
+      onSuccess: () => {
         loadCompanies();
-        return res.data.message as string;
       },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
       },
     });
   };
