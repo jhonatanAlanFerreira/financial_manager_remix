@@ -1,15 +1,14 @@
 import { Company, Income } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Icon } from "~/components/icon/icon";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as incomeLoader } from "~/routes/api/income/index";
 import { Pagination } from "~/components/pagination/pagination";
 import { queryParamsFromObject } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -19,13 +18,18 @@ import { PrimaryButton } from "~/components/buttons/primary-button/primary-butto
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
-import { IncomeWithCompaniesType } from "~/data/income/income-types";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   IncomeFiltersFormInterface,
   IncomeFormInterface,
 } from "~/components/page-components/income/income-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { IncomeWithRelationsInterface } from "~/data/income/income-types";
+import {
+  createOrUpdateIncome,
+  deleteIncome,
+  fetchIncomes,
+} from "~/data/frontend-services/income-service";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -40,19 +44,26 @@ export default function Incomes() {
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
+  const [incomes, setIncomes] = useState<
+    ServerResponseInterface<IncomeWithRelationsInterface[]>
   >({});
-  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
 
   const { companyData, incomeData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    incomeData: ServerResponseInterface<IncomeWithCompaniesType[]>;
+    incomeData: ServerResponseInterface<IncomeWithRelationsInterface[]>;
   }>();
 
   const mainForm = useFormik<IncomeFormInterface>({
@@ -61,7 +72,7 @@ export default function Incomes() {
       name: "",
       amount: 0,
       companies: [],
-      is_personal_income: false,
+      is_personal: false,
     },
     onSubmit: () => {},
   });
@@ -79,7 +90,6 @@ export default function Incomes() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Incomes",
       pageTooltipMessage:
@@ -96,7 +106,6 @@ export default function Incomes() {
       setCompanies(companyData);
     }
     if (incomeData) {
-      setCurrentPage(incomeData.pageInfo?.currentPage || 0);
       setTotalPages(incomeData.pageInfo?.totalPages || 0);
       setIncomes(incomeData);
     }
@@ -105,7 +114,7 @@ export default function Incomes() {
 
   useEffect(() => {
     mainForm.setFieldValue("companies", null);
-  }, [mainForm.values.is_personal_income]);
+  }, [mainForm.values.is_personal]);
 
   useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
@@ -114,10 +123,10 @@ export default function Incomes() {
   }, [filterForm.values.is_personal_or_company]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadIncomes();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -132,74 +141,63 @@ export default function Incomes() {
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/income?incomeId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating income";
-    } else {
-      axiosRequest = axios.post("/api/income", formData);
-      loadingMessage = "Creating income";
-    }
-
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadIncomes();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateIncome(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadIncomes();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   const loadIncomes = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<ServerResponseInterface<Income[]>>(
-        `/api/income?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
+    setLoading(true);
 
-      setIncomes(res.data);
-      setLoading(false);
+    await fetchIncomes(
+      { paginationParams: paginationParams(), searchParams },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setIncomes(data);
 
-      if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+          if (!data.data?.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
+    );
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = incomes;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadIncomes();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
     }
   };
 
@@ -207,27 +205,21 @@ export default function Incomes() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/income?incomeId=${mainForm.values.id}`), {
-      loading: "Deleting income",
-      success: (res: AxiosResponse<ServerResponseInterface>) => {
-        loadIncomes();
-        return res.data.message as string;
+    await deleteIncome(mainForm.values.id, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
       },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
       },
     });
   };
 
   const getIncomeType = (income: Income) => {
-    return income.is_personal_income ? "Personal Income" : "Company Income";
+    return income.is_personal ? "Personal Income" : "Company Income";
   };
 
   const onClickAdd = () => {
@@ -246,7 +238,7 @@ export default function Incomes() {
     setOpenRemoveModal(true);
   };
 
-  const onClickUpdate = (income: Income) => {
+  const onClickUpdate = (income: IncomeWithRelationsInterface) => {
     setFormValues(income);
     setOpenAddModal(true);
   };
@@ -255,22 +247,17 @@ export default function Incomes() {
     mainForm.setFieldValue("companies", companies);
   };
 
-  const setFormValues = (income: Income) => {
-    mainForm.setValues({
-      id: income.id,
-      amount: income.amount,
-      is_personal_income: income.is_personal_income,
-      name: income.name,
-      companies:
-        companies.data?.filter((company) =>
-          income.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (income: IncomeWithRelationsInterface) => {
+    mainForm.setValues(income);
   };
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadIncomes();
+    if (paginationState.page == 1) {
+      loadIncomes();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const onCompanyFilterChange = (company: Company) => {
@@ -279,7 +266,7 @@ export default function Incomes() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -294,6 +281,18 @@ export default function Incomes() {
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+
+    formData.set("id", mainForm.values.id);
+
+    return formData;
   };
 
   return (
@@ -382,10 +381,12 @@ export default function Incomes() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => {
+            setPaginationState({ reload: true, page });
+          }}
         ></Pagination>
       )}
 
@@ -437,14 +438,14 @@ export default function Incomes() {
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_income"
-                  id="is_personal_income"
+                  name="is_personal"
+                  id="is_personal"
                   onChange={mainForm.handleChange}
-                  checked={mainForm.values.is_personal_income}
+                  checked={mainForm.values.is_personal}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_income"
+                  htmlFor="is_personal"
                 >
                   Use as personal income
                 </label>
@@ -453,7 +454,7 @@ export default function Incomes() {
                 label="Name *"
                 name="name"
                 required
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
               ></InputText>
@@ -466,7 +467,7 @@ export default function Incomes() {
                 value={mainForm.values.amount || 0}
                 onChange={mainForm.handleChange}
               ></InputText>
-              {!mainForm.values.is_personal_income && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -624,7 +625,17 @@ export default function Incomes() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const [companyData, incomeData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    incomeLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    }).then((res) => res.json()),
+  ]);
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
+    incomeData,
   };
 }

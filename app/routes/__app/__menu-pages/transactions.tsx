@@ -8,15 +8,14 @@ import {
 } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
+import { loader as transactionLoader } from "~/routes/api/transaction/index";
 import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { Icon } from "~/components/icon/icon";
 import {
@@ -38,10 +37,18 @@ import { TransactionFilters } from "~/components/page-components/transaction/tra
 import {
   TransactionFiltersFormInterface,
   TransactionFormInterface,
-  TransactionsWithTotalsInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  TransactionsWithTotalsInterface,
+  TransactionWithRelationsInterface,
+} from "~/data/transaction/transaction-types";
+import {
+  createOrUpdateTransaction,
+  deleteTransaction,
+  fetchTransactions,
+} from "~/data/frontend-services/transactions-service";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -53,15 +60,22 @@ export default function Transactions() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [skipEffect, setSkipEffect] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
   const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const [transactions, setTransactions] = useState<
     ServerResponseInterface<TransactionsWithTotalsInterface>
   >({});
+
   const [classifications, setClassifications] = useState<
     ServerResponseInterface<TransactionClassification[]>
   >({});
@@ -76,9 +90,8 @@ export default function Transactions() {
     {}
   );
 
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
 
   const {
     companyData,
@@ -103,10 +116,10 @@ export default function Transactions() {
       company: null,
       expense: null,
       account: null,
-      transaction_date: todayFormatedDate(),
+      date: todayFormatedDate(),
       amount: 0,
-      classifications: [],
-      is_personal_transaction: false,
+      transaction_classifications: [],
+      is_personal: false,
       income: null,
       name: "",
     },
@@ -133,8 +146,6 @@ export default function Transactions() {
   });
 
   useEffect(() => {
-    buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Transactions",
       pageTooltipMessage:
@@ -160,9 +171,10 @@ export default function Transactions() {
       setAccounts(userAccountData);
     }
     if (transactionData) {
-      setCurrentPage(transactionData.pageInfo?.currentPage || 0);
-      setTotalPages(transactionData.pageInfo?.totalPages || 0);
       setTransactions(transactionData);
+      setTotalIncomeValue(transactionData.data?.totalIncomeValue || 0);
+      setTotalExpenseValue(transactionData.data?.totalExpenseValue || 0);
+      setTotalPages(transactionData.pageInfo?.totalPages || 0);
     }
     if (incomeData) {
       setIncomes(incomeData);
@@ -178,10 +190,10 @@ export default function Transactions() {
   ]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadTransactions();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -204,149 +216,91 @@ export default function Transactions() {
     );
   };
 
-  const getCompanyNameFromTransaction = (transaction: Transaction) => {
-    return companies?.data?.find((c) => c.id == transaction.company_id)?.name;
-  };
-
-  const getExpenseNameFromTransaction = (transaction: Transaction) => {
-    return expenses?.data?.find((e) => e.id == transaction.expense_id)?.name;
-  };
-
-  const getIncomeNameFromTransaction = (transaction: Transaction) => {
-    return incomes?.data?.find((e) => e.id == transaction.income_id)?.name;
-  };
-
   const getTransactionType = (transaction: Transaction) => {
-    return transaction.is_personal_transaction
+    return transaction.is_personal
       ? "Personal Transaction"
       : "Company Transaction";
   };
 
   const loadTransactions = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<TransactionsWithTotalsInterface>
-      >(
-        `/api/transaction?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
-
-      const { data } = res;
-
-      setTransactions(data);
-
-      setTotalPages(data.pageInfo?.totalPages || 1);
-      setCurrentPage(data.pageInfo?.currentPage || 1);
-
-      setTotalExpenseValue(data.data?.totalExpenseValue || 0);
-      setTotalIncomeValue(data.data?.totalIncomeValue || 0);
-
-      setLoading(false);
-
-      if (!data.data?.transactions.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+    await fetchTransactions(
+      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`,
+      {
+        onSuccess: (data, totalPages) => {
+          setTransactions(data);
+          setTotalPages(totalPages);
+          setTotalExpenseValue(data.data?.totalExpenseValue || 0);
+          setTotalIncomeValue(data.data?.totalIncomeValue || 0);
+          if (!data.data?.transactions.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => setLoading(false),
+        onFinally: () => setLoading(false),
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    if (mainForm.values.is_income) {
-      formData.set("is_income", "on");
-    }
-
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/transaction?transactionId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating transaction";
-    } else {
-      axiosRequest = axios.post("/api/transaction", formData);
-      loadingMessage = "Creating transaction";
-    }
-
-    mainForm.resetForm();
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadTransactions();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => {
+    createOrUpdateTransaction(formData, {
+      onSuccess: () => {
+        mainForm.resetForm();
+        setOpenAddModal(false);
+        loadTransactions();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
         setTimeout(() => setIsSubmitting(false), 500);
-      });
+      },
+    });
   };
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadTransactions();
+    if (paginationState.page == 1) {
+      loadTransactions();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
 
-  const removeTransaction = async () => {
-    setOpenRemoveModal(false);
-    setLoading(true);
+  const adjustPaginationBeforeReload = () => {
+    const { data } = transactions;
+    const hasMinimalData = data?.transactions && data?.transactions.length < 2;
 
-    toast.promise(
-      axios.delete(`/api/transaction?transactionId=${mainForm.values.id}`),
-      {
-        loading: "Deleting transaction",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadTransactions();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      }
-    );
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadTransactions();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
+  };
+
+  const removeTransaction = async () => {
+    await deleteTransaction(mainForm.values.id, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
+        setOpenRemoveModal(false);
+      },
+      onError: () => setLoading(false),
+      onFinally: () => setLoading(false),
+    });
   };
 
   const onClickAdd = () => {
@@ -354,7 +308,7 @@ export default function Transactions() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (transaction: Transaction) => {
+  const onClickUpdate = (transaction: TransactionWithRelationsInterface) => {
     setFormValues(transaction);
     setOpenAddModal(true);
   };
@@ -364,35 +318,22 @@ export default function Transactions() {
     setOpenRemoveModal(true);
   };
 
-  const setFormValues = (transaction: Transaction) => {
+  const setFormValues = (transaction: TransactionWithRelationsInterface) => {
     setSkipEffect(true);
-    mainForm.setValues({
-      id: transaction.id,
-      amount: transaction.amount,
-      is_income: transaction.is_income,
-      is_personal_transaction: transaction.is_personal_transaction,
-      name: transaction.name,
-      transaction_date: transaction.transaction_date,
-      classifications:
-        classifications.data?.filter((classification) =>
-          transaction.transaction_classification_ids.includes(classification.id)
-        ) || [],
-      company:
-        companies.data?.find(
-          (company) => company.id == transaction.company_id
-        ) || null,
-      expense:
-        expenses.data?.find(
-          (expense) => expense.id == transaction.expense_id
-        ) || null,
-      income:
-        incomes.data?.find((income) => income.id == transaction.income_id) ||
-        null,
-      account:
-        accounts.data?.find(
-          (account) => account.id == transaction.account_id
-        ) || null,
-    });
+    mainForm.setValues(transaction);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+    formData.set("is_income", mainForm.values.is_income ? "true" : "false");
+
+    formData.set("id", mainForm.values.id);
+
+    return formData;
   };
 
   return (
@@ -462,34 +403,28 @@ export default function Transactions() {
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getCompanyNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.company?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getCompanyNameFromTransaction(transaction) || "Not set"}
+                  {transaction.company?.name || "Not set"}
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getExpenseNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.expense?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getExpenseNameFromTransaction(transaction) || "Not set"}
+                  {transaction.expense?.name || "Not set"}
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${
-                    getIncomeNameFromTransaction(transaction)
-                      ? ""
-                      : "opacity-50"
+                    transaction.income?.name ? "" : "opacity-50"
                   }`}
                 >
-                  {getIncomeNameFromTransaction(transaction) || "Not set"}
+                  {transaction.income?.name || "Not set"}
                 </td>
 
                 <td className="py-2 px-4 border-b border-r">
-                  {formatDate(transaction.transaction_date)}
+                  {formatDate(transaction.date)}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.amount}
@@ -528,10 +463,10 @@ export default function Transactions() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}
 
@@ -622,19 +557,40 @@ export default function Transactions() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const res = await Promise.all([
-    companyLoader(request),
-    expenseLoader(request),
-    classificationLoader(request),
-    incomeLoader(request),
-    userAccountLoader(request),
+  const [
+    companyData,
+    expenseData,
+    classificationData,
+    incomeData,
+    userAccountData,
+    transactionData,
+  ] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    expenseLoader(request).then((res) => res.json()),
+    classificationLoader(request).then((res) => res.json()),
+    incomeLoader(request).then((res) => res.json()),
+    userAccountLoader(request).then((res) => res.json()),
+    transactionLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: [
+        "account",
+        "company",
+        "expense",
+        "income",
+        "transaction_classifications",
+      ],
+      date_after: firstDayOfCurrentMonth(),
+      date_before: lastDayOfCurrentMonth(),
+    }).then((res) => res.json()),
   ]);
 
   return {
-    companyData: res[0],
-    expenseData: res[1],
-    classificationData: res[2],
-    incomeData: res[3],
-    userAccountData: res[4],
+    companyData,
+    expenseData,
+    classificationData,
+    incomeData,
+    userAccountData,
+    transactionData,
   };
 }

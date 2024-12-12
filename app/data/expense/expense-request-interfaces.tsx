@@ -1,8 +1,9 @@
 export interface ExpenseCreateRequestInterface {
   name: string;
   amount: number;
-  is_personal_expense: boolean;
+  is_personal: boolean;
   companies?: string[];
 }
 
-export interface ExpenseUpdateRequestInterface extends ExpenseCreateRequestInterface {}
+export interface ExpenseUpdateRequestInterface
+  extends ExpenseCreateRequestInterface {}

@@ -1,12 +1,11 @@
 import { Modal } from "react-responsive-modal";
 import { useEffect, useState } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
-import toast from "react-hot-toast";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { Company, Expense } from "@prisma/client";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
@@ -20,11 +19,17 @@ import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ExpenseFiltersFormInterface,
   ExpenseFormInterface,
 } from "~/components/page-components/expense/expense-interfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ExpenseWithRelationsInterface } from "~/data/expense/expense-types";
+import {
+  createOrUpdateExpense,
+  deleteExpense,
+  fetchExpenses,
+} from "~/data/frontend-services/expense-service";
 
 export default function Expenses() {
   const { setTitle } = useTitle();
@@ -34,22 +39,27 @@ export default function Expenses() {
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [reloadExpenses, setReloadExpenses] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
-    {}
-  );
+  const [expenses, setExpenses] = useState<
+    ServerResponseInterface<ExpenseWithRelationsInterface[]>
+  >({});
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const { expenseData, companyData } = useLoaderData<{
-    expenseData: ServerResponseInterface<Expense[]>;
+    expenseData: ServerResponseInterface<ExpenseWithRelationsInterface[]>;
     companyData: ServerResponseInterface<Company[]>;
   }>();
 
@@ -59,7 +69,7 @@ export default function Expenses() {
       name: "",
       amount: 0,
       companies: [],
-      is_personal_expense: false,
+      is_personal: false,
     },
     onSubmit: () => {},
   });
@@ -80,7 +90,6 @@ export default function Expenses() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Expenses",
       pageTooltipMessage:
@@ -94,7 +103,6 @@ export default function Expenses() {
 
   useEffect(() => {
     if (expenseData) {
-      setCurrentPage(expenseData.pageInfo?.currentPage || 0);
       setTotalPages(expenseData.pageInfo?.totalPages || 0);
       setExpenses(expenseData);
     }
@@ -105,10 +113,14 @@ export default function Expenses() {
   }, [expenseData, companyData]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadExpenses();
     }
-  }, [currentPage]);
+  }, [paginationState]);
+
+  useEffect(() => {
+    mainForm.setFieldValue("companies", null);
+  }, [mainForm.values.is_personal]);
 
   useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
@@ -122,125 +134,91 @@ export default function Expenses() {
 
   useEffect(() => {
     if (reloadExpenses) {
+      setReloadExpenses(false);
       loadExpenses();
     }
   }, [searchParams]);
 
   const loadExpenses = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<ServerResponseInterface<Expense[]>>(
-        `/api/expense?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
-
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
-
-      setExpenses(res.data);
-      setLoading(false);
-
-      if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+    await fetchExpenses(
+      { paginationParams: paginationParams(), searchParams },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setExpenses(data);
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/expense?expenseId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating expense";
-    } else {
-      axiosRequest = axios.post("/api/expense", formData);
-      loadingMessage = "Creating expense";
-    }
-
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadExpenses();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    createOrUpdateExpense(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadExpenses();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setIsSubmitting(false);
+      },
+    });
   };
 
   const getExpenseType = (expense: Expense) => {
-    return expense.is_personal_expense ? "Personal Expense" : "Company Expense";
+    return expense.is_personal ? "Personal Expense" : "Company Expense";
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = expenses;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadExpenses();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
   };
 
   const removeExpense = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(
-      axios.delete(`/api/expense?expenseId=${mainForm.values.id}`),
-      {
-        loading: "Deleting expense",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadExpenses();
-          return res.data.message as string;
+    try {
+      await deleteExpense(mainForm.values.id, {
+        onSuccess: () => {
+          adjustPaginationBeforeReload();
+          setLoading(false);
         },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
+        onError: () => {
+          setLoading(false);
         },
-      }
-    );
+        onFinally: () => setLoading(false),
+      });
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setLoading(false);
+    }
   };
 
-  const setFormValues = (expense: Expense) => {
-    mainForm.setValues({
-      id: expense.id,
-      amount: expense.amount,
-      is_personal_expense: expense.is_personal_expense,
-      name: expense.name,
-      companies:
-        companies.data?.filter((company) =>
-          expense.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (expense: ExpenseWithRelationsInterface) => {
+    mainForm.setValues(expense);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
@@ -252,7 +230,7 @@ export default function Expenses() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (expense: Expense) => {
+  const onClickUpdate = (expense: ExpenseWithRelationsInterface) => {
     setFormValues(expense);
     setOpenAddModal(true);
   };
@@ -274,7 +252,11 @@ export default function Expenses() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadExpenses();
+    if (paginationState.page == 1) {
+      loadExpenses();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
 
   const buildSearchParamsUrl = () => {
@@ -287,13 +269,25 @@ export default function Expenses() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+
+    formData.set("id", mainForm.values.id);
+
+    return formData;
   };
 
   return (
@@ -386,10 +380,12 @@ export default function Expenses() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => {
+            setPaginationState({ reload: true, page });
+          }}
         ></Pagination>
       )}
 
@@ -441,14 +437,14 @@ export default function Expenses() {
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal_expense"
-                  id="is_personal_expense"
-                  checked={mainForm.values.is_personal_expense}
+                  name="is_personal"
+                  id="is_personal"
+                  checked={mainForm.values.is_personal}
                   onChange={mainForm.handleChange}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal_expense"
+                  htmlFor="is_personal"
                 >
                   Use as personal expense
                 </label>
@@ -459,7 +455,7 @@ export default function Expenses() {
                 required
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
               <InputText
                 label="Amount"
@@ -470,7 +466,7 @@ export default function Expenses() {
                 value={mainForm.values.amount || 0}
                 onChange={mainForm.handleChange}
               ></InputText>
-              {!mainForm.values.is_personal_expense && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -628,7 +624,17 @@ export default function Expenses() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const [companyData, expenseData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    expenseLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    }).then((res) => res.json()),
+  ]);
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
+    expenseData,
   };
 }

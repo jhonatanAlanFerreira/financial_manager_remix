@@ -1,4 +1,4 @@
-import { Account, User } from "@prisma/client";
+import { Account, Prisma, User } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   AccountCreateRequestInterface,
@@ -6,22 +6,24 @@ import {
 } from "~/data/account/account-request-interfaces";
 import {
   accountCreateValidator,
-  accountDeleteValidator,
+  accountRemoveValidator,
   accountUpdateValidator,
+  listAccountsValidator,
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
+import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
+import { paginate } from "~/data/services/list.service";
 
 export async function create(
   data: AccountCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountCreateValidator(data, user);
+  const serverError = await accountCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -31,7 +33,7 @@ export async function create(
       balance: data.balance,
       company_id: data.company || null,
       user_id: user.id,
-      is_personal_account: !data.company,
+      is_personal: !data.company,
     },
   });
 
@@ -43,31 +45,38 @@ export async function create(
 
 export async function list(
   user: User,
-  personalOnly = true
+  params: AccountLoaderParamsInterface
 ): Promise<ServerResponseInterface<Account[]>> {
-  const userAccounts = await prisma.account.findMany({
-    where: {
-      user_id: user.id,
-      ...(personalOnly && { is_personal_account: true }),
-    },
-  });
+  const serverError = await listAccountsValidator(params, user);
 
-  return {
-    data: userAccounts,
-  };
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
+  }
+
+  const { page, pageSize, ...restParams } = params;
+
+  return paginate<Account, Prisma.AccountFindManyArgs, Prisma.AccountCountArgs>(
+    prisma.account.findMany,
+    prisma.account.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id }
+  );
 }
 
 export async function remove(
   classificationId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountDeleteValidator(user, classificationId);
+  const serverError = await accountRemoveValidator(user, classificationId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
-      message: "Classification not found",
-      data: dataIsValid,
+      serverError,
+      message: "There are some invalid params",
     };
   }
 
@@ -87,13 +96,12 @@ export async function update(
   user: User,
   data: AccountUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await accountUpdateValidator(data, user, accountId);
+  const serverError = await accountUpdateValidator(data, user, accountId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 

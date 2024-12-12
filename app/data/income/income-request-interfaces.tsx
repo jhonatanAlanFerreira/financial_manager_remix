@@ -1,8 +1,9 @@
 export interface IncomeCreateRequestInterface {
   name: string;
-  companies: string[];
+  companies?: string[];
   amount: number;
-  is_personal_income: boolean;
+  is_personal: boolean;
 }
 
-export interface IncomeUpdateRequestInterface extends IncomeCreateRequestInterface {}
+export interface IncomeUpdateRequestInterface
+  extends IncomeCreateRequestInterface {}

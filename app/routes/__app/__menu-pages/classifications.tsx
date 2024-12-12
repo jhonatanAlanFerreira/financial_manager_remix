@@ -1,13 +1,12 @@
 import { Company, TransactionClassification } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
+import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
 import { queryParamsFromObject } from "~/utils/utilities";
@@ -20,11 +19,17 @@ import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ClassificationFiltersFormInterface,
   ClassificationFormInterface,
 } from "~/components/page-components/classification/classification-finterfaces";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ClassificationWithRelationsInterface } from "~/data/classification/classification-types";
+import {
+  createOrUpdateClassification,
+  deleteClassification,
+  fetchClassifications,
+} from "~/data/frontend-services/classification-service";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -35,23 +40,30 @@ export default function Classifications() {
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [reloadClassification, setReloadClassification] =
     useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<String>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [searchParams, setSearchParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [classifications, setClassifications] = useState<
-    ServerResponseInterface<TransactionClassification[]>
+    ServerResponseInterface<ClassificationWithRelationsInterface[]>
   >({});
+  const [paginationState, setPaginationState] = useState<{
+    reload: boolean;
+    page: number;
+  }>({
+    reload: false,
+    page: 1,
+  });
 
   const { companyData, classificationData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
-    classificationData: ServerResponseInterface<TransactionClassification[]>;
+    classificationData: ServerResponseInterface<
+      ClassificationWithRelationsInterface[]
+    >;
   }>();
 
   const mainForm = useFormik<ClassificationFormInterface>({
@@ -59,7 +71,7 @@ export default function Classifications() {
       id: "",
       name: "",
       companies: [],
-      is_personal_transaction_classification: false,
+      is_personal: false,
       is_income: false,
     },
     onSubmit: () => {},
@@ -80,7 +92,6 @@ export default function Classifications() {
 
   useEffect(() => {
     buildSearchParamsUrl();
-    setCurrentPage(1);
     setTitle({
       pageTitle: "Incomes & Expenses Classifications",
       pageTooltipMessage:
@@ -97,7 +108,6 @@ export default function Classifications() {
       setCompanies(companyData);
     }
     if (classificationData) {
-      setCurrentPage(classificationData.pageInfo?.currentPage || 0);
       setTotalPages(classificationData.pageInfo?.totalPages || 0);
       setClassifications(classificationData);
     }
@@ -105,10 +115,10 @@ export default function Classifications() {
   }, [companyData, classificationData]);
 
   useEffect(() => {
-    if (currentPage) {
+    if (paginationState.reload) {
       loadClassifications();
     }
-  }, [currentPage]);
+  }, [paginationState]);
 
   useEffect(() => {
     buildSearchParamsUrl();
@@ -122,133 +132,108 @@ export default function Classifications() {
   }, [searchParams]);
 
   useEffect(() => {
+    mainForm.setFieldValue("companies", null);
+  }, [mainForm.values.is_personal]);
+
+  useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
       filterForm.setFieldValue("company", null);
     }
   }, [filterForm.values.is_personal_or_company]);
 
   const loadClassifications = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get<
-        ServerResponseInterface<TransactionClassification[]>
-      >(
-        `/api/classification?${searchParams}${
-          searchParams ? "&" : ""
-        }${paginationParams()}`
-      );
+    setLoading(true);
 
-      setCurrentPage(res.data.pageInfo?.currentPage || 1);
-      setTotalPages(res.data.pageInfo?.totalPages || 1);
+    await fetchClassifications(
+      {
+        paginationParams: paginationParams(),
+        searchParams,
+        extends: "companies",
+      },
+      {
+        onSuccess: (data) => {
+          setPaginationState({
+            reload: false,
+            page: data.pageInfo?.currentPage || 1,
+          });
+          setTotalPages(data.pageInfo?.totalPages || 1);
+          setClassifications(data);
 
-      setClassifications(res.data);
-      setLoading(false);
-
-      if (!res.data.data?.length) {
-        setCurrentPage(res.data.pageInfo?.totalPages || 1);
+          if (!data.data?.length) {
+            setPaginationState({
+              reload: false,
+              page: data.pageInfo?.totalPages || 1,
+            });
+          }
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (mainForm.values.id) {
-      axiosRequest = axios.patch(
-        `/api/classification?classificationId=${mainForm.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating classification";
-    } else {
-      axiosRequest = axios.post("/api/classification", formData);
-      loadingMessage = "Creating classification";
-    }
-
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadClassifications();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateClassification(formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadClassifications();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   const getClassificationType = (classification: TransactionClassification) => {
-    return classification.is_personal_transaction_classification
+    return classification.is_personal
       ? "Personal Transaction Classification"
       : "Company Transaction Classification";
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = classifications;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (paginationState.page == 1 || !hasMinimalData) {
+      loadClassifications();
+    } else {
+      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    }
   };
 
   const removeClassification = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(
-      axios.delete(
-        `/api/classification?classificationId=${mainForm.values.id}`
-      ),
-      {
-        loading: "Deleting classification",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          loadClassifications();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setLoading(false);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      }
-    );
+    await deleteClassification(mainForm.values.id as string, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
+      },
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
-  const setFormValues = (classification: TransactionClassification) => {
-    mainForm.setValues({
-      id: classification.id,
-      name: classification.name,
-      is_personal_transaction_classification:
-        classification.is_personal_transaction_classification,
-      is_income: classification.is_income,
-      companies:
-        companies.data?.filter((company) =>
-          classification.company_ids.includes(company.id)
-        ) || [],
-    });
+  const setFormValues = (
+    classification: ClassificationWithRelationsInterface
+  ) => {
+    mainForm.setValues(classification);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
@@ -260,7 +245,9 @@ export default function Classifications() {
     setOpenAddModal(true);
   };
 
-  const onClickUpdate = (classification: TransactionClassification) => {
+  const onClickUpdate = (
+    classification: ClassificationWithRelationsInterface
+  ) => {
     setFormValues(classification);
     setOpenAddModal(true);
   };
@@ -282,9 +269,12 @@ export default function Classifications() {
 
   const onFilterFormSubmit = async () => {
     setOpenFilterModal(false);
-    loadClassifications();
+    if (paginationState.page == 1) {
+      loadClassifications();
+    } else {
+      setPaginationState({ reload: true, page: 1 });
+    }
   };
-
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -295,7 +285,7 @@ export default function Classifications() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: paginationState.page,
       pageSize: 10,
     } as any).toString();
   };
@@ -306,6 +296,22 @@ export default function Classifications() {
 
   const isPersonalOrCompanyChange = (e: any) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+  };
+
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set(
+      "is_personal",
+      formData.get("is_personal") == "on" ? "true" : "false"
+    );
+    formData.set(
+      "is_income",
+      formData.get("is_income") == "on" ? "true" : "false"
+    );
+
+    formData.set("id", mainForm.values.id);
+
+    return formData;
   };
 
   return (
@@ -394,10 +400,10 @@ export default function Classifications() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={paginationState.page}
           totalPages={totalPages}
           optionsAmount={10}
-          onPageChange={setCurrentPage}
+          onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}
 
@@ -451,17 +457,15 @@ export default function Classifications() {
               <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4 mb-6">
                 <div>
                   <Checkbox
-                    name="is_personal_transaction_classification"
-                    id="is_personal_transaction_classification"
+                    name="is_personal"
+                    id="is_personal"
                     className="relative top-1"
-                    checked={
-                      mainForm.values.is_personal_transaction_classification
-                    }
+                    checked={mainForm.values.is_personal}
                     onChange={mainForm.handleChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
-                    htmlFor="is_personal_transaction_classification"
+                    htmlFor="is_personal"
                   >
                     Use as personal classification
                   </label>
@@ -504,9 +508,9 @@ export default function Classifications() {
                 required
                 value={mainForm.values.name}
                 onChange={mainForm.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
-              {!mainForm.values.is_personal_transaction_classification && (
+              {!mainForm.values.is_personal && (
                 <InputSelect
                   isClearable
                   isMulti
@@ -707,7 +711,17 @@ export default function Classifications() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const [companyData, classificationData] = await Promise.all([
+    companyLoader(request).then((res) => res.json()),
+    classificationLoader(request, {
+      page: 1,
+      pageSize: 10,
+      extends: ["companies"],
+    }).then((res) => res.json()),
+  ]);
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
+    classificationData,
   };
 }

@@ -1,74 +1,80 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ClassificationCreateRequestInterface,
   ClassificationUpdateRequestInterface,
 } from "~/data/classification/classification-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  validateCompanies,
+  validateCompany,
+  validateIdFormat,
+  validatePaginationParams,
+} from "~/data/services/validators";
+import { ClassificationLoaderParamsInterface } from "./classification-query-params-interfaces";
 
 export async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
+      },
+    };
+  }
+
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        is_personal: "Personal classification can not have companies",
       },
     };
   }
 
   const classificationsExists =
-    await prisma.transactionClassification.findUnique({
+    await prisma.transactionClassification.findFirst({
       where: {
-        user_id_name_is_personal_transaction_classification_is_income: {
-          name: data.name,
-          user_id: user.id,
-          is_personal_transaction_classification:
-            data.is_personal_transaction_classification,
-          is_income: data.is_income,
-        },
+        name: data.name,
+        user_id: user.id,
+        is_personal: data.is_personal,
+        is_income: data.is_income,
       },
     });
 
   if (classificationsExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This classification already exists",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function classificationDeleteValidator(
   user: User,
   classificationId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(classificationId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        classificationId: "Invalid classification ID format",
+      },
+    };
+  }
+
   const classificationExistis =
     await prisma.transactionClassification.findFirst({
       where: {
@@ -79,28 +85,44 @@ export async function classificationDeleteValidator(
 
   if (!classificationExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Classification not found",
+        classificationId: "Classification not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function classificationUpdateValidator(
   data: ClassificationUpdateRequestInterface,
   user: User,
   classificationId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
+      },
+    };
+  }
+
+  if (!validateIdFormat(classificationId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        classificationId: "Invalid classification ID format",
+      },
+    };
+  }
+
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        is_personal: "Personal classification can not have companies",
       },
     };
   }
@@ -114,56 +136,54 @@ export async function classificationUpdateValidator(
 
   if (!classification) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Classification not found",
+        classificationId: "Classification not found",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const classificationsExists =
-    await prisma.transactionClassification.findUnique({
+    await prisma.transactionClassification.findFirst({
       where: {
         NOT: { id: classificationId },
-        user_id_name_is_personal_transaction_classification_is_income: {
-          name: data.name,
-          user_id: user.id,
-          is_personal_transaction_classification:
-            data.is_personal_transaction_classification,
-          is_income: data.is_income,
-        },
+        name: data.name,
+        user_id: user.id,
+        is_personal: data.is_personal,
+        is_income: data.is_income,
       },
     });
 
   if (classificationsExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This classification already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
+}
+
+export async function listClassificationsValidator(
+  params: ClassificationLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = validateCompany(params.has_company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  return null;
 }

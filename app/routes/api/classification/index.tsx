@@ -5,12 +5,19 @@ import {
   ClassificationCreateRequestInterface,
   ClassificationUpdateRequestInterface,
 } from "~/data/classification/classification-request-interfaces";
+import { classificationIncludeOptions } from "~/data/classification/classification-types";
 import {
   create,
   list,
   remove,
   update,
 } from "~/data/classification/classification.server";
+import { sendResponse } from "~/data/services/responses";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
+import { getArrayFromFormData, parseIncludes } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -29,26 +36,12 @@ let createClassification = async (request: Request) => {
 
   const data: ClassificationCreateRequestInterface = {
     name: String(body.get("name") || ""),
-    is_income: !!body.get("is_income"),
-    is_personal_transaction_classification: !!body.get(
-      "is_personal_transaction_classification"
-    ),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_income: body.get("is_income") == "true",
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeClassification = async (request: Request) => {
@@ -57,17 +50,7 @@ let removeClassification = async (request: Request) => {
     new URL(request.url).searchParams.get("classificationId")
   );
 
-  const res = await remove(classificationId, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(classificationId, user));
 };
 
 let updateClassification = async (request: Request) => {
@@ -79,47 +62,40 @@ let updateClassification = async (request: Request) => {
 
   const data: ClassificationUpdateRequestInterface = {
     name: String(body.get("name") || ""),
-    is_income: !!body.get("is_income"),
-    is_personal_transaction_classification: !!body.get(
-      "is_personal_transaction_classification"
-    ),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_income: body.get("is_income") == "true",
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await update(classificationId, user, data);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(classificationId, user, data));
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<ClassificationLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
   const params: ClassificationLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    has_company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
+    extends: parseIncludes(url, classificationIncludeOptions),
     is_income_or_expense:
-      (url.searchParams.get("is_income_or_expense") as
-        | "expense"
-        | "income"
-        | "all") || "all",
+      (url.searchParams.get("is_income_or_expense") as IsIncomeOrExpenseType) ||
+      "all",
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
   };
-  return list(user, params);
+
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };

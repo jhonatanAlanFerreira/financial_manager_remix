@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { IconNameType } from "~/shared/icon-name-type";
+import { IconNameType } from "~/shared/shared-types";
 
 export interface AccordionPropsInterface {
   title: string;

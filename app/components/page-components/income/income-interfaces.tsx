@@ -13,5 +13,5 @@ export interface IncomeFormInterface {
   name: string;
   amount: number | null;
   companies: Company[];
-  is_personal_income: boolean;
+  is_personal: boolean;
 }

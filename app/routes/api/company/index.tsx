@@ -6,6 +6,9 @@ import {
   CompanyUpdateRequestInterface,
 } from "~/data/company/company-request-interfaces";
 import { create, list, remove, update } from "~/data/company/company.server";
+import { parseIncludes } from "~/utils/utilities";
+import { companyIncludeOptions } from "~/data/company/company-types";
+import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -18,22 +21,26 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<CompanyLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
   const params: CompanyLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    with_accounts: !!url.searchParams.get("with_accounts"),
-    working_capital_greater: Number(
-      url.searchParams.get("working_capital_greater")
-    ),
-    working_capital_less: Number(url.searchParams.get("working_capital_less")),
-    name: url.searchParams.get("name"),
+    name: url.searchParams.get("name") || undefined,
+    extends: parseIncludes(url, companyIncludeOptions),
   };
 
-  return list(user, params);
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };
 
 let createCompany = async (request: Request) => {
@@ -44,34 +51,14 @@ let createCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeCompany = async (request: Request) => {
   const user = await requireUserSession(request);
   const companyId = String(new URL(request.url).searchParams.get("companyId"));
 
-  const res = await remove(companyId, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(companyId, user));
 };
 
 let updateCompany = async (request: Request) => {
@@ -83,14 +70,5 @@ let updateCompany = async (request: Request) => {
     name: String(body.get("name") || ""),
   };
 
-  const res = await update(data, user, companyId);
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(data, user, companyId));
 };

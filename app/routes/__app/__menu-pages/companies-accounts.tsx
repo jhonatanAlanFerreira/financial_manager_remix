@@ -1,10 +1,8 @@
 import { Account, Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { Modal } from "react-responsive-modal";
 import { Accordion } from "~/components/accordion/accordion";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
@@ -14,10 +12,17 @@ import { Loader } from "~/components/loader/loader";
 import { AccountDropdown } from "~/components/page-components/company-accounts/account-dropdown";
 import { CompanyFormInterface } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
-import { CompanyWithAccountsType } from "~/data/company/company-types";
-import { loader as userAccountLoader } from "~/routes/api/account/index";
+import { CompanyWithRelationsInterface } from "~/data/company/company-types";
+import {
+  createOrUpdateCompany,
+  deleteCompany,
+  fetchAccounts,
+  fetchCompanies,
+} from "~/data/frontend-services/company-account-service";
+import { loader as accountLoader } from "~/routes/api/account/index";
+import { loader as companyLoader } from "~/routes/api/company/index";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 
 export default function Companies() {
   const { setTitle } = useTitle();
@@ -27,17 +32,17 @@ export default function Companies() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [companies, setCompanies] = useState<
-    ServerResponseInterface<CompanyWithAccountsType[]>
+    ServerResponseInterface<CompanyWithRelationsInterface[]>
   >({});
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
-  >({});
+  const [responseErrors, setResponseErrors] =
+    useState<ServerResponseErrorInterface>({});
   const [userAccounts, setUserAccounts] = useState<
     ServerResponseInterface<Account[]>
   >({});
 
-  const { userAccountData } = useLoaderData<{
+  const { userAccountData, companyData } = useLoaderData<{
     userAccountData: ServerResponseInterface<Account[]>;
+    companyData: ServerResponseInterface<CompanyWithRelationsInterface[]>;
   }>();
 
   const formik = useFormik<CompanyFormInterface>({
@@ -60,104 +65,80 @@ export default function Companies() {
   }, []);
 
   useEffect(() => {
-    loadCompanies();
-  }, []);
-
-  useEffect(() => {
     if (userAccountData) {
       setUserAccounts(userAccountData);
     }
-  }, [userAccountData]);
+    if (companyData) {
+      setCompanies(companyData);
+    }
+  }, [userAccountData, companyData]);
 
   const loadUserAccounts = async () => {
     setLoading(true);
-    const res = await axios.get(`/api/account`);
-    setUserAccounts(res.data);
-    setLoading(false);
-  };
 
-  const loadCompanies = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`/api/company?with_accounts=true`);
-
-      setCompanies(res.data);
-      setLoading(false);
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
+    await fetchAccounts(
+      {
+        paginationParams: "is_personal_or_company=personal",
+        searchParams: "",
+      },
+      {
+        onSuccess: (data) => {
+          setUserAccounts(data);
+        },
+        onError: () => {
+          setLoading(false);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
       }
-      setLoading(false);
-    }
+    );
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    let axiosRequest;
-    let loadingMessage;
-
-    if (formik.values.id) {
-      axiosRequest = axios.patch(
-        `/api/company?companyId=${formik.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating company";
-    } else {
-      axiosRequest = axios.post("/api/company", formData);
-      loadingMessage = "Creating company";
-    }
 
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          loadCompanies();
-          setResponseErrors({});
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateCompany(formik.values.id, formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        loadCompanies();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
+  };
+
+  const loadCompanies = async () => {
+    setLoading(true);
+    const res = await fetchCompanies();
+    if (res) {
+      setCompanies(res);
+    }
+    setLoading(false);
   };
 
   const removeCompany = async () => {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/company?companyId=${formik.values.id}`), {
-      loading: "Deleting company",
-      success: (res: AxiosResponse<ServerResponseInterface>) => {
+    await deleteCompany(formik.values.id, {
+      onSuccess: () => {
         loadCompanies();
-        return res.data.message as string;
       },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
       },
     });
   };
@@ -298,7 +279,7 @@ export default function Companies() {
                 required
                 value={formik.values.name}
                 onChange={formik.handleChange}
-                errorMessage={responseErrors?.data?.errors?.["name"]}
+                errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
             </Form>
           </div>
@@ -319,7 +300,19 @@ export default function Companies() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const [userAccountData, companyData] = await Promise.all([
+    accountLoader(request, {
+      page: 1,
+      pageSize: "all",
+      is_personal_or_company: "personal",
+    }).then((res) => res.json()),
+    companyLoader(request, {
+      extends: ["accounts"],
+    }).then((res) => res.json()),
+  ]);
+
   return {
-    userAccountData: await userAccountLoader(request, true),
+    userAccountData,
+    companyData,
   };
 }

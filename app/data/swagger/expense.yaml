@@ -1,0 +1,192 @@
+paths:
+  /api/expense:
+    get:
+      tags:
+        - Expense Services
+      summary: Retrieve a list of expenses
+      parameters:
+        - in: query
+          name: company
+          schema:
+            type: string
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: amount_greater
+          schema:
+            type: number
+        - in: query
+          name: amount_less
+          schema:
+            type: number
+        - in: query
+          name: is_personal_or_company
+          schema:
+            type: string
+            enum: [all, personal, company]
+            default: all
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            oneOf:
+              - type: integer
+                default: 10
+              - type: string
+                enum: ["all"]
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "companies"
+      responses:
+        200:
+          description: A list of expenses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Expense"
+                        - type: object
+                          properties:
+                            companies:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/Company"
+                          nullable: true
+                  pageInfo:
+                    $ref: "#/components/schemas/PageInfo"
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
+    post:
+      tags:
+        - Expense Services
+      summary: Create a new expense
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                companies:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
+                is_personal:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Expense"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
+    patch:
+      tags:
+        - Expense Services
+      summary: Update an expense
+      parameters:
+        - in: query
+          name: expenseId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                companies:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
+                is_personal:
+                  type: boolean
+                  default: false
+      responses:
+        200:
+          description: Expense updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Expense"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Expense not found
+
+    delete:
+      tags:
+        - Expense Services
+      summary: Delete an expense
+      parameters:
+        - in: query
+          name: expenseId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Expense deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Expense not found

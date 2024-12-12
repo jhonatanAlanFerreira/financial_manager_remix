@@ -1,48 +1,29 @@
 import { Form, Link, useNavigate } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { Icon } from "~/components/icon/icon";
 import { InputPassword } from "~/components/inputs/input-password/input-password";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { NavigationLoader } from "~/components/navigation-loader/navigation-loader";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import { login } from "~/data/frontend-services/auth-service";
 
 export default function Login() {
-  const [responseErrors, setResponseErrors] = useState<
-    ServerResponseInterface<ValidatedDataInterface>
-  >({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axios.post("/api/login", formData), {
-        loading: "Logging in",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          navigate("/");
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setIsSubmitting(false));
+    await login(formData, {
+      onSuccess: () => {
+        navigate("/");
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   return (
@@ -64,18 +45,12 @@ export default function Login() {
           </div>
           <div>
             <Form method="post" id="login-form" onSubmit={formSubmit}>
-              <InputText
-                label="Login"
-                name="login"
-                required
-                errorMessage={responseErrors?.data?.errors?.["login"]}
-              ></InputText>
+              <InputText label="Login" name="login" required></InputText>
               <InputPassword
                 showEyeIcon={true}
                 label="Password"
                 name="password"
                 required
-                errorMessage={responseErrors?.data?.errors?.["password"]}
               ></InputPassword>
             </Form>
             <div>

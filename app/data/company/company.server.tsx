@@ -1,8 +1,6 @@
 import { Company, Prisma, User } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import { CompanyLoaderParamsInterface } from "~/data/company/company-query-params-interfaces";
-import { CompanyWithAccountsType } from "~/data/company/company-types";
 import { prisma } from "~/data/database/database.server";
 import {
   CompanyCreateRequestInterface,
@@ -12,63 +10,52 @@ import {
   companyCreateValidator,
   companyDeleteValidator,
   companyUpdateValidator,
+  listCompaniesValidator,
 } from "~/data/company/company-validator";
-
-type CompanyWhereInput = Prisma.CompanyWhereInput;
+import { paginate } from "~/data/services/list.service";
+import { CompanyIncludeOptions } from "~/data/company/company-types";
 
 export async function list(
   user: User,
   params: CompanyLoaderParamsInterface
-): Promise<ServerResponseInterface<Company[] | CompanyWithAccountsType[]>> {
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+): Promise<ServerResponseInterface<Company[]>> {
+  const serverError = await listCompaniesValidator(params);
 
-  const whereClause: CompanyWhereInput = {
-    user_id: user.id,
-  };
-
-  if (params.name) {
-    whereClause.name = { contains: params.name, mode: "insensitive" };
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
   }
 
-  const companies = await prisma.company.findMany({
-    where: whereClause,
-    skip,
-    take,
-    include: { accounts: params.with_accounts },
-  });
+  const { page, pageSize, extends: companyIncludes, ...restParams } = params;
 
-  const totalData = await prisma.company.count({
-    where: whereClause,
-  });
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
-
-  return {
-    data: companies,
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
-    },
-  };
+  return paginate<
+    Company,
+    Prisma.CompanyFindManyArgs,
+    Prisma.CompanyCountArgs,
+    CompanyIncludeOptions,
+    Prisma.CompanyWhereInput
+  >(
+    prisma.company.findMany,
+    prisma.company.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id },
+    companyIncludes
+  );
 }
 
 export async function create(
   data: CompanyCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
-  const dataIsValid = await companyCreateValidator(data, user);
+): Promise<ServerResponseInterface<Company>> {
+  const serverError = await companyCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -89,14 +76,13 @@ export async function update(
   data: CompanyUpdateRequestInterface,
   user: User,
   companyId: string
-): Promise<ServerResponseInterface<Company | ValidatedDataInterface>> {
-  const dataIsValid = await companyUpdateValidator(data, user, companyId);
+): Promise<ServerResponseInterface<Company>> {
+  const serverError = await companyUpdateValidator(data, user, companyId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -117,13 +103,12 @@ export async function remove(
   companyId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await companyDeleteValidator(user, companyId);
+  const serverError = await companyDeleteValidator(user, companyId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
-      message: "Company not found",
-      data: dataIsValid,
+      serverError,
+      message: "There are some invalid params",
     };
   }
 

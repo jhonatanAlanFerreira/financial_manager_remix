@@ -101,7 +101,7 @@ export function TransactionFilters({
         expenses.filter((expense) => {
           const expenseTypeFilter =
             formik.values.is_personal_or_company === "personal"
-              ? expense.is_personal_expense
+              ? expense.is_personal
               : true;
 
           const companyFilter =
@@ -120,7 +120,7 @@ export function TransactionFilters({
         incomes.filter((income) => {
           const incomeTypeFilter =
             formik.values.is_personal_or_company === "personal"
-              ? income.is_personal_income
+              ? income.is_personal
               : true;
 
           const companyFilter =

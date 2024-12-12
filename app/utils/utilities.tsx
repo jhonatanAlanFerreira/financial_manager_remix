@@ -64,6 +64,40 @@ export function getBaseUrl() {
   const host =
     process.env.NODE_ENV === "production"
       ? process.env.APP_URL
-      : `localhost:${port}`;
+      : `host.docker.internal:${port}`;
   return `http://${host}`;
+}
+
+export function parseIncludes<T extends readonly string[]>(
+  url: URL,
+  includeOptions: T
+): T[number][] {
+  const includesParam = url.searchParams.get("extends");
+  if (!includesParam) return [];
+
+  return includesParam
+    .split(",")
+    .filter((value): value is T[number] =>
+      includeOptions.includes(value as T[number])
+    );
+}
+
+export function getArrayFromFormData(
+  formData: FormData,
+  paramName: string
+): string[] {
+  const paramValue = formData.get(paramName);
+
+  if (paramValue && paramValue !== "null") {
+    return formData.getAll(paramName) as string[];
+  }
+
+  return [];
+}
+
+export function getOptionalField(
+  body: FormData,
+  field: string
+): string | undefined {
+  return body.get(field) ? String(body.get(field)) : undefined;
 }

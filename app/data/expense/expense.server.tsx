@@ -7,25 +7,23 @@ import {
 import {
   expenseCreateValidator,
   expenseDeleteValidator,
+  expenseListValidator,
   expenseUpdateValidator,
 } from "~/data/expense/expense-validator";
 import { ExpenseLoaderParamsInterface } from "~/data/expense/expense-query-params-interfaces";
-import { ExpenseWithCompaniesType } from "~/data/expense/expense-types";
 import { prisma } from "~/data/database/database.server";
-
-type ExpenseWhereInput = Prisma.ExpenseWhereInput;
+import { paginate } from "~/data/services/list.service";
 
 export async function create(
   data: ExpenseCreateRequestInterface,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseCreateValidator(data, user);
+  const serverError = await expenseCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -33,7 +31,7 @@ export async function create(
     data: {
       name: data.name,
       amount: data.amount,
-      is_personal_expense: data.is_personal_expense,
+      is_personal: data.is_personal,
       user_id: user.id,
       company_ids: data.companies,
     },
@@ -48,76 +46,38 @@ export async function create(
 export async function list(
   user: User,
   params: ExpenseLoaderParamsInterface
-): Promise<ServerResponseInterface<Expense[] | ExpenseWithCompaniesType[]>> {
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+): Promise<ServerResponseInterface<Expense[]>> {
+  const serverError = await expenseListValidator(params, user);
 
-  const whereClause: ExpenseWhereInput = {
-    user_id: user.id,
-  };
-
-  whereClause.is_personal_expense =
-    params.is_personal_or_company !== "all"
-      ? params.is_personal_or_company === "personal"
-      : undefined;
-
-  if (params.name) {
-    whereClause.name = { contains: params.name, mode: "insensitive" };
-  }
-
-  if (params.amount_greater || params.amount_less) {
-    whereClause.amount = {};
-    if (params.amount_greater) {
-      whereClause.amount.gte = params.amount_greater;
-    }
-    if (params.amount_less) {
-      whereClause.amount.lte = params.amount_less;
-    }
-  }
-
-  if (params.company) {
-    whereClause.company_ids = {
-      has: params.company,
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
     };
   }
 
-  const expenses = await prisma.expense.findMany({
-    where: whereClause,
-    skip,
-    take,
-  });
+  const { page, pageSize, extends: expenseIncludes, ...restParams } = params;
 
-  const totalData = await prisma.expense.count({
-    where: whereClause,
-  });
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
-
-  return {
-    data: expenses,
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
-    },
-  };
+  return paginate<Expense, Prisma.ExpenseFindManyArgs, Prisma.ExpenseCountArgs>(
+    prisma.expense.findMany,
+    prisma.expense.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id },
+    expenseIncludes
+  );
 }
 
 export async function remove(
   expenseId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseDeleteValidator(user, expenseId);
+  const serverError = await expenseDeleteValidator(user, expenseId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
-      message: "Expense not found",
-      data: dataIsValid,
+      serverError,
+      message: "There are some invalid params",
     };
   }
 
@@ -137,13 +97,12 @@ export async function update(
   user: User,
   data: ExpenseUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await expenseUpdateValidator(expenseId, user, data);
+  const serverError = await expenseUpdateValidator(expenseId, user, data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -151,7 +110,7 @@ export async function update(
     data: {
       name: data.name,
       amount: data.amount,
-      is_personal_expense: data.is_personal_expense,
+      is_personal: data.is_personal,
       user_id: user.id,
       company_ids: data.companies,
     },

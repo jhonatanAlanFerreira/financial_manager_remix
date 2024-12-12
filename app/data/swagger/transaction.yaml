@@ -1,0 +1,271 @@
+paths:
+  /api/transaction:
+    get:
+      tags:
+        - Transaction Services
+      summary: Get a list of transactions
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          default: ""
+        - in: query
+          name: amount_greater
+          schema:
+            type: integer
+        - in: query
+          name: amount_less
+          schema:
+            type: integer
+        - in: query
+          name: company
+          schema:
+            type: string
+          default: ""
+        - in: query
+          name: expense
+          schema:
+            type: string
+          default: ""
+        - in: query
+          name: income
+          schema:
+            type: string
+          default: ""
+        - in: query
+          name: account
+          schema:
+            type: string
+          default: ""
+        - in: query
+          name: company
+          schema:
+            type: string
+        - in: query
+          name: is_personal_or_company
+          schema:
+            type: string
+            enum: [all, personal, company]
+          default: all
+        - in: query
+          name: is_income_or_expense
+          schema:
+            type: string
+            enum: [all, income, expense]
+          default: all
+        - in: query
+          name: date_after
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_before
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            oneOf:
+              - type: integer
+                default: 10
+              - type: string
+                enum: ["all"]
+        - in: query
+          name: extends
+          schema:
+            type: string
+            example: "company,transaction_classifications,expense,income,account"
+      responses:
+        200:
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/Transaction"
+                        - type: object
+                          properties:
+                            company:
+                              $ref: "#/components/schemas/Company"
+                            transaction_classifications:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/Classification"
+                            expense:
+                              $ref: "#/components/schemas/Expense"
+                            income:
+                              $ref: "#/components/schemas/Income"
+                            account:
+                              $ref: "#/components/schemas/Account"
+                  pageInfo:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      pageSize:
+                        type: integer
+                      totalData:
+                        type: integer
+                      totalPages:
+                        type: integer
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
+    post:
+      tags:
+        - Transaction Services
+      summary: Create a new transaction
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                company:
+                  type: string
+                  default: ""
+                expense:
+                  type: string
+                  default: ""
+                income:
+                  type: string
+                  default: ""
+                account:
+                  type: string
+                  default: ""
+                is_personal_or_company:
+                  type: string
+                  enum: [all, personal, company]
+                  default: all
+                is_income:
+                  type: boolean
+                  default: false
+                date:
+                  type: string
+                  format: date
+      responses:
+        201:
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Transaction"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+
+    patch:
+      tags:
+        - Transaction Services
+      summary: Update a transaction
+      parameters:
+        - in: query
+          name: transactionId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                amount:
+                  type: integer
+                company:
+                  type: string
+                  default: ""
+                expense:
+                  type: string
+                  default: ""
+                income:
+                  type: string
+                  default: ""
+                account:
+                  type: string
+                  default: ""
+                is_personal_or_company:
+                  type: string
+                  enum: [all, personal, company]
+                  default: all
+                is_income:
+                  type: boolean
+                  default: false
+                date:
+                  type: string
+                  format: date
+      responses:
+        200:
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Transaction"
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Transaction not found
+
+    delete:
+      tags:
+        - Transaction Services
+      summary: Delete an transaction
+      parameters:
+        - in: query
+          name: transactionId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Transaction deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        404:
+          description: Transaction not found

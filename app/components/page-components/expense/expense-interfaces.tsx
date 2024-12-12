@@ -13,5 +13,5 @@ export interface ExpenseFormInterface {
   name: string;
   amount: number | null;
   companies: Company[];
-  is_personal_expense: boolean;
+  is_personal: boolean;
 }

@@ -5,7 +5,11 @@ import {
   IncomeCreateRequestInterface,
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
+import { incomeIncludeOptions } from "~/data/income/income-types";
 import { create, list, remove, update } from "~/data/income/income.server";
+import { sendResponse } from "~/data/services/responses";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
+import { getArrayFromFormData, parseIncludes } from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -18,7 +22,10 @@ export let action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<IncomeLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -27,15 +34,21 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    has_company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
+    extends: parseIncludes(url, incomeIncludeOptions),
   };
-  return list(user, params);
+
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };
 
 let createIncome = async (request: Request) => {
@@ -45,40 +58,18 @@ let createIncome = async (request: Request) => {
   const data: IncomeCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_income: !!body.get("is_personal_income"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeIncome = async (request: Request) => {
   const user = await requireUserSession(request);
   const incomeId = String(new URL(request.url).searchParams.get("incomeId"));
 
-  const res = await remove(incomeId, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(incomeId, user));
 };
 
 let updateIncome = async (request: Request) => {
@@ -89,21 +80,9 @@ let updateIncome = async (request: Request) => {
   const data: IncomeUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    is_personal_income: !!body.get("is_personal_income"),
-    companies: body.get("companies")
-      ? (body.getAll("companies") as string[])
-      : [],
+    is_personal: body.get("is_personal") == "true",
+    companies: getArrayFromFormData(body, "companies"),
   };
 
-  const res = await update(incomeId, user, data);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(incomeId, user, data));
 };

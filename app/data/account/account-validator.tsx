@@ -1,22 +1,43 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   AccountCreateRequestInterface,
   AccountUpdateRequestInterface,
 } from "~/data/account/account-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import {
+  validateCompany,
+  validateIdFormat,
+  validateNumber,
+  validatePaginationParams,
+} from "~/data/services/validators";
 
 export async function accountCreateValidator(
   data: AccountCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
+  }
+
+  if (!validateNumber(data.balance)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Balance must be a valid number",
+      },
+    };
+  }
+
+  const companyErrors = await validateCompany(data.company, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const accountExists = await prisma.account.findFirst({
@@ -24,44 +45,35 @@ export async function accountCreateValidator(
       name: data.name,
       user_id: user.id,
       company_id: data.company || null,
-      is_personal_account: !data.company,
+      is_personal: !data.company,
     },
   });
 
   if (accountExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This account already exists",
       },
     };
   }
 
-  const validCompany = prisma.company.findFirst({
-    where: {
-      id: data.company,
-      user_id: user.id,
-    },
-  });
+  return null;
+}
 
-  if (validCompany === null) {
+export async function accountRemoveValidator(
+  user: User,
+  accountId: string
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(accountId)) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        name: "Invalid company",
+        accountId: "Invalid account ID format",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
-}
-
-export async function accountDeleteValidator(
-  user: User,
-  accountId: string
-): Promise<ValidatedDataInterface> {
   const accountExistis = await prisma.account.findFirst({
     where: {
       id: accountId,
@@ -71,28 +83,44 @@ export async function accountDeleteValidator(
 
   if (!accountExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Account not found",
+        accountId: "Account not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function accountUpdateValidator(
   data: AccountUpdateRequestInterface,
   user: User,
   accountId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(accountId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        accountId: "Invalid account ID format",
+      },
+    };
+  }
+
+  if (!validateNumber(data.balance)) {
+    return {
+      errorCode: 400,
+      errors: {
+        balance: "Balance must be a valid number",
+      },
+    };
+  }
+
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
@@ -106,9 +134,9 @@ export async function accountUpdateValidator(
 
   if (!account) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Account not found",
+        accountId: "Account not found",
       },
     };
   }
@@ -118,7 +146,7 @@ export async function accountUpdateValidator(
       name: data.name,
       user_id: user.id,
       company_id: account.company_id,
-      is_personal_account: account.is_personal_account,
+      is_personal: account.is_personal,
       NOT: {
         id: accountId,
       },
@@ -127,14 +155,29 @@ export async function accountUpdateValidator(
 
   if (accountExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This account already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
+}
+
+export async function listAccountsValidator(
+  params: AccountLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = await validateCompany(params.company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  return null;
 }

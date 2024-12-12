@@ -1,71 +1,79 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   IncomeCreateRequestInterface,
   IncomeUpdateRequestInterface,
 } from "~/data/income/income-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  validateCompanies,
+  validateCompany,
+  validateIdFormat,
+  validateNumber,
+  validatePaginationParams,
+} from "~/data/services/validators";
+import { IncomeLoaderParamsInterface } from "./income-query-params-interfaces";
 
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        personal: "Personal income can not have companies",
       },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
+    };
   }
 
-  const incomeExists = await prisma.income.findUnique({
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  const incomeExists = await prisma.income.findFirst({
     where: {
-      user_id_name_is_personal_income: {
-        name: data.name,
-        user_id: user.id,
-        is_personal_income: data.is_personal_income,
-      },
+      name: data.name,
+      user_id: user.id,
+      is_personal: data.is_personal,
     },
   });
 
   if (incomeExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This income already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function incomeDeleteValidator(
   user: User,
   incomeId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(incomeId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        incomeId: "Invalid income ID format",
+      },
+    };
+  }
+
   const incomeExistis = await prisma.income.findFirst({
     where: {
       id: incomeId,
@@ -75,28 +83,44 @@ export async function incomeDeleteValidator(
 
   if (!incomeExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Income not found",
+        incomeId: "Income not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function incomeUpdateValidator(
   data: IncomeUpdateRequestInterface,
   user: User,
   incomeId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
+      },
+    };
+  }
+
+  if (!validateIdFormat(incomeId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        incomeId: "Invalid income ID format",
+      },
+    };
+  }
+
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        is_personal: "Personal income can not have companies",
       },
     };
   }
@@ -110,30 +134,16 @@ export async function incomeUpdateValidator(
 
   if (!income) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Income not found",
+        incomeId: "Income not found",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const incomeExists = await prisma.income.findFirst({
@@ -142,21 +152,54 @@ export async function incomeUpdateValidator(
         { id: { not: incomeId } },
         { name: data.name },
         { user_id: user.id },
-        { is_personal_income: data.is_personal_income },
+        { is_personal: data.is_personal },
       ],
     },
   });
 
   if (incomeExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This income already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
+}
+
+export async function incomeListValidator(
+  params: IncomeLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = await validateCompany(params.has_company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  if (!validateNumber(params.amount_greater)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_greater: "Amount must be a valid number",
+      },
+    };
+  }
+
+  if (!validateNumber(params.amount_less)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_less: "Amount must be a valid number",
+      },
+    };
+  }
+
+  return null;
 }

@@ -3,12 +3,10 @@ import {
   Company,
   Expense,
   Income,
-  Transaction,
   TransactionClassification,
 } from "@prisma/client";
 import { FormikProps } from "formik";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 
 export interface TransactionFiltersFormInterface {
   name: string;
@@ -25,11 +23,11 @@ export interface TransactionFiltersFormInterface {
 
 export interface TransactionFormInterface {
   id: string;
-  transaction_date: string;
+  date: string;
   amount: number;
-  is_personal_transaction: boolean;
+  is_personal: boolean;
   is_income: boolean;
-  classifications: TransactionClassification[];
+  transaction_classifications: TransactionClassification[];
   income: Income | null;
   company: Company | null;
   expense: Expense | null;
@@ -44,7 +42,7 @@ export interface TransactionAddPropsInterface {
   formik: FormikProps<TransactionFormInterface>;
   skipEffect: boolean;
   isSubmitting: boolean;
-  responseErrors: ServerResponseInterface<ValidatedDataInterface>;
+  responseErrors: ServerResponseErrorInterface;
   companies: Company[];
   expenses: Expense[];
   incomes: Income[];
@@ -58,10 +56,4 @@ export interface TransactionFiltersPropsInterface {
   incomes: Income[];
   formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
-}
-
-export interface TransactionsWithTotalsInterface {
-  transactions: Transaction[];
-  totalIncomeValue: number;
-  totalExpenseValue: number;
 }

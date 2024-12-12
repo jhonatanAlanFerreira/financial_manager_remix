@@ -7,6 +7,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
   let transactionIdsIncome: string[] = [];
   let transactionIdsExpense: string[] = [];
   let accountId: string;
+  let transactionCreatedId: string | undefined;
 
   const getUser = async () => prisma.user.findFirstOrThrow();
 
@@ -15,7 +16,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
     user: User
   ) => {
     const transaction = await create(transactionData, user);
-    return transaction.data.id;
+    return transaction.data?.id;
   };
 
   const checkAccountBalance = async (expectedBalance: number) => {
@@ -44,124 +45,142 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       data: {
         balance: 500,
         name: "Account Test",
-        is_personal_account: true,
+        is_personal: true,
         user_id: user.id,
       },
     });
     accountId = account.id;
 
-    transactionIdsIncome.push(
-      await createTransaction(
-        {
-          amount: 100,
-          is_income: true,
-          account: accountId,
-          name: "Income 1",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 100,
+        is_income: true,
+        account: accountId,
+        name: "Income 1",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsIncome.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(600);
 
-    transactionIdsIncome.push(
-      await createTransaction(
-        {
-          amount: 150,
-          is_income: true,
-          account: accountId,
-          name: "Income 2",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 150,
+        is_income: true,
+        account: accountId,
+        name: "Income 2",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsIncome.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(750);
 
-    transactionIdsIncome.push(
-      await createTransaction(
-        {
-          amount: 200,
-          is_income: true,
-          account: accountId,
-          name: "Income 3",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 200,
+        is_income: true,
+        account: accountId,
+        name: "Income 3",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsIncome.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(950);
 
-    transactionIdsExpense.push(
-      await createTransaction(
-        {
-          amount: 50,
-          is_income: false,
-          account: accountId,
-          name: "Expense 1",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 50,
+        is_income: false,
+        account: accountId,
+        name: "Expense 1",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsExpense.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(900);
 
-    transactionIdsExpense.push(
-      await createTransaction(
-        {
-          amount: 100,
-          is_income: false,
-          account: accountId,
-          name: "Expense 2",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 100,
+        is_income: false,
+        account: accountId,
+        name: "Expense 2",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsExpense.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(800);
 
-    transactionIdsExpense.push(
-      await createTransaction(
-        {
-          amount: 150,
-          is_income: false,
-          account: accountId,
-          name: "Expense 3",
-          transaction_date: new Date().toISOString(),
-          company: null,
-          expense: null,
-          income: null,
-          is_personal_transaction: true,
-          classifications: [],
-        },
-        user
-      )
+    transactionCreatedId = await createTransaction(
+      {
+        amount: 150,
+        is_income: false,
+        account: accountId,
+        name: "Expense 3",
+        date: new Date().toISOString(),
+        company: undefined,
+        expense: undefined,
+        income: undefined,
+        is_personal: true,
+        classifications: [],
+      },
+      user
     );
+
+    if (transactionCreatedId) {
+      transactionIdsExpense.push(transactionCreatedId);
+    }
+
     await checkAccountBalance(650);
   });
 
@@ -171,42 +190,42 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
     await update(transactionIdsIncome[0], user, {
       name: "Updated Income 1",
       amount: 50,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: true,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(600);
 
     await update(transactionIdsIncome[1], user, {
       name: "Updated Income 2",
       amount: 100,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: true,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(550);
 
     await update(transactionIdsIncome[2], user, {
       name: "Updated Income 3",
       amount: 250,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: true,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(600);
   });
@@ -217,42 +236,42 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
     await update(transactionIdsExpense[0], user, {
       name: "Updated Expense 1",
       amount: 25,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: false,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(625);
 
     await update(transactionIdsExpense[1], user, {
       name: "Updated Expense 2",
       amount: 75,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: false,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(650);
 
     await update(transactionIdsExpense[2], user, {
       name: "Updated Expense 3",
       amount: 200,
-      transaction_date: new Date().toISOString(),
+      date: new Date().toISOString(),
       is_income: false,
       account: accountId,
-      company: null,
-      expense: null,
-      income: null,
+      company: undefined,
+      expense: undefined,
+      income: undefined,
       classifications: [],
-      is_personal_transaction: true,
+      is_personal: true,
     });
     await checkAccountBalance(600);
   });

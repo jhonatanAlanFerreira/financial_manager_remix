@@ -1,16 +1,27 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
+import { sendResponse } from "~/data/services/responses";
 import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
 } from "~/data/transaction/transaction-request-interfaces";
+import { transactionIncludeOptions } from "~/data/transaction/transaction-types";
 import {
   create,
   list,
   remove,
   update,
 } from "~/data/transaction/transaction.server";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
+import {
+  getArrayFromFormData,
+  getOptionalField,
+  parseIncludes,
+} from "~/utils/utilities";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   switch (request.method) {
@@ -30,29 +41,17 @@ let createTransaction = async (request: Request) => {
   const data: TransactionCreateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: body.get("company") ? String(body.get("company")) : null,
-    expense: body.get("expense") ? String(body.get("expense")) : null,
-    income: body.get("income") ? String(body.get("income")) : null,
-    account: String(body.get("account")),
-    classifications: body.get("classifications")
-      ? (body.getAll("classifications") as string[])
-      : [],
-    transaction_date: String(body.get("transaction_date") || ""),
-    is_personal_transaction: !!body.get("is_personal_transaction"),
-    is_income: !!body.get("is_income"),
+    company: getOptionalField(body, "company"),
+    expense: getOptionalField(body, "expense"),
+    income: getOptionalField(body, "income"),
+    account: String(body.get("account") || ""),
+    classifications: getArrayFromFormData(body, "classifications"),
+    date: String(body.get("date") || ""),
+    is_personal: body.get("is_personal") == "true",
+    is_income: body.get("is_income") == "true",
   };
 
-  const res = await create(data, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 201;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await create(data, user));
 };
 
 let removeTransaction = async (request: Request) => {
@@ -61,17 +60,7 @@ let removeTransaction = async (request: Request) => {
     new URL(request.url).searchParams.get("transactionId")
   );
 
-  const res = await remove(transactionId, user);
-
-  let status: number;
-
-  if (res.error) {
-    status = 404;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await remove(transactionId, user));
 };
 
 let updateTransaction = async (request: Request) => {
@@ -84,32 +73,23 @@ let updateTransaction = async (request: Request) => {
   const data: TransactionUpdateRequestInterface = {
     name: String(body.get("name") || ""),
     amount: +(body.get("amount") || 0),
-    company: body.get("company") ? String(body.get("company")) : null,
-    expense: body.get("expense") ? String(body.get("expense")) : null,
-    income: body.get("income") ? String(body.get("income")) : null,
-    account: String(body.get("account")),
-    classifications: body.get("classifications")
-      ? (body.getAll("classifications") as string[])
-      : [],
-    transaction_date: String(body.get("transaction_date") || ""),
-    is_personal_transaction: !!body.get("is_personal_transaction"),
-    is_income: !!body.get("is_income"),
+    company: getOptionalField(body, "company"),
+    expense: getOptionalField(body, "expense"),
+    income: getOptionalField(body, "income"),
+    account: String(body.get("account") || ""),
+    classifications: getArrayFromFormData(body, "classifications"),
+    date: String(body.get("date") || ""),
+    is_personal: body.get("is_personal") == "true",
+    is_income: body.get("is_income") == "true",
   };
 
-  const res = await update(transactionId, user, data);
-
-  let status: number;
-
-  if (res.error) {
-    status = 400;
-  } else {
-    status = 200;
-  }
-
-  return new Response(JSON.stringify(res), { status });
+  return sendResponse(await update(transactionId, user, data));
 };
 
-export let loader = async ({ request }: LoaderFunctionArgs) => {
+export let loader = async (
+  { request }: LoaderFunctionArgs,
+  overrideParams?: Partial<TransactionLoaderParamsInterface>
+) => {
   const user = await requireUserSession(request);
 
   const url = new URL(request.url);
@@ -118,23 +98,28 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
-    date_after: url.searchParams.get("date_after"),
-    date_before: url.searchParams.get("date_before"),
-    expense: url.searchParams.get("expense"),
-    income: url.searchParams.get("income"),
-    company: url.searchParams.get("company"),
-    name: url.searchParams.get("name"),
+    date_after: url.searchParams.get("date_after") || undefined,
+    date_before: url.searchParams.get("date_before") || undefined,
+    expense: url.searchParams.get("expense") || undefined,
+    income: url.searchParams.get("income") || undefined,
+    account: url.searchParams.get("account") || undefined,
+    classification: url.searchParams.get("classification") || undefined,
+    company: url.searchParams.get("company") || undefined,
+    name: url.searchParams.get("name") || undefined,
     is_income_or_expense:
-      (url.searchParams.get("is_income_or_expense") as
-        | "expense"
-        | "income"
-        | "all") || "all",
+      (url.searchParams.get("is_income_or_expense") as IsIncomeOrExpenseType) ||
+      "all",
     is_personal_or_company:
-      (url.searchParams.get("is_personal_or_company") as
-        | "all"
-        | "personal"
-        | "company") || "all",
+      (url.searchParams.get(
+        "is_personal_or_company"
+      ) as IsPersonalOrCompanyType) || "all",
+    extends: parseIncludes(url, transactionIncludeOptions),
   };
 
-  return list(user, params);
+  const finalParams = {
+    ...params,
+    ...overrideParams,
+  };
+
+  return sendResponse(await list(user, finalParams));
 };

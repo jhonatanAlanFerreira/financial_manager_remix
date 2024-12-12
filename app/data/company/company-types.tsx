@@ -1,7 +1,8 @@
-import { Prisma } from "@prisma/client";
+import { Account, Company } from "@prisma/client";
 
-export type CompanyWithAccountsType = Prisma.CompanyGetPayload<{
-  include: {
-    accounts: true;
-  };
-}>;
+export const companyIncludeOptions = ["accounts"] as const;
+export type CompanyIncludeOptions = (typeof companyIncludeOptions)[number];
+
+export interface CompanyWithRelationsInterface extends Company {
+  accounts: Account[];
+}

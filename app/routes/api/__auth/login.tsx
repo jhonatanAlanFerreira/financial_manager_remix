@@ -1,6 +1,7 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { LoginRequestInterface } from "~/data/auth/auth-request-interfaces";
 import { createUserSession, login } from "~/data/auth/auth.server";
+import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
@@ -16,15 +17,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
 
   const res = await login(data);
 
-  let status: number;
-  let headers: HeadersInit = [];
-
-  if (res.error) {
-    status = 401;
-  } else {
-    status = 200;
-    headers = [["Set-Cookie", await createUserSession(res.data.id)]];
-  }
-
-  return new Response(JSON.stringify(res), { status, headers });
+  return sendResponse(res, [
+    ["Set-Cookie", await createUserSession(res.data?.id)],
+  ]);
 };

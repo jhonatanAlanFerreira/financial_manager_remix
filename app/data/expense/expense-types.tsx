@@ -1,7 +1,8 @@
-import { Prisma } from "@prisma/client";
+import { Company, Expense } from "@prisma/client";
 
-export type ExpenseWithCompaniesType = Prisma.ExpenseGetPayload<{
-  include: {
-    companies: true;
-  };
-}>;
+export interface ExpenseWithRelationsInterface extends Expense {
+  companies: Company[];
+}
+
+export const expenseIncludeOptions = ["companies"] as const;
+export type ExpenseIncludeOptions = (typeof expenseIncludeOptions)[number];

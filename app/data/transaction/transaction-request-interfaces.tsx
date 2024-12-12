@@ -1,13 +1,13 @@
 export interface TransactionCreateRequestInterface {
   name: string;
   amount: number;
-  company: string | null;
-  expense: string | null;
-  income: string | null;
+  company: string | undefined;
+  expense: string | undefined;
+  income: string | undefined;
   account: string;
   classifications: string[];
-  transaction_date: string;
-  is_personal_transaction: boolean;
+  date: string;
+  is_personal: boolean;
   is_income: boolean;
 }
 

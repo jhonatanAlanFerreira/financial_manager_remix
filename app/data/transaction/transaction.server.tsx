@@ -1,92 +1,65 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, Transaction, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
 import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { TransactionsWithTotalsInterface } from "~/components/page-components/transaction/transaction-interfaces";
-import { TransactionCreateRequestInterface, TransactionUpdateRequestInterface } from "~/data/transaction/transaction-request-interfaces";
+import {
+  TransactionCreateRequestInterface,
+  TransactionUpdateRequestInterface,
+} from "~/data/transaction/transaction-request-interfaces";
 import {
   transactionCreateValidator,
   transactionDeleteValidator,
+  transactionListValidator,
   transactionUpdateValidator,
-} from "~/data/transaction/transaction-Validator";
-
-type TransactionWhereInput = Prisma.TransactionWhereInput;
+} from "~/data/transaction/transaction-validator";
+import { paginate } from "~/data/services/list.service";
+import {
+  TransactionsWithTotalsInterface,
+  TransactionWithRelationsInterface,
+} from "./transaction-types";
+import { buildWhereClause } from "~/data/services/list.service";
 
 export async function list(
   user: User,
   params: TransactionLoaderParamsInterface
 ): Promise<ServerResponseInterface<TransactionsWithTotalsInterface>> {
-  const take = params.pageSize != "all" ? params.pageSize : undefined;
-  const skip =
-    params.pageSize != "all" ? (params.page - 1) * params.pageSize : undefined;
+  const serverError = await transactionListValidator(params, user);
 
-  const whereClause: TransactionWhereInput = {
-    user_id: user.id,
-    is_personal_transaction:
-      params.is_personal_or_company !== "all"
-        ? params.is_personal_or_company === "personal"
-        : undefined,
-    is_income:
-      params.is_income_or_expense !== "all"
-        ? params.is_income_or_expense === "income"
-        : undefined,
-    name: params.name
-      ? { contains: params.name, mode: "insensitive" }
-      : undefined,
-    transaction_date: {
-      gte: params.date_after || undefined,
-      lte: params.date_before || undefined,
-    },
-    amount: {
-      gte: params.amount_greater || undefined,
-      lte: params.amount_less || undefined,
-    },
-    income_id: params.income || undefined,
-    expense_id: params.expense || undefined,
-    company_id: params.company || undefined,
-  };
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
+  }
 
-  const [totalData, totalExpense, totalIncome] = await prisma.$transaction([
-    prisma.transaction.count({ where: whereClause }),
-    prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { ...whereClause, is_income: false },
-    }),
-    prisma.transaction.aggregate({
-      _sum: { amount: true },
-      where: { ...whereClause, is_income: true },
-    }),
-  ]);
+  const {
+    page,
+    pageSize,
+    extends: transactionIncludes,
+    ...restParams
+  } = params;
 
-  const transactions = await prisma.transaction.findMany({
-    where: whereClause,
-    skip,
-    take,
-  });
+  const transactions = await paginate<
+    Transaction,
+    Prisma.TransactionFindManyArgs,
+    Prisma.TransactionCountArgs
+  >(
+    prisma.transaction.findMany,
+    prisma.transaction.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id },
+    transactionIncludes
+  );
 
-  const totalExpenseValue = totalExpense._sum.amount || 0;
-  const totalIncomeValue = totalIncome._sum.amount || 0;
-
-  const finalExpenseValue =
-    params.is_income_or_expense === "income" ? 0 : totalExpenseValue;
-  const finalIncomeValue =
-    params.is_income_or_expense === "expense" ? 0 : totalIncomeValue;
-
-  const totalPages =
-    params.pageSize != "all" ? Math.ceil(totalData / params.pageSize) : 1;
-  const pageSize = params.pageSize != "all" ? params.pageSize : totalData;
+  const totals = await calculateTotals(user, params);
 
   return {
+    ...transactions,
     data: {
-      transactions,
-      totalExpenseValue: finalExpenseValue,
-      totalIncomeValue: finalIncomeValue,
-    },
-    pageInfo: {
-      currentPage: params.page,
-      pageSize,
-      totalData,
-      totalPages,
+      transactions: transactions.data as TransactionWithRelationsInterface[],
+      totalExpenseValue: totals.totalExpenseValue,
+      totalIncomeValue: totals.totalIncomeValue,
     },
   };
 }
@@ -94,14 +67,13 @@ export async function list(
 export async function create(
   data: TransactionCreateRequestInterface,
   user: User
-): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionCreateValidator(data, user);
+): Promise<ServerResponseInterface<Transaction>> {
+  const serverError = await transactionCreateValidator(data, user);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -109,14 +81,7 @@ export async function create(
     where: { id: data.account },
   });
 
-  if (!account) {
-    return {
-      error: true,
-      message: "Account not found",
-    };
-  }
-
-  let newBalance = account.balance || 0;
+  let newBalance = account?.balance || 0;
   if (data.is_income) {
     newBalance += data.amount;
   } else {
@@ -127,13 +92,13 @@ export async function create(
     data: {
       name: data.name,
       amount: data.amount,
-      transaction_date: data.transaction_date,
+      date: data.date,
       company_id: data.company,
       account_id: data.account,
       expense_id: data.expense,
       income_id: data.income,
       is_income: data.is_income,
-      is_personal_transaction: data.is_personal_transaction,
+      is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
       user_id: user.id,
     },
@@ -154,13 +119,12 @@ export async function remove(
   transactionId: string,
   user: User
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionDeleteValidator(user, transactionId);
+  const serverError = await transactionDeleteValidator(user, transactionId);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
-      message: "Transaction not found",
-      data: dataIsValid,
+      serverError,
+      message: "There are some invalid params",
     };
   }
 
@@ -168,20 +132,13 @@ export async function remove(
     where: { id: transactionId },
   });
 
-  if (!transaction) {
-    return {
-      error: true,
-      message: "Transaction not found",
-    };
-  }
-
   await prisma.account.update({
-    where: { id: transaction.account_id },
+    where: { id: transaction?.account_id },
     data: {
       balance: {
-        increment: transaction.is_income
-          ? -transaction.amount
-          : transaction.amount,
+        increment: transaction?.is_income
+          ? -transaction?.amount
+          : transaction?.amount,
       },
     },
   });
@@ -202,17 +159,16 @@ export async function update(
   user: User,
   data: TransactionUpdateRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await transactionUpdateValidator(
+  const serverError = await transactionUpdateValidator(
     transactionId,
     user,
     data
   );
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -220,20 +176,13 @@ export async function update(
     where: { id: transactionId },
   });
 
-  if (!existingTransaction) {
-    return {
-      error: true,
-      message: "Transaction not found",
-    };
-  }
-
-  const adjustmentAmount = data.amount - existingTransaction.amount;
-  const adjustment = existingTransaction.is_income
+  const adjustmentAmount = data.amount - (existingTransaction?.amount || 0);
+  const adjustment = existingTransaction?.is_income
     ? adjustmentAmount
     : -adjustmentAmount;
 
   await prisma.account.update({
-    where: { id: existingTransaction.account_id },
+    where: { id: existingTransaction?.account_id },
     data: {
       balance: {
         increment: adjustment,
@@ -245,12 +194,12 @@ export async function update(
     data: {
       name: data.name,
       amount: data.amount,
-      transaction_date: data.transaction_date,
+      date: data.date,
       company_id: data.company,
       expense_id: data.expense,
       income_id: data.income,
       is_income: data.is_income,
-      is_personal_transaction: data.is_personal_transaction,
+      is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
     },
     where: { id: transactionId },
@@ -259,5 +208,40 @@ export async function update(
   return {
     data: updatedTransaction,
     message: "Transaction was updated successfully",
+  };
+}
+
+async function calculateTotals(
+  user: User,
+  filters: TransactionLoaderParamsInterface
+): Promise<{ totalExpenseValue: number; totalIncomeValue: number }> {
+  const whereClause = {
+    ...buildWhereClause(filters),
+    user_id: user.id,
+  };
+
+  const [totalExpense, totalIncome] = await prisma.$transaction([
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: false },
+    }),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { ...whereClause, is_income: true },
+    }),
+  ]);
+
+  const totalExpenseValue =
+    filters.is_income_or_expense === "income"
+      ? 0
+      : totalExpense._sum.amount || 0;
+  const totalIncomeValue =
+    filters.is_income_or_expense === "expense"
+      ? 0
+      : totalIncome._sum.amount || 0;
+
+  return {
+    totalExpenseValue,
+    totalIncomeValue,
   };
 }

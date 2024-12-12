@@ -11,6 +11,6 @@ export interface ClassificationFormInterface {
   id: string;
   name: string;
   companies: Company[];
-  is_personal_transaction_classification: boolean;
+  is_personal: boolean;
   is_income: boolean;
 }

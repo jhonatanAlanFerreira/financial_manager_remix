@@ -1,71 +1,79 @@
 import { User } from "@prisma/client";
-import { ValidatedDataInterface } from "~/shared/validated-data-interface";
 import {
   ExpenseCreateRequestInterface,
   ExpenseUpdateRequestInterface,
 } from "~/data/expense/expense-request-interfaces";
 import { prisma } from "~/data/database/database.server";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  validateCompanies,
+  validateCompany,
+  validateIdFormat,
+  validateNumber,
+  validatePaginationParams,
+} from "~/data/services/validators";
+import { ExpenseLoaderParamsInterface } from "~/data/expense/expense-query-params-interfaces";
 
 export async function expenseCreateValidator(
   data: ExpenseCreateRequestInterface,
   user: User
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
   if (!data.name) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        name: "Name can not be empty",
       },
     };
   }
 
-  const expenseExists = await prisma.expense.findUnique({
-    where: {
-      user_id_name_is_personal_expense: {
-        name: data.name,
-        user_id: user.id,
-        is_personal_expense: data.is_personal_expense,
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        personal: "Personal expense can not have companies",
       },
+    };
+  }
+
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  const expenseExists = await prisma.expense.findFirst({
+    where: {
+      name: data.name,
+      user_id: user.id,
+      is_personal: data.is_personal,
     },
   });
 
   if (expenseExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This expense already exists",
       },
     };
   }
 
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
-  }
-
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function expenseDeleteValidator(
   user: User,
   expenseId: string
-): Promise<ValidatedDataInterface> {
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(expenseId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        expenseId: "Invalid expense ID format",
+      },
+    };
+  }
+
   const expenseExistis = await prisma.expense.findFirst({
     where: {
       id: expenseId,
@@ -75,30 +83,51 @@ export async function expenseDeleteValidator(
 
   if (!expenseExistis) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Expense not found",
+        expenseId: "Expense not found",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
 }
 
 export async function expenseUpdateValidator(
   expenseId: string,
   user: User,
   data: ExpenseUpdateRequestInterface
-): Promise<ValidatedDataInterface> {
-  if (!data.name) {
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(expenseId)) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
-        empty: "Name can not be empty",
+        expenseId: "Invalid expense ID format",
       },
     };
+  }
+
+  if (!data.name) {
+    return {
+      errorCode: 400,
+      errors: {
+        name: "Name can not be empty",
+      },
+    };
+  }
+
+  if (data.companies?.length && data.is_personal) {
+    return {
+      errorCode: 400,
+      errors: {
+        is_personal: "Personal expense can not have companies",
+      },
+    };
+  }
+
+  const companyErrors = await validateCompanies(data.companies, user);
+  if (companyErrors) {
+    return companyErrors;
   }
 
   const expense = await prisma.expense.findFirst({
@@ -110,30 +139,11 @@ export async function expenseUpdateValidator(
 
   if (!expense) {
     return {
-      isValid: false,
+      errorCode: 404,
       errors: {
-        id: "Expense not found",
+        expenseId: "Expense not found",
       },
     };
-  }
-
-  if (data.companies?.length) {
-    const companiesFromSameUser = await prisma.company.findMany({
-      where: {
-        id: {
-          in: data.companies,
-        },
-        user_id: user.id,
-      },
-    });
-    if (companiesFromSameUser.length != data.companies.length) {
-      return {
-        isValid: false,
-        errors: {
-          company_ids: "There are some invalid companies",
-        },
-      };
-    }
   }
 
   const expenseExists = await prisma.expense.findFirst({
@@ -142,21 +152,54 @@ export async function expenseUpdateValidator(
         { id: { not: expenseId } },
         { name: data.name },
         { user_id: user.id },
-        { is_personal_expense: data.is_personal_expense },
+        { is_personal: data.is_personal },
       ],
     },
   });
 
   if (expenseExists !== null) {
     return {
-      isValid: false,
+      errorCode: 400,
       errors: {
         name: "This expense already exists",
       },
     };
   }
 
-  return {
-    isValid: true,
-  };
+  return null;
+}
+
+export async function expenseListValidator(
+  params: ExpenseLoaderParamsInterface,
+  user: User
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
+  }
+
+  const companyErrors = await validateCompany(params.has_company, user);
+  if (companyErrors) {
+    return companyErrors;
+  }
+
+  if (!validateNumber(params.amount_greater)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_greater: "Amount must be a valid number",
+      },
+    };
+  }
+
+  if (!validateNumber(params.amount_less)) {
+    return {
+      errorCode: 400,
+      errors: {
+        amount_less: "Amount must be a valid number",
+      },
+    };
+  }
+
+  return null;
 }

@@ -1,0 +1,87 @@
+paths:
+  /api/login:
+    post:
+      tags:
+        - Auth Services
+      summary: Log into app
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Login succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+                message:
+                  type: string
+        400:
+          description: Bad Request
+        401:
+          description: Login Invalid
+
+  /api/logout:
+    get:
+      tags:
+        - Auth Services
+      summary: End the user session
+      responses:
+        200:
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          description: Bad Request
+
+  /api/signup:
+    post:
+      tags:
+        - Auth Services
+      summary: Create Login
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  default: ""
+                login:
+                  type: string
+                  default: ""
+                password:
+                  type: string
+                  default: ""
+                passwordRepeat:
+                  type: string
+                  default: ""
+      responses:
+        201:
+          description: Login created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/User"
+                  message:
+                    type: string
+        400:
+          description: Bad Request

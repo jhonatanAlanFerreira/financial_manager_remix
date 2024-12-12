@@ -53,25 +53,36 @@ export async function getUserFromSession(
 }
 
 export async function requireUserSession(request: Request): Promise<User> {
-  const user = await getUserFromSession(request);
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  const userId = session.get("userId");
 
-  if (!user) {
+  if (!userId) {
+    const acceptHeader = request.headers.get("Accept") || "";
+
+    if (acceptHeader.includes("application/json")) {
+      throw new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     throw redirect("/login");
   }
 
-  return user;
+  return await prisma.user.findFirstOrThrow({ where: { id: userId } });
 }
 
 export async function signup(
   data: SignupRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await signupValidator(data);
+  const serverError = await signupValidator(data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -90,7 +101,7 @@ export async function signup(
       name: "Personal Account",
       user_id: user.id,
       balance: 0,
-      is_personal_account: true,
+      is_personal: true,
     },
   });
 
@@ -107,6 +118,21 @@ export async function destroyUserSession(request: Request) {
     request.headers.get("Cookie")
   );
 
+  const acceptHeader = request.headers.get("Accept") || "";
+
+  if (acceptHeader.includes("application/json")) {
+    return new Response(
+      JSON.stringify({ message: "Successfully logged out" }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": await sessionStorage.destroySession(session),
+        },
+      }
+    );
+  }
+
   return redirect("/login", {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
@@ -117,13 +143,12 @@ export async function destroyUserSession(request: Request) {
 export async function login(
   data: LoginRequestInterface
 ): Promise<ServerResponseInterface> {
-  const dataIsValid = await loginValidator(data);
+  const serverError = await loginValidator(data);
 
-  if (!dataIsValid.isValid) {
+  if (serverError) {
     return {
-      error: true,
+      serverError,
       message: "There are some errors in your form",
-      data: dataIsValid,
     };
   }
 
@@ -135,7 +160,9 @@ export async function login(
 
   if (!user) {
     return {
-      error: true,
+      serverError: {
+        errorCode: 401,
+      },
       message: "Login or password is invalid",
     };
   }
@@ -144,7 +171,9 @@ export async function login(
 
   if (!validPass) {
     return {
-      error: true,
+      serverError: {
+        errorCode: 401,
+      },
       message: "Login or password is invalid",
     };
   }

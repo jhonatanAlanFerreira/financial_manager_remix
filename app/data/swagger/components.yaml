@@ -1,0 +1,155 @@
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        is_personal:
+          type: boolean
+        company_id:
+          type: string
+        balance:
+          type: number
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        login:
+          type: string
+        accountant_balance:
+          type: number
+
+    Company:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        expense_ids:
+          type: array
+          items:
+            type: string
+        income_ids:
+          type: array
+          items:
+            type: string
+        transaction_classification_ids:
+          type: array
+          items:
+            type: string
+
+    Classification:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        transaction_ids:
+          type: array
+          items:
+            type: string
+        user_id:
+          type: string
+        is_personal:
+          type: boolean
+        company_ids:
+          type: array
+          items:
+            type: string
+        is_income:
+          type: boolean
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        amount:
+          type: number
+        transaction_date:
+          type: string
+          format: date
+        user_id:
+          type: string
+        company_id:
+          type: string
+          nullable: true
+        transaction_classification_ids:
+          type: array
+          items:
+            type: string
+        expense_id:
+          type: string
+          nullable: true
+        income_id:
+          type: string
+          nullable: true
+        account_id:
+          type: string
+        is_personal:
+          type: boolean
+        is_income:
+          type: boolean
+
+    Income:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        company_ids:
+          type: array
+          items:
+            type: string
+        is_personal:
+          type: boolean
+        amount:
+          type: integer
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
+        company_ids:
+          type: array
+          items:
+            type: string
+        is_personal:
+          type: boolean
+        amount:
+          type: integer
+
+    PageInfo:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+        pageSize:
+          type: integer
+        totalData:
+          type: integer
+        totalPages:
+          type: integer
