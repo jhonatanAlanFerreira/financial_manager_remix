@@ -297,7 +297,7 @@ export function TransactionAdd({
                 isClearable
                 required
                 className="mb-8"
-                placeholder="Account"
+                placeholder="Account *"
                 options={filteredAccounts}
                 getOptionLabel={getSelectAccountOptionLabel as any}
                 getOptionValue={getSelectAccountOptionValue as any}
@@ -396,7 +396,7 @@ export function TransactionAdd({
                 isClearable
                 required
                 className="mb-8"
-                placeholder="Account"
+                placeholder="Account *"
                 options={filteredAccounts}
                 getOptionLabel={getSelectAccountOptionLabel as any}
                 getOptionValue={getSelectAccountOptionValue as any}

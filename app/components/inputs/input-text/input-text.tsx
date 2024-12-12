@@ -26,7 +26,7 @@ export function InputText({
       <label
         htmlFor={inputId}
         className={`absolute top-3 left-0 pointer-events-none transition duration-200 ease-in-outbg-white px-2 text-grey-darker ${
-          errorMessage ? "text-rose-500" : "text-violet-950"
+          errorMessage ? "text-rose-500" : "text-violet-950 opacity-60"
         }`}
       >
         {label}
