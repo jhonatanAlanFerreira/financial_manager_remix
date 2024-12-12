@@ -3,19 +3,20 @@ import { Form } from "@remix-run/react";
 import { useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { Icon } from "~/components/icon/icon";
-import axios, { AxiosResponse, isAxiosError } from "axios";
-import toast from "react-hot-toast";
 import { Account } from "@prisma/client";
 import { AddButton } from "~/components/buttons/add-button/add-button";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   AccountDropdownPropsInterface,
   AccountFormInterface,
 } from "~/components/page-components/company-accounts/company-accounts-interfaces";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  createOrUpdateAccount,
+  deleteAccount,
+} from "~/data/frontend-services/company-account-service";
 
 export function AccountDropdown({
   company,
@@ -45,43 +46,21 @@ export function AccountDropdown({
     const formData = new FormData(event.currentTarget);
     formData.append("company", formik.values.company);
 
-    let axiosRequest;
-    let loadingMessage;
-
-    if (formik.values.id) {
-      axiosRequest = axios.patch(
-        `/api/account?accountId=${formik.values.id}`,
-        formData
-      );
-      loadingMessage = "Updating account";
-    } else {
-      axiosRequest = axios.post("/api/account", formData);
-      loadingMessage = "Creating account";
-    }
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axiosRequest, {
-        loading: loadingMessage,
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          setOpenAddModal(false);
-          setResponseErrors({});
-          onSave();
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setTimeout(() => setIsSubmitting(false), 500));
+    await createOrUpdateAccount(formik.values.id, formData, {
+      onSuccess: () => {
+        setOpenAddModal(false);
+        setResponseErrors({});
+        onSave();
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   const onModalCancel = () => {
@@ -113,22 +92,15 @@ export function AccountDropdown({
     setOpenRemoveModal(false);
     setLoading(true);
 
-    toast.promise(axios.delete(`/api/account?accountId=${formik.values.id}`), {
-      loading: "Deleting account",
-      success: (res: AxiosResponse<ServerResponseInterface>) => {
+    await deleteAccount(formik.values.id, {
+      onSuccess: () => {
         onAccountRemove();
-        setLoading(false);
-        return res.data.message as string;
       },
-      error: (error) => {
-        if (isAxiosError(error)) {
-          setLoading(false);
-          return (
-            error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-          );
-        }
-        return "Sorry, unexpected error. Be back soon";
+      onError: () => {
+        setLoading(false);
+      },
+      onFinally: () => {
+        setLoading(false);
       },
     });
   };

@@ -121,3 +121,72 @@ export const fetchAccounts = async (
     onFinally();
   }
 };
+
+export const createOrUpdateAccount = async (
+  accountId: string | null,
+  formData: FormData,
+  callbacks: {
+    onSuccess: (message: string) => void;
+    onError: (errors: any) => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  const axiosRequest = accountId
+    ? axios.patch(`/api/account?accountId=${accountId}`, formData)
+    : axios.post("/api/account", formData);
+
+  const loadingMessage = accountId ? "Updating account" : "Creating account";
+
+  toast
+    .promise(axiosRequest, {
+      loading: loadingMessage,
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
+        onSuccess(res.data.message as string);
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          onError(error.response?.data.serverError || {});
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
+        }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    })
+    .finally(onFinally);
+};
+
+export const deleteAccount = async (
+  accountId: string,
+  callbacks: {
+    onSuccess: () => void;
+    onError: () => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  toast
+    .promise(axios.delete(`/api/account?accountId=${accountId}`), {
+      loading: "Deleting account",
+      success: (res: AxiosResponse<ServerResponseInterface>) => {
+        onSuccess();
+        return res.data.message as string;
+      },
+      error: (error) => {
+        if (isAxiosError(error)) {
+          onError();
+          return (
+            error.response?.data.message ||
+            "Sorry, unexpected error. Be back soon"
+          );
+        }
+        return "Sorry, unexpected error. Be back soon";
+      },
+    })
+    .finally(onFinally);
+};
