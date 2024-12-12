@@ -43,11 +43,6 @@ export interface TransactionAddPropsInterface {
   skipEffect: boolean;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
-  companies: Company[];
-  expenses: Expense[];
-  incomes: Income[];
-  classifications: TransactionClassification[];
-  accounts: Account[];
 }
 
 export interface TransactionFiltersPropsInterface {

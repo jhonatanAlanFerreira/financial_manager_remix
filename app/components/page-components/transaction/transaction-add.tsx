@@ -14,13 +14,10 @@ import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
+import { fetchAccounts } from "~/data/frontend-services/company-account-service";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export function TransactionAdd({
-  companies,
-  expenses,
-  incomes,
-  classifications,
-  accounts,
   responseErrors,
   isSubmitting,
   skipEffect,
@@ -29,12 +26,9 @@ export function TransactionAdd({
   setSkipEffect,
   onModalCancel,
 }: TransactionAddPropsInterface) {
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
-  const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
-  const [filteredAccounts, setFilteredAccounts] = useState<Account[]>([]);
-  const [filteredClassifications, setFilteredClassifications] = useState<
-    TransactionClassification[]
-  >([]);
+  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
+    {}
+  );
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -74,38 +68,10 @@ export function TransactionAdd({
     formik.setFieldValue("transaction_classifications", classifications);
   };
 
-  const runFilters = () => {
-    filterClassifications();
-    filterExpenses();
-    filterIncomes();
+  useEffect(() => {
+    console.log('??')
     filterAccounts();
-  };
-
-  useEffect(() => {
-    runFilters();
   }, []);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    formik.setFieldValue("company", null);
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    formik.setFieldValue("account", null);
-    formik.setFieldValue("classifications", null);
-
-    runFilters();
-  }, [formik.values.is_personal]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    runFilters();
-  }, [formik.values.is_income]);
 
   useEffect(() => {
     if (skipEffect) {
@@ -135,92 +101,29 @@ export function TransactionAdd({
     }
   }, [formik.values.expense]);
 
-  useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    formik.setFieldValue("classifications", null);
-    formik.setFieldValue("account", null);
-
-    runFilters();
-  }, [formik.values.company]);
-
-  const filterExpenses = () => {
-    if (expenses) {
-      setFilteredExpenses(
-        expenses.filter((expense) => {
-          const transactionTypeFilter = formik.values.is_personal
-            ? expense.is_personal
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            expense.company_ids.includes(formik.values.company.id);
-
-          return transactionTypeFilter && companyFilter;
-        })
-      );
-    }
+  const defaultPaginationQuery = () => {
+    return new URLSearchParams({
+      page: 1,
+      pageSize: 10,
+    } as any).toString();
   };
 
-  const filterClassifications = () => {
-    if (classifications) {
-      setFilteredClassifications(
-        classifications.filter((classification) => {
-          const transactionTypeFilter = formik.values.is_personal
-            ? classification.is_personal
-            : true;
+  const filterAccounts = async () => {
+    let searchParams = "";
 
-          const companyFilter =
-            !formik.values.company ||
-            classification.company_ids.includes(formik.values.company.id);
-
-          const isIncomeFilter = formik.values.is_income
-            ? classification.is_income
-            : !classification.is_income;
-          return transactionTypeFilter && companyFilter && isIncomeFilter;
-        })
-      );
-    }
-  };
-
-  const filterIncomes = () => {
-    if (incomes) {
-      setFilteredIncomes(
-        incomes.filter((income) => {
-          const incomeTypeFilter = formik.values.is_personal
-            ? income.is_personal
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            income.company_ids.includes(formik.values.company.id);
-
-          return incomeTypeFilter && companyFilter;
-        })
-      );
-    }
-  };
-
-  const filterAccounts = () => {
-    if (accounts) {
-      setFilteredAccounts(
-        accounts.filter((account) => {
-          const transactionTypeFilter = formik.values.is_personal
-            ? account.is_personal
-            : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            account.company_id === formik.values.company.id;
-
-          return transactionTypeFilter && companyFilter;
-        })
-      );
-    }
+    await fetchAccounts(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams,
+      },
+      {
+        onSuccess: (res) => {
+          setAccounts(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
   };
 
   return (
@@ -280,7 +183,7 @@ export function TransactionAdd({
                   Personal transaction
                 </label>
               </div>
-              {!formik.values.is_personal && (
+              {/* {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
@@ -292,13 +195,13 @@ export function TransactionAdd({
                   onChange={(event) => onCompanyChange(event as Company)}
                   value={formik.values.company}
                 ></InputSelect>
-              )}
+              )} */}
               <InputSelect
                 isClearable
                 required
                 className="mb-8"
                 placeholder="Account *"
-                options={filteredAccounts}
+                options={accounts.data}
                 getOptionLabel={getSelectAccountOptionLabel as any}
                 getOptionValue={getSelectAccountOptionValue as any}
                 name="account"
@@ -307,7 +210,7 @@ export function TransactionAdd({
                 }
                 value={formik.values.account}
               />
-              <InputSelect
+              {/* <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Expense"
@@ -317,7 +220,7 @@ export function TransactionAdd({
                 name="expense"
                 onChange={(event) => onExpenseChange(event as Expense)}
                 value={formik.values.expense}
-              ></InputSelect>
+              ></InputSelect> */}
               <InputText
                 label="Name *"
                 name="name"
@@ -344,7 +247,7 @@ export function TransactionAdd({
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>
-              <InputSelect
+              {/* <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Classification"
@@ -357,7 +260,7 @@ export function TransactionAdd({
                   onClassificationsChange(event as TransactionClassification[])
                 }
                 value={formik.values.transaction_classifications}
-              ></InputSelect>
+              ></InputSelect> */}
             </Form>
           </div>
         </TabPanel>
@@ -379,7 +282,7 @@ export function TransactionAdd({
                   Personal transaction
                 </label>
               </div>
-              {!formik.values.is_personal && (
+              {/* {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
@@ -391,13 +294,13 @@ export function TransactionAdd({
                   onChange={(event) => onCompanyChange(event as Company)}
                   value={formik.values.company}
                 ></InputSelect>
-              )}
+              )} */}
               <InputSelect
                 isClearable
                 required
                 className="mb-8"
                 placeholder="Account *"
-                options={filteredAccounts}
+                options={accounts.data}
                 getOptionLabel={getSelectAccountOptionLabel as any}
                 getOptionValue={getSelectAccountOptionValue as any}
                 name="account"
@@ -406,7 +309,7 @@ export function TransactionAdd({
                 }
                 value={formik.values.account}
               />
-              <InputSelect
+              {/* <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Income"
@@ -416,7 +319,7 @@ export function TransactionAdd({
                 name="income"
                 onChange={(event) => onIncomeChange(event as Income)}
                 value={formik.values.income}
-              ></InputSelect>
+              ></InputSelect> */}
               <InputText
                 label="Name *"
                 name="name"
@@ -443,7 +346,7 @@ export function TransactionAdd({
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>
-              <InputSelect
+              {/* <InputSelect
                 isClearable
                 isMulti
                 className="mb-8"
@@ -456,7 +359,7 @@ export function TransactionAdd({
                   onClassificationsChange(event as TransactionClassification[])
                 }
                 value={formik.values.transaction_classifications}
-              ></InputSelect>
+              ></InputSelect> */}
             </Form>
           </div>
         </TabPanel>
