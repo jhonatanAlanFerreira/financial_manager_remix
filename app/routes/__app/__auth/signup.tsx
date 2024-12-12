@@ -1,14 +1,12 @@
 import { Form, Link, useNavigate } from "@remix-run/react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { Icon } from "~/components/icon/icon";
 import { InputPassword } from "~/components/inputs/input-password/input-password";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { NavigationLoader } from "~/components/navigation-loader/navigation-loader";
+import { signup } from "~/data/frontend-services/auth-service";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export default function Signup() {
   const [responseErrors, setResponseErrors] =
@@ -18,30 +16,20 @@ export default function Signup() {
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
-
     setIsSubmitting(true);
 
-    toast
-      .promise(axios.post("/api/signup", formData), {
-        loading: "Creating new user",
-        success: (res: AxiosResponse<ServerResponseInterface>) => {
-          navigate("/");
-          return res.data.message as string;
-        },
-        error: (error) => {
-          if (isAxiosError(error)) {
-            setResponseErrors(error.response?.data.serverError);
-            return (
-              error.response?.data.message ||
-              "Sorry, unexpected error. Be back soon"
-            );
-          }
-          return "Sorry, unexpected error. Be back soon";
-        },
-      })
-      .finally(() => setIsSubmitting(false));
+    await signup(formData, {
+      onSuccess: () => {
+        navigate("/");
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
   };
 
   return (
