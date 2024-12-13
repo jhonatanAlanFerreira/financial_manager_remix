@@ -6,7 +6,7 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { Form } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
@@ -14,21 +14,30 @@ import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
-import { fetchAccounts } from "~/data/frontend-services/company-account-service";
+import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import {
+  fetchAccounts,
+  fetchCompanies,
+} from "~/data/frontend-services/company-account-service";
+import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export function TransactionAdd({
   responseErrors,
   isSubmitting,
-  skipEffect,
   formik,
   onSubmit,
-  setSkipEffect,
   onModalCancel,
 }: TransactionAddPropsInterface) {
+  const hasRun = useRef(false);
+  const [shouldFilter, setShouldFilter] = useState(false);
+
   const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
     {}
   );
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -51,6 +60,7 @@ export function TransactionAdd({
   };
 
   const onCompanyChange = (company: Company) => {
+    setShouldFilter(true);
     formik.setFieldValue("company", company);
   };
 
@@ -69,15 +79,22 @@ export function TransactionAdd({
   };
 
   useEffect(() => {
-    console.log('??')
-    filterAccounts();
+    if (!hasRun.current) {
+      loadAccounts();
+      loadCompanies();
+      hasRun.current = true;
+    }
   }, []);
 
   useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
+    if (shouldFilter) {
+      formik.setFieldValue("account", null);
+      loadAccounts();
+      setShouldFilter(false);
     }
+  }, [formik.values.company]);
 
+  useEffect(() => {
     if (formik.values.income?.name && !formik.values.name) {
       formik.setFieldValue("name", formik.values.income.name);
     }
@@ -88,10 +105,6 @@ export function TransactionAdd({
   }, [formik.values.income]);
 
   useEffect(() => {
-    if (skipEffect) {
-      return setSkipEffect(false);
-    }
-
     if (formik.values.expense?.name && !formik.values.name) {
       formik.setFieldValue("name", formik.values.expense.name);
     }
@@ -102,19 +115,32 @@ export function TransactionAdd({
   }, [formik.values.expense]);
 
   const defaultPaginationQuery = () => {
-    return new URLSearchParams({
-      page: 1,
-      pageSize: 10,
-    } as any).toString();
+    let paginationParamsInterface: Record<
+      keyof PaginationParamsInterface,
+      string
+    > = {
+      page: "1",
+      pageSize: "all",
+    };
+
+    return new URLSearchParams(paginationParamsInterface).toString();
   };
 
-  const filterAccounts = async () => {
-    let searchParams = "";
+  const filterAccountsParams = () => {
+    const accountLoaderParamsInterface: Partial<
+      Record<keyof AccountLoaderParamsInterface, string>
+    > = {
+      company: formik.values.company?.id || "",
+    };
 
+    return new URLSearchParams(accountLoaderParamsInterface).toString();
+  };
+
+  const loadAccounts = async () => {
     await fetchAccounts(
       {
         paginationParams: defaultPaginationQuery(),
-        searchParams,
+        searchParams: filterAccountsParams(),
       },
       {
         onSuccess: (res) => {
@@ -124,6 +150,13 @@ export function TransactionAdd({
         onFinally: () => {},
       }
     );
+  };
+
+  const loadCompanies = async () => {
+    const res = await fetchCompanies();
+    if (res) {
+      setCompanies(res);
+    }
   };
 
   return (
@@ -183,19 +216,19 @@ export function TransactionAdd({
                   Personal transaction
                 </label>
               </div>
-              {/* {!formik.values.is_personal && (
+              {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
                   placeholder="Company"
-                  options={companies}
+                  options={companies.data}
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="company"
                   onChange={(event) => onCompanyChange(event as Company)}
                   value={formik.values.company}
                 ></InputSelect>
-              )} */}
+              )}
               <InputSelect
                 isClearable
                 required
@@ -282,19 +315,19 @@ export function TransactionAdd({
                   Personal transaction
                 </label>
               </div>
-              {/* {!formik.values.is_personal && (
+              {!formik.values.is_personal && (
                 <InputSelect
                   isClearable
                   className="mb-8"
                   placeholder="Company"
-                  options={companies}
+                  options={companies.data}
                   getOptionLabel={getSelectCompanyOptionLabel as any}
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="company"
                   onChange={(event) => onCompanyChange(event as Company)}
                   value={formik.values.company}
                 ></InputSelect>
-              )} */}
+              )}
               <InputSelect
                 isClearable
                 required

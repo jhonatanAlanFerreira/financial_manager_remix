@@ -46,7 +46,6 @@ export default function Transactions() {
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [skipEffect, setSkipEffect] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
@@ -260,7 +259,6 @@ export default function Transactions() {
   };
 
   const setFormValues = (transaction: TransactionWithRelationsInterface) => {
-    setSkipEffect(true);
     mainForm.setValues(transaction);
   };
 
@@ -454,8 +452,6 @@ export default function Transactions() {
           {mainForm.values.id ? "Update transaction" : "Add new transaction"}
         </h2>
         <TransactionAdd
-          skipEffect={skipEffect}
-          setSkipEffect={setSkipEffect}
           formik={mainForm}
           onModalCancel={() => setOpenAddModal(false)}
           isSubmitting={isSubmitting}

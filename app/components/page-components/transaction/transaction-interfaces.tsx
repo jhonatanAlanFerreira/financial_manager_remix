@@ -37,10 +37,8 @@ export interface TransactionFormInterface {
 
 export interface TransactionAddPropsInterface {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  setSkipEffect: (value: boolean) => void;
   onModalCancel: () => void;
   formik: FormikProps<TransactionFormInterface>;
-  skipEffect: boolean;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
 }
