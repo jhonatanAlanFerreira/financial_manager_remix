@@ -6,7 +6,7 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { Form } from "@remix-run/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
@@ -15,12 +15,17 @@ import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import { fetchClassifications } from "~/data/frontend-services/classification-service";
 import {
   fetchAccounts,
   fetchCompanies,
 } from "~/data/frontend-services/company-account-service";
+import { fetchExpenses } from "~/data/frontend-services/expense-service";
+import { fetchIncomes } from "~/data/frontend-services/income-service";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
+import { useDebouncedCallback } from "~/utils/utilities";
 
 export function TransactionAdd({
   responseErrors,
@@ -38,6 +43,13 @@ export function TransactionAdd({
   const [companies, setCompanies] = useState<
     ServerResponseInterface<Company[]>
   >({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
+    {}
+  );
+  const [classifications, setClassifications] = useState<
+    ServerResponseInterface<TransactionClassification[]>
+  >({});
+  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -78,19 +90,36 @@ export function TransactionAdd({
     formik.setFieldValue("transaction_classifications", classifications);
   };
 
+  const onIsPersonalChange = (value: boolean) => {
+    setShouldFilter(true);
+    formik.setFieldValue("is_personal", value);
+  };
+
   useEffect(() => {
     if (!hasRun.current) {
       loadAccounts();
       loadCompanies();
+      loadExpenses();
+      loadClassifications();
+      loadIncomes();
       hasRun.current = true;
     }
   }, []);
 
   useEffect(() => {
     if (shouldFilter) {
+      setShouldFilter(false);
+      formik.setFieldValue("account", null);
+      formik.setFieldValue("company", null);
+      loadAccounts();
+    }
+  }, [formik.values.is_personal]);
+
+  useEffect(() => {
+    if (shouldFilter) {
+      setShouldFilter(false);
       formik.setFieldValue("account", null);
       loadAccounts();
-      setShouldFilter(false);
     }
   }, [formik.values.company]);
 
@@ -127,16 +156,34 @@ export function TransactionAdd({
   };
 
   const filterAccountsParams = () => {
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
+      .is_personal
+      ? "personal"
+      : "all";
+
     const accountLoaderParamsInterface: Partial<
       Record<keyof AccountLoaderParamsInterface, string>
     > = {
       company: formik.values.company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
     };
 
     return new URLSearchParams(accountLoaderParamsInterface).toString();
   };
 
-  const loadAccounts = async () => {
+  const filterExpensesParams = () => {
+    return "";
+  };
+
+  const filterClassificationsParams = () => {
+    return "";
+  };
+
+  const filterIncomesParams = () => {
+    return "";
+  };
+
+  const loadAccounts = useDebouncedCallback(async () => {
     await fetchAccounts(
       {
         paginationParams: defaultPaginationQuery(),
@@ -145,6 +192,54 @@ export function TransactionAdd({
       {
         onSuccess: (res) => {
           setAccounts(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  }, 300);
+
+  const loadExpenses = async () => {
+    await fetchExpenses(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterExpensesParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setExpenses(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  };
+
+  const loadClassifications = async () => {
+    await fetchClassifications(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterClassificationsParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setClassifications(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  };
+
+  const loadIncomes = async () => {
+    await fetchIncomes(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterIncomesParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setIncomes(res);
         },
         onError: () => {},
         onFinally: () => {},
@@ -206,7 +301,7 @@ export function TransactionAdd({
                   className="relative top-1"
                   name="is_personal"
                   id="is_personal"
-                  onChange={formik.handleChange}
+                  onChange={(event) => onIsPersonalChange(event.target.checked)}
                   checked={formik.values.is_personal}
                 ></Checkbox>
                 <label
@@ -243,17 +338,17 @@ export function TransactionAdd({
                 }
                 value={formik.values.account}
               />
-              {/* <InputSelect
+              <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Expense"
-                options={filteredExpenses}
+                options={expenses.data}
                 getOptionLabel={getSelectExpenseOptionLabel as any}
                 getOptionValue={getSelectExpenseOptionValue as any}
                 name="expense"
                 onChange={(event) => onExpenseChange(event as Expense)}
                 value={formik.values.expense}
-              ></InputSelect> */}
+              ></InputSelect>
               <InputText
                 label="Name *"
                 name="name"
@@ -280,11 +375,11 @@ export function TransactionAdd({
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>
-              {/* <InputSelect
+              <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Classification"
-                options={filteredClassifications}
+                options={classifications.data}
                 getOptionLabel={getSelectClassificationOptionLabel as any}
                 getOptionValue={getSelectClassificationOptionValue as any}
                 isMulti
@@ -293,7 +388,7 @@ export function TransactionAdd({
                   onClassificationsChange(event as TransactionClassification[])
                 }
                 value={formik.values.transaction_classifications}
-              ></InputSelect> */}
+              ></InputSelect>
             </Form>
           </div>
         </TabPanel>
@@ -305,7 +400,7 @@ export function TransactionAdd({
                   className="relative top-1"
                   name="is_personal"
                   id="is_personal"
-                  onChange={formik.handleChange}
+                  onChange={(event) => onIsPersonalChange(event.target.checked)}
                   checked={formik.values.is_personal}
                 ></Checkbox>
                 <label
@@ -342,17 +437,17 @@ export function TransactionAdd({
                 }
                 value={formik.values.account}
               />
-              {/* <InputSelect
+              <InputSelect
                 isClearable
                 className="mb-8"
                 placeholder="Income"
-                options={filteredIncomes}
+                options={incomes.data}
                 getOptionLabel={getSelectIncomeOptionLabel as any}
                 getOptionValue={getSelectIncomeOptionValue as any}
                 name="income"
                 onChange={(event) => onIncomeChange(event as Income)}
                 value={formik.values.income}
-              ></InputSelect> */}
+              ></InputSelect>
               <InputText
                 label="Name *"
                 name="name"
@@ -379,20 +474,20 @@ export function TransactionAdd({
                 onChange={formik.handleChange}
                 value={formik.values.amount}
               ></InputText>
-              {/* <InputSelect
+              <InputSelect
                 isClearable
                 isMulti
                 className="mb-8"
                 placeholder="Classification"
                 name="classifications"
-                options={filteredClassifications}
+                options={classifications.data}
                 getOptionLabel={getSelectClassificationOptionLabel as any}
                 getOptionValue={getSelectClassificationOptionValue as any}
                 onChange={(event) =>
                   onClassificationsChange(event as TransactionClassification[])
                 }
                 value={formik.values.transaction_classifications}
-              ></InputSelect> */}
+              ></InputSelect>
             </Form>
           </div>
         </TabPanel>
