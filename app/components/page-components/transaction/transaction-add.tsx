@@ -6,7 +6,7 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { Form } from "@remix-run/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
