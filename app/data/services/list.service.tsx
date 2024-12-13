@@ -40,6 +40,12 @@ export function buildWhereClause(
       whereClause.company_ids = { has: params.has_company };
     }
 
+    if (params.has_classification) {
+      whereClause.transaction_classification_ids = {
+        has: params.has_classification,
+      };
+    }
+
     if (
       params.is_personal_or_company &&
       params.is_personal_or_company !== "all"

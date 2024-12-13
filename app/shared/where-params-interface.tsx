@@ -11,6 +11,7 @@ export interface WhereParamsInterface {
   account?: string;
   classification?: string;
   has_company?: string;
+  has_classification?: string;
   date_after?: string;
   date_before?: string;
   is_personal_or_company?: IsPersonalOrCompanyType;

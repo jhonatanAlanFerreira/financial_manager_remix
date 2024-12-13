@@ -52,6 +52,14 @@ export function TransactionFilters({
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
   const getSelectIncomeOptionValue = (option: Income) => option.id;
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
+  const getSelectAccountOptionValue = (option: Account) => option.id;
+  const getSelectAccountOptionLabel = (option: Account) => option.name;
+  const getSelectClassificationOptionValue = (
+    option: TransactionClassification
+  ) => option.id;
+  const getSelectClassificationOptionLabel = (
+    option: TransactionClassification
+  ) => option.name;
 
   const loadData = () => {
     loadAccounts();
@@ -75,6 +83,8 @@ export function TransactionFilters({
         formik.setFieldValue("company", null);
         formik.setFieldValue("expense", null);
         formik.setFieldValue("income", null);
+        formik.setFieldValue("classification", null);
+        formik.setFieldValue("account", null);
         loadData();
       }
     }
@@ -85,6 +95,8 @@ export function TransactionFilters({
       setShouldFilter(false);
       formik.setFieldValue("expense", null);
       formik.setFieldValue("income", null);
+      formik.setFieldValue("classification", null);
+      formik.setFieldValue("account", null);
       loadData();
     }
   }, [formik.values.company]);
@@ -117,11 +129,19 @@ export function TransactionFilters({
     formik.setFieldValue("income", income);
   };
 
+  const onClassificationChange = (
+    classification: TransactionClassification
+  ) => {
+    formik.setFieldValue("classification", classification);
+  };
+
   const resetForm = () => {
     formik.resetForm();
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
+    formik.setFieldValue("classification", null);
+    formik.setFieldValue("account", null);
     formik.setFieldValue("date_after", "");
     formik.setFieldValue("date_before", "");
   };
@@ -411,6 +431,18 @@ export function TransactionFilters({
           value={formik.values.company}
         ></InputSelect>
       )}
+      <InputSelect
+        isClearable
+        required
+        className="mb-8"
+        placeholder="Account"
+        options={accounts.data}
+        getOptionLabel={getSelectAccountOptionLabel as any}
+        getOptionValue={getSelectAccountOptionValue as any}
+        name="account"
+        onChange={(event) => formik.setFieldValue("account", event as Account)}
+        value={formik.values.account}
+      />
       {formik.values.is_income_or_expense != "income" && (
         <InputSelect
           isClearable
@@ -437,6 +469,19 @@ export function TransactionFilters({
           value={formik.values.income}
         ></InputSelect>
       )}
+      <InputSelect
+        isClearable
+        className="mb-8"
+        placeholder="Classification"
+        name="classification"
+        options={classifications.data}
+        getOptionLabel={getSelectClassificationOptionLabel as any}
+        getOptionValue={getSelectClassificationOptionValue as any}
+        onChange={(event) =>
+          onClassificationChange(event as TransactionClassification)
+        }
+        value={formik.values.classification}
+      ></InputSelect>
 
       <div className="flex justify-end p-2 mt-10">
         <PrimaryButton

@@ -18,6 +18,6 @@ export interface TransactionLoaderParamsInterface
   expense: string | undefined;
   company: string | undefined;
   account: string | undefined;
-  classification: string | undefined;
+  has_classification: string | undefined;
   extends?: TransactionIncludeOptions[];
 }

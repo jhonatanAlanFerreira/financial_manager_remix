@@ -19,6 +19,8 @@ export interface TransactionFiltersFormInterface {
   date_before: string;
   amount_greater: number;
   amount_less: number;
+  account: Account | null;
+  classification: TransactionClassification | null;
 }
 
 export interface TransactionFormInterface {

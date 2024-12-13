@@ -380,7 +380,7 @@ export async function transactionListValidator(
     };
   }
 
-  if (!validateIdFormat(params.classification)) {
+  if (!validateIdFormat(params.has_classification)) {
     return {
       errorCode: 400,
       errors: {

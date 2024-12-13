@@ -24,6 +24,11 @@ paths:
             type: string
           default: ""
         - in: query
+          name: classification
+          schema:
+            type: string
+          default: ""
+        - in: query
           name: expense
           schema:
             type: string
