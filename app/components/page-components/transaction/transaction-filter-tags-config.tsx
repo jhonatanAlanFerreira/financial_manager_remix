@@ -38,6 +38,18 @@ export const TransactionFilterTagsConfig: {
     getValue: (fieldValue: any) => fieldValue,
   },
   {
+    fieldName: "classification",
+    label: "Classification",
+    closeBtn: true,
+    getValue: (fieldValue: any) => fieldValue.name,
+  },
+  {
+    fieldName: "account",
+    label: "Account",
+    closeBtn: true,
+    getValue: (fieldValue: any) => fieldValue.name,
+  },
+  {
     fieldName: "company",
     label: "Company",
     closeBtn: true,

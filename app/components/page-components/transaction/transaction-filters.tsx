@@ -1,20 +1,50 @@
-import { Company, Expense, Income } from "@prisma/client";
-import { useEffect, useState } from "react";
+import {
+  Account,
+  Company,
+  Expense,
+  Income,
+  TransactionClassification,
+} from "@prisma/client";
+import { useEffect, useRef, useState } from "react";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionFiltersPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
+import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
+import { ExpenseLoaderParamsInterface } from "~/data/expense/expense-query-params-interfaces";
+import { fetchClassifications } from "~/data/frontend-services/classification-service";
+import {
+  fetchAccounts,
+  fetchCompanies,
+} from "~/data/frontend-services/company-account-service";
+import { fetchExpenses } from "~/data/frontend-services/expense-service";
+import { fetchIncomes } from "~/data/frontend-services/income-service";
+import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
+import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { useDebouncedCallback } from "~/utils/utilities";
 
 export function TransactionFilters({
-  companies,
-  expenses,
-  incomes,
   formik,
   onSubmit,
 }: TransactionFiltersPropsInterface) {
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
-  const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
-  const [skipEffect, setSkipEffect] = useState<boolean>(true);
+  const hasRun = useRef(false);
+  const [shouldFilter, setShouldFilter] = useState(false);
+
+  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
+    {}
+  );
+  const [companies, setCompanies] = useState<
+    ServerResponseInterface<Company[]>
+  >({});
+  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
+    {}
+  );
+  const [classifications, setClassifications] = useState<
+    ServerResponseInterface<TransactionClassification[]>
+  >({});
+  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -22,31 +52,56 @@ export function TransactionFilters({
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
   const getSelectIncomeOptionValue = (option: Income) => option.id;
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
+  const getSelectAccountOptionValue = (option: Account) => option.id;
+  const getSelectAccountOptionLabel = (option: Account) => option.name;
+  const getSelectClassificationOptionValue = (
+    option: TransactionClassification
+  ) => option.id;
+  const getSelectClassificationOptionLabel = (
+    option: TransactionClassification
+  ) => option.name;
+
+  const loadData = () => {
+    loadAccounts();
+    loadCompanies();
+    loadExpenses();
+    loadClassifications();
+    loadIncomes();
+  };
 
   useEffect(() => {
-    runFilters();
-    setSkipEffect(false);
+    if (!hasRun.current) {
+      loadData();
+      hasRun.current = true;
+    }
   }, []);
 
   useEffect(() => {
-    if (skipEffect) {
-      return;
+    if (shouldFilter) {
+      setShouldFilter(false);
+      if (formik.values.is_personal_or_company === "personal") {
+        formik.setFieldValue("company", null);
+        formik.setFieldValue("expense", null);
+        formik.setFieldValue("income", null);
+        formik.setFieldValue("classification", null);
+        formik.setFieldValue("account", null);
+        loadData();
+      }
     }
-
-    if (formik.values.is_personal_or_company === "personal") {
-      formik.setFieldValue("company", null);
-      formik.setFieldValue("expense", null);
-      formik.setFieldValue("income", null);
-    }
-
-    runFilters();
   }, [formik.values.is_personal_or_company]);
 
   useEffect(() => {
-    if (skipEffect) {
-      return;
+    if (shouldFilter) {
+      setShouldFilter(false);
+      formik.setFieldValue("expense", null);
+      formik.setFieldValue("income", null);
+      formik.setFieldValue("classification", null);
+      formik.setFieldValue("account", null);
+      loadData();
     }
+  }, [formik.values.company]);
 
+  useEffect(() => {
     if (formik.values.is_income_or_expense == "income") {
       formik.setFieldValue("expense", null);
     }
@@ -55,26 +110,14 @@ export function TransactionFilters({
       formik.setFieldValue("income", null);
     }
 
-    runFilters();
-  }, [formik.values.is_income_or_expense]);
-
-  useEffect(() => {
-    if (skipEffect) {
-      return;
-    }
-
+    formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
-
-    runFilters();
-  }, [formik.values.company]);
-
-  const runFilters = () => {
-    filterExpenses();
-    filterIncomes();
-  };
+    loadData();
+  }, [formik.values.is_income_or_expense]);
 
   const onCompanyFilterChange = (company: Company) => {
+    setShouldFilter(true);
     formik.setFieldValue("company", company);
   };
 
@@ -86,51 +129,21 @@ export function TransactionFilters({
     formik.setFieldValue("income", income);
   };
 
+  const onClassificationChange = (
+    classification: TransactionClassification
+  ) => {
+    formik.setFieldValue("classification", classification);
+  };
+
   const resetForm = () => {
     formik.resetForm();
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
+    formik.setFieldValue("classification", null);
+    formik.setFieldValue("account", null);
     formik.setFieldValue("date_after", "");
     formik.setFieldValue("date_before", "");
-  };
-
-  const filterExpenses = () => {
-    if (expenses) {
-      setFilteredExpenses(
-        expenses.filter((expense) => {
-          const expenseTypeFilter =
-            formik.values.is_personal_or_company === "personal"
-              ? expense.is_personal
-              : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            expense.company_ids.includes(formik.values.company.id);
-
-          return expenseTypeFilter && companyFilter;
-        })
-      );
-    }
-  };
-
-  const filterIncomes = () => {
-    if (incomes) {
-      setFilteredIncomes(
-        incomes.filter((income) => {
-          const incomeTypeFilter =
-            formik.values.is_personal_or_company === "personal"
-              ? income.is_personal
-              : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            income.company_ids.includes(formik.values.company.id);
-
-          return incomeTypeFilter && companyFilter;
-        })
-      );
-    }
   };
 
   const isIncomeOrExpenseChange = (e: any) => {
@@ -138,8 +151,137 @@ export function TransactionFilters({
   };
 
   const isPersonalOrCompanyChange = (e: any) => {
+    setShouldFilter(true);
     formik.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };
+
+  const defaultPaginationQuery = () => {
+    let paginationParamsInterface: Record<
+      keyof PaginationParamsInterface,
+      string
+    > = {
+      page: "1",
+      pageSize: "all",
+    };
+
+    return new URLSearchParams(paginationParamsInterface).toString();
+  };
+
+  const filterAccountsParams = () => {
+    const accountLoaderParamsInterface: Partial<
+      Record<keyof AccountLoaderParamsInterface, string>
+    > = {
+      company: formik.values.company?.id || "",
+      is_personal_or_company: formik.values.is_personal_or_company,
+    };
+
+    return new URLSearchParams(accountLoaderParamsInterface).toString();
+  };
+
+  const filterExpensesParams = () => {
+    const expenseLoaderParamsInterface: Partial<
+      Record<keyof ExpenseLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_personal_or_company: formik.values.is_personal_or_company,
+    };
+
+    return new URLSearchParams(expenseLoaderParamsInterface).toString();
+  };
+
+  const filterClassificationsParams = () => {
+    const classificationLoaderParamsInterface: Partial<
+      Record<keyof ClassificationLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_income_or_expense: formik.values.is_income_or_expense,
+      is_personal_or_company: formik.values.is_personal_or_company,
+    };
+
+    return new URLSearchParams(classificationLoaderParamsInterface).toString();
+  };
+
+  const filterIncomesParams = () => {
+    const incomeLoaderParamsInterface: Partial<
+      Record<keyof IncomeLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_personal_or_company: formik.values.is_personal_or_company,
+    };
+
+    return new URLSearchParams(incomeLoaderParamsInterface).toString();
+  };
+
+  const loadAccounts = useDebouncedCallback(async () => {
+    await fetchAccounts(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterAccountsParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setAccounts(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  });
+
+  const loadExpenses = useDebouncedCallback(async () => {
+    await fetchExpenses(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterExpensesParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setExpenses(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  });
+
+  const loadClassifications = useDebouncedCallback(async () => {
+    await fetchClassifications(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterClassificationsParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setClassifications(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  });
+
+  const loadIncomes = useDebouncedCallback(async () => {
+    await fetchIncomes(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: filterIncomesParams(),
+      },
+      {
+        onSuccess: (res) => {
+          setIncomes(res);
+        },
+        onError: () => {},
+        onFinally: () => {},
+      }
+    );
+  });
+
+  const loadCompanies = useDebouncedCallback(async () => {
+    const res = await fetchCompanies();
+    if (res) {
+      setCompanies(res);
+    }
+  });
 
   return (
     <form>
@@ -281,7 +423,7 @@ export function TransactionFilters({
           isClearable
           className="mb-8"
           placeholder="Company"
-          options={companies}
+          options={companies.data}
           getOptionLabel={getSelectCompanyOptionLabel as any}
           getOptionValue={getSelectCompanyOptionValue as any}
           name="company"
@@ -289,12 +431,24 @@ export function TransactionFilters({
           value={formik.values.company}
         ></InputSelect>
       )}
+      <InputSelect
+        isClearable
+        required
+        className="mb-8"
+        placeholder="Account"
+        options={accounts.data}
+        getOptionLabel={getSelectAccountOptionLabel as any}
+        getOptionValue={getSelectAccountOptionValue as any}
+        name="account"
+        onChange={(event) => formik.setFieldValue("account", event as Account)}
+        value={formik.values.account}
+      />
       {formik.values.is_income_or_expense != "income" && (
         <InputSelect
           isClearable
           className="mb-8"
           placeholder="Expense"
-          options={filteredExpenses}
+          options={expenses.data}
           getOptionLabel={getSelectExpenseOptionLabel as any}
           getOptionValue={getSelectExpenseOptionValue as any}
           name="expense"
@@ -307,7 +461,7 @@ export function TransactionFilters({
           isClearable
           className="mb-8"
           placeholder="Income"
-          options={filteredIncomes}
+          options={incomes.data}
           getOptionLabel={getSelectIncomeOptionLabel as any}
           getOptionValue={getSelectIncomeOptionValue as any}
           name="income"
@@ -315,6 +469,19 @@ export function TransactionFilters({
           value={formik.values.income}
         ></InputSelect>
       )}
+      <InputSelect
+        isClearable
+        className="mb-8"
+        placeholder="Classification"
+        name="classification"
+        options={classifications.data}
+        getOptionLabel={getSelectClassificationOptionLabel as any}
+        getOptionValue={getSelectClassificationOptionValue as any}
+        onChange={(event) =>
+          onClassificationChange(event as TransactionClassification)
+        }
+        value={formik.values.classification}
+      ></InputSelect>
 
       <div className="flex justify-end p-2 mt-10">
         <PrimaryButton

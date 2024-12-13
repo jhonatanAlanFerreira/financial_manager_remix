@@ -19,6 +19,8 @@ export interface TransactionFiltersFormInterface {
   date_before: string;
   amount_greater: number;
   amount_less: number;
+  account: Account | null;
+  classification: TransactionClassification | null;
 }
 
 export interface TransactionFormInterface {
@@ -37,23 +39,13 @@ export interface TransactionFormInterface {
 
 export interface TransactionAddPropsInterface {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  setSkipEffect: (value: boolean) => void;
   onModalCancel: () => void;
   formik: FormikProps<TransactionFormInterface>;
-  skipEffect: boolean;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
-  companies: Company[];
-  expenses: Expense[];
-  incomes: Income[];
-  classifications: TransactionClassification[];
-  accounts: Account[];
 }
 
 export interface TransactionFiltersPropsInterface {
-  companies: Company[];
-  expenses: Expense[];
-  incomes: Income[];
   formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
 }

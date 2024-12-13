@@ -2,6 +2,7 @@ import { toast } from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { Account } from "@prisma/client";
+import { CompanyWithRelationsInterface } from "../company/company-types";
 
 export const createOrUpdateCompany = async (
   companyId: string | null,
@@ -41,23 +42,23 @@ export const createOrUpdateCompany = async (
     .finally(onFinally);
 };
 
-export const fetchCompanies =
-  async (): Promise<ServerResponseInterface | null> => {
-    try {
-      const response = await axios.get(`/api/company?extends=accounts`);
-      return response.data;
-    } catch (error) {
-      if (isAxiosError(error)) {
-        toast.error(
-          error.response?.data.message ||
-            "Sorry, unexpected error. Be back soon"
-        );
-      } else {
-        toast.error("Sorry, unexpected error. Be back soon");
-      }
-      return null;
+export const fetchCompanies = async (): Promise<ServerResponseInterface<
+  CompanyWithRelationsInterface[]
+> | null> => {
+  try {
+    const response = await axios.get(`/api/company?extends=accounts`);
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      toast.error(
+        error.response?.data.message || "Sorry, unexpected error. Be back soon"
+      );
+    } else {
+      toast.error("Sorry, unexpected error. Be back soon");
     }
-  };
+    return null;
+  }
+};
 
 export const deleteCompany = async (
   companyId: string,

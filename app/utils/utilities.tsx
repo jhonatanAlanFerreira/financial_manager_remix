@@ -1,4 +1,5 @@
 import moment from "moment";
+import { useCallback, useRef } from "react";
 
 export function parseJsonOrNull(data: string) {
   try {
@@ -101,3 +102,21 @@ export function getOptionalField(
 ): string | undefined {
   return body.get(field) ? String(body.get(field)) : undefined;
 }
+
+export const useDebouncedCallback = (callback: Function, delay = 300) => {
+  const timeoutRef = useRef<any>();
+
+  const debouncedFunction = useCallback(
+    (...args: any[]) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+
+  return debouncedFunction;
+};

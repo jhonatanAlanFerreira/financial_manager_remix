@@ -1,22 +1,10 @@
-import {
-  Account,
-  Company,
-  Expense,
-  Income,
-  Transaction,
-  TransactionClassification,
-} from "@prisma/client";
+import { Transaction } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React, { useEffect, useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { Loader } from "~/components/loader/loader";
-import { loader as companyLoader } from "~/routes/api/company/index";
-import { loader as classificationLoader } from "~/routes/api/classification/index";
-import { loader as expenseLoader } from "~/routes/api/expense/index";
-import { loader as incomeLoader } from "~/routes/api/income/index";
 import { loader as transactionLoader } from "~/routes/api/transaction/index";
-import { loader as userAccountLoader } from "~/routes/api/account/index";
 import { Icon } from "~/components/icon/icon";
 import {
   firstDayOfCurrentMonth,
@@ -58,7 +46,6 @@ export default function Transactions() {
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [skipEffect, setSkipEffect] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
@@ -76,37 +63,11 @@ export default function Transactions() {
     ServerResponseInterface<TransactionsWithTotalsInterface>
   >({});
 
-  const [classifications, setClassifications] = useState<
-    ServerResponseInterface<TransactionClassification[]>
-  >({});
-  const [companies, setCompanies] = useState<
-    ServerResponseInterface<Company[]>
-  >({});
-  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
-    {}
-  );
-  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
-    {}
-  );
-
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
 
-  const {
-    companyData,
-    transactionData,
-    expenseData,
-    classificationData,
-    incomeData,
-    userAccountData,
-  } = useLoaderData<{
-    companyData: ServerResponseInterface<Company[]>;
+  const { transactionData } = useLoaderData<{
     transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
-    expenseData: ServerResponseInterface<Expense[]>;
-    classificationData: ServerResponseInterface<TransactionClassification[]>;
-    incomeData: ServerResponseInterface<Income[]>;
-    userAccountData: ServerResponseInterface<Account[]>;
   }>();
 
   const mainForm = useFormik<TransactionFormInterface>({
@@ -134,6 +95,8 @@ export default function Transactions() {
       company: null,
       expense: null,
       income: null,
+      classification: null,
+      account: null,
       date_after: firstDayOfCurrentMonth(),
       date_before: lastDayOfCurrentMonth(),
       amount_greater: 0,
@@ -158,36 +121,15 @@ export default function Transactions() {
   }, []);
 
   useEffect(() => {
-    if (companyData) {
-      setCompanies(companyData);
-    }
-    if (classificationData) {
-      setClassifications(classificationData);
-    }
-    if (expenseData) {
-      setExpenses(expenseData);
-    }
-    if (userAccountData) {
-      setAccounts(userAccountData);
-    }
     if (transactionData) {
       setTransactions(transactionData);
       setTotalIncomeValue(transactionData.data?.totalIncomeValue || 0);
       setTotalExpenseValue(transactionData.data?.totalExpenseValue || 0);
       setTotalPages(transactionData.pageInfo?.totalPages || 0);
     }
-    if (incomeData) {
-      setIncomes(incomeData);
-    }
 
     setLoading(false);
-  }, [
-    companyData,
-    transactionData,
-    expenseData,
-    classificationData,
-    userAccountData,
-  ]);
+  }, [transactionData]);
 
   useEffect(() => {
     if (paginationState.reload) {
@@ -212,6 +154,8 @@ export default function Transactions() {
         company: "id",
         expense: "id",
         income: "id",
+        account: "id",
+        classification: "id",
       })
     );
   };
@@ -319,7 +263,6 @@ export default function Transactions() {
   };
 
   const setFormValues = (transaction: TransactionWithRelationsInterface) => {
-    setSkipEffect(true);
     mainForm.setValues(transaction);
   };
 
@@ -513,15 +456,8 @@ export default function Transactions() {
           {mainForm.values.id ? "Update transaction" : "Add new transaction"}
         </h2>
         <TransactionAdd
-          skipEffect={skipEffect}
-          setSkipEffect={setSkipEffect}
           formik={mainForm}
           onModalCancel={() => setOpenAddModal(false)}
-          accounts={accounts.data || []}
-          classifications={classifications.data || []}
-          companies={companies.data || []}
-          expenses={expenses.data || []}
-          incomes={incomes.data || []}
           isSubmitting={isSubmitting}
           onSubmit={formSubmit}
           responseErrors={responseErrors}
@@ -544,9 +480,6 @@ export default function Transactions() {
         </h2>
         <div className="p-4">
           <TransactionFilters
-            companies={companies.data || []}
-            expenses={expenses.data || []}
-            incomes={incomes.data || []}
             formik={filterForm}
             onSubmit={onFilterFormSubmit}
           ></TransactionFilters>
@@ -557,40 +490,21 @@ export default function Transactions() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
-  const [
-    companyData,
-    expenseData,
-    classificationData,
-    incomeData,
-    userAccountData,
-    transactionData,
-  ] = await Promise.all([
-    companyLoader(request).then((res) => res.json()),
-    expenseLoader(request).then((res) => res.json()),
-    classificationLoader(request).then((res) => res.json()),
-    incomeLoader(request).then((res) => res.json()),
-    userAccountLoader(request).then((res) => res.json()),
-    transactionLoader(request, {
-      page: 1,
-      pageSize: 10,
-      extends: [
-        "account",
-        "company",
-        "expense",
-        "income",
-        "transaction_classifications",
-      ],
-      date_after: firstDayOfCurrentMonth(),
-      date_before: lastDayOfCurrentMonth(),
-    }).then((res) => res.json()),
-  ]);
+  const transactionData = await transactionLoader(request, {
+    page: 1,
+    pageSize: 10,
+    extends: [
+      "account",
+      "company",
+      "expense",
+      "income",
+      "transaction_classifications",
+    ],
+    date_after: firstDayOfCurrentMonth(),
+    date_before: lastDayOfCurrentMonth(),
+  }).then((res) => res.json());
 
   return {
-    companyData,
-    expenseData,
-    classificationData,
-    incomeData,
-    userAccountData,
     transactionData,
   };
 }
