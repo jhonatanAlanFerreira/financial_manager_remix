@@ -15,6 +15,8 @@ import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
+import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
+import { ExpenseLoaderParamsInterface } from "~/data/expense/expense-query-params-interfaces";
 import { fetchClassifications } from "~/data/frontend-services/classification-service";
 import {
   fetchAccounts,
@@ -22,9 +24,13 @@ import {
 } from "~/data/frontend-services/company-account-service";
 import { fetchExpenses } from "~/data/frontend-services/expense-service";
 import { fetchIncomes } from "~/data/frontend-services/income-service";
+import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { IsPersonalOrCompanyType } from "~/shared/shared-types";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 import { useDebouncedCallback } from "~/utils/utilities";
 
 export function TransactionAdd({
@@ -95,13 +101,17 @@ export function TransactionAdd({
     formik.setFieldValue("is_personal", value);
   };
 
+  const loadData = () => {
+    loadAccounts();
+    loadCompanies();
+    loadExpenses();
+    loadClassifications();
+    loadIncomes();
+  };
+
   useEffect(() => {
     if (!hasRun.current) {
-      loadAccounts();
-      loadCompanies();
-      loadExpenses();
-      loadClassifications();
-      loadIncomes();
+      loadData();
       hasRun.current = true;
     }
   }, []);
@@ -109,17 +119,23 @@ export function TransactionAdd({
   useEffect(() => {
     if (shouldFilter) {
       setShouldFilter(false);
-      formik.setFieldValue("account", null);
       formik.setFieldValue("company", null);
-      loadAccounts();
+      formik.setFieldValue("expense", null);
+      formik.setFieldValue("income", null);
+      formik.setFieldValue("account", null);
+      formik.setFieldValue("transaction_classifications", null);
+      loadData();
     }
   }, [formik.values.is_personal]);
 
   useEffect(() => {
     if (shouldFilter) {
       setShouldFilter(false);
+      formik.setFieldValue("expense", null);
+      formik.setFieldValue("income", null);
+      formik.setFieldValue("transaction_classifications", null);
       formik.setFieldValue("account", null);
-      loadAccounts();
+      loadData();
     }
   }, [formik.values.company]);
 
@@ -131,6 +147,9 @@ export function TransactionAdd({
     if (formik.values.income?.amount && !formik.values.amount) {
       formik.setFieldValue("amount", formik.values.income.amount);
     }
+
+    formik.setFieldValue("classifications", null);
+    loadClassifications();
   }, [formik.values.income]);
 
   useEffect(() => {
@@ -141,6 +160,9 @@ export function TransactionAdd({
     if (formik.values.expense?.amount && !formik.values.amount) {
       formik.setFieldValue("amount", formik.values.expense.amount);
     }
+
+    formik.setFieldValue("classifications", null);
+    loadClassifications();
   }, [formik.values.expense]);
 
   const defaultPaginationQuery = () => {
@@ -159,7 +181,7 @@ export function TransactionAdd({
     const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
       .is_personal
       ? "personal"
-      : "all";
+      : "company";
 
     const accountLoaderParamsInterface: Partial<
       Record<keyof AccountLoaderParamsInterface, string>
@@ -172,15 +194,55 @@ export function TransactionAdd({
   };
 
   const filterExpensesParams = () => {
-    return "";
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const expenseLoaderParamsInterface: Partial<
+      Record<keyof ExpenseLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(expenseLoaderParamsInterface).toString();
   };
 
   const filterClassificationsParams = () => {
-    return "";
+    const isIncomeOrExpenseType: IsIncomeOrExpenseType = formik.values.is_income
+      ? "income"
+      : "expense";
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const classificationLoaderParamsInterface: Partial<
+      Record<keyof ClassificationLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_income_or_expense: isIncomeOrExpenseType,
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(classificationLoaderParamsInterface).toString();
   };
 
   const filterIncomesParams = () => {
-    return "";
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const incomeLoaderParamsInterface: Partial<
+      Record<keyof IncomeLoaderParamsInterface, string>
+    > = {
+      has_company: formik.values.company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(incomeLoaderParamsInterface).toString();
   };
 
   const loadAccounts = useDebouncedCallback(async () => {
@@ -197,9 +259,9 @@ export function TransactionAdd({
         onFinally: () => {},
       }
     );
-  }, 300);
+  });
 
-  const loadExpenses = async () => {
+  const loadExpenses = useDebouncedCallback(async () => {
     await fetchExpenses(
       {
         paginationParams: defaultPaginationQuery(),
@@ -213,9 +275,9 @@ export function TransactionAdd({
         onFinally: () => {},
       }
     );
-  };
+  });
 
-  const loadClassifications = async () => {
+  const loadClassifications = useDebouncedCallback(async () => {
     await fetchClassifications(
       {
         paginationParams: defaultPaginationQuery(),
@@ -229,9 +291,9 @@ export function TransactionAdd({
         onFinally: () => {},
       }
     );
-  };
+  });
 
-  const loadIncomes = async () => {
+  const loadIncomes = useDebouncedCallback(async () => {
     await fetchIncomes(
       {
         paginationParams: defaultPaginationQuery(),
@@ -245,14 +307,14 @@ export function TransactionAdd({
         onFinally: () => {},
       }
     );
-  };
+  });
 
-  const loadCompanies = async () => {
+  const loadCompanies = useDebouncedCallback(async () => {
     const res = await fetchCompanies();
     if (res) {
       setCompanies(res);
     }
-  };
+  });
 
   return (
     <div className="p-2">

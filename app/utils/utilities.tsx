@@ -103,7 +103,7 @@ export function getOptionalField(
   return body.get(field) ? String(body.get(field)) : undefined;
 }
 
-export const useDebouncedCallback = (callback: Function, delay: number) => {
+export const useDebouncedCallback = (callback: Function, delay = 300) => {
   const timeoutRef = useRef<any>();
 
   const debouncedFunction = useCallback(
