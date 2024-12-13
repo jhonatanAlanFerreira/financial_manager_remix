@@ -6,16 +6,9 @@ import { InputText } from "~/components/inputs/input-text/input-text";
 import { TransactionFiltersPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
 export function TransactionFilters({
-  companies,
-  expenses,
-  incomes,
   formik,
   onSubmit,
 }: TransactionFiltersPropsInterface) {
-  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
-  const [filteredIncomes, setFilteredIncomes] = useState<Income[]>([]);
-  const [skipEffect, setSkipEffect] = useState<boolean>(true);
-
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
   const getSelectExpenseOptionValue = (option: Expense) => option.id;
@@ -23,30 +16,17 @@ export function TransactionFilters({
   const getSelectIncomeOptionValue = (option: Income) => option.id;
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
 
-  useEffect(() => {
-    runFilters();
-    setSkipEffect(false);
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
-    if (skipEffect) {
-      return;
-    }
-
     if (formik.values.is_personal_or_company === "personal") {
       formik.setFieldValue("company", null);
       formik.setFieldValue("expense", null);
       formik.setFieldValue("income", null);
     }
-
-    runFilters();
   }, [formik.values.is_personal_or_company]);
 
   useEffect(() => {
-    if (skipEffect) {
-      return;
-    }
-
     if (formik.values.is_income_or_expense == "income") {
       formik.setFieldValue("expense", null);
     }
@@ -54,25 +34,12 @@ export function TransactionFilters({
     if (formik.values.is_income_or_expense == "expense") {
       formik.setFieldValue("income", null);
     }
-
-    runFilters();
   }, [formik.values.is_income_or_expense]);
 
   useEffect(() => {
-    if (skipEffect) {
-      return;
-    }
-
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
-
-    runFilters();
   }, [formik.values.company]);
-
-  const runFilters = () => {
-    filterExpenses();
-    filterIncomes();
-  };
 
   const onCompanyFilterChange = (company: Company) => {
     formik.setFieldValue("company", company);
@@ -93,44 +60,6 @@ export function TransactionFilters({
     formik.setFieldValue("income", null);
     formik.setFieldValue("date_after", "");
     formik.setFieldValue("date_before", "");
-  };
-
-  const filterExpenses = () => {
-    if (expenses) {
-      setFilteredExpenses(
-        expenses.filter((expense) => {
-          const expenseTypeFilter =
-            formik.values.is_personal_or_company === "personal"
-              ? expense.is_personal
-              : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            expense.company_ids.includes(formik.values.company.id);
-
-          return expenseTypeFilter && companyFilter;
-        })
-      );
-    }
-  };
-
-  const filterIncomes = () => {
-    if (incomes) {
-      setFilteredIncomes(
-        incomes.filter((income) => {
-          const incomeTypeFilter =
-            formik.values.is_personal_or_company === "personal"
-              ? income.is_personal
-              : true;
-
-          const companyFilter =
-            !formik.values.company ||
-            income.company_ids.includes(formik.values.company.id);
-
-          return incomeTypeFilter && companyFilter;
-        })
-      );
-    }
   };
 
   const isIncomeOrExpenseChange = (e: any) => {
@@ -276,7 +205,7 @@ export function TransactionFilters({
         onChange={formik.handleChange}
         value={formik.values.name}
       ></InputText>
-      {formik.values.is_personal_or_company != "personal" && (
+      {/* {formik.values.is_personal_or_company != "personal" && (
         <InputSelect
           isClearable
           className="mb-8"
@@ -288,8 +217,8 @@ export function TransactionFilters({
           onChange={(event) => onCompanyFilterChange(event as Company)}
           value={formik.values.company}
         ></InputSelect>
-      )}
-      {formik.values.is_income_or_expense != "income" && (
+      )} */}
+      {/* {formik.values.is_income_or_expense != "income" && (
         <InputSelect
           isClearable
           className="mb-8"
@@ -301,8 +230,8 @@ export function TransactionFilters({
           onChange={(event) => onExpenseFilterChange(event as Expense)}
           value={formik.values.expense}
         ></InputSelect>
-      )}
-      {formik.values.is_income_or_expense != "expense" && (
+      )} */}
+      {/* {formik.values.is_income_or_expense != "expense" && (
         <InputSelect
           isClearable
           className="mb-8"
@@ -314,7 +243,7 @@ export function TransactionFilters({
           onChange={(event) => onIncomeFilterChange(event as Income)}
           value={formik.values.income}
         ></InputSelect>
-      )}
+      )} */}
 
       <div className="flex justify-end p-2 mt-10">
         <PrimaryButton

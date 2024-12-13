@@ -475,13 +475,10 @@ export default function Transactions() {
           Filters
         </h2>
         <div className="p-4">
-          {/* <TransactionFilters
-            companies={companies.data || []}
-            expenses={expenses.data || []}
-            incomes={incomes.data || []}
+          <TransactionFilters
             formik={filterForm}
             onSubmit={onFilterFormSubmit}
-          ></TransactionFilters> */}
+          ></TransactionFilters>
         </div>
       </Modal>
     </Loader>

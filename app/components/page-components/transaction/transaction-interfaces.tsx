@@ -44,9 +44,6 @@ export interface TransactionAddPropsInterface {
 }
 
 export interface TransactionFiltersPropsInterface {
-  companies: Company[];
-  expenses: Expense[];
-  incomes: Income[];
   formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
 }
