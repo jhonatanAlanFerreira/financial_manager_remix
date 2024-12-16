@@ -167,14 +167,18 @@ export function TransactionAdd({
       formik.setFieldValue("amount", formik.values.income.amount);
     }
 
-    formik.setFieldValue("transaction_classifications", null);
+    if (shouldFilter) {
+      setShouldFilter(false);
 
-    setLoadingStates((prev) => ({
-      ...prev,
-      isClassificationLoading: true,
-    }));
+      formik.setFieldValue("transaction_classifications", null);
 
-    loadClassifications();
+      setLoadingStates((prev) => ({
+        ...prev,
+        isClassificationLoading: true,
+      }));
+
+      loadClassifications();
+    }
   }, [formik.values.income]);
 
   useEffect(() => {
@@ -186,14 +190,18 @@ export function TransactionAdd({
       formik.setFieldValue("amount", formik.values.expense.amount);
     }
 
-    formik.setFieldValue("transaction_classifications", null);
+    if (shouldFilter) {
+      setShouldFilter(false);
 
-    setLoadingStates((prev) => ({
-      ...prev,
-      isClassificationLoading: true,
-    }));
+      formik.setFieldValue("transaction_classifications", null);
 
-    loadClassifications();
+      setLoadingStates((prev) => ({
+        ...prev,
+        isClassificationLoading: true,
+      }));
+
+      loadClassifications();
+    }
   }, [formik.values.expense]);
 
   useEffect(() => {
