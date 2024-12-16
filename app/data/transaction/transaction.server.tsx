@@ -111,7 +111,7 @@ export async function create(
 
   return {
     data: transaction,
-    message: "Transaction was created successfully",
+    message: "Transaction was created successfully and balance adjusted",
   };
 }
 
@@ -207,7 +207,7 @@ export async function update(
 
   return {
     data: updatedTransaction,
-    message: "Transaction was updated successfully",
+    message: "Transaction was updated successfully and balance adjusted",
   };
 }
 
