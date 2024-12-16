@@ -13,6 +13,7 @@ import { PrimaryButton } from "~/components/buttons/primary-button/primary-butto
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
+import { Loader } from "~/components/loader/loader";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
@@ -42,6 +43,14 @@ export function TransactionAdd({
 }: TransactionAddPropsInterface) {
   const hasRun = useRef(false);
   const [shouldFilter, setShouldFilter] = useState(false);
+
+  const [loadingStates, setLoadingStates] = useState({
+    isAccountLoading: false,
+    isCompanyLoading: false,
+    isExpenseLoading: false,
+    isClassificationLoading: false,
+    isIncomeLoading: false,
+  });
 
   const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
     {}
@@ -73,7 +82,7 @@ export function TransactionAdd({
   ) => option.name;
 
   const onTabSelect = (tabSelected: number) => {
-    formik.setFieldValue("classifications", null);
+    formik.setFieldValue("transaction_classifications", null);
     formik.setFieldValue("is_income", !!tabSelected);
   };
 
@@ -102,12 +111,22 @@ export function TransactionAdd({
   };
 
   const loadData = () => {
+    setLoadingStates({
+      isAccountLoading: true,
+      isCompanyLoading: true,
+      isExpenseLoading: true,
+      isClassificationLoading: true,
+      isIncomeLoading: true,
+    });
+
     loadAccounts();
     loadCompanies();
     loadExpenses();
     loadClassifications();
     loadIncomes();
   };
+
+  const loadingData = () => Object.values(loadingStates).some((state) => state);
 
   useEffect(() => {
     if (!hasRun.current) {
@@ -148,7 +167,13 @@ export function TransactionAdd({
       formik.setFieldValue("amount", formik.values.income.amount);
     }
 
-    formik.setFieldValue("classifications", null);
+    formik.setFieldValue("transaction_classifications", null);
+
+    setLoadingStates((prev) => ({
+      ...prev,
+      isClassificationLoading: true,
+    }));
+
     loadClassifications();
   }, [formik.values.income]);
 
@@ -161,7 +186,13 @@ export function TransactionAdd({
       formik.setFieldValue("amount", formik.values.expense.amount);
     }
 
-    formik.setFieldValue("classifications", null);
+    formik.setFieldValue("transaction_classifications", null);
+
+    setLoadingStates((prev) => ({
+      ...prev,
+      isClassificationLoading: true,
+    }));
+
     loadClassifications();
   }, [formik.values.expense]);
 
@@ -256,7 +287,12 @@ export function TransactionAdd({
           setAccounts(res);
         },
         onError: () => {},
-        onFinally: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isAccountLoading: false,
+          }));
+        },
       }
     );
   });
@@ -272,7 +308,12 @@ export function TransactionAdd({
           setExpenses(res);
         },
         onError: () => {},
-        onFinally: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isExpenseLoading: false,
+          }));
+        },
       }
     );
   });
@@ -288,7 +329,12 @@ export function TransactionAdd({
           setClassifications(res);
         },
         onError: () => {},
-        onFinally: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isClassificationLoading: false,
+          }));
+        },
       }
     );
   });
@@ -304,7 +350,12 @@ export function TransactionAdd({
           setIncomes(res);
         },
         onError: () => {},
-        onFinally: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isIncomeLoading: false,
+          }));
+        },
       }
     );
   });
@@ -313,257 +364,271 @@ export function TransactionAdd({
     const res = await fetchCompanies();
     if (res) {
       setCompanies(res);
+      setLoadingStates((prev) => ({
+        ...prev,
+        isCompanyLoading: false,
+      }));
     }
   });
 
   return (
-    <div className="p-2">
-      <Tabs
-        onSelect={onTabSelect}
-        defaultIndex={!!formik.values.is_income ? 1 : 0}
-      >
-        <TabList className="mb-2">
-          <div className="flex justify-around gap-2">
-            <Tab
-              disabled={!!formik.values.id && !!formik.values.is_income}
-              selectedClassName="bg-violet-900 text-white"
-              disabledClassName="opacity-50 pointer-events-none"
-              className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
-                !formik.values.is_income
-                  ? "pointer-events-none"
-                  : "cursor-pointer"
-              }`}
-            >
-              <div className="w-full transform transition-transform duration-300 hover:scale-110">
-                Expense Transaction
-              </div>
-            </Tab>
-            <div className="border-r-2"></div>
-            <Tab
-              disabled={!!formik.values.id && !formik.values.is_income}
-              selectedClassName="bg-violet-900 text-white"
-              disabledClassName="opacity-50 pointer-events-none"
-              className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
-                !!formik.values.is_income
-                  ? "pointer-events-none"
-                  : "cursor-pointer"
-              }`}
-            >
-              <div className="w-full transform transition-transform duration-300 hover:scale-110">
-                Income Transaction
-              </div>
-            </Tab>
-          </div>
-        </TabList>
-        <TabPanel>
-          <div className="p-4">
-            <Form method="post" id="classification-form" onSubmit={onSubmit}>
-              <div className="border-2 border-violet-950 border-opacity-50 p-4">
-                <Checkbox
-                  className="relative top-1"
-                  name="is_personal"
-                  id="is_personal"
-                  onChange={(event) => onIsPersonalChange(event.target.checked)}
-                  checked={formik.values.is_personal}
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal"
-                >
-                  Personal transaction
-                </label>
-              </div>
-              {!formik.values.is_personal && (
+    <Loader loading={loadingData()}>
+      <div className="p-2">
+        <Tabs
+          onSelect={onTabSelect}
+          defaultIndex={!!formik.values.is_income ? 1 : 0}
+        >
+          <TabList className="mb-2">
+            <div className="flex justify-around gap-2">
+              <Tab
+                disabled={!!formik.values.id && !!formik.values.is_income}
+                selectedClassName="bg-violet-900 text-white"
+                disabledClassName="opacity-50 pointer-events-none"
+                className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
+                  !formik.values.is_income
+                    ? "pointer-events-none"
+                    : "cursor-pointer"
+                }`}
+              >
+                <div className="w-full transform transition-transform duration-300 hover:scale-110">
+                  Expense Transaction
+                </div>
+              </Tab>
+              <div className="border-r-2"></div>
+              <Tab
+                disabled={!!formik.values.id && !formik.values.is_income}
+                selectedClassName="bg-violet-900 text-white"
+                disabledClassName="opacity-50 pointer-events-none"
+                className={`w-full text-center p-2 text-violet-950 border overflow-hidden ${
+                  !!formik.values.is_income
+                    ? "pointer-events-none"
+                    : "cursor-pointer"
+                }`}
+              >
+                <div className="w-full transform transition-transform duration-300 hover:scale-110">
+                  Income Transaction
+                </div>
+              </Tab>
+            </div>
+          </TabList>
+          <TabPanel>
+            <div className="p-4">
+              <Form method="post" id="classification-form" onSubmit={onSubmit}>
+                <div className="border-2 border-violet-950 border-opacity-50 p-4">
+                  <Checkbox
+                    className="relative top-1"
+                    name="is_personal"
+                    id="is_personal"
+                    onChange={(event) =>
+                      onIsPersonalChange(event.target.checked)
+                    }
+                    checked={formik.values.is_personal}
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_personal"
+                  >
+                    Personal transaction
+                  </label>
+                </div>
+                {!formik.values.is_personal && (
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Company"
+                    options={companies.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    name="company"
+                    onChange={(event) => onCompanyChange(event as Company)}
+                    value={formik.values.company}
+                  ></InputSelect>
+                )}
+                <InputSelect
+                  isClearable
+                  required
+                  className="mb-8"
+                  placeholder="Account *"
+                  options={accounts.data}
+                  getOptionLabel={getSelectAccountOptionLabel as any}
+                  getOptionValue={getSelectAccountOptionValue as any}
+                  name="account"
+                  onChange={(event) =>
+                    formik.setFieldValue("account", event as Account)
+                  }
+                  value={formik.values.account}
+                />
                 <InputSelect
                   isClearable
                   className="mb-8"
-                  placeholder="Company"
-                  options={companies.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
-                  name="company"
-                  onChange={(event) => onCompanyChange(event as Company)}
-                  value={formik.values.company}
+                  placeholder="Expense"
+                  options={expenses.data}
+                  getOptionLabel={getSelectExpenseOptionLabel as any}
+                  getOptionValue={getSelectExpenseOptionValue as any}
+                  name="expense"
+                  onChange={(event) => onExpenseChange(event as Expense)}
+                  value={formik.values.expense}
                 ></InputSelect>
-              )}
-              <InputSelect
-                isClearable
-                required
-                className="mb-8"
-                placeholder="Account *"
-                options={accounts.data}
-                getOptionLabel={getSelectAccountOptionLabel as any}
-                getOptionValue={getSelectAccountOptionValue as any}
-                name="account"
-                onChange={(event) =>
-                  formik.setFieldValue("account", event as Account)
-                }
-                value={formik.values.account}
-              />
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Expense"
-                options={expenses.data}
-                getOptionLabel={getSelectExpenseOptionLabel as any}
-                getOptionValue={getSelectExpenseOptionValue as any}
-                name="expense"
-                onChange={(event) => onExpenseChange(event as Expense)}
-                value={formik.values.expense}
-              ></InputSelect>
-              <InputText
-                label="Name *"
-                name="name"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              ></InputText>
-              <InputText
-                label="Date *"
-                name="date"
-                type="date"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.date}
-              ></InputText>
-              <InputText
-                label="Amount *"
-                name="amount"
-                type="number"
-                step={0.01}
-                min={0.01}
-                required
-                errorMessage={responseErrors?.errors?.["amount"]}
-                onChange={formik.handleChange}
-                value={formik.values.amount}
-              ></InputText>
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Classification"
-                options={classifications.data}
-                getOptionLabel={getSelectClassificationOptionLabel as any}
-                getOptionValue={getSelectClassificationOptionValue as any}
-                isMulti
-                name="classifications"
-                onChange={(event) =>
-                  onClassificationsChange(event as TransactionClassification[])
-                }
-                value={formik.values.transaction_classifications}
-              ></InputSelect>
-            </Form>
-          </div>
-        </TabPanel>
-        <TabPanel>
-          <div className="p-4">
-            <Form method="post" id="classification-form" onSubmit={onSubmit}>
-              <div className="border-2 border-violet-950 border-opacity-50 p-4">
-                <Checkbox
-                  className="relative top-1"
-                  name="is_personal"
-                  id="is_personal"
-                  onChange={(event) => onIsPersonalChange(event.target.checked)}
-                  checked={formik.values.is_personal}
-                ></Checkbox>
-                <label
-                  className="pl-3 text-violet-950 cursor-pointer"
-                  htmlFor="is_personal"
-                >
-                  Personal transaction
-                </label>
-              </div>
-              {!formik.values.is_personal && (
+                <InputText
+                  label="Name *"
+                  name="name"
+                  required
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                ></InputText>
+                <InputText
+                  label="Date *"
+                  name="date"
+                  type="date"
+                  required
+                  onChange={formik.handleChange}
+                  value={formik.values.date}
+                ></InputText>
+                <InputText
+                  label="Amount *"
+                  name="amount"
+                  type="number"
+                  step={0.01}
+                  min={0.01}
+                  required
+                  errorMessage={responseErrors?.errors?.["amount"]}
+                  onChange={formik.handleChange}
+                  value={formik.values.amount}
+                ></InputText>
                 <InputSelect
                   isClearable
                   className="mb-8"
-                  placeholder="Company"
-                  options={companies.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
-                  name="company"
-                  onChange={(event) => onCompanyChange(event as Company)}
-                  value={formik.values.company}
+                  placeholder="Classification"
+                  options={classifications.data}
+                  getOptionLabel={getSelectClassificationOptionLabel as any}
+                  getOptionValue={getSelectClassificationOptionValue as any}
+                  isMulti
+                  name="classifications"
+                  onChange={(event) =>
+                    onClassificationsChange(
+                      event as TransactionClassification[]
+                    )
+                  }
+                  value={formik.values.transaction_classifications}
                 ></InputSelect>
-              )}
-              <InputSelect
-                isClearable
-                required
-                className="mb-8"
-                placeholder="Account *"
-                options={accounts.data}
-                getOptionLabel={getSelectAccountOptionLabel as any}
-                getOptionValue={getSelectAccountOptionValue as any}
-                name="account"
-                onChange={(event) =>
-                  formik.setFieldValue("account", event as Account)
-                }
-                value={formik.values.account}
-              />
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Income"
-                options={incomes.data}
-                getOptionLabel={getSelectIncomeOptionLabel as any}
-                getOptionValue={getSelectIncomeOptionValue as any}
-                name="income"
-                onChange={(event) => onIncomeChange(event as Income)}
-                value={formik.values.income}
-              ></InputSelect>
-              <InputText
-                label="Name *"
-                name="name"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.name}
-              ></InputText>
-              <InputText
-                label="Date *"
-                name="date"
-                type="date"
-                required
-                onChange={formik.handleChange}
-                value={formik.values.date}
-              ></InputText>
-              <InputText
-                label="Amount *"
-                name="amount"
-                type="number"
-                step={0.01}
-                min={0.01}
-                required
-                errorMessage={responseErrors?.errors?.["amount"]}
-                onChange={formik.handleChange}
-                value={formik.values.amount}
-              ></InputText>
-              <InputSelect
-                isClearable
-                isMulti
-                className="mb-8"
-                placeholder="Classification"
-                name="classifications"
-                options={classifications.data}
-                getOptionLabel={getSelectClassificationOptionLabel as any}
-                getOptionValue={getSelectClassificationOptionValue as any}
-                onChange={(event) =>
-                  onClassificationsChange(event as TransactionClassification[])
-                }
-                value={formik.values.transaction_classifications}
-              ></InputSelect>
-            </Form>
-          </div>
-        </TabPanel>
-      </Tabs>
-      <div className="flex justify-between p-2">
-        <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
-        <PrimaryButton
-          text="Save"
-          disabled={isSubmitting}
-          form="classification-form"
-          type="submit"
-          className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
-        ></PrimaryButton>
+              </Form>
+            </div>
+          </TabPanel>
+          <TabPanel>
+            <div className="p-4">
+              <Form method="post" id="classification-form" onSubmit={onSubmit}>
+                <div className="border-2 border-violet-950 border-opacity-50 p-4">
+                  <Checkbox
+                    className="relative top-1"
+                    name="is_personal"
+                    id="is_personal"
+                    onChange={(event) =>
+                      onIsPersonalChange(event.target.checked)
+                    }
+                    checked={formik.values.is_personal}
+                  ></Checkbox>
+                  <label
+                    className="pl-3 text-violet-950 cursor-pointer"
+                    htmlFor="is_personal"
+                  >
+                    Personal transaction
+                  </label>
+                </div>
+                {!formik.values.is_personal && (
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Company"
+                    options={companies.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    name="company"
+                    onChange={(event) => onCompanyChange(event as Company)}
+                    value={formik.values.company}
+                  ></InputSelect>
+                )}
+                <InputSelect
+                  isClearable
+                  required
+                  className="mb-8"
+                  placeholder="Account *"
+                  options={accounts.data}
+                  getOptionLabel={getSelectAccountOptionLabel as any}
+                  getOptionValue={getSelectAccountOptionValue as any}
+                  name="account"
+                  onChange={(event) =>
+                    formik.setFieldValue("account", event as Account)
+                  }
+                  value={formik.values.account}
+                />
+                <InputSelect
+                  isClearable
+                  className="mb-8"
+                  placeholder="Income"
+                  options={incomes.data}
+                  getOptionLabel={getSelectIncomeOptionLabel as any}
+                  getOptionValue={getSelectIncomeOptionValue as any}
+                  name="income"
+                  onChange={(event) => onIncomeChange(event as Income)}
+                  value={formik.values.income}
+                ></InputSelect>
+                <InputText
+                  label="Name *"
+                  name="name"
+                  required
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                ></InputText>
+                <InputText
+                  label="Date *"
+                  name="date"
+                  type="date"
+                  required
+                  onChange={formik.handleChange}
+                  value={formik.values.date}
+                ></InputText>
+                <InputText
+                  label="Amount *"
+                  name="amount"
+                  type="number"
+                  step={0.01}
+                  min={0.01}
+                  required
+                  errorMessage={responseErrors?.errors?.["amount"]}
+                  onChange={formik.handleChange}
+                  value={formik.values.amount}
+                ></InputText>
+                <InputSelect
+                  isClearable
+                  isMulti
+                  className="mb-8"
+                  placeholder="Classification"
+                  name="classifications"
+                  options={classifications.data}
+                  getOptionLabel={getSelectClassificationOptionLabel as any}
+                  getOptionValue={getSelectClassificationOptionValue as any}
+                  onChange={(event) =>
+                    onClassificationsChange(
+                      event as TransactionClassification[]
+                    )
+                  }
+                  value={formik.values.transaction_classifications}
+                ></InputSelect>
+              </Form>
+            </div>
+          </TabPanel>
+        </Tabs>
+        <div className="flex justify-between p-2">
+          <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
+          <PrimaryButton
+            text="Save"
+            disabled={isSubmitting}
+            form="classification-form"
+            type="submit"
+            className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
+          ></PrimaryButton>
+        </div>
       </div>
-    </div>
+    </Loader>
   );
 }
