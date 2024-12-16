@@ -196,6 +196,15 @@ export function TransactionAdd({
     loadClassifications();
   }, [formik.values.expense]);
 
+  useEffect(() => {
+    setLoadingStates((prev) => ({
+      ...prev,
+      isClassificationLoading: true,
+    }));
+
+    loadClassifications();
+  }, [formik.values.is_income]);
+
   const defaultPaginationQuery = () => {
     let paginationParamsInterface: Record<
       keyof PaginationParamsInterface,
