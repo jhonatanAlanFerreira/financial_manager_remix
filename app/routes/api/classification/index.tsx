@@ -80,7 +80,7 @@ export let loader = async (
   const params: ClassificationLoaderParamsInterface = {
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
-    has_company: url.searchParams.get("company") || undefined,
+    has_company: url.searchParams.get("has_company") || undefined,
     name: url.searchParams.get("name") || undefined,
     extends: parseIncludes(url, classificationIncludeOptions),
     is_income_or_expense:

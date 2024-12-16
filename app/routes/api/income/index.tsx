@@ -34,7 +34,7 @@ export let loader = async (
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     amount_greater: Number(url.searchParams.get("amount_greater")),
     amount_less: Number(url.searchParams.get("amount_less")),
-    has_company: url.searchParams.get("company") || undefined,
+    has_company: url.searchParams.get("has_company") || undefined,
     name: url.searchParams.get("name") || undefined,
     is_personal_or_company:
       (url.searchParams.get(

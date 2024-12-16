@@ -19,7 +19,7 @@ export const ExpenseFilterTagsConfig: {
     getValue: (fieldValue: any) => fieldValue,
   },
   {
-    fieldName: "company",
+    fieldName: "has_company",
     label: "Company",
     closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,

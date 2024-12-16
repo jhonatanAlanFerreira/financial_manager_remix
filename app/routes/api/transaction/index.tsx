@@ -103,7 +103,7 @@ export let loader = async (
     expense: url.searchParams.get("expense") || undefined,
     income: url.searchParams.get("income") || undefined,
     account: url.searchParams.get("account") || undefined,
-    has_classification: url.searchParams.get("classification") || undefined,
+    has_classification: url.searchParams.get("has_classification") || undefined,
     company: url.searchParams.get("company") || undefined,
     name: url.searchParams.get("name") || undefined,
     is_income_or_expense:

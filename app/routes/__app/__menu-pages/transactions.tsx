@@ -95,7 +95,7 @@ export default function Transactions() {
       company: null,
       expense: null,
       income: null,
-      classification: null,
+      has_classification: null,
       account: null,
       date_after: firstDayOfCurrentMonth(),
       date_before: lastDayOfCurrentMonth(),
@@ -155,7 +155,7 @@ export default function Transactions() {
         expense: "id",
         income: "id",
         account: "id",
-        classification: "id",
+        has_classification: "id",
       })
     );
   };

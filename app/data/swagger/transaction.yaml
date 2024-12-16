@@ -24,7 +24,7 @@ paths:
             type: string
           default: ""
         - in: query
-          name: classification
+          name: has_classification
           schema:
             type: string
           default: ""

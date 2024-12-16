@@ -38,7 +38,7 @@ export const TransactionFilterTagsConfig: {
     getValue: (fieldValue: any) => fieldValue,
   },
   {
-    fieldName: "classification",
+    fieldName: "has_classification",
     label: "Classification",
     closeBtn: true,
     getValue: (fieldValue: any) => fieldValue.name,

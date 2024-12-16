@@ -4,7 +4,7 @@ export interface ExpenseFiltersFormInterface {
   name: string;
   amount_greater: number;
   amount_less: number;
-  company: Company | null;
+  has_company: Company | null;
   is_personal_or_company: "personal" | "company" | "all";
 }
 

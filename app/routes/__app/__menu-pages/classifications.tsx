@@ -80,7 +80,7 @@ export default function Classifications() {
   const filterForm = useFormik<ClassificationFiltersFormInterface>({
     initialValues: {
       name: "",
-      company: null,
+      has_company: null,
       is_personal_or_company: "all",
       is_income_or_expense: "all",
     },
@@ -137,7 +137,7 @@ export default function Classifications() {
 
   useEffect(() => {
     if (filterForm.values.is_personal_or_company === "personal") {
-      filterForm.setFieldValue("company", null);
+      filterForm.setFieldValue("has_company", null);
     }
   }, [filterForm.values.is_personal_or_company]);
 
@@ -264,7 +264,7 @@ export default function Classifications() {
   };
 
   const onCompanyFilterChange = (company: Company) => {
-    filterForm.setFieldValue("company", company);
+    filterForm.setFieldValue("has_company", company);
   };
 
   const onFilterFormSubmit = async () => {
@@ -278,7 +278,7 @@ export default function Classifications() {
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
-        company: "id",
+        has_company: "id",
       })
     );
   };
@@ -690,9 +690,9 @@ export default function Classifications() {
                 options={companies.data}
                 getOptionLabel={getSelectCompanyOptionLabel as any}
                 getOptionValue={getSelectCompanyOptionValue as any}
-                name="company"
+                name="has_company"
                 onChange={(event) => onCompanyFilterChange(event as Company)}
-                value={filterForm.values.company}
+                value={filterForm.values.has_company}
               ></InputSelect>
             )}
 

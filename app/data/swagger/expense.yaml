@@ -6,7 +6,7 @@ paths:
       summary: Retrieve a list of expenses
       parameters:
         - in: query
-          name: company
+          name: has_company
           schema:
             type: string
         - in: query

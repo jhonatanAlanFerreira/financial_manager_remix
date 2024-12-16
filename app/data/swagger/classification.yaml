@@ -10,7 +10,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: company
+          name: has_company
           schema:
             type: string
         - in: query

@@ -526,14 +526,14 @@ export function TransactionFilters({
           isClearable
           className="mb-8"
           placeholder="Classification"
-          name="classification"
+          name="has_classification"
           options={classifications.data}
           getOptionLabel={getSelectClassificationOptionLabel as any}
           getOptionValue={getSelectClassificationOptionValue as any}
           onChange={(event) =>
             onClassificationChange(event as TransactionClassification)
           }
-          value={formik.values.classification}
+          value={formik.values.has_classification}
         ></InputSelect>
 
         <div className="flex justify-end p-2 mt-10">

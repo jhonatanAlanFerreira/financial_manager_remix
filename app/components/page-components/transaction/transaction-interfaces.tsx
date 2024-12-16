@@ -20,7 +20,7 @@ export interface TransactionFiltersFormInterface {
   amount_greater: number;
   amount_less: number;
   account: Account | null;
-  classification: TransactionClassification | null;
+  has_classification: TransactionClassification | null;
 }
 
 export interface TransactionFormInterface {
