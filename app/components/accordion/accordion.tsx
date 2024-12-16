@@ -48,7 +48,7 @@ export function Accordion({
         </div>
       </button>
       <div
-        className={`overflow-hidden transition-max-height duration-500 ease-in-out ${
+        className={`overflow-auto transition-max-height duration-500 ease-in-out ${
           isOpen ? "max-h-96" : "max-h-0"
         }`}
       >
