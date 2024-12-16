@@ -105,7 +105,9 @@ export default function Index() {
 }
 
 export async function loader(request: LoaderFunctionArgs) {
+  const companyData = await (await companyLoader(request)).json();
+
   return {
-    companyData: await companyLoader(request),
+    companyData,
   };
 }
