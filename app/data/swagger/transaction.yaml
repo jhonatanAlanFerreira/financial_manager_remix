@@ -168,6 +168,12 @@ paths:
                 date:
                   type: string
                   format: date
+                classifications:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
       responses:
         201:
           description: Transaction created
@@ -223,6 +229,12 @@ paths:
                   type: string
                   enum: [all, personal, company]
                   default: all
+                classifications:
+                  type: array
+                  items:
+                    type: string
+                  nullable: true
+                  default: null
                 is_income:
                   type: boolean
                   default: false
