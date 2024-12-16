@@ -101,7 +101,7 @@ export function TransactionFilters({
       formik.setFieldValue("company", null);
       formik.setFieldValue("expense", null);
       formik.setFieldValue("income", null);
-      formik.setFieldValue("classification", null);
+      formik.setFieldValue("has_classification", null);
       formik.setFieldValue("account", null);
       loadData();
     }
@@ -112,25 +112,29 @@ export function TransactionFilters({
       setShouldFilter(false);
       formik.setFieldValue("expense", null);
       formik.setFieldValue("income", null);
-      formik.setFieldValue("classification", null);
+      formik.setFieldValue("has_classification", null);
       formik.setFieldValue("account", null);
       loadData();
     }
   }, [formik.values.company]);
 
   useEffect(() => {
-    if (formik.values.is_income_or_expense == "income") {
+    if (shouldFilter) {
+      setShouldFilter(false);
+
+      if (formik.values.is_income_or_expense == "income") {
+        formik.setFieldValue("expense", null);
+      }
+
+      if (formik.values.is_income_or_expense == "expense") {
+        formik.setFieldValue("income", null);
+      }
+
+      formik.setFieldValue("company", null);
       formik.setFieldValue("expense", null);
-    }
-
-    if (formik.values.is_income_or_expense == "expense") {
       formik.setFieldValue("income", null);
+      loadData();
     }
-
-    formik.setFieldValue("company", null);
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    loadData();
   }, [formik.values.is_income_or_expense]);
 
   const onCompanyFilterChange = (company: Company) => {
@@ -149,7 +153,7 @@ export function TransactionFilters({
   const onClassificationChange = (
     classification: TransactionClassification
   ) => {
-    formik.setFieldValue("classification", classification);
+    formik.setFieldValue("has_classification", classification);
   };
 
   const resetForm = () => {
@@ -157,7 +161,7 @@ export function TransactionFilters({
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
-    formik.setFieldValue("classification", null);
+    formik.setFieldValue("has_classification", null);
     formik.setFieldValue("account", null);
     formik.setFieldValue("date_after", "");
     formik.setFieldValue("date_before", "");
