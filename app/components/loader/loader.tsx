@@ -8,9 +8,8 @@ export function Loader({ children, loading }: LoaderPropsInterface) {
           <div className="loader ease-linear border-t-4 border-violet-950 border-solid rounded-full animate-spin h-16 w-16"></div>
         </div>
       )}
-      <div className={loading ? "blur-sm pointer-events-none" : ""}>
-        {children}
-      </div>
+      {loading && <div className="blur-sm pointer-events-none">{children}</div>}
+      {!loading && children}
     </>
   );
 }
