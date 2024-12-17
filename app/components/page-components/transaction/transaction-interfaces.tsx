@@ -35,6 +35,7 @@ export interface TransactionFormInterface {
   expense: Expense | null;
   account: Account | null;
   name: string;
+  description: string;
 }
 
 export interface TransactionAddPropsInterface {

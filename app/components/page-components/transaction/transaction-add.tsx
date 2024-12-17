@@ -13,6 +13,7 @@ import { PrimaryButton } from "~/components/buttons/primary-button/primary-butto
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
+import { TextArea } from "~/components/inputs/text-area/text-area";
 import { Loader } from "~/components/loader/loader";
 import { TransactionAddPropsInterface } from "~/components/page-components/transaction/transaction-interfaces";
 import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
@@ -493,6 +494,12 @@ export function TransactionAdd({
                   onChange={formik.handleChange}
                   value={formik.values.name}
                 ></InputText>
+                <TextArea
+                  label="Description"
+                  name="description"
+                  onChange={formik.handleChange}
+                  value={formik.values.description}
+                ></TextArea>
                 <InputText
                   label="Date *"
                   name="date"
@@ -596,6 +603,12 @@ export function TransactionAdd({
                   onChange={formik.handleChange}
                   value={formik.values.name}
                 ></InputText>
+                <TextArea
+                  label="Description"
+                  name="description"
+                  onChange={formik.handleChange}
+                  value={formik.values.description}
+                ></TextArea>
                 <InputText
                   label="Date *"
                   name="date"

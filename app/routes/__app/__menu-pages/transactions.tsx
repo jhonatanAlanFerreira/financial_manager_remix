@@ -83,6 +83,7 @@ export default function Transactions() {
       is_personal: false,
       income: null,
       name: "",
+      description: "",
     },
     onSubmit: () => {},
   });

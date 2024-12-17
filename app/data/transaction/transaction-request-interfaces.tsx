@@ -9,6 +9,7 @@ export interface TransactionCreateRequestInterface {
   date: string;
   is_personal: boolean;
   is_income: boolean;
+  description: string;
 }
 
 export interface TransactionUpdateRequestInterface

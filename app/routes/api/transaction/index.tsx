@@ -49,6 +49,7 @@ let createTransaction = async (request: Request) => {
     date: String(body.get("date") || ""),
     is_personal: body.get("is_personal") == "true",
     is_income: body.get("is_income") == "true",
+    description: String(body.get("description") || ""),
   };
 
   return sendResponse(await create(data, user));
@@ -81,6 +82,7 @@ let updateTransaction = async (request: Request) => {
     date: String(body.get("date") || ""),
     is_personal: body.get("is_personal") == "true",
     is_income: body.get("is_income") == "true",
+    description: String(body.get("description") || ""),
   };
 
   return sendResponse(await update(transactionId, user, data));

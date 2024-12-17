@@ -101,6 +101,7 @@ export async function create(
       is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
       user_id: user.id,
+      description: data.description,
     },
   });
 
@@ -201,6 +202,7 @@ export async function update(
       is_income: data.is_income,
       is_personal: data.is_personal,
       transaction_classification_ids: data.classifications,
+      description: data.description,
     },
     where: { id: transactionId },
   });

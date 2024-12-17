@@ -144,6 +144,9 @@ paths:
                 name:
                   type: string
                   default: ""
+                description:
+                  type: string
+                  default: ""
                 amount:
                   type: integer
                 company:
@@ -209,6 +212,9 @@ paths:
               type: object
               properties:
                 name:
+                  type: string
+                  default: ""
+                description:
                   type: string
                   default: ""
                 amount:
