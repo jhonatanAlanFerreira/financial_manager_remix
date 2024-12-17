@@ -99,6 +99,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
         income: undefined,
         is_personal: false,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -121,6 +122,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
         income: undefined,
         is_personal: false,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -143,6 +145,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
         income: undefined,
         is_personal: false,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -165,6 +168,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
         income: undefined,
         is_personal: false,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -189,6 +193,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: false,
     });
     await checkAccountBalance(accountFromCompany1Id, 200);
@@ -203,6 +208,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: false,
     });
     await checkAccountBalance(accountFromCompany2Id, -500);
@@ -221,6 +227,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: false,
     });
     await checkAccountBalance(accountFromCompany1Id, 225);
@@ -235,6 +242,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Comp
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: false,
     });
     await checkAccountBalance(accountFromCompany2Id, 0);

@@ -498,7 +498,7 @@ export function TransactionAdd({
                   label="Description"
                   name="description"
                   onChange={formik.handleChange}
-                  value={formik.values.description}
+                  value={formik.values.description || undefined}
                 ></TextArea>
                 <InputText
                   label="Date *"
@@ -607,7 +607,7 @@ export function TransactionAdd({
                   label="Description"
                   name="description"
                   onChange={formik.handleChange}
-                  value={formik.values.description}
+                  value={formik.values.description || undefined}
                 ></TextArea>
                 <InputText
                   label="Date *"

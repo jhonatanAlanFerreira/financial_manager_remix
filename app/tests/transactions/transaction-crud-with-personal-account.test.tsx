@@ -63,6 +63,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -85,6 +86,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -107,6 +109,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -129,6 +132,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -151,6 +155,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -173,6 +178,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
         income: undefined,
         is_personal: true,
         classifications: [],
+        description: "",
       },
       user
     );
@@ -197,6 +203,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(600);
@@ -211,6 +218,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(550);
@@ -225,6 +233,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(600);
@@ -243,6 +252,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(625);
@@ -257,6 +267,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(650);
@@ -271,6 +282,7 @@ describe("Transaction CRUD Operations - Multiple Incomes and Expenses using Pers
       expense: undefined,
       income: undefined,
       classifications: [],
+      description: "",
       is_personal: true,
     });
     await checkAccountBalance(600);

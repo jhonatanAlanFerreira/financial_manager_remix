@@ -77,6 +77,7 @@ describe("Transaction Totals Logic", () => {
           date: todayFormatedDate(),
           is_income: true,
           company_id: company1.id,
+          description: "",
         },
       });
     }
@@ -91,6 +92,7 @@ describe("Transaction Totals Logic", () => {
           date: todayFormatedDate(),
           is_income: false,
           company_id: company1.id,
+          description: "",
         },
       });
     }
@@ -105,6 +107,7 @@ describe("Transaction Totals Logic", () => {
           date: todayFormatedDate(),
           is_income: true,
           company_id: company2.id,
+          description: "",
         },
       });
     }
@@ -119,6 +122,7 @@ describe("Transaction Totals Logic", () => {
           date: todayFormatedDate(),
           is_income: false,
           company_id: company2.id,
+          description: "",
         },
       });
     }
