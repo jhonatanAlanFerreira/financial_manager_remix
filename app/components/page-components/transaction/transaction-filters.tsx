@@ -334,213 +334,217 @@ export function TransactionFilters({
         <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
           <span onClick={resetForm}>Clear all filters</span>
         </div>
-        <div className="flex flex-col gap-2 mb-12">
-          <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
-            Income or Expense Transaction
-          </span>
-          <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
-            <div>
-              <input
-                id="income_expense_all_filter"
-                type="radio"
-                name="is_income_or_expense"
-                value={"all"}
-                onChange={isIncomeOrExpenseChange}
-                checked={formik.values.is_income_or_expense === "all"}
-              ></input>
-              <label
-                className="cursor-pointer ml-2"
-                htmlFor="income_expense_all_filter"
-              >
-                All
-              </label>
+        <div className="overflow-auto max-h-[calc(100vh_-_16rem)]">
+          <div className="flex flex-col gap-2 mb-12">
+            <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+              Income or Expense Transaction
+            </span>
+            <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+              <div>
+                <input
+                  id="income_expense_all_filter"
+                  type="radio"
+                  name="is_income_or_expense"
+                  value={"all"}
+                  onChange={isIncomeOrExpenseChange}
+                  checked={formik.values.is_income_or_expense === "all"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="income_expense_all_filter"
+                >
+                  All
+                </label>
+              </div>
+              <div>
+                <input
+                  id="is_expense_filter"
+                  type="radio"
+                  name="is_income_or_expense"
+                  value={"expense"}
+                  onChange={isIncomeOrExpenseChange}
+                  checked={formik.values.is_income_or_expense === "expense"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="is_expense_filter"
+                >
+                  Expense transaction
+                </label>
+              </div>
+              <div>
+                <input
+                  id="is_income_filter"
+                  type="radio"
+                  name="is_income_or_expense"
+                  value={"income"}
+                  onChange={isIncomeOrExpenseChange}
+                  checked={formik.values.is_income_or_expense === "income"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="is_income_filter"
+                >
+                  Income transaction
+                </label>
+              </div>
             </div>
-            <div>
-              <input
-                id="is_expense_filter"
-                type="radio"
-                name="is_income_or_expense"
-                value={"expense"}
-                onChange={isIncomeOrExpenseChange}
-                checked={formik.values.is_income_or_expense === "expense"}
-              ></input>
-              <label
-                className="cursor-pointer ml-2"
-                htmlFor="is_expense_filter"
-              >
-                Expense transaction
-              </label>
-            </div>
-            <div>
-              <input
-                id="is_income_filter"
-                type="radio"
-                name="is_income_or_expense"
-                value={"income"}
-                onChange={isIncomeOrExpenseChange}
-                checked={formik.values.is_income_or_expense === "income"}
-              ></input>
-              <label className="cursor-pointer ml-2" htmlFor="is_income_filter">
-                Income transaction
-              </label>
+            <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
+              Personal or Company Transaction
+            </span>
+            <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+              <div>
+                <input
+                  id="personal_company_all_filter"
+                  type="radio"
+                  name="is_personal_or_company"
+                  value={"all"}
+                  onChange={isPersonalOrCompanyChange}
+                  checked={formik.values.is_personal_or_company === "all"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="personal_company_all_filter"
+                >
+                  All
+                </label>
+              </div>
+              <div>
+                <input
+                  id="is_personal_filter"
+                  type="radio"
+                  name="is_personal_or_company"
+                  value={"personal"}
+                  onChange={isPersonalOrCompanyChange}
+                  checked={formik.values.is_personal_or_company === "personal"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="is_personal_filter"
+                >
+                  Personal transaction
+                </label>
+              </div>
+              <div>
+                <input
+                  id="is_company_filter"
+                  type="radio"
+                  name="is_personal_or_company"
+                  value={"company"}
+                  onChange={isPersonalOrCompanyChange}
+                  checked={formik.values.is_personal_or_company === "company"}
+                ></input>
+                <label
+                  className="cursor-pointer ml-2"
+                  htmlFor="is_company_filter"
+                >
+                  Company transaction
+                </label>
+              </div>
             </div>
           </div>
-          <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
-            Personal or Company Transaction
-          </span>
-          <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
-            <div>
-              <input
-                id="personal_company_all_filter"
-                type="radio"
-                name="is_personal_or_company"
-                value={"all"}
-                onChange={isPersonalOrCompanyChange}
-                checked={formik.values.is_personal_or_company === "all"}
-              ></input>
-              <label
-                className="cursor-pointer ml-2"
-                htmlFor="personal_company_all_filter"
-              >
-                All
-              </label>
-            </div>
-            <div>
-              <input
-                id="is_personal_filter"
-                type="radio"
-                name="is_personal_or_company"
-                value={"personal"}
-                onChange={isPersonalOrCompanyChange}
-                checked={formik.values.is_personal_or_company === "personal"}
-              ></input>
-              <label
-                className="cursor-pointer ml-2"
-                htmlFor="is_personal_filter"
-              >
-                Personal transaction
-              </label>
-            </div>
-            <div>
-              <input
-                id="is_company_filter"
-                type="radio"
-                name="is_personal_or_company"
-                value={"company"}
-                onChange={isPersonalOrCompanyChange}
-                checked={formik.values.is_personal_or_company === "company"}
-              ></input>
-              <label
-                className="cursor-pointer ml-2"
-                htmlFor="is_company_filter"
-              >
-                Company transaction
-              </label>
-            </div>
-          </div>
+          <InputText
+            type="date"
+            label="After"
+            name="date_after"
+            value={formik.values.date_after}
+            onChange={formik.handleChange}
+          ></InputText>
+          <InputText
+            type="date"
+            label="Before"
+            name="date_before"
+            value={formik.values.date_before}
+            onChange={formik.handleChange}
+          ></InputText>
+          <InputText
+            type="number"
+            label="Amount greater than"
+            name="amount_greater"
+            value={formik.values.amount_greater}
+            onChange={formik.handleChange}
+          ></InputText>
+          <InputText
+            type="number"
+            label="Amount less than"
+            name="amount_less"
+            value={formik.values.amount_less}
+            onChange={formik.handleChange}
+          ></InputText>
+          <InputText
+            label="Name"
+            name="name"
+            onChange={formik.handleChange}
+            value={formik.values.name}
+          ></InputText>
+          {formik.values.is_personal_or_company != "personal" && (
+            <InputSelect
+              isClearable
+              className="mb-8"
+              placeholder="Company"
+              options={companies.data}
+              getOptionLabel={getSelectCompanyOptionLabel as any}
+              getOptionValue={getSelectCompanyOptionValue as any}
+              name="company"
+              onChange={(event) => onCompanyFilterChange(event as Company)}
+              value={formik.values.company}
+            ></InputSelect>
+          )}
+          <InputSelect
+            isClearable
+            required
+            className="mb-8"
+            placeholder="Account"
+            options={accounts.data}
+            getOptionLabel={getSelectAccountOptionLabel as any}
+            getOptionValue={getSelectAccountOptionValue as any}
+            name="account"
+            onChange={(event) =>
+              formik.setFieldValue("account", event as Account)
+            }
+            value={formik.values.account}
+          />
+          {formik.values.is_income_or_expense != "income" && (
+            <InputSelect
+              isClearable
+              className="mb-8"
+              placeholder="Expense"
+              options={expenses.data}
+              getOptionLabel={getSelectExpenseOptionLabel as any}
+              getOptionValue={getSelectExpenseOptionValue as any}
+              name="expense"
+              onChange={(event) => onExpenseFilterChange(event as Expense)}
+              value={formik.values.expense}
+            ></InputSelect>
+          )}
+          {formik.values.is_income_or_expense != "expense" && (
+            <InputSelect
+              isClearable
+              className="mb-8"
+              placeholder="Income"
+              options={incomes.data}
+              getOptionLabel={getSelectIncomeOptionLabel as any}
+              getOptionValue={getSelectIncomeOptionValue as any}
+              name="income"
+              onChange={(event) => onIncomeFilterChange(event as Income)}
+              value={formik.values.income}
+            ></InputSelect>
+          )}
+          <InputSelect
+            isClearable
+            className="mb-8"
+            placeholder="Classification"
+            name="has_classification"
+            options={classifications.data}
+            getOptionLabel={getSelectClassificationOptionLabel as any}
+            getOptionValue={getSelectClassificationOptionValue as any}
+            onChange={(event) =>
+              onClassificationChange(event as TransactionClassification)
+            }
+            value={formik.values.has_classification}
+          ></InputSelect>
         </div>
-        <InputText
-          type="date"
-          label="After"
-          name="date_after"
-          value={formik.values.date_after}
-          onChange={formik.handleChange}
-        ></InputText>
-        <InputText
-          type="date"
-          label="Before"
-          name="date_before"
-          value={formik.values.date_before}
-          onChange={formik.handleChange}
-        ></InputText>
-        <InputText
-          type="number"
-          label="Amount greater than"
-          name="amount_greater"
-          value={formik.values.amount_greater}
-          onChange={formik.handleChange}
-        ></InputText>
-        <InputText
-          type="number"
-          label="Amount less than"
-          name="amount_less"
-          value={formik.values.amount_less}
-          onChange={formik.handleChange}
-        ></InputText>
-        <InputText
-          label="Name"
-          name="name"
-          onChange={formik.handleChange}
-          value={formik.values.name}
-        ></InputText>
-        {formik.values.is_personal_or_company != "personal" && (
-          <InputSelect
-            isClearable
-            className="mb-8"
-            placeholder="Company"
-            options={companies.data}
-            getOptionLabel={getSelectCompanyOptionLabel as any}
-            getOptionValue={getSelectCompanyOptionValue as any}
-            name="company"
-            onChange={(event) => onCompanyFilterChange(event as Company)}
-            value={formik.values.company}
-          ></InputSelect>
-        )}
-        <InputSelect
-          isClearable
-          required
-          className="mb-8"
-          placeholder="Account"
-          options={accounts.data}
-          getOptionLabel={getSelectAccountOptionLabel as any}
-          getOptionValue={getSelectAccountOptionValue as any}
-          name="account"
-          onChange={(event) =>
-            formik.setFieldValue("account", event as Account)
-          }
-          value={formik.values.account}
-        />
-        {formik.values.is_income_or_expense != "income" && (
-          <InputSelect
-            isClearable
-            className="mb-8"
-            placeholder="Expense"
-            options={expenses.data}
-            getOptionLabel={getSelectExpenseOptionLabel as any}
-            getOptionValue={getSelectExpenseOptionValue as any}
-            name="expense"
-            onChange={(event) => onExpenseFilterChange(event as Expense)}
-            value={formik.values.expense}
-          ></InputSelect>
-        )}
-        {formik.values.is_income_or_expense != "expense" && (
-          <InputSelect
-            isClearable
-            className="mb-8"
-            placeholder="Income"
-            options={incomes.data}
-            getOptionLabel={getSelectIncomeOptionLabel as any}
-            getOptionValue={getSelectIncomeOptionValue as any}
-            name="income"
-            onChange={(event) => onIncomeFilterChange(event as Income)}
-            value={formik.values.income}
-          ></InputSelect>
-        )}
-        <InputSelect
-          isClearable
-          className="mb-8"
-          placeholder="Classification"
-          name="has_classification"
-          options={classifications.data}
-          getOptionLabel={getSelectClassificationOptionLabel as any}
-          getOptionValue={getSelectClassificationOptionValue as any}
-          onChange={(event) =>
-            onClassificationChange(event as TransactionClassification)
-          }
-          value={formik.values.has_classification}
-        ></InputSelect>
-
-        <div className="flex justify-end p-2 mt-10">
+        <div className="flex justify-end p-2 mt-7">
           <PrimaryButton
             onClick={onSubmit}
             text="Done"

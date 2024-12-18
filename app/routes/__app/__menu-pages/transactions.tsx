@@ -444,7 +444,7 @@ export default function Transactions() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-3/4 max-h-95vh",
+          modal: "p-0 m-0 w-full sm:w-3/4 max-h-95vh overflow-hidden",
         }}
         closeOnEsc={false}
         closeOnOverlayClick={false}
@@ -467,7 +467,7 @@ export default function Transactions() {
 
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-1/3",
+          modal: "p-0 m-0 w-full sm:w-1/3 overflow-hidden",
         }}
         center
         closeOnEsc={false}

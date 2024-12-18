@@ -430,7 +430,7 @@ export function TransactionAdd({
             </div>
           </TabList>
           <TabPanel>
-            <div className="p-4">
+            <div className="p-4 overflow-auto max-h-[calc(100vh_-_15rem)]">
               <Form method="post" id="classification-form" onSubmit={onSubmit}>
                 <div className="border-2 border-violet-950 border-opacity-50 p-4">
                   <Checkbox
@@ -539,7 +539,7 @@ export function TransactionAdd({
             </div>
           </TabPanel>
           <TabPanel>
-            <div className="p-4">
+            <div className="p-4 overflow-auto max-h-[calc(100vh_-_15rem)]">
               <Form method="post" id="classification-form" onSubmit={onSubmit}>
                 <div className="border-2 border-violet-950 border-opacity-50 p-4">
                   <Checkbox
