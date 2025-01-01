@@ -15,3 +15,5 @@ tags:
     description: API for managing expenses
   - name: Transaction Services
     description: API for managing transactions
+  - name: Merchant Services
+    description: API for managing merchants

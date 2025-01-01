@@ -22,6 +22,7 @@ model User {
   transaction_classifications TransactionClassification[]
   incomes                     Income[]
   accounts                    Account[]
+  merchants                   Merchant[]
 }
 
 model Company {
@@ -72,6 +73,8 @@ model Transaction {
   is_personal                    Boolean                     @default(false)
   is_income                      Boolean                     @default(false)
   description                    String?
+  merchant                       Merchant?                   @relation(fields: [merchant_id], references: [id])
+  merchant_id                    String?                     @db.ObjectId
 }
 
 model TransactionClassification {
@@ -108,6 +111,14 @@ model Account {
   company_id   String?       @db.ObjectId
   company      Company?      @relation(fields: [company_id], references: [id])
   balance      Float?
+  transactions Transaction[]
+}
+
+model Merchant {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  user_id      String        @db.ObjectId
+  user         User          @relation(fields: [user_id], references: [id])
   transactions Transaction[]
 }
 

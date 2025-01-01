@@ -153,3 +153,13 @@ components:
           type: integer
         totalPages:
           type: integer
+
+    Merchant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        user_id:
+          type: string
