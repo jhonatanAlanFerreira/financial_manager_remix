@@ -4,7 +4,7 @@ import {
   MerchantCreateRequestInterface,
   MerchantUpdateRequestInterface,
 } from "~/data/merchant/merchant-request-interface";
-import { create, update } from "~/data/merchant/merchant.server";
+import { create, remove, update } from "~/data/merchant/merchant.server";
 import { sendResponse } from "~/data/services/responses";
 
 export let action = async ({ request }: ActionFunctionArgs) => {
@@ -12,7 +12,7 @@ export let action = async ({ request }: ActionFunctionArgs) => {
     case "POST":
       return createMerchant(request);
     case "DELETE":
-      return;
+      return removeMerchant(request);
     case "PATCH":
       return updateMerchant(request);
   }
@@ -41,4 +41,13 @@ let updateMerchant = async (request: Request) => {
   };
 
   return sendResponse(await update(merchantId, user, data));
+};
+
+let removeMerchant = async (request: Request) => {
+  const user = await requireUserSession(request);
+  const merchantId = String(
+    new URL(request.url).searchParams.get("merchantId")
+  );
+
+  return sendResponse(await remove(merchantId, user));
 };

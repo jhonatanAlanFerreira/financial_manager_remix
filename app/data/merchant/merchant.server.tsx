@@ -7,6 +7,7 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { prisma } from "~/data/database/database.server";
 import {
   merchantCreateValidator,
+  merchantDeleteValidator,
   merchantUpdateValidator,
 } from "~/data/merchant/merchant-validator";
 
@@ -63,5 +64,29 @@ export async function update(
   return {
     data: res,
     message: "Merchant was updated successfully",
+  };
+}
+
+export async function remove(
+  merchantId: string,
+  user: User
+): Promise<ServerResponseInterface> {
+  const serverError = await merchantDeleteValidator(user, merchantId);
+
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
+  }
+
+  await prisma.merchant.delete({
+    where: {
+      id: merchantId,
+    },
+  });
+
+  return {
+    message: "Merchant removed successfully",
   };
 }

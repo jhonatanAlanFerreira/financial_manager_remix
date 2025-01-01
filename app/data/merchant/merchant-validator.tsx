@@ -99,3 +99,35 @@ export async function merchantUpdateValidator(
 
   return null;
 }
+
+export async function merchantDeleteValidator(
+  user: User,
+  merchantId: string
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(merchantId)) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchantId: "Invalid merchant ID format",
+      },
+    };
+  }
+
+  const merchantExists = await prisma.merchant.findFirst({
+    where: {
+      id: merchantId,
+      user_id: user.id,
+    },
+  });
+
+  if (!merchantExists) {
+    return {
+      errorCode: 404,
+      errors: {
+        merchantId: "Merchant not found",
+      },
+    };
+  }
+
+  return null;
+}
