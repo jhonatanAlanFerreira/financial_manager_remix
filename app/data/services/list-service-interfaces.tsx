@@ -7,6 +7,7 @@ import {
   Transaction,
   TransactionClassification,
   User,
+  Merchant,
 } from "@prisma/client";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 
@@ -23,7 +24,8 @@ export type Models =
   | Expense
   | Transaction
   | TransactionClassification
-  | Income;
+  | Income
+  | Merchant;
 
 export type CountArgs =
   | Prisma.AccountCountArgs
@@ -32,7 +34,8 @@ export type CountArgs =
   | Prisma.ExpenseCountArgs
   | Prisma.TransactionCountArgs
   | Prisma.TransactionClassificationCountArgs
-  | Prisma.IncomeCountArgs;
+  | Prisma.IncomeCountArgs
+  | Prisma.MerchantCountArgs;
 
 export type FindManyArgs =
   | Prisma.AccountFindManyArgs
@@ -41,7 +44,8 @@ export type FindManyArgs =
   | Prisma.ExpenseFindManyArgs
   | Prisma.TransactionFindManyArgs
   | Prisma.TransactionClassificationFindManyArgs
-  | Prisma.IncomeFindManyArgs;
+  | Prisma.IncomeFindManyArgs
+  | Prisma.MerchantFindManyArgs;
 
 export type WhereInputs =
   | Prisma.AccountWhereInput
@@ -50,6 +54,7 @@ export type WhereInputs =
   | Prisma.ExpenseWhereInput
   | Prisma.TransactionWhereInput
   | Prisma.TransactionClassificationWhereInput
-  | Prisma.IncomeWhereInput;
+  | Prisma.IncomeWhereInput
+  | Prisma.MerchantWhereInput;
 
 export type AdditionalArgs = Omit<FindManyArgs, "where" | "skip" | "take">;

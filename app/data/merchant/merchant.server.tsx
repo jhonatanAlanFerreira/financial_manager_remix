@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Merchant, Prisma, User } from "@prisma/client";
 import {
   MerchantCreateRequestInterface,
   MerchantUpdateRequestInterface,
@@ -8,8 +8,11 @@ import { prisma } from "~/data/database/database.server";
 import {
   merchantCreateValidator,
   merchantDeleteValidator,
+  merchantListValidator,
   merchantUpdateValidator,
 } from "~/data/merchant/merchant-validator";
+import { MerchantLoaderParamsInterface } from "~/data/merchant/merchant-query-params-interfaces";
+import { paginate } from "~/data/services/list.service";
 
 export async function create(
   data: MerchantCreateRequestInterface,
@@ -89,4 +92,33 @@ export async function remove(
   return {
     message: "Merchant removed successfully",
   };
+}
+
+export async function list(
+  user: User,
+  params: MerchantLoaderParamsInterface
+): Promise<ServerResponseInterface<Merchant[]>> {
+  const serverError = await merchantListValidator(params);
+
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
+  }
+
+  const { page, pageSize, extends: merchantIncludes, ...restParams } = params;
+
+  return paginate<
+    Merchant,
+    Prisma.MerchantFindManyArgs,
+    Prisma.MerchantCountArgs
+  >(
+    prisma.merchant.findMany,
+    prisma.merchant.count,
+    { page, pageSize },
+    restParams,
+    { user_id: user.id },
+    merchantIncludes
+  );
 }

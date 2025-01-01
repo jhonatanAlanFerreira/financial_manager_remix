@@ -5,7 +5,11 @@ import {
 } from "~/data/merchant/merchant-request-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { prisma } from "~/data/database/database.server";
-import { validateIdFormat } from "~/data/services/validators";
+import {
+  validateIdFormat,
+  validatePaginationParams,
+} from "~/data/services/validators";
+import { MerchantLoaderParamsInterface } from "~/data/merchant/merchant-query-params-interfaces";
 
 export async function merchantCreateValidator(
   data: MerchantCreateRequestInterface,
@@ -127,6 +131,17 @@ export async function merchantDeleteValidator(
         merchantId: "Merchant not found",
       },
     };
+  }
+
+  return null;
+}
+
+export async function merchantListValidator(
+  params: MerchantLoaderParamsInterface
+): Promise<ServerResponseErrorInterface | null> {
+  const paginationErrors = validatePaginationParams(params);
+  if (paginationErrors) {
+    return paginationErrors;
   }
 
   return null;
