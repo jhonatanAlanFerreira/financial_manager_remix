@@ -7,11 +7,15 @@ import {
 } from "@prisma/client";
 import { FormikProps } from "formik";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 
 export interface TransactionFiltersFormInterface {
   name: string;
-  is_personal_or_company: "personal" | "company" | "all";
-  is_income_or_expense: "income" | "expense" | "all";
+  is_personal_or_company: IsPersonalOrCompanyType;
+  is_income_or_expense: IsIncomeOrExpenseType;
   company: Company | null;
   expense: Expense | null;
   income: Income | null;

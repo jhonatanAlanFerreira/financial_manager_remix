@@ -1,10 +1,14 @@
 import { Company } from "@prisma/client";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 
 export interface ClassificationFiltersFormInterface {
   name: string;
   has_company: Company | null;
-  is_personal_or_company: "personal" | "company" | "all";
-  is_income_or_expense: "income" | "expense" | "all";
+  is_personal_or_company: IsPersonalOrCompanyType;
+  is_income_or_expense: IsIncomeOrExpenseType;
 }
 
 export interface ClassificationFormInterface {

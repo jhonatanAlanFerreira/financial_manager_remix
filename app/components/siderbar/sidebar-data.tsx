@@ -32,6 +32,11 @@ export const items: SidebarItemType[] = [
     path: "/classifications",
   },
   {
+    title: "Merchants",
+    icon: "ShoppingCart",
+    path: "/merchants",
+  },
+  {
     title: "Settings",
     icon: "Settings",
     path: "",

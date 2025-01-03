@@ -1,11 +1,12 @@
 import { Company } from "@prisma/client";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export interface ExpenseFiltersFormInterface {
   name: string;
   amount_greater: number;
   amount_less: number;
   has_company: Company | null;
-  is_personal_or_company: "personal" | "company" | "all";
+  is_personal_or_company: IsPersonalOrCompanyType;
 }
 
 export interface ExpenseFormInterface {
