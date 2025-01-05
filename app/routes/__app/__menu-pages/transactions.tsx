@@ -77,6 +77,7 @@ export default function Transactions() {
       company: null,
       expense: null,
       account: null,
+      merchant: null,
       date: todayFormatedDate(),
       amount: 0,
       transaction_classifications: [],
@@ -96,6 +97,7 @@ export default function Transactions() {
       company: null,
       expense: null,
       income: null,
+      merchant: null,
       has_classification: null,
       account: null,
       date_after: firstDayOfCurrentMonth(),
@@ -156,6 +158,7 @@ export default function Transactions() {
         expense: "id",
         income: "id",
         account: "id",
+        merchant: "id",
         has_classification: "id",
       })
     );
@@ -169,7 +172,7 @@ export default function Transactions() {
 
   const loadTransactions = async () => {
     await fetchTransactions(
-      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account`,
+      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
       {
         onSuccess: (data, totalPages) => {
           setTransactions(data);
@@ -324,6 +327,7 @@ export default function Transactions() {
               <th className="py-2 px-4 border-b border-r">Company</th>
               <th className="py-2 px-4 border-b border-r">Expense</th>
               <th className="py-2 px-4 border-b border-r">Income</th>
+              <th className="py-2 px-4 border-b border-r">Merchant</th>
               <th className="py-2 px-4 border-b border-r">Date</th>
               <th className="py-2 px-4 border-b border-r">Amount</th>
               <th className="py-2 px-4 border-b">Actions</th>
@@ -365,6 +369,13 @@ export default function Transactions() {
                   }`}
                 >
                   {transaction.income?.name || "Not set"}
+                </td>
+                <td
+                  className={`py-2 px-4 border-b border-r ${
+                    transaction.merchant?.name ? "" : "opacity-50"
+                  }`}
+                >
+                  {transaction.merchant?.name || "Not set"}
                 </td>
 
                 <td className="py-2 px-4 border-b border-r">
@@ -499,6 +510,7 @@ export async function loader(request: LoaderFunctionArgs) {
       "company",
       "expense",
       "income",
+      "merchant",
       "transaction_classifications",
     ],
     date_after: firstDayOfCurrentMonth(),

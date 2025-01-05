@@ -3,6 +3,7 @@ import {
   Company,
   Expense,
   Income,
+  Merchant,
   Transaction,
   TransactionClassification,
 } from "@prisma/client";
@@ -13,6 +14,7 @@ export interface TransactionWithRelationsInterface extends Transaction {
   expense: Expense;
   income: Income;
   account: Account;
+  merchant: Merchant;
 }
 
 export interface TransactionsWithTotalsInterface {
@@ -27,6 +29,7 @@ export const transactionIncludeOptions = [
   "expense",
   "income",
   "account",
+  "merchant",
 ] as const;
 export type TransactionIncludeOptions =
   (typeof transactionIncludeOptions)[number];

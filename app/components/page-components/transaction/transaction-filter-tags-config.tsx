@@ -68,6 +68,12 @@ export const TransactionFilterTagsConfig: {
     getValue: (fieldValue: any) => fieldValue.name,
   },
   {
+    fieldName: "merchant",
+    label: "Merchant",
+    closeBtn: true,
+    getValue: (fieldValue: any) => fieldValue.name,
+  },
+  {
     fieldName: "amount_greater",
     label: "Amount Greater",
     closeBtn: true,

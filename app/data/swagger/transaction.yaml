@@ -91,7 +91,7 @@ paths:
           name: extends
           schema:
             type: string
-            example: "company,transaction_classifications,expense,income,account"
+            example: "company,transaction_classifications,expense,income,account,merchant"
       responses:
         200:
           description: List of transactions

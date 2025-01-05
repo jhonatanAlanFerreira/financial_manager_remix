@@ -3,6 +3,7 @@ import {
   Company,
   Expense,
   Income,
+  Merchant,
   TransactionClassification,
 } from "@prisma/client";
 import { useEffect, useRef, useState } from "react";
@@ -21,6 +22,7 @@ import {
 } from "~/data/frontend-services/company-account-service";
 import { fetchExpenses } from "~/data/frontend-services/expense-service";
 import { fetchIncomes } from "~/data/frontend-services/income-service";
+import { fetchMerchants } from "~/data/frontend-services/merchant-service";
 import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
@@ -39,6 +41,7 @@ export function TransactionFilters({
     isExpenseLoading: false,
     isClassificationLoading: false,
     isIncomeLoading: false,
+    isMerchantLoading: false,
   });
 
   const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
@@ -54,6 +57,9 @@ export function TransactionFilters({
     ServerResponseInterface<TransactionClassification[]>
   >({});
   const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
+  const [merchants, setMerchants] = useState<
+    ServerResponseInterface<Merchant[]>
+  >({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -61,6 +67,8 @@ export function TransactionFilters({
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
   const getSelectIncomeOptionValue = (option: Income) => option.id;
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
+  const getSelectMerchantOptionValue = (option: Merchant) => option.id;
+  const getSelectMerchantOptionLabel = (option: Merchant) => option.name;
   const getSelectAccountOptionValue = (option: Account) => option.id;
   const getSelectAccountOptionLabel = (option: Account) => option.name;
   const getSelectClassificationOptionValue = (
@@ -77,6 +85,7 @@ export function TransactionFilters({
       isExpenseLoading: true,
       isClassificationLoading: true,
       isIncomeLoading: true,
+      isMerchantLoading: true,
     });
 
     loadAccounts();
@@ -84,6 +93,7 @@ export function TransactionFilters({
     loadExpenses();
     loadClassifications();
     loadIncomes();
+    loadMerchants();
   };
 
   const loadingData = () => Object.values(loadingStates).some((state) => state);
@@ -150,6 +160,10 @@ export function TransactionFilters({
     formik.setFieldValue("income", income);
   };
 
+  const onMerchantFilterChange = (merchant: Merchant) => {
+    formik.setFieldValue("merchant", merchant);
+  };
+
   const onClassificationChange = (
     classification: TransactionClassification
   ) => {
@@ -161,6 +175,7 @@ export function TransactionFilters({
     formik.setFieldValue("company", null);
     formik.setFieldValue("expense", null);
     formik.setFieldValue("income", null);
+    formik.setFieldValue("merchant", null);
     formik.setFieldValue("has_classification", null);
     formik.setFieldValue("account", null);
     formik.setFieldValue("date_after", "");
@@ -311,6 +326,27 @@ export function TransactionFilters({
           setLoadingStates((prev) => ({
             ...prev,
             isIncomeLoading: false,
+          }));
+        },
+      }
+    );
+  });
+
+  const loadMerchants = useDebouncedCallback(async () => {
+    await fetchMerchants(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: "",
+      },
+      {
+        onSuccess: (res) => {
+          setMerchants(res);
+        },
+        onError: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isMerchantLoading: false,
           }));
         },
       }
@@ -504,6 +540,17 @@ export function TransactionFilters({
             }
             value={formik.values.account}
           />
+          <InputSelect
+            isClearable
+            className="mb-8"
+            placeholder="Merchant"
+            options={merchants.data}
+            getOptionLabel={getSelectMerchantOptionLabel as any}
+            getOptionValue={getSelectMerchantOptionValue as any}
+            name="merchant"
+            onChange={(event) => onMerchantFilterChange(event as Merchant)}
+            value={formik.values.merchant}
+          ></InputSelect>
           {formik.values.is_income_or_expense != "income" && (
             <InputSelect
               isClearable

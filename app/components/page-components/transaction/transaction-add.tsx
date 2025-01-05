@@ -3,6 +3,7 @@ import {
   Company,
   Expense,
   Income,
+  Merchant,
   TransactionClassification,
 } from "@prisma/client";
 import { Form } from "@remix-run/react";
@@ -26,6 +27,7 @@ import {
 } from "~/data/frontend-services/company-account-service";
 import { fetchExpenses } from "~/data/frontend-services/expense-service";
 import { fetchIncomes } from "~/data/frontend-services/income-service";
+import { fetchMerchants } from "~/data/frontend-services/merchant-service";
 import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
@@ -51,6 +53,7 @@ export function TransactionAdd({
     isExpenseLoading: false,
     isClassificationLoading: false,
     isIncomeLoading: false,
+    isMerchantLoading: false,
   });
 
   const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
@@ -66,6 +69,9 @@ export function TransactionAdd({
     ServerResponseInterface<TransactionClassification[]>
   >({});
   const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
+  const [merchants, setMerchants] = useState<
+    ServerResponseInterface<Merchant[]>
+  >({});
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -75,6 +81,8 @@ export function TransactionAdd({
   const getSelectExpenseOptionLabel = (option: Expense) => option.name;
   const getSelectIncomeOptionValue = (option: Income) => option.id;
   const getSelectIncomeOptionLabel = (option: Income) => option.name;
+  const getSelectMerchantOptionValue = (option: Merchant) => option.id;
+  const getSelectMerchantOptionLabel = (option: Merchant) => option.name;
   const getSelectClassificationOptionValue = (
     option: TransactionClassification
   ) => option.id;
@@ -100,6 +108,10 @@ export function TransactionAdd({
     formik.setFieldValue("income", income);
   };
 
+  const onMerchantChange = (merchant: Merchant) => {
+    formik.setFieldValue("merchant", merchant);
+  };
+
   const onClassificationsChange = (
     classifications: TransactionClassification[]
   ) => {
@@ -118,6 +130,7 @@ export function TransactionAdd({
       isExpenseLoading: true,
       isClassificationLoading: true,
       isIncomeLoading: true,
+      isMerchantLoading: true,
     });
 
     loadAccounts();
@@ -125,6 +138,7 @@ export function TransactionAdd({
     loadExpenses();
     loadClassifications();
     loadIncomes();
+    loadMerchants();
   };
 
   const loadingData = () => Object.values(loadingStates).some((state) => state);
@@ -378,6 +392,27 @@ export function TransactionAdd({
     );
   });
 
+  const loadMerchants = useDebouncedCallback(async () => {
+    await fetchMerchants(
+      {
+        paginationParams: defaultPaginationQuery(),
+        searchParams: "",
+      },
+      {
+        onSuccess: (res) => {
+          setMerchants(res);
+        },
+        onError: () => {},
+        onFinally: () => {
+          setLoadingStates((prev) => ({
+            ...prev,
+            isMerchantLoading: false,
+          }));
+        },
+      }
+    );
+  });
+
   const loadCompanies = useDebouncedCallback(async () => {
     const res = await fetchCompanies();
     if (res) {
@@ -500,6 +535,17 @@ export function TransactionAdd({
                   onChange={formik.handleChange}
                   value={formik.values.description || undefined}
                 ></TextArea>
+                <InputSelect
+                  isClearable
+                  className="mb-8"
+                  placeholder="Merchant"
+                  options={merchants.data}
+                  getOptionLabel={getSelectMerchantOptionLabel as any}
+                  getOptionValue={getSelectMerchantOptionValue as any}
+                  name="merchant"
+                  onChange={(event) => onMerchantChange(event as Merchant)}
+                  value={formik.values.merchant}
+                ></InputSelect>
                 <InputText
                   label="Date *"
                   name="date"
@@ -609,6 +655,17 @@ export function TransactionAdd({
                   onChange={formik.handleChange}
                   value={formik.values.description || undefined}
                 ></TextArea>
+                <InputSelect
+                  isClearable
+                  className="mb-8"
+                  placeholder="Merchant"
+                  options={merchants.data}
+                  getOptionLabel={getSelectMerchantOptionLabel as any}
+                  getOptionValue={getSelectMerchantOptionValue as any}
+                  name="merchant"
+                  onChange={(event) => onMerchantChange(event as Merchant)}
+                  value={formik.values.merchant}
+                ></InputSelect>
                 <InputText
                   label="Date *"
                   name="date"

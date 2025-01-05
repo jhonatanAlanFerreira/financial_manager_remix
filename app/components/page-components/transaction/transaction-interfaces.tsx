@@ -3,6 +3,7 @@ import {
   Company,
   Expense,
   Income,
+  Merchant,
   TransactionClassification,
 } from "@prisma/client";
 import { FormikProps } from "formik";
@@ -19,6 +20,7 @@ export interface TransactionFiltersFormInterface {
   company: Company | null;
   expense: Expense | null;
   income: Income | null;
+  merchant: Merchant | null;
   date_after: string;
   date_before: string;
   amount_greater: number;
@@ -38,6 +40,7 @@ export interface TransactionFormInterface {
   company: Company | null;
   expense: Expense | null;
   account: Account | null;
+  merchant: Merchant | null;
   name: string;
   description: string | null;
 }
