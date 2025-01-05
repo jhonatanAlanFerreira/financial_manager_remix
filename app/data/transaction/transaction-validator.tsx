@@ -117,6 +117,60 @@ export async function transactionCreateValidator(
     };
   }
 
+  if (!validateIdFormat(data.merchant)) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant ID format",
+      },
+    };
+  }
+
+  const validMerchant = data.merchant
+    ? prisma.merchant.findFirst({
+        where: {
+          id: data.merchant,
+          user_id: user.id,
+        },
+      })
+    : true;
+
+  if (!validMerchant) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant",
+      },
+    };
+  }
+
+  if (!validateIdFormat(data.income)) {
+    return {
+      errorCode: 400,
+      errors: {
+        income: "Invalid income ID format",
+      },
+    };
+  }
+
+  const validIncome = data.income
+    ? prisma.income.findFirst({
+        where: {
+          id: data.income,
+          user_id: user.id,
+        },
+      })
+    : true;
+
+  if (!validIncome) {
+    return {
+      errorCode: 400,
+      errors: {
+        income: "Invalid income",
+      },
+    };
+  }
+
   if (!validateMultipleIdsFormat(data.classifications)) {
     return {
       errorCode: 400,
@@ -314,6 +368,60 @@ export async function transactionUpdateValidator(
     };
   }
 
+  if (!validateIdFormat(data.merchant)) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant ID format",
+      },
+    };
+  }
+
+  const validMerchant = data.merchant
+    ? prisma.merchant.findFirst({
+        where: {
+          id: data.merchant,
+          user_id: user.id,
+        },
+      })
+    : true;
+
+  if (!validMerchant) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant",
+      },
+    };
+  }
+
+  if (!validateIdFormat(data.income)) {
+    return {
+      errorCode: 400,
+      errors: {
+        income: "Invalid income ID format",
+      },
+    };
+  }
+
+  const validIncome = data.income
+    ? prisma.income.findFirst({
+        where: {
+          id: data.income,
+          user_id: user.id,
+        },
+      })
+    : true;
+
+  if (!validIncome) {
+    return {
+      errorCode: 400,
+      errors: {
+        income: "Invalid income",
+      },
+    };
+  }
+
   if (!validateMultipleIdsFormat(data.classifications)) {
     return {
       errorCode: 400,
@@ -376,6 +484,15 @@ export async function transactionListValidator(
       errorCode: 400,
       errors: {
         expense: "Invalid expense ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.merchant)) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant ID format",
       },
     };
   }

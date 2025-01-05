@@ -34,6 +34,11 @@ paths:
             type: string
           default: ""
         - in: query
+          name: merchant
+          schema:
+            type: string
+          default: ""
+        - in: query
           name: income
           schema:
             type: string
@@ -158,6 +163,9 @@ paths:
                 income:
                   type: string
                   default: ""
+                merchant:
+                  type: string
+                  default: ""
                 account:
                   type: string
                   default: ""
@@ -226,6 +234,9 @@ paths:
                   type: string
                   default: ""
                 income:
+                  type: string
+                  default: ""
+                merchant:
                   type: string
                   default: ""
                 account:

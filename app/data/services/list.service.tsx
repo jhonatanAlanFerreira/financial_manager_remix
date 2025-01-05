@@ -32,6 +32,10 @@ export function buildWhereClause(
       whereClause.expense_id = params.expense;
     }
 
+    if (params.merchant) {
+      whereClause.merchant_id = params.merchant;
+    }
+
     if (params.company) {
       whereClause.company_id = params.company;
     }

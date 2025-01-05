@@ -8,6 +8,7 @@ export interface WhereParamsInterface {
   company?: string;
   income?: string;
   expense?: string;
+  merchant?: string;
   account?: string;
   classification?: string;
   has_company?: string;

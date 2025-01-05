@@ -2,6 +2,7 @@ export interface TransactionCreateRequestInterface {
   name: string;
   amount: number;
   company: string | undefined;
+  merchant: string | undefined;
   expense: string | undefined;
   income: string | undefined;
   account: string;
