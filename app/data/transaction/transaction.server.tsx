@@ -108,7 +108,7 @@ export async function create(
 
   await prisma.account.update({
     where: { id: data.account },
-    data: { balance: newBalance },
+    data: { balance: +newBalance.toFixed(2) },
   });
 
   return {
@@ -134,13 +134,13 @@ export async function remove(
     where: { id: transactionId },
   });
 
+  const amount = transaction ? +transaction.amount.toFixed(2) : 0;
+
   await prisma.account.update({
     where: { id: transaction?.account_id },
     data: {
       balance: {
-        increment: transaction?.is_income
-          ? -transaction?.amount
-          : transaction?.amount,
+        increment: transaction?.is_income ? -amount : amount,
       },
     },
   });
@@ -187,7 +187,7 @@ export async function update(
     where: { id: existingTransaction?.account_id },
     data: {
       balance: {
-        increment: adjustment,
+        increment: +adjustment.toFixed(2),
       },
     },
   });
