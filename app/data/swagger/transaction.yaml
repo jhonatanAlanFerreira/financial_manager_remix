@@ -119,6 +119,8 @@ paths:
                               $ref: "#/components/schemas/Income"
                             account:
                               $ref: "#/components/schemas/Account"
+                            merchant:
+                              $ref: "#/components/schemas/Merchant"
                   pageInfo:
                     type: object
                     properties:
