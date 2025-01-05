@@ -1,10 +1,10 @@
 export interface TransactionCreateRequestInterface {
   name: string;
   amount: number;
-  company: string | undefined;
-  merchant: string | undefined;
-  expense: string | undefined;
-  income: string | undefined;
+  company: string | undefined | null;
+  merchant: string | undefined | null;
+  expense: string | undefined | null;
+  income: string | undefined | null;
   account: string;
   classifications: string[];
   date: string;

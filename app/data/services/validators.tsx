@@ -9,7 +9,7 @@ export function validateNumber(value: any) {
 }
 
 export function validateIdFormat(id: any | undefined) {
-  return id === undefined || ObjectId.isValid(id);
+  return !id || ObjectId.isValid(id);
 }
 
 export function validateMultipleIdsFormat(ids: any[] | undefined) {
@@ -41,7 +41,7 @@ export function validatePaginationParams(
 }
 
 export async function validateCompany(
-  companyId: string | undefined,
+  companyId: string | undefined | null,
   user: User
 ): Promise<ServerResponseErrorInterface | null> {
   if (companyId) {
