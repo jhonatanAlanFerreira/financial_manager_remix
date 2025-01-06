@@ -7,7 +7,7 @@ export const fetchClassifications = async (
   params: {
     paginationParams: string;
     searchParams: string;
-    sortParams: string;
+    sortParams?: string;
     extends?: string;
   },
   callbacks: {

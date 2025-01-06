@@ -32,6 +32,9 @@ export let loader = async (
     page: Number(url.searchParams.get("page")) || 1,
     pageSize: Number(url.searchParams.get("pageSize")) || "all",
     name: url.searchParams.get("name") || undefined,
+    sort_key: url.searchParams.get("sort_key") || undefined,
+    sort_order:
+      (url.searchParams.get("sort_order") as "desc" | "asc") || "desc",
     extends: parseIncludes(url, merchantIncludeOptions),
   };
 

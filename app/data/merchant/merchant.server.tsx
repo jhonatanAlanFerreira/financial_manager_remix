@@ -119,6 +119,7 @@ export async function list(
     { page, pageSize },
     restParams,
     { user_id: user.id },
-    merchantIncludes
+    merchantIncludes,
+    { column: restParams.sort_key, order: restParams.sort_order }
   );
 }

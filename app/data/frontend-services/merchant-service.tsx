@@ -4,19 +4,23 @@ import toast from "react-hot-toast";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export const fetchMerchants = async (
-  params: { paginationParams: string; searchParams: string },
+  params: {
+    paginationParams: string;
+    searchParams: string;
+    sortParams?: string;
+  },
   callbacks: {
     onSuccess: (data: ServerResponseInterface<Merchant[]>) => void;
     onError: () => void;
     onFinally: () => void;
   }
 ): Promise<void> => {
-  const { paginationParams, searchParams } = params;
+  const { paginationParams, searchParams, sortParams } = params;
   const { onSuccess, onError, onFinally } = callbacks;
 
   try {
     const res = await axios.get<ServerResponseInterface<Merchant[]>>(
-      `/api/merchant?${paginationParams}&${searchParams}`
+      `/api/merchant?${paginationParams}&${sortParams}&${searchParams}`
     );
 
     onSuccess(res.data);
