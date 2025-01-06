@@ -30,6 +30,8 @@ import {
   deleteIncome,
   fetchIncomes,
 } from "~/data/frontend-services/income-service";
+import { ThSort } from "~/components/th-sort/th-sort";
+import { IncomesThSortConfig } from "~/components/page-components/income/incomes-th-sort-config";
 
 export default function Incomes() {
   const { setTitle } = useTitle();
@@ -49,6 +51,7 @@ export default function Incomes() {
   const [incomes, setIncomes] = useState<
     ServerResponseInterface<IncomeWithRelationsInterface[]>
   >({});
+  const [sortParams, setSortParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [paginationState, setPaginationState] = useState<{
     reload: boolean;
@@ -139,6 +142,13 @@ export default function Incomes() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (reloadIncomes) {
+      setReloadIncomes(false);
+      loadIncomes();
+    }
+  }, [sortParams]);
+
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = prepareFormData(event.currentTarget);
@@ -163,7 +173,7 @@ export default function Incomes() {
     setLoading(true);
 
     await fetchIncomes(
-      { paginationParams: paginationParams(), searchParams },
+      { paginationParams: paginationParams(), searchParams, sortParams },
       {
         onSuccess: (data) => {
           setPaginationState({
@@ -295,6 +305,11 @@ export default function Incomes() {
     return formData;
   };
 
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setReloadIncomes(true);
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -334,10 +349,10 @@ export default function Incomes() {
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Amount</th>
-              <th className="py-2 px-4 border-b border-r">Type</th>
-              <th className="py-2 px-4 border-b">Actions</th>
+              <ThSort
+                thSortConfigs={IncomesThSortConfig.thSortConfigs}
+                onSortChange={onSortChange}
+              ></ThSort>
             </tr>
           </thead>
           <tbody>

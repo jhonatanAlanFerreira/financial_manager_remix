@@ -51,7 +51,11 @@ export const createOrUpdateIncome = async (
 };
 
 export const fetchIncomes = async (
-  params: { paginationParams: string; searchParams: string },
+  params: {
+    paginationParams: string;
+    searchParams: string;
+    sortParams?: string;
+  },
   callbacks: {
     onSuccess: (
       data: ServerResponseInterface<IncomeWithRelationsInterface[]>
@@ -60,13 +64,15 @@ export const fetchIncomes = async (
     onFinally: () => void;
   }
 ): Promise<void> => {
-  const { paginationParams, searchParams } = params;
+  const { paginationParams, searchParams, sortParams } = params;
   const { onSuccess, onError, onFinally } = callbacks;
 
   try {
     const res = await axios.get<
       ServerResponseInterface<IncomeWithRelationsInterface[]>
-    >(`/api/income?${paginationParams}&${searchParams}&extends=companies`);
+    >(
+      `/api/income?${paginationParams}&${searchParams}&${sortParams}&extends=companies`
+    );
 
     onSuccess(res.data);
   } catch (error) {
