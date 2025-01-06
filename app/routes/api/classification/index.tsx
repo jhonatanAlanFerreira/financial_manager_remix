@@ -90,6 +90,9 @@ export let loader = async (
       (url.searchParams.get(
         "is_personal_or_company"
       ) as IsPersonalOrCompanyType) || "all",
+    sort_key: url.searchParams.get("sort_key") || undefined,
+    sort_order:
+      (url.searchParams.get("sort_order") as "desc" | "asc") || "desc",
   };
 
   const finalParams = {

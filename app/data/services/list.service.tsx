@@ -117,6 +117,10 @@ function buildOrderByQuery(sortParams: {
     return { is_personal: order === "asc" ? "asc" : "desc" };
   }
 
+  if (column === "is_income_or_expense") {
+    return { is_income: order === "asc" ? "asc" : "desc" };
+  }
+
   return { [column]: order };
 }
 

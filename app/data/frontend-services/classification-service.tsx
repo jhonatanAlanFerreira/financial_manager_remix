@@ -7,6 +7,7 @@ export const fetchClassifications = async (
   params: {
     paginationParams: string;
     searchParams: string;
+    sortParams: string;
     extends?: string;
   },
   callbacks: {
@@ -17,10 +18,15 @@ export const fetchClassifications = async (
     onFinally: () => void;
   }
 ): Promise<void> => {
-  const { paginationParams, searchParams, extends: extendsParams } = params;
+  const {
+    paginationParams,
+    searchParams,
+    extends: extendsParams,
+    sortParams,
+  } = params;
   const { onSuccess, onError, onFinally } = callbacks;
 
-  const url = `/api/classification?${paginationParams}&${searchParams}${
+  const url = `/api/classification?${paginationParams}&${searchParams}&${sortParams}${
     extendsParams ? `&extends=${extendsParams}` : ""
   }`;
 
