@@ -111,7 +111,7 @@ export default function Transactions() {
       has_classification: null,
       account: null,
       date_after: firstDayOfCurrentMonth(),
-      date_before: lastDayOfCurrentMonth(),
+      date_before: "",
       amount_greater: 0,
       amount_less: 0,
     },
@@ -532,7 +532,6 @@ export async function loader(request: LoaderFunctionArgs) {
       "transaction_classifications",
     ],
     date_after: firstDayOfCurrentMonth(),
-    date_before: lastDayOfCurrentMonth(),
     ...defaultSortKey,
   }).then((res) => res.json());
 
