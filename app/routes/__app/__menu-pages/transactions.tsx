@@ -193,6 +193,7 @@ export default function Transactions() {
   };
 
   const loadTransactions = async () => {
+    setLoading(true);
     await fetchTransactions(
       `${paginationParams()}&${searchParams}&${sortParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
       {
