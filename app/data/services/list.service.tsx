@@ -87,6 +87,35 @@ export function buildWhereClause(
   return whereClause;
 }
 
+function buildOrderByQuery(sortParams: {
+  column: string;
+  order: "asc" | "desc";
+}) {
+  const { column, order } = sortParams;
+
+  if (column === "company") {
+    return { company: { name: order } };
+  }
+
+  if (column === "expense") {
+    return { expense: { name: order } };
+  }
+
+  if (column === "income") {
+    return { income: { name: order } };
+  }
+
+  if (column === "merchant") {
+    return { merchant: { name: order } };
+  }
+
+  if (column === "type") {
+    //WIP
+  }
+
+  return { [column]: order };
+}
+
 export async function paginate<
   Model extends Models,
   FindManyArg extends FindManyArgs,
@@ -100,7 +129,7 @@ export async function paginate<
   whereParams?: WhereParamsInterface,
   additionalWhere?: WhereType,
   includes?: IncludeOption[],
-  sortParams?: { column: keyof Model; order: "asc" | "desc" }
+  sortParams?: { column: string; order: "asc" | "desc" }
 ): Promise<{
   data: Model[];
   pageInfo: {
@@ -126,9 +155,7 @@ export async function paginate<
     {} as Record<string, boolean>
   );
 
-  const orderByQuery = sortParams
-    ? { [sortParams.column]: sortParams.order }
-    : undefined;
+  const orderByQuery = sortParams ? buildOrderByQuery(sortParams) : undefined;
 
   const finalQuery = {
     where: finalWhereClause,

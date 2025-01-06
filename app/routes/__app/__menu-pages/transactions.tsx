@@ -365,6 +365,9 @@ export default function Transactions() {
                   {formatDate(transaction.date)}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
+                  {transaction.name}
+                </td>
+                <td className="py-2 px-4 border-b border-r">
                   {getTransactionType(transaction)}
                 </td>
                 <td
@@ -394,9 +397,6 @@ export default function Transactions() {
                   }`}
                 >
                   {transaction.merchant?.name || "Not set"}
-                </td>
-                <td className="py-2 px-4 border-b border-r">
-                  {transaction.name}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.amount}
