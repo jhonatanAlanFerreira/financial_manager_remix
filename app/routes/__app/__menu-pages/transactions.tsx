@@ -43,9 +43,9 @@ import { TransactionThSortConfig } from "~/components/page-components/transactio
 export default function Transactions() {
   const { setTitle } = useTitle();
 
-  const defaultSortKey: { key: string; sortOrder: "desc" | "asc" } = {
-    key: "date",
-    sortOrder: "desc",
+  const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
+    sort_key: "date",
+    sort_order: "desc",
   };
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -181,9 +181,9 @@ export default function Transactions() {
     );
   };
 
-  const onSortChange = (key: string, sortOrder: "asc" | "desc") => {
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setReloadTransactions(true);
-    setSortParams(queryParamsFromObject({ key, sortOrder }));
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
   };
 
   const getTransactionType = (transaction: Transaction) => {

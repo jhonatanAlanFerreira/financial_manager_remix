@@ -8,8 +8,8 @@ export function ThSort({
   onSortChange,
 }: ThSortPropsInterface) {
   const [sortState, setSortState] = useState<{
-    key: string;
-    sortOrder: "asc" | "desc";
+    sort_key: string;
+    sort_order: "asc" | "desc";
   } | null>(defaultKey || null);
 
   const handleSortClick = (key: string) => {
@@ -17,11 +17,11 @@ export function ThSort({
 
     setSortState((prevState) => {
       const newSortOrder =
-        prevState?.key === key && prevState.sortOrder === "asc"
+        prevState?.sort_key === key && prevState.sort_order === "asc"
           ? "desc"
           : "asc";
       onSortChange?.(key, newSortOrder);
-      return { key, sortOrder: newSortOrder };
+      return { sort_key: key, sort_order: newSortOrder };
     });
   };
 
@@ -44,8 +44,8 @@ export function ThSort({
             <span>{th.title}</span>
             {th.sort && th.key && (
               <span style={{ marginLeft: "8px" }}>
-                {sortState?.key === th.key ? (
-                  sortState.sortOrder === "asc" ? (
+                {sortState?.sort_key === th.key ? (
+                  sortState.sort_order === "asc" ? (
                     <Icon name="ArrowUp" size={16}></Icon>
                   ) : (
                     <Icon name="ArrowDown" size={16}></Icon>

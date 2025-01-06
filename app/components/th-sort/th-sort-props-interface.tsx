@@ -6,8 +6,8 @@ export interface ThSortPropsInterface {
     key?: string;
   }[];
   defaultKey?: {
-    key: string;
-    sortOrder: "asc" | "desc";
+    sort_key: string;
+    sort_order: "asc" | "desc";
   };
-  onSortChange?: (key: string, sortOrder: "asc" | "desc") => void;
+  onSortChange?: (sort_key: string, sort_order: "asc" | "desc") => void;
 }
