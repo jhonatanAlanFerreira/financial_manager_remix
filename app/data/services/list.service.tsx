@@ -109,8 +109,8 @@ function buildOrderByQuery(sortParams: {
     return { merchant: { name: order } };
   }
 
-  if (column === "type") {
-    //WIP
+  if (column === "is_personal_or_company") {
+    return { is_personal: order === "asc" ? "asc" : "desc" };
   }
 
   return { [column]: order };
