@@ -37,6 +37,8 @@ import {
   deleteTransaction,
   fetchTransactions,
 } from "~/data/frontend-services/transactions-service";
+import { ThSort } from "~/components/th-sort/th-sort";
+import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -322,15 +324,10 @@ export default function Transactions() {
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Type</th>
-              <th className="py-2 px-4 border-b border-r">Company</th>
-              <th className="py-2 px-4 border-b border-r">Expense</th>
-              <th className="py-2 px-4 border-b border-r">Income</th>
-              <th className="py-2 px-4 border-b border-r">Merchant</th>
-              <th className="py-2 px-4 border-b border-r">Date</th>
-              <th className="py-2 px-4 border-b border-r">Amount</th>
-              <th className="py-2 px-4 border-b">Actions</th>
+              <ThSort
+                thSortConfigs={TransactionThSortConfig.thSortConfigs}
+                defaultKey={{ key: "date", sortOrder: "desc" }}
+              ></ThSort>
             </tr>
           </thead>
           <tbody>
@@ -344,7 +341,7 @@ export default function Transactions() {
             {transactions.data?.transactions.map((transaction, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="py-2 px-4 border-b border-r">
-                  {transaction.name}
+                  {formatDate(transaction.date)}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {getTransactionType(transaction)}
@@ -377,9 +374,8 @@ export default function Transactions() {
                 >
                   {transaction.merchant?.name || "Not set"}
                 </td>
-
                 <td className="py-2 px-4 border-b border-r">
-                  {formatDate(transaction.date)}
+                  {transaction.name}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.amount}
