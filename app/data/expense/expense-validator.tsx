@@ -201,5 +201,17 @@ export async function expenseListValidator(
     };
   }
 
+  if (
+    params.sort_key &&
+    !["name", "amount", "is_personal_or_company"].includes(params.sort_key)
+  ) {
+    return {
+      errorCode: 400,
+      errors: {
+        sort_key: `${params.sort_key} is not a valid key`,
+      },
+    };
+  }
+
   return null;
 }

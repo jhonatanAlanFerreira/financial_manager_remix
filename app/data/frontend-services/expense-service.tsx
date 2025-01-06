@@ -4,7 +4,11 @@ import toast from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 
 export const fetchExpenses = async (
-  params: { paginationParams: string; searchParams: string },
+  params: {
+    paginationParams: string;
+    searchParams: string;
+    sortParams?: string;
+  },
   callbacks: {
     onSuccess: (
       data: ServerResponseInterface<ExpenseWithRelationsInterface[]>
@@ -13,13 +17,15 @@ export const fetchExpenses = async (
     onFinally: () => void;
   }
 ): Promise<void> => {
-  const { paginationParams, searchParams } = params;
+  const { paginationParams, searchParams, sortParams } = params;
   const { onSuccess, onError, onFinally } = callbacks;
 
   try {
     const res = await axios.get<
       ServerResponseInterface<ExpenseWithRelationsInterface[]>
-    >(`/api/expense?${paginationParams}&${searchParams}&extends=companies`);
+    >(
+      `/api/expense?${paginationParams}&${searchParams}&${sortParams}&extends=companies`
+    );
 
     onSuccess(res.data);
   } catch (error) {
