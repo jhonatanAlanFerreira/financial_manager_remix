@@ -506,5 +506,26 @@ export async function transactionListValidator(
     };
   }
 
+  if (
+    params.sort_key &&
+    ![
+      "date",
+      "name",
+      "amount",
+      "company",
+      "expense",
+      "income",
+      "merchant",
+      "is_personal_or_company",
+    ].includes(params.sort_key)
+  ) {
+    return {
+      errorCode: 400,
+      errors: {
+        sort_key: `${params.sort_key} is not a valid key`,
+      },
+    };
+  }
+
   return null;
 }
