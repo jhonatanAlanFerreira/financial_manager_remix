@@ -88,10 +88,14 @@ export function buildWhereClause(
 }
 
 function buildOrderByQuery(sortParams: {
-  column: string;
+  column: string | undefined;
   order: "asc" | "desc";
 }) {
   const { column, order } = sortParams;
+
+  if (!column) {
+    return undefined;
+  }
 
   if (column === "company") {
     return { company: { name: order } };
@@ -129,7 +133,7 @@ export async function paginate<
   whereParams?: WhereParamsInterface,
   additionalWhere?: WhereType,
   includes?: IncludeOption[],
-  sortParams?: { column: string; order: "asc" | "desc" }
+  sortParams?: { column: string | undefined; order: "asc" | "desc" }
 ): Promise<{
   data: Model[];
   pageInfo: {
