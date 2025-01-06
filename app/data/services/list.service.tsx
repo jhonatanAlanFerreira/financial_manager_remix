@@ -99,7 +99,8 @@ export async function paginate<
   paginationParams: PaginationParamsInterface = { page: 1, pageSize: "all" },
   whereParams?: WhereParamsInterface,
   additionalWhere?: WhereType,
-  includes?: IncludeOption[]
+  includes?: IncludeOption[],
+  sortParams?: { column: keyof Model; order: "asc" | "desc" }
 ): Promise<{
   data: Model[];
   pageInfo: {
@@ -125,11 +126,16 @@ export async function paginate<
     {} as Record<string, boolean>
   );
 
+  const orderByQuery = sortParams
+    ? { [sortParams.column]: sortParams.order }
+    : undefined;
+
   const finalQuery = {
     where: finalWhereClause,
     skip,
     take,
     include: includeQuery,
+    orderBy: orderByQuery,
   } as FindManyArg;
 
   const data = await findManyQuery(finalQuery);

@@ -49,7 +49,8 @@ export async function list(
     { page, pageSize },
     restParams,
     { user_id: user.id },
-    transactionIncludes
+    transactionIncludes,
+    { column: "date", order: "desc" }
   );
 
   const totals = await calculateTotals(user, params);
