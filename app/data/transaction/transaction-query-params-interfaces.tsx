@@ -4,9 +4,11 @@ import {
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
 import { TransactionIncludeOptions } from "~/data/transaction/transaction-types";
+import { SortParamsInterface } from "~/shared/sort-params-interface";
 
 export interface TransactionLoaderParamsInterface
-  extends PaginationParamsInterface {
+  extends PaginationParamsInterface,
+    SortParamsInterface {
   name: string | undefined;
   is_personal_or_company: IsPersonalOrCompanyType;
   is_income_or_expense: IsIncomeOrExpenseType;

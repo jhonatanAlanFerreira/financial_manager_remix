@@ -50,7 +50,7 @@ export async function list(
     restParams,
     { user_id: user.id },
     transactionIncludes,
-    { column: "date", order: "desc" }
+    { column: restParams.sort_key, order: restParams.sort_order }
   );
 
   const totals = await calculateTotals(user, params);

@@ -144,5 +144,14 @@ export async function merchantListValidator(
     return paginationErrors;
   }
 
+  if (params.sort_key && !["name"].includes(params.sort_key)) {
+    return {
+      errorCode: 400,
+      errors: {
+        sort_key: `${params.sort_key} is not a valid key`,
+      },
+    };
+  }
+
   return null;
 }

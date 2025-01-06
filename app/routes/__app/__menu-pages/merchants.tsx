@@ -26,6 +26,8 @@ import {
 } from "~/data/frontend-services/merchant-service";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { InputText } from "~/components/inputs/input-text/input-text";
+import { ThSort } from "~/components/th-sort/th-sort";
+import { MerchantThSortConfig } from "~/components/page-components/merchants/merchant-th-sort-config";
 
 export default function Merchants() {
   const { setTitle } = useTitle();
@@ -37,6 +39,7 @@ export default function Merchants() {
   const [reloadMerchants, setReloadMerchants] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [sortParams, setSortParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
@@ -114,6 +117,13 @@ export default function Merchants() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (reloadMerchants) {
+      setReloadMerchants(false);
+      loadMerchants();
+    }
+  }, [sortParams]);
+
   const onModalCancel = () => {
     mainForm.resetForm();
     setResponseErrors({});
@@ -124,7 +134,7 @@ export default function Merchants() {
     setLoading(true);
 
     await fetchMerchants(
-      { paginationParams: paginationParams(), searchParams },
+      { paginationParams: paginationParams(), searchParams, sortParams },
       {
         onSuccess: (data) => {
           setPaginationState({
@@ -243,6 +253,11 @@ export default function Merchants() {
     }
   };
 
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setReloadMerchants(true);
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -282,8 +297,10 @@ export default function Merchants() {
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b">Actions</th>
+              <ThSort
+                thSortConfigs={MerchantThSortConfig.thSortConfigs}
+                onSortChange={onSortChange}
+              ></ThSort>
             </tr>
           </thead>
           <tbody>

@@ -27,6 +27,16 @@ paths:
           schema:
             type: string
             example: "transactions"
+        - in: query
+          name: sort_key
+          schema:
+            type: string
+            example: "name"
+        - in: query
+          name: sort_order
+          schema:
+            type: string
+            enum: ["asc", "desc"]
       responses:
         200:
           description: A list of merchants

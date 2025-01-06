@@ -30,6 +30,8 @@ import {
   deleteClassification,
   fetchClassifications,
 } from "~/data/frontend-services/classification-service";
+import { ThSort } from "~/components/th-sort/th-sort";
+import { ClassificationThSortConfig } from "~/components/page-components/classification/classification-th-sort-config";
 
 export default function Classifications() {
   const { setTitle } = useTitle();
@@ -41,6 +43,7 @@ export default function Classifications() {
   const [reloadClassification, setReloadClassification] =
     useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
+  const [sortParams, setSortParams] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(0);
   const [responseErrors, setResponseErrors] =
     useState<ServerResponseErrorInterface>({});
@@ -141,6 +144,13 @@ export default function Classifications() {
     }
   }, [filterForm.values.is_personal_or_company]);
 
+  useEffect(() => {
+    if (reloadClassification) {
+      setReloadClassification(false);
+      loadClassifications();
+    }
+  }, [sortParams]);
+
   const loadClassifications = async () => {
     setLoading(true);
 
@@ -148,6 +158,7 @@ export default function Classifications() {
       {
         paginationParams: paginationParams(),
         searchParams,
+        sortParams,
         extends: "companies",
       },
       {
@@ -314,6 +325,11 @@ export default function Classifications() {
     return formData;
   };
 
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setReloadClassification(true);
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -353,10 +369,10 @@ export default function Classifications() {
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Type</th>
-              <th className="py-2 px-4 border-b border-r">Income/Expense</th>
-              <th className="py-2 px-4 border-b">Actions</th>
+              <ThSort
+                thSortConfigs={ClassificationThSortConfig.thSortConfigs}
+                onSortChange={onSortChange}
+              ></ThSort>
             </tr>
           </thead>
           <tbody>

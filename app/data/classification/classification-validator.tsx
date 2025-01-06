@@ -180,6 +180,20 @@ export async function listClassificationsValidator(
     return paginationErrors;
   }
 
+  if (
+    params.sort_key &&
+    !["name", "is_personal_or_company", "is_income_or_expense"].includes(
+      params.sort_key
+    )
+  ) {
+    return {
+      errorCode: 400,
+      errors: {
+        sort_key: `${params.sort_key} is not a valid key`,
+      },
+    };
+  }
+
   const companyErrors = validateCompany(params.has_company, user);
   if (companyErrors) {
     return companyErrors;

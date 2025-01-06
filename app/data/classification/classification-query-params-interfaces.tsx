@@ -4,9 +4,11 @@ import {
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
 import { ClassificationIncludeOptions } from "~/data/classification/classification-types";
+import { SortParamsInterface } from "~/shared/sort-params-interface";
 
 export interface ClassificationLoaderParamsInterface
-  extends PaginationParamsInterface {
+  extends PaginationParamsInterface,
+    SortParamsInterface {
   name: string | undefined;
   has_company: string | undefined;
   is_personal_or_company: IsPersonalOrCompanyType;

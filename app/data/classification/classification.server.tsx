@@ -139,6 +139,7 @@ export async function list(
     { page, pageSize },
     restParams,
     { user_id: user.id },
-    classificationIncludes
+    classificationIncludes,
+    { column: restParams.sort_key, order: restParams.sort_order }
   );
 }

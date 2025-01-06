@@ -37,6 +37,13 @@ import {
   deleteTransaction,
   fetchTransactions,
 } from "~/data/frontend-services/transactions-service";
+import { ThSort } from "~/components/th-sort/th-sort";
+import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
+
+const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
+  sort_key: "date",
+  sort_order: "desc",
+};
 
 export default function Transactions() {
   const { setTitle } = useTitle();
@@ -47,6 +54,9 @@ export default function Transactions() {
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
+  const [sortParams, setSortParams] = useState<string>(
+    queryParamsFromObject(defaultSortKey)
+  );
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
@@ -151,6 +161,13 @@ export default function Transactions() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (reloadTransactions) {
+      setReloadTransactions(false);
+      loadTransactions();
+    }
+  }, [sortParams]);
+
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -164,6 +181,11 @@ export default function Transactions() {
     );
   };
 
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setReloadTransactions(true);
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+  };
+
   const getTransactionType = (transaction: Transaction) => {
     return transaction.is_personal
       ? "Personal Transaction"
@@ -171,8 +193,9 @@ export default function Transactions() {
   };
 
   const loadTransactions = async () => {
+    setLoading(true);
     await fetchTransactions(
-      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
+      `${paginationParams()}&${searchParams}&${sortParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
       {
         onSuccess: (data, totalPages) => {
           setTransactions(data);
@@ -322,15 +345,11 @@ export default function Transactions() {
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b border-r">Name</th>
-              <th className="py-2 px-4 border-b border-r">Type</th>
-              <th className="py-2 px-4 border-b border-r">Company</th>
-              <th className="py-2 px-4 border-b border-r">Expense</th>
-              <th className="py-2 px-4 border-b border-r">Income</th>
-              <th className="py-2 px-4 border-b border-r">Merchant</th>
-              <th className="py-2 px-4 border-b border-r">Date</th>
-              <th className="py-2 px-4 border-b border-r">Amount</th>
-              <th className="py-2 px-4 border-b">Actions</th>
+              <ThSort
+                thSortConfigs={TransactionThSortConfig.thSortConfigs}
+                defaultKey={defaultSortKey}
+                onSortChange={onSortChange}
+              ></ThSort>
             </tr>
           </thead>
           <tbody>
@@ -343,6 +362,9 @@ export default function Transactions() {
             )}
             {transactions.data?.transactions.map((transaction, index) => (
               <tr key={index} className="hover:bg-gray-50">
+                <td className="py-2 px-4 border-b border-r">
+                  {formatDate(transaction.date)}
+                </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.name}
                 </td>
@@ -376,10 +398,6 @@ export default function Transactions() {
                   }`}
                 >
                   {transaction.merchant?.name || "Not set"}
-                </td>
-
-                <td className="py-2 px-4 border-b border-r">
-                  {formatDate(transaction.date)}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
                   {transaction.amount}
@@ -515,6 +533,7 @@ export async function loader(request: LoaderFunctionArgs) {
     ],
     date_after: firstDayOfCurrentMonth(),
     date_before: lastDayOfCurrentMonth(),
+    ...defaultSortKey,
   }).then((res) => res.json());
 
   return {

@@ -145,6 +145,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       2400,
       2400
@@ -168,6 +170,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       2400,
       0
@@ -191,6 +195,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       0,
       2400
@@ -214,6 +220,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       1200,
       1200
@@ -237,6 +245,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       1200,
       0
@@ -260,6 +270,8 @@ describe("Transaction Totals Logic", () => {
         is_personal_or_company: "all",
         page: 1,
         pageSize: 10,
+        sort_key: undefined,
+        sort_order: "desc"
       },
       0,
       1200
