@@ -43,12 +43,20 @@ import { TransactionThSortConfig } from "~/components/page-components/transactio
 export default function Transactions() {
   const { setTitle } = useTitle();
 
+  const defaultSortKey: { key: string; sortOrder: "desc" | "asc" } = {
+    key: "date",
+    sortOrder: "desc",
+  };
+
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useState<string>("");
+  const [sortParams, setSortParams] = useState<string>(
+    queryParamsFromObject(defaultSortKey)
+  );
   const [totalPages, setTotalPages] = useState<number>(0);
   const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
   const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
@@ -153,6 +161,13 @@ export default function Transactions() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (reloadTransactions) {
+      setReloadTransactions(false);
+      loadTransactions();
+    }
+  }, [sortParams]);
+
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -166,6 +181,11 @@ export default function Transactions() {
     );
   };
 
+  const onSortChange = (key: string, sortOrder: "asc" | "desc") => {
+    setReloadTransactions(true);
+    setSortParams(queryParamsFromObject({ key, sortOrder }));
+  };
+
   const getTransactionType = (transaction: Transaction) => {
     return transaction.is_personal
       ? "Personal Transaction"
@@ -174,7 +194,7 @@ export default function Transactions() {
 
   const loadTransactions = async () => {
     await fetchTransactions(
-      `${paginationParams()}&${searchParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
+      `${paginationParams()}&${searchParams}&${sortParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
       {
         onSuccess: (data, totalPages) => {
           setTransactions(data);
@@ -326,7 +346,8 @@ export default function Transactions() {
             <tr className="bg-gray-100">
               <ThSort
                 thSortConfigs={TransactionThSortConfig.thSortConfigs}
-                defaultKey={{ key: "date", sortOrder: "desc" }}
+                defaultKey={defaultSortKey}
+                onSortChange={onSortChange}
               ></ThSort>
             </tr>
           </thead>
