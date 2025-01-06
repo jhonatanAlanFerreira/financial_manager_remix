@@ -40,13 +40,13 @@ import {
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
 
+const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
+  sort_key: "date",
+  sort_order: "desc",
+};
+
 export default function Transactions() {
   const { setTitle } = useTitle();
-
-  const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
-    sort_key: "date",
-    sort_order: "desc",
-  };
 
   const [loading, setLoading] = useState<boolean>(true);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -532,6 +532,7 @@ export async function loader(request: LoaderFunctionArgs) {
     ],
     date_after: firstDayOfCurrentMonth(),
     date_before: lastDayOfCurrentMonth(),
+    ...defaultSortKey,
   }).then((res) => res.json());
 
   return {
