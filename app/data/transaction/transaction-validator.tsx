@@ -517,6 +517,7 @@ export async function transactionListValidator(
       "income",
       "merchant",
       "is_personal_or_company",
+      "is_income_or_expense",
     ].includes(params.sort_key)
   ) {
     return {

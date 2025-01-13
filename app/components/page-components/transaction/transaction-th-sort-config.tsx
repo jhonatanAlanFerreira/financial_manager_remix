@@ -15,10 +15,16 @@ export const TransactionThSortConfig: ThSortPropsInterface = {
       key: "name",
     },
     {
-      title: "Type",
+      title: "Personal/Company",
       sort: true,
       className: "py-2 px-4 border-b border-r",
       key: "is_personal_or_company",
+    },
+    {
+      title: "Income/Expense",
+      sort: true,
+      className: "py-2 px-4 border-b border-r",
+      key: "is_income_or_expense",
     },
     {
       title: "Company",

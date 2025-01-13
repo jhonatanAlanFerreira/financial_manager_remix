@@ -186,10 +186,14 @@ export default function Transactions() {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
   };
 
-  const getTransactionType = (transaction: Transaction) => {
+  const getPersonalCompanyType = (transaction: Transaction) => {
     return transaction.is_personal
       ? "Personal Transaction"
       : "Company Transaction";
+  };
+
+  const getIncomeExpenseType = (transaction: Transaction) => {
+    return transaction.is_income ? "Income" : "Expense";
   };
 
   const loadTransactions = async () => {
@@ -369,7 +373,10 @@ export default function Transactions() {
                   {transaction.name}
                 </td>
                 <td className="py-2 px-4 border-b border-r">
-                  {getTransactionType(transaction)}
+                  {getPersonalCompanyType(transaction)}
+                </td>
+                <td className="py-2 px-4 border-b border-r">
+                  {getIncomeExpenseType(transaction)}
                 </td>
                 <td
                   className={`py-2 px-4 border-b border-r ${

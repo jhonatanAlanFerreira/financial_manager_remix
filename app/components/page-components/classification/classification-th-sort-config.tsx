@@ -9,7 +9,7 @@ export const ClassificationThSortConfig: ThSortPropsInterface = {
       key: "name",
     },
     {
-      title: "Type",
+      title: "Personal/Company",
       sort: true,
       className: "py-2 px-4 border-b border-r",
       key: "is_personal_or_company",
