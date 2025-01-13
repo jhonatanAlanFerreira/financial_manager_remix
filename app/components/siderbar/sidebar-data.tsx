@@ -37,6 +37,23 @@ export const items: SidebarItemType[] = [
     path: "/merchants",
   },
   {
+    title: "Docs",
+    icon: "FileText",
+    path: "",
+    childrens: [
+      {
+        title: "API",
+        icon: "FileText",
+        path: "/docs",
+      },
+      {
+        title: "GraphQL",
+        icon: "FileText",
+        path: "/GraphQL",
+      },
+    ],
+  },
+  {
     title: "Settings",
     icon: "Settings",
     path: "",

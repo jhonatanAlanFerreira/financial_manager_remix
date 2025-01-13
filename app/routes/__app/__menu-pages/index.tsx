@@ -87,16 +87,16 @@ export default function Index() {
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 1</p>
+            <p className="text-violet-950">Chart 1 [WIP]</p>
           </div>
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 2</p>
+            <p className="text-violet-950">Chart 2 [WIP]</p>
           </div>
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 3</p>
+            <p className="text-violet-950">Chart 3 [WIP]</p>
           </div>
           <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 4</p>
+            <p className="text-violet-950">Chart 4 [WIP]</p>
           </div>
         </div>
       </div>

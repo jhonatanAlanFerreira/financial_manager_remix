@@ -3,8 +3,12 @@ import { TooltipIcon } from "~/components/tooltip-icon/tooltip-icon";
 import { TopBarPropsInterface } from "~/components/top-bar/top-bar-props-interface";
 import { useTitle } from "~/components/top-bar/title-context";
 
-export function TopBar({ updateSidebarOpen }: TopBarPropsInterface) {
+export function TopBar({
+  updateSidebarOpen,
+  overrideTitle,
+}: TopBarPropsInterface) {
   const { title } = useTitle();
+  const displayedTitle = overrideTitle || title;
 
   return (
     <div className="bg-violet-950 w-full h-16 text-white flex items-center pl-1">
@@ -15,9 +19,11 @@ export function TopBar({ updateSidebarOpen }: TopBarPropsInterface) {
         <Icon name="Menu" />
       </span>
       <div className="flex justify-center items-center gap-2 w-full">
-        {title.pageTitle}
-        {title.pageTooltipMessage && (
-          <TooltipIcon message={title.pageTooltipMessage}></TooltipIcon>
+        {displayedTitle.pageTitle}
+        {displayedTitle.pageTooltipMessage && (
+          <TooltipIcon
+            message={displayedTitle.pageTooltipMessage}
+          ></TooltipIcon>
         )}
       </div>
     </div>
