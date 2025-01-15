@@ -279,7 +279,9 @@ export function TransactionAdd({
     const isPersonalOrCompanyType: IsPersonalOrCompanyType = formik.values
       .is_personal
       ? "personal"
-      : "company";
+      : formik.values.company
+      ? "company"
+      : "all";
 
     const classificationLoaderParamsInterface: Partial<
       Record<keyof ClassificationLoaderParamsInterface, string>
