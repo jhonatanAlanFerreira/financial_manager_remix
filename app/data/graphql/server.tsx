@@ -24,8 +24,15 @@ const yoga = createYoga({
   context: ({ request }) => ({
     request,
   }),
-  graphiql: true,
-  graphqlEndpoint: '/api/graphql',
+  graphiql: {
+    disableTabs: true,
+    defaultQuery: `
+      query {
+        test
+      }
+    `,
+  },
+  graphqlEndpoint: "/api/graphql",
 });
 
 export const graphqlHandler = yoga.handle;
