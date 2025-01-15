@@ -25,6 +25,7 @@ const yoga = createYoga({
     request,
   }),
   graphiql: true,
+  graphqlEndpoint: '/api/graphql',
 });
 
 export const graphqlHandler = yoga.handle;

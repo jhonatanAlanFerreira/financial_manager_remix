@@ -49,7 +49,7 @@ export const items: SidebarItemType[] = [
       {
         title: "GraphQL",
         icon: "FileText",
-        path: "/graphql",
+        path: "/graphql-playground",
       },
     ],
   },
