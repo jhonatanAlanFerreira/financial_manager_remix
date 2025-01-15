@@ -1,35 +1,27 @@
 import { createYoga } from "graphql-yoga";
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import { GraphQLSchema } from "graphql";
+import models from "~/data/graphql/schema/models";
 
-const typeDefs = `
-  type Query {
-    test: String
-  }
-`;
-
-const resolvers = {
-  Query: {
-    test: () => "Working!",
-  },
+const generateSchema = (schemaParts: any) => {
+  return makeExecutableSchema({
+    typeDefs: schemaParts.map((part: any) => part.typeDefs),
+    resolvers: [...schemaParts.map((part: any) => part.resolvers)],
+  });
 };
 
-const schema: GraphQLSchema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
-});
-
 const yoga = createYoga({
-  schema,
+  schema: generateSchema(models),
   context: ({ request }) => ({
     request,
   }),
   graphiql: {
     disableTabs: true,
     defaultQuery: `
-      query {
-        test
-      }
+{
+  parent{
+    test
+  }
+}
     `,
   },
   graphqlEndpoint: "/api/graphql",

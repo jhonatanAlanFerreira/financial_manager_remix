@@ -1,4 +1,4 @@
-import { graphqlHandler } from "~/data/graphql/server";
+import { graphqlHandler } from "~/data/graphql/schema";
 
 export const loader = async ({ request }: { request: Request }) => {
   return graphqlHandler(request);
