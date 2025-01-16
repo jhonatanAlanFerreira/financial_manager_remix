@@ -19,7 +19,11 @@ const yoga = createYoga({
     defaultQuery: `
 {
   parent{
-    test
+    test,
+  }
+  transactions{
+    name,
+    date
   }
 }
     `,
