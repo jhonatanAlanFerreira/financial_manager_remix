@@ -18,9 +18,11 @@ const yoga = createYoga({
     disableTabs: true,
     defaultQuery: `
 {
-  transactions{
-    name,
-    date
+  chartTransactionData{
+    year
+    income
+    expense
+    net
   }
 }
     `,

@@ -6,6 +6,7 @@ import { dashboardStore } from "~/components/page-components/dashboard/dashboard
 import { useTitle } from "~/components/top-bar/title-context";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
+import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
 
 export default function Index() {
   const { setTitle } = useTitle();
@@ -88,17 +89,35 @@ export default function Index() {
           <span className="mr-2">{getSelectedCompanyName()}</span>
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
-          <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 1 [WIP]</p>
+          <div>
+            <VictoryChart theme={VictoryTheme.clean}>
+              <VictoryAxis
+                tickValues={[]}
+                style={{
+                  tickLabels: {
+                    fontSize: 10,
+                    angle: 45,
+                  },
+                }}
+              />
+              <VictoryAxis dependentAxis />
+              <VictoryLine data={[]} x="year" y="value" />
+            </VictoryChart>
           </div>
-          <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 2 [WIP]</p>
+          <div>
+            {/* <VictoryChart theme={VictoryTheme.clean}>
+              <VictoryLine />
+            </VictoryChart> */}
           </div>
-          <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 3 [WIP]</p>
+          <div>
+            {/* <VictoryChart theme={VictoryTheme.clean}>
+              <VictoryLine />
+            </VictoryChart> */}
           </div>
-          <div className="bg-white border border-violet-950 p-4 rounded-md flex items-center justify-center h-full">
-            <p className="text-violet-950">Chart 4 [WIP]</p>
+          <div>
+            {/* <VictoryChart theme={VictoryTheme.clean}>
+              <VictoryLine />
+            </VictoryChart> */}
           </div>
         </div>
       </div>
