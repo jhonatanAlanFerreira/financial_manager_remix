@@ -1,4 +1,0 @@
-type Transaction{
-    name: String
-    date: String
-}
