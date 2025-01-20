@@ -18,9 +18,6 @@ const yoga = createYoga({
     disableTabs: true,
     defaultQuery: `
 {
-  parent{
-    test,
-  }
   transactions{
     name,
     date
