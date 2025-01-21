@@ -1,0 +1,19 @@
+type MonthData {
+  month: Int
+  income: Float
+  expense: Float
+  net: Float
+}
+
+type YearData {
+  year: Int
+  income: Float
+  expense: Float
+  net: Float
+  months: [MonthData!]!
+}
+
+type ChartTransactionData {
+  availableYears: [Int!]!
+  data: [YearData!]!
+}

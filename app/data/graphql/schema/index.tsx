@@ -19,10 +19,19 @@ const yoga = createYoga({
     defaultQuery: `
 {
   chartTransactionData{
-    year
-    income
-    expense
-    net
+    availableYears,
+    data {
+      year
+      income
+      expense
+      net,
+      months {
+        month
+        income
+        expense
+        net
+      }
+    }
   }
 }
     `,

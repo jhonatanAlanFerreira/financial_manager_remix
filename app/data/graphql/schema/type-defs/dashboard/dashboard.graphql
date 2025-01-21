@@ -1,6 +1,0 @@
-type ChartTransactionData {
-  year: Int
-  income: Float
-  expense: Float
-  net: Float
-}
