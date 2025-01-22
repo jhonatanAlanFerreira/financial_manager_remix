@@ -1,14 +1,18 @@
 import { Company } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { dashboardStore } from "~/components/page-components/dashboard/dashboard-zustand";
 import { useTitle } from "~/components/top-bar/title-context";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
+import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
+import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
+import { Loader } from "~/components/loader/loader";
 
 export default function Index() {
+  const initialized = useRef(false);
   const { setTitle } = useTitle();
 
   const { companyData } = useLoaderData<{
@@ -25,7 +29,11 @@ export default function Index() {
   } = dashboardStore();
 
   useEffect(() => {
-    setTitle({ pageTitle: "Dashboard" });
+    if (!initialized.current) {
+      initialized.current = true;
+      setTitle({ pageTitle: "Dashboard" });
+      loadTransactionsChartData();
+    }
 
     return () => {
       setTitle({ pageTitle: "" });
@@ -47,6 +55,18 @@ export default function Index() {
     return selectedCompany == "personal"
       ? "Personal Dashboard"
       : selectedCompany.name;
+  };
+
+  const loadTransactionsChartData = () => {
+    setLoading(true);
+
+    fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
+      .then((data) => {
+        console.log("GraphQL Data:", data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -89,36 +109,38 @@ export default function Index() {
           <span className="mr-2">{getSelectedCompanyName()}</span>
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
-          <div>
-            <VictoryChart theme={VictoryTheme.clean}>
-              <VictoryAxis
-                tickValues={[]}
-                style={{
-                  tickLabels: {
-                    fontSize: 10,
-                    angle: 45,
-                  },
-                }}
-              />
-              <VictoryAxis dependentAxis />
-              <VictoryLine data={[]} x="year" y="value" />
-            </VictoryChart>
-          </div>
-          <div>
-            {/* <VictoryChart theme={VictoryTheme.clean}>
+          <Loader loading={loading}>
+            <div>
+              <VictoryChart theme={VictoryTheme.clean}>
+                <VictoryAxis
+                  tickValues={[]}
+                  style={{
+                    tickLabels: {
+                      fontSize: 10,
+                      angle: 45,
+                    },
+                  }}
+                />
+                <VictoryAxis dependentAxis />
+                <VictoryLine data={[]} x="year" y="value" />
+              </VictoryChart>
+            </div>
+            <div>
+              {/* <VictoryChart theme={VictoryTheme.clean}>
               <VictoryLine />
             </VictoryChart> */}
-          </div>
-          <div>
-            {/* <VictoryChart theme={VictoryTheme.clean}>
+            </div>
+            <div>
+              {/* <VictoryChart theme={VictoryTheme.clean}>
               <VictoryLine />
             </VictoryChart> */}
-          </div>
-          <div>
-            {/* <VictoryChart theme={VictoryTheme.clean}>
+            </div>
+            <div>
+              {/* <VictoryChart theme={VictoryTheme.clean}>
               <VictoryLine />
             </VictoryChart> */}
-          </div>
+            </div>
+          </Loader>
         </div>
       </div>
     </div>
