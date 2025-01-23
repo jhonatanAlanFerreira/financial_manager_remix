@@ -92,14 +92,20 @@ export const listChartTransactionData = async (
       income,
       expense,
       net,
-      months: Array.from(months.entries()).map(
-        ([month, { income, expense, net }]) => ({
-          month: MONTH_NAMES[month - 1],
-          income,
-          expense,
-          net,
-        })
-      ),
+      months: Array.from({ length: 12 }, (_, i) => {
+        const monthIndex = i + 1;
+        const monthData = months.get(monthIndex) || {
+          income: 0,
+          expense: 0,
+          net: 0,
+        };
+        return {
+          month: MONTH_NAMES[monthIndex - 1],
+          income: monthData.income,
+          expense: monthData.expense,
+          net: monthData.net,
+        };
+      }),
     })
   );
 

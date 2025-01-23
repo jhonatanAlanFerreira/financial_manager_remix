@@ -11,4 +11,5 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   chartTransactionDataResponse: null,
   setChartTransactionDataResponse: (value) =>
     set({ chartTransactionDataResponse: value }),
+  getChartTransactionDataResponse: () => get().chartTransactionDataResponse,
 }));

@@ -13,4 +13,5 @@ export interface DashboardStoreInterface {
   setChartTransactionDataResponse: (
     value: ChartTransactionDataResponse
   ) => void;
+  getChartTransactionDataResponse: () => ChartTransactionDataResponse | null;
 }

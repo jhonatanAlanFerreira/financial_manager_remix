@@ -6,14 +6,16 @@ import { dashboardStore } from "~/components/page-components/dashboard/dashboard
 import { useTitle } from "~/components/top-bar/title-context";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
 import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
+import * as echarts from "echarts";
 import { MONTH_NAMES } from "~/utils/utilities";
 
 export default function Index() {
   const initialized = useRef(false);
+  const chartRef = useRef<HTMLDivElement>(null);
+
   const { setTitle } = useTitle();
 
   const { companyData } = useLoaderData<{
@@ -29,6 +31,7 @@ export default function Index() {
     setSelectedCompany,
     chartTransactionDataResponse,
     setChartTransactionDataResponse,
+    getChartTransactionDataResponse,
   } = dashboardStore();
 
   useEffect(() => {
@@ -48,7 +51,67 @@ export default function Index() {
       setCompanies(companyData);
     }
     setLoading(false);
-  }, [companyData]);
+  }, [companyData, setCompanies, setLoading]);
+
+  const initializeChart = () => {
+    const myChart = echarts.init(chartRef.current!);
+    myChart.setOption({
+      title: {
+        text: "Net Position",
+      },
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        data: ["Income", "Expense", "Net"],
+      },
+      grid: {
+        left: "3%",
+        right: "4%",
+        bottom: "3%",
+        containLabel: true,
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {},
+        },
+      },
+      xAxis: {
+        type: "category",
+        boundaryGap: false,
+        data: MONTH_NAMES,
+      },
+      yAxis: {
+        type: "value",
+      },
+      series: [
+        {
+          name: "Income",
+          type: "line",
+          stack: "Total",
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
+            (m) => m.income
+          ),
+        },
+        {
+          name: "Expense",
+          type: "line",
+          stack: "Total",
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
+            (m) => m.expense
+          ),
+        },
+        {
+          name: "Net",
+          type: "line",
+          stack: "Total",
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
+            (m) => m.net
+          ),
+        },
+      ],
+    });
+  };
 
   const selectCompany = (selected: Company | "personal") => {
     setSelectedCompany(selected);
@@ -66,6 +129,7 @@ export default function Index() {
     fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
       .then((data) => {
         setChartTransactionDataResponse(data);
+        initializeChart();
       })
       .finally(() => {
         setLoading(false);
@@ -113,43 +177,7 @@ export default function Index() {
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
-            <div>
-              <VictoryChart theme={VictoryTheme.clean}>
-                <VictoryAxis
-                  tickValues={MONTH_NAMES}
-                  style={{
-                    tickLabels: {
-                      fontSize: 10,
-                      angle: 45,
-                    },
-                  }}
-                />
-                <VictoryAxis dependentAxis />
-                <VictoryLine
-                  data={
-                    chartTransactionDataResponse?.chartTransactionData.data[0]
-                      .months || []
-                  }
-                  x="month"
-                  y="expense"
-                />
-              </VictoryChart>
-            </div>
-            <div>
-              {/* <VictoryChart theme={VictoryTheme.clean}>
-              <VictoryLine />
-            </VictoryChart> */}
-            </div>
-            <div>
-              {/* <VictoryChart theme={VictoryTheme.clean}>
-              <VictoryLine />
-            </VictoryChart> */}
-            </div>
-            <div>
-              {/* <VictoryChart theme={VictoryTheme.clean}>
-              <VictoryLine />
-            </VictoryChart> */}
-            </div>
+            <div ref={chartRef}></div>
           </Loader>
         </div>
       </div>
