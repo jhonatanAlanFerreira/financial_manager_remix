@@ -12,7 +12,7 @@ import { Loader } from "~/components/loader/loader";
 import * as echarts from "echarts";
 import { MONTH_NAMES } from "~/utils/utilities";
 
-export default function Index() {
+export default function Index() { //WIP
   const initialized = useRef(false);
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -29,15 +29,15 @@ export default function Index() {
     setCompanies,
     selectedCompany,
     setSelectedCompany,
-    chartTransactionDataResponse,
     setChartTransactionDataResponse,
     getChartTransactionDataResponse,
   } = dashboardStore();
 
   useEffect(() => {
+    setTitle({ pageTitle: "Dashboard [WIP]" });
+
     if (!initialized.current) {
       initialized.current = true;
-      setTitle({ pageTitle: "Dashboard" });
       loadTransactionsChartData();
     }
 
@@ -53,11 +53,26 @@ export default function Index() {
     setLoading(false);
   }, [companyData, setCompanies, setLoading]);
 
-  const initializeChart = () => {
-    const myChart = echarts.init(chartRef.current!);
-    myChart.setOption({
+  useEffect(() => {
+    if (
+      getChartTransactionDataResponse()?.chartTransactionData?.availableYears
+        ?.length
+    ) {
+      initializeChart();
+    }
+  }, [getChartTransactionDataResponse()]);
+
+  const initializeChart = (yearIndex = 0) => {
+    const year =
+      getChartTransactionDataResponse()?.chartTransactionData.availableYears[
+        yearIndex
+      ];
+
+    const transactionChart = echarts.init(chartRef.current);
+
+    transactionChart.setOption({
       title: {
-        text: "Net Position",
+        text: `Net Position for the year ${year}`,
       },
       tooltip: {
         trigger: "axis",
@@ -88,33 +103,30 @@ export default function Index() {
         {
           name: "Income",
           type: "line",
-          stack: "Total",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
-            (m) => m.income
-          ),
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[
+            yearIndex
+          ].months.map((m) => m.income),
         },
         {
           name: "Expense",
           type: "line",
-          stack: "Total",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
-            (m) => m.expense
-          ),
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[
+            yearIndex
+          ].months.map((m) => m.expense),
         },
         {
           name: "Net",
           type: "line",
-          stack: "Total",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[0].months.map(
-            (m) => m.net
-          ),
+          data: getChartTransactionDataResponse()?.chartTransactionData.data[
+            yearIndex
+          ].months.map((m) => m.net),
         },
       ],
     });
   };
 
   const selectCompany = (selected: Company | "personal") => {
-    setSelectedCompany(selected);
+    // setSelectedCompany(selected); WIP
   };
 
   const getSelectedCompanyName = () => {
@@ -129,7 +141,6 @@ export default function Index() {
     fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
       .then((data) => {
         setChartTransactionDataResponse(data);
-        initializeChart();
       })
       .finally(() => {
         setLoading(false);
@@ -177,7 +188,30 @@ export default function Index() {
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
-            <div ref={chartRef}></div>
+            {!!getChartTransactionDataResponse()?.chartTransactionData
+              .availableYears.length && (
+              <div>
+                <div className="mb-2 flex text-violet-950">
+                  <span className="mr-2">Select Year: </span>
+                  {getChartTransactionDataResponse()?.chartTransactionData.availableYears.map(
+                    (year, index) => (
+                      <a
+                        onClick={() => initializeChart(index)}
+                        className="mr-2 cursor-pointer underline"
+                        key={index}
+                      >
+                        {year}
+                      </a>
+                    )
+                  )}
+                </div>
+                <div className="h-5/6" ref={chartRef}></div>
+              </div>
+            )}
+            {!getChartTransactionDataResponse()?.chartTransactionData
+              .availableYears.length && (
+              <span className="text-violet-950">There are no data yet</span>
+            )}
           </Loader>
         </div>
       </div>
