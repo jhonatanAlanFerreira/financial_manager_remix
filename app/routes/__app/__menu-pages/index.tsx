@@ -12,7 +12,8 @@ import { Loader } from "~/components/loader/loader";
 import * as echarts from "echarts";
 import { MONTH_NAMES } from "~/utils/utilities";
 
-export default function Index() { //WIP
+export default function Index() {
+  //WIP
   const initialized = useRef(false);
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -62,11 +63,16 @@ export default function Index() { //WIP
     }
   }, [getChartTransactionDataResponse()]);
 
-  const initializeChart = (yearIndex = 0) => {
-    const year =
-      getChartTransactionDataResponse()?.chartTransactionData.availableYears[
-        yearIndex
-      ];
+  const initializeChart = (yearIndex?: number) => {
+    const availableYears =
+      getChartTransactionDataResponse()?.chartTransactionData.availableYears ||
+      [];
+
+    if (yearIndex == null) {
+      yearIndex = availableYears.length - 1;
+    }
+
+    const year = availableYears[yearIndex];
 
     const transactionChart = echarts.init(chartRef.current);
 
