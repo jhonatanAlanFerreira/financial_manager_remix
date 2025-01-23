@@ -1,6 +1,21 @@
 import moment from "moment";
 import { useCallback, useRef } from "react";
 
+export const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export function parseJsonOrNull(data: string) {
   try {
     return JSON.parse(data);

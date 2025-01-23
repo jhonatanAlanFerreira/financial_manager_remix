@@ -1,5 +1,5 @@
 type MonthData {
-  month: Int
+  month: String
   income: Float
   expense: Float
   net: Float

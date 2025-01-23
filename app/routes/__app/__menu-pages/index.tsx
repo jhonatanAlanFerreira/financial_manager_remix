@@ -10,6 +10,7 @@ import { VictoryAxis, VictoryChart, VictoryLine, VictoryTheme } from "victory";
 import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
+import { MONTH_NAMES } from "~/utils/utilities";
 
 export default function Index() {
   const initialized = useRef(false);
@@ -26,6 +27,8 @@ export default function Index() {
     setCompanies,
     selectedCompany,
     setSelectedCompany,
+    chartTransactionDataResponse,
+    setChartTransactionDataResponse,
   } = dashboardStore();
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export default function Index() {
 
     fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
       .then((data) => {
-        console.log("GraphQL Data:", data);
+        setChartTransactionDataResponse(data);
       })
       .finally(() => {
         setLoading(false);
@@ -108,12 +111,12 @@ export default function Index() {
         <h1 className="text-2xl font-bold text-violet-950 relative mb-4">
           <span className="mr-2">{getSelectedCompanyName()}</span>
         </h1>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 h-full">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
             <div>
               <VictoryChart theme={VictoryTheme.clean}>
                 <VictoryAxis
-                  tickValues={[]}
+                  tickValues={MONTH_NAMES}
                   style={{
                     tickLabels: {
                       fontSize: 10,
@@ -122,7 +125,14 @@ export default function Index() {
                   }}
                 />
                 <VictoryAxis dependentAxis />
-                <VictoryLine data={[]} x="year" y="value" />
+                <VictoryLine
+                  data={
+                    chartTransactionDataResponse?.chartTransactionData.data[0]
+                      .months || []
+                  }
+                  x="month"
+                  y="expense"
+                />
               </VictoryChart>
             </div>
             <div>

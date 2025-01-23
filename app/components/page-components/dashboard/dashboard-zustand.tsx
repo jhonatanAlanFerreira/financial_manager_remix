@@ -8,4 +8,7 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   setCompanies: (value) => set({ companies: value }),
   selectedCompany: "personal",
   setSelectedCompany: (value) => set({ selectedCompany: value }),
+  chartTransactionDataResponse: null,
+  setChartTransactionDataResponse: (value) =>
+    set({ chartTransactionDataResponse: value }),
 }));

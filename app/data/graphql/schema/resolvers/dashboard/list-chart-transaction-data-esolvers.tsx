@@ -1,5 +1,6 @@
 import { requireUserSession } from "~/data/auth/auth.server";
 import { prisma } from "~/data/database/database.server";
+import { MONTH_NAMES } from "~/utils/utilities";
 
 export const listChartTransactionData = async (
   parent: any,
@@ -93,7 +94,7 @@ export const listChartTransactionData = async (
       net,
       months: Array.from(months.entries()).map(
         ([month, { income, expense, net }]) => ({
-          month,
+          month: MONTH_NAMES[month - 1],
           income,
           expense,
           net,
