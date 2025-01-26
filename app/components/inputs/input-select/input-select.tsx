@@ -44,7 +44,7 @@ export function InputSelect({ ...rest }: SelectProps) {
       position: "relative",
       width: "95%",
       background: "#2e10650a",
-      justifySelf: "center",
+      marginLeft: "2.5%",
     }),
   };
 
