@@ -18,6 +18,7 @@ import {
   LoadTransactionsChartDataVariablesInterface,
   YearIndexOptionInterface,
 } from "~/components/page-components/dashboard/dashboard-interfaces";
+import { Icon } from "~/components/icon/icon";
 
 export default function Index() {
   const initialized = useRef(false);
@@ -149,32 +150,51 @@ export default function Index() {
   return (
     <div className="flex h-full">
       <div className="w-2/12 bg-violet-900 text-white p-4 overflow-auto">
-        <h2 className="text-lg font-semibold mb-1">Your Dashboard</h2>
+        <h2 className="text-xl font-bold mb-3 text-violet-200 tracking-wide flex items-center gap-2">
+          <Icon name="PieChart" size={20} className="text-violet-300"></Icon>
+          Select View
+        </h2>
+
         <ul>
           <li
-            onClick={() => selectCompany("personal")}
-            className={`p-2 cursor-pointer hover:bg-violet-950 rounded ${
+            onClick={() =>
+              getSelectedCompany() != "personal" && selectCompany("personal")
+            }
+            className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-violet-950 rounded text-lg ${
               getSelectedCompany() == "personal"
-                ? "bg-violet-600"
+                ? "bg-violet-600 font-semibold"
                 : "transition duration-300 ease-in-out"
             }`}
           >
+            <Icon name="Home" size={18} className="text-violet-300"></Icon>
             Personal Finances
           </li>
-          <hr className="my-2 border-violet-500" />
-          <h2 className="text-lg font-semibold mb-1">Your Companies</h2>
+
+          <h3 className="text-sm font-semibold mt-5 mb-1 text-violet-300 uppercase tracking-wide flex items-center gap-2">
+            <Icon name="Briefcase" size={16} className="text-violet-300"></Icon>
+            Companies
+          </h3>
+          <hr className="mb-2 border-violet-500" />
+
           {companies.data?.map((company, index) => (
             <li
               title={company.name}
-              onClick={() => selectCompany(company)}
+              onClick={() =>
+                (getSelectedCompany() as Company).id != company.id &&
+                selectCompany(company)
+              }
               key={index}
-              className={`p-2 my-2 cursor-pointer hover:bg-violet-950 rounded whitespace-nowrap overflow-hidden text-ellipsis ${
-                getSelectedCompany() != "personal" &&
+              className={`flex items-center gap-2 p-2 my-1 cursor-pointer hover:bg-violet-950 rounded text-lg whitespace-nowrap overflow-hidden text-ellipsis ${
                 (getSelectedCompany() as Company).id == company.id
-                  ? "bg-violet-600"
+                  ? "bg-violet-600 font-semibold"
                   : "transition duration-300 ease-in-out"
               }`}
             >
+              <Icon
+                name="Briefcase"
+                size={18}
+                className="text-violet-300"
+              ></Icon>
               {company.name}
             </li>
           ))}
