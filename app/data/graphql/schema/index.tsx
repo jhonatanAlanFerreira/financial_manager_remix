@@ -1,6 +1,7 @@
 import { createYoga } from "graphql-yoga";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import models from "~/data/graphql/schema/models";
+import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 
 const generateSchema = (schemaParts: any) => {
   return makeExecutableSchema({
@@ -16,14 +17,7 @@ const yoga = createYoga({
   }),
   graphiql: {
     disableTabs: true,
-    defaultQuery: `
-{
-  transactions{
-    name,
-    date
-  }
-}
-    `,
+    defaultQuery: CHART_TRANSACTION_DATA_QUERY,
   },
   graphqlEndpoint: "/api/graphql",
 });

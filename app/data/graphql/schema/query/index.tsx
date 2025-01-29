@@ -1,8 +1,8 @@
 import typeDefs from "~/data/graphql/schema/query/query.graphql";
-import { listTransactions } from "~/data/graphql/schema/resolvers/transaction";
+import { listChartTransactionData } from "~/data/graphql/schema/resolvers/dashboard/list-chart-transaction-data-esolvers";
 
 export const Query = {
-  transactions: listTransactions,
+  chartTransactionData: listChartTransactionData,
 };
 
 const schemaDef = {
