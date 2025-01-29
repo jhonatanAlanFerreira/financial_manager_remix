@@ -1,7 +1,11 @@
 import { useEffect, useId, useRef, useState } from "react";
-import Select, { StylesConfig, Props as SelectProps } from "react-select";
+import Select, { StylesConfig } from "react-select";
+import { InputSelectPropsInterface } from "~/components/inputs/input-select/input-select-props-interface";
 
-export function InputSelect({ ...rest }: SelectProps) {
+export function InputSelect({
+  dropdownPosition = "relative",
+  ...rest
+}: InputSelectPropsInterface) {
   const inputId = useId();
   const [hasValue, setHasValue] = useState<boolean>(false);
   const selectRef = useRef(null);
@@ -34,16 +38,21 @@ export function InputSelect({ ...rest }: SelectProps) {
       color: "var(--primary-color)",
       opacity: "0.8",
     }),
-    option: (styles) => ({
+    option: (styles, state) => ({
       ...styles,
-      color: "var(--primary-color)",
+      color: state.isSelected ? "white" : "var(--primary-color)",
+      backgroundColor: state.isSelected
+        ? "var(--primary-color)"
+        : state.isFocused
+        ? "#d6c5f1"
+        : "",
     }),
     menu: (styles) => ({
       ...styles,
       border: "1px solid var(--primary-color)",
-      position: "relative",
+      position: dropdownPosition,
       width: "95%",
-      background: "#2e10650a",
+      background: "#f2eaff",
       marginLeft: "2.5%",
     }),
   };
