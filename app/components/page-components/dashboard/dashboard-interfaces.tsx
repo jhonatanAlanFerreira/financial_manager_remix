@@ -21,3 +21,12 @@ export interface ChartTransactionData {
 export interface ChartTransactionDataResponse {
   chartTransactionData: ChartTransactionData;
 }
+
+export interface DashboardFormInterface {
+  yearIndex: YearIndexOptionInterface | null;
+}
+
+export interface YearIndexOptionInterface {
+  value: number;
+  label: string;
+}

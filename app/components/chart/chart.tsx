@@ -2,7 +2,12 @@ import { useEffect, useRef } from "react";
 import { ChartPropsInterface } from "~/components/chart/chart-props-interface";
 import * as echarts from "echarts";
 
-export function Chart({ title, xAxisData, seriesData }: ChartPropsInterface) {
+export function Chart({
+  title,
+  xAxisData,
+  seriesData,
+  ...rest
+}: ChartPropsInterface) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<echarts.EChartsType | null>(null);
 
@@ -27,5 +32,5 @@ export function Chart({ title, xAxisData, seriesData }: ChartPropsInterface) {
     });
   }, [xAxisData, seriesData, title]);
 
-  return <div className="h-64" ref={chartRef}></div>;
+  return <div {...rest} ref={chartRef}></div>;
 }

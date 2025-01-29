@@ -11,6 +11,12 @@ import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
 import { MONTH_NAMES } from "~/utils/utilities";
 import { Chart } from "~/components/chart/chart";
+import { InputSelect } from "~/components/inputs/input-select/input-select";
+import { useFormik } from "formik";
+import {
+  DashboardFormInterface,
+  YearIndexOptionInterface,
+} from "~/components/page-components/dashboard/dashboard-interfaces";
 
 export default function Index() {
   //WIP
@@ -34,6 +40,13 @@ export default function Index() {
     setYear,
     getYear,
   } = dashboardStore();
+
+  const mainForm = useFormik<DashboardFormInterface>({
+    initialValues: {
+      yearIndex: null,
+    },
+    onSubmit: () => {},
+  });
 
   useEffect(() => {
     setTitle({ pageTitle: "Dashboard [WIP]" });
@@ -94,6 +107,11 @@ export default function Index() {
 
       setYear(chartData.availableYears[yearIndex]);
 
+      mainForm.setFieldValue("yearIndex", {
+        value: yearIndex,
+        label: getYear(),
+      });
+
       setChartTransactionSeriesData([
         {
           name: "Income",
@@ -112,6 +130,11 @@ export default function Index() {
         },
       ]);
     }
+  };
+
+  const onYearChange = (year: YearIndexOptionInterface) => {
+    mainForm.setFieldValue("yearIndex", year);
+    updateChartTransactionSeriesData(year.value);
   };
 
   return (
@@ -150,28 +173,27 @@ export default function Index() {
       </div>
 
       <div className="flex flex-col w-full p-4 bg-white relative overflow-auto">
-        <h1 className="text-2xl font-bold text-violet-950 relative mb-4">
+        <h1 className="text-2xl font-bold text-violet-950 relative">
           <span className="mr-2">{getSelectedCompanyName()}</span>
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
             {!!getChartTransactionData()?.availableYears.length && (
               <div>
-                <div className="mb-2 flex text-violet-950">
-                  <span className="mr-2">Select Year: </span>
-                  {getChartTransactionData()?.availableYears.map(
-                    (year, index) => (
-                      <a
-                        onClick={() => updateChartTransactionSeriesData(index)}
-                        className="mr-2 cursor-pointer underline"
-                        key={index}
-                      >
-                        {year}
-                      </a>
-                    )
+                <InputSelect
+                  dropdownPosition="absolute"
+                  className="w-48 mb-18"
+                  placeholder="Select the year"
+                  value={mainForm.values.yearIndex}
+                  onChange={(year) =>
+                    onYearChange(year as YearIndexOptionInterface)
+                  }
+                  options={getChartTransactionData()?.availableYears.map(
+                    (year, index) => ({ value: index, label: year })
                   )}
-                </div>
+                ></InputSelect>
                 <Chart
+                  className="h-4/5"
                   title={`Net Position for the year ${getYear()}`}
                   seriesData={getChartTransactionSeriesData()}
                   xAxisData={MONTH_NAMES}
