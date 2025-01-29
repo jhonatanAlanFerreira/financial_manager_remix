@@ -7,7 +7,9 @@ export function Chart({ title, xAxisData, seriesData }: ChartPropsInterface) {
   const chartInstanceRef = useRef<echarts.EChartsType | null>(null);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current) {
+      return;
+    }
 
     if (!chartInstanceRef.current) {
       chartInstanceRef.current = echarts.init(chartRef.current);

@@ -78,13 +78,17 @@ export default function Index() {
       });
   };
 
-  const updateChartTransactionSeriesData = (year?: number) => {
-    const chartData = getChartTransactionDataResponse()?.chartTransactionData;
+  const getChartTransactionData = () => {
+    return getChartTransactionDataResponse()?.chartTransactionData;
+  };
+
+  const updateChartTransactionSeriesData = (yearIndex?: number) => {
+    const chartData = getChartTransactionData();
 
     if (chartData) {
-      const yearIndex = year
-        ? chartData.availableYears.indexOf(year)
-        : chartData.availableYears.length - 1;
+      if (yearIndex === undefined) {
+        yearIndex = chartData.availableYears.length - 1;
+      }
 
       const { months } = chartData.data[yearIndex];
 
@@ -151,15 +155,14 @@ export default function Index() {
         </h1>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
-            {!!getChartTransactionDataResponse()?.chartTransactionData
-              .availableYears.length && (
+            {!!getChartTransactionData()?.availableYears.length && (
               <div>
                 <div className="mb-2 flex text-violet-950">
                   <span className="mr-2">Select Year: </span>
-                  {getChartTransactionDataResponse()?.chartTransactionData.availableYears.map(
+                  {getChartTransactionData()?.availableYears.map(
                     (year, index) => (
                       <a
-                        onClick={() => updateChartTransactionSeriesData(year)}
+                        onClick={() => updateChartTransactionSeriesData(index)}
                         className="mr-2 cursor-pointer underline"
                         key={index}
                       >
@@ -175,8 +178,7 @@ export default function Index() {
                 ></Chart>
               </div>
             )}
-            {!getChartTransactionDataResponse()?.chartTransactionData
-              .availableYears.length && (
+            {!getChartTransactionData()?.availableYears.length && (
               <span className="text-violet-950">There are no data yet</span>
             )}
           </Loader>
