@@ -85,7 +85,7 @@ export default function Index() {
   const updateChartTransactionSeriesData = (yearIndex?: number) => {
     const chartData = getChartTransactionData();
 
-    if (chartData) {
+    if (chartData?.availableYears.length) {
       if (yearIndex === undefined) {
         yearIndex = chartData.availableYears.length - 1;
       }
