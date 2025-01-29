@@ -12,4 +12,11 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   setChartTransactionDataResponse: (value) =>
     set({ chartTransactionDataResponse: value }),
   getChartTransactionDataResponse: () => get().chartTransactionDataResponse,
+  chartTransactionSeriesData: [],
+  setChartTransactionSeriesData: (value) =>
+    set({ chartTransactionSeriesData: value }),
+  getChartTransactionSeriesData: () => get().chartTransactionSeriesData,
+  year: null,
+  setYear: (value) => set({ year: value }),
+  getYear: () => get().year,
 }));

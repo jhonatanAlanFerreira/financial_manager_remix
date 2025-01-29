@@ -9,16 +9,13 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
-import * as echarts from "echarts";
 import { MONTH_NAMES } from "~/utils/utilities";
+import { Chart } from "~/components/chart/chart";
 
 export default function Index() {
   //WIP
   const initialized = useRef(false);
-  const chartRef = useRef<HTMLDivElement>(null);
-
   const { setTitle } = useTitle();
-
   const { companyData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
   }>();
@@ -32,6 +29,10 @@ export default function Index() {
     setSelectedCompany,
     setChartTransactionDataResponse,
     getChartTransactionDataResponse,
+    getChartTransactionSeriesData,
+    setChartTransactionSeriesData,
+    setYear,
+    getYear,
   } = dashboardStore();
 
   useEffect(() => {
@@ -54,83 +55,6 @@ export default function Index() {
     setLoading(false);
   }, [companyData, setCompanies, setLoading]);
 
-  useEffect(() => {
-    if (
-      getChartTransactionDataResponse()?.chartTransactionData?.availableYears
-        ?.length
-    ) {
-      initializeChart();
-    }
-  }, [getChartTransactionDataResponse()]);
-
-  const initializeChart = (yearIndex?: number) => {
-    const availableYears =
-      getChartTransactionDataResponse()?.chartTransactionData.availableYears ||
-      [];
-
-    if (yearIndex == null) {
-      yearIndex = availableYears.length - 1;
-    }
-
-    const year = availableYears[yearIndex];
-
-    const transactionChart = echarts.init(chartRef.current);
-
-    transactionChart.setOption({
-      title: {
-        text: `Net Position for the year ${year}`,
-      },
-      tooltip: {
-        trigger: "axis",
-      },
-      legend: {
-        data: ["Income", "Expense", "Net"],
-      },
-      grid: {
-        left: "3%",
-        right: "4%",
-        bottom: "3%",
-        containLabel: true,
-      },
-      toolbox: {
-        feature: {
-          saveAsImage: {},
-        },
-      },
-      xAxis: {
-        type: "category",
-        boundaryGap: false,
-        data: MONTH_NAMES,
-      },
-      yAxis: {
-        type: "value",
-      },
-      series: [
-        {
-          name: "Income",
-          type: "line",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[
-            yearIndex
-          ].months.map((m) => m.income),
-        },
-        {
-          name: "Expense",
-          type: "line",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[
-            yearIndex
-          ].months.map((m) => m.expense),
-        },
-        {
-          name: "Net",
-          type: "line",
-          data: getChartTransactionDataResponse()?.chartTransactionData.data[
-            yearIndex
-          ].months.map((m) => m.net),
-        },
-      ],
-    });
-  };
-
   const selectCompany = (selected: Company | "personal") => {
     // setSelectedCompany(selected); WIP
   };
@@ -147,10 +71,43 @@ export default function Index() {
     fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
       .then((data) => {
         setChartTransactionDataResponse(data);
+        updateChartTransactionSeriesData();
       })
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const updateChartTransactionSeriesData = (year?: number) => {
+    const chartData = getChartTransactionDataResponse()?.chartTransactionData;
+
+    if (chartData) {
+      const yearIndex = year
+        ? chartData.availableYears.indexOf(year)
+        : chartData.availableYears.length - 1;
+
+      const { months } = chartData.data[yearIndex];
+
+      setYear(chartData.availableYears[yearIndex]);
+
+      setChartTransactionSeriesData([
+        {
+          name: "Income",
+          type: "line",
+          data: months.map((m) => m.income),
+        },
+        {
+          name: "Expense",
+          type: "line",
+          data: months.map((m) => m.expense),
+        },
+        {
+          name: "Net",
+          type: "line",
+          data: months.map((m) => m.net),
+        },
+      ]);
+    }
   };
 
   return (
@@ -202,7 +159,7 @@ export default function Index() {
                   {getChartTransactionDataResponse()?.chartTransactionData.availableYears.map(
                     (year, index) => (
                       <a
-                        onClick={() => initializeChart(index)}
+                        onClick={() => updateChartTransactionSeriesData(year)}
                         className="mr-2 cursor-pointer underline"
                         key={index}
                       >
@@ -211,7 +168,11 @@ export default function Index() {
                     )
                   )}
                 </div>
-                <div className="h-5/6" ref={chartRef}></div>
+                <Chart
+                  title={`Net Position for the year ${getYear()}`}
+                  seriesData={getChartTransactionSeriesData()}
+                  xAxisData={MONTH_NAMES}
+                ></Chart>
               </div>
             )}
             {!getChartTransactionDataResponse()?.chartTransactionData
