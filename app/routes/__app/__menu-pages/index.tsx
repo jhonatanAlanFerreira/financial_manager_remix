@@ -54,7 +54,7 @@ export default function Index() {
 
     if (!initialized.current) {
       initialized.current = true;
-      loadTransactionsChartData({ type: "ALL" });
+      loadTransactionsChartData({ type: "PERSONAL_ONLY" });
     }
 
     return () => {
