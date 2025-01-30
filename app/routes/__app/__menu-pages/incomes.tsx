@@ -289,7 +289,9 @@ export default function Incomes() {
     );
   };
 
-  const isPersonalOrCompanyChange = (e: any) => {
+  const isPersonalOrCompanyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };
 

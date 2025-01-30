@@ -182,11 +182,13 @@ export function TransactionFilters({
     formik.setFieldValue("date_before", "");
   };
 
-  const isIncomeOrExpenseChange = (e: any) => {
+  const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     formik.setFieldValue("is_income_or_expense", e.currentTarget.value);
   };
 
-  const isPersonalOrCompanyChange = (e: any) => {
+  const isPersonalOrCompanyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setShouldFilter(true);
     formik.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };

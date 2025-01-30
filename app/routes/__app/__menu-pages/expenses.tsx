@@ -284,7 +284,9 @@ export default function Expenses() {
     } as any).toString();
   };
 
-  const isPersonalOrCompanyChange = (e: any) => {
+  const isPersonalOrCompanyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };
 

@@ -301,11 +301,13 @@ export default function Classifications() {
     } as any).toString();
   };
 
-  const isIncomeOrExpenseChange = (e: any) => {
+  const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     filterForm.setFieldValue("is_income_or_expense", e.currentTarget.value);
   };
 
-  const isPersonalOrCompanyChange = (e: any) => {
+  const isPersonalOrCompanyChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };
 
