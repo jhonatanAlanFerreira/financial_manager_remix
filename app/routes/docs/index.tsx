@@ -1,14 +1,13 @@
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { useLoaderData } from "@remix-run/react";
-import { getBaseUrl } from "~/utils/utilities";
 import { useState } from "react";
 import { Sidebar } from "~/components/siderbar/sidebar";
 import { TopBar } from "~/components/top-bar/top-bar";
+import { loader as swaggerLoader } from "~/routes/docs/api-docs";
 
 export let loader = async () => {
-  const response = await fetch(`${getBaseUrl()}/docs/api-docs`);
-  return response.json();
+  return await swaggerLoader();
 };
 
 export default function SwaggerPage() {
