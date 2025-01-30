@@ -1,19 +1,29 @@
 type MonthData {
-  month: String
-  income: Float
-  expense: Float
-  net: Float
+  month: String!
+  income: Float!
+  expense: Float!
+  net: Float!
 }
 
 type YearData {
-  year: Int
-  income: Float
-  expense: Float
-  net: Float
+  year: Int!
+  income: Float!
+  expense: Float!
+  net: Float!
   months: [MonthData!]!
 }
 
 type ChartTransactionData {
   availableYears: [Int!]!
   data: [YearData!]!
+}
+
+type Query {
+  chartTransactionData(companyId: String, type: TransactionType!): ChartTransactionData!
+}
+
+enum TransactionType {
+  PERSONAL_ONLY
+  COMPANY_ONLY
+  ALL
 }

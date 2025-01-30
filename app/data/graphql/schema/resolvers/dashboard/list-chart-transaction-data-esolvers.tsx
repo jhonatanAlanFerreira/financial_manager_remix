@@ -1,22 +1,34 @@
+import { TransactionsChartType } from "~/components/page-components/dashboard/dashboard-interfaces";
 import { requireUserSession } from "~/data/auth/auth.server";
 import { prisma } from "~/data/database/database.server";
 import { MONTH_NAMES } from "~/utils/utilities";
 
 export const listChartTransactionData = async (
   parent: any,
-  args: any,
+  args: { companyId?: string; type: TransactionsChartType },
   context: { request: Request }
 ) => {
   const user = await requireUserSession(context.request);
 
+  const matchCondition: any = { user_id: { $oid: user.id } };
+
+  if (args.type === "PERSONAL_ONLY") {
+    matchCondition.is_personal = true;
+  } else if (args.type === "COMPANY_ONLY") {
+    matchCondition.is_personal = false;
+    if (args.companyId) {
+      matchCondition.company_id = { $oid: args.companyId };
+    }
+  } else if (args.type === "ALL" && args.companyId) {
+    matchCondition.$or = [
+      { is_personal: true },
+      { is_personal: false, company_id: { $oid: args.companyId } },
+    ];
+  }
+
   const transactions = (await prisma.transaction.aggregateRaw({
     pipeline: [
-      {
-        $match: {
-          user_id: { $oid: user.id },
-          is_personal: true,
-        },
-      },
+      { $match: matchCondition },
       {
         $addFields: {
           year: { $year: { $dateFromString: { dateString: "$date" } } },
@@ -33,9 +45,7 @@ export const listChartTransactionData = async (
           total_amount: { $sum: "$amount" },
         },
       },
-      {
-        $sort: { "_id.year": 1, "_id.month": 1 },
-      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
     ],
   })) as unknown as Array<{
     _id: { year: number; month: number; is_income: boolean };
@@ -57,16 +67,10 @@ export const listChartTransactionData = async (
     const { year, month, is_income } = _id;
 
     if (!yearData.has(year)) {
-      yearData.set(year, {
-        months: new Map(),
-        income: 0,
-        expense: 0,
-        net: 0,
-      });
+      yearData.set(year, { months: new Map(), income: 0, expense: 0, net: 0 });
     }
 
     const yearEntry = yearData.get(year)!;
-
     if (!yearEntry.months.has(month)) {
       yearEntry.months.set(month, { income: 0, expense: 0, net: 0 });
     }
@@ -79,13 +83,11 @@ export const listChartTransactionData = async (
       monthEntry.expense += total_amount;
       yearEntry.expense += total_amount;
     }
-
     monthEntry.net = monthEntry.income - monthEntry.expense;
     yearEntry.net = yearEntry.income - yearEntry.expense;
   }
 
   const availableYears = Array.from(yearData.keys());
-
   const chartData = Array.from(yearData.entries()).map(
     ([year, { months, income, expense, net }]) => ({
       year,

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { DashboardStoreInterface } from "~/components/page-components/dashboard/dashboard-zustand-interface";
+import { DashboardStoreInterface } from "~/components/page-components/dashboard/dashboard-interfaces";
 
 export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   loading: true,
@@ -8,6 +8,7 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   setCompanies: (value) => set({ companies: value }),
   selectedCompany: "personal",
   setSelectedCompany: (value) => set({ selectedCompany: value }),
+  getSelectedCompany: () => get().selectedCompany,
   chartTransactionDataResponse: null,
   setChartTransactionDataResponse: (value) =>
     set({ chartTransactionDataResponse: value }),

@@ -15,11 +15,11 @@ import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { useFormik } from "formik";
 import {
   DashboardFormInterface,
+  LoadTransactionsChartDataVariablesInterface,
   YearIndexOptionInterface,
 } from "~/components/page-components/dashboard/dashboard-interfaces";
 
 export default function Index() {
-  //WIP
   const initialized = useRef(false);
   const { setTitle } = useTitle();
   const { companyData } = useLoaderData<{
@@ -31,8 +31,8 @@ export default function Index() {
     setLoading,
     companies,
     setCompanies,
-    selectedCompany,
     setSelectedCompany,
+    getSelectedCompany,
     setChartTransactionDataResponse,
     getChartTransactionDataResponse,
     getChartTransactionSeriesData,
@@ -49,11 +49,11 @@ export default function Index() {
   });
 
   useEffect(() => {
-    setTitle({ pageTitle: "Dashboard [WIP]" });
+    setTitle({ pageTitle: "Dashboard" });
 
     if (!initialized.current) {
       initialized.current = true;
-      loadTransactionsChartData();
+      loadTransactionsChartData({ type: "ALL" });
     }
 
     return () => {
@@ -69,19 +69,28 @@ export default function Index() {
   }, [companyData, setCompanies, setLoading]);
 
   const selectCompany = (selected: Company | "personal") => {
-    // setSelectedCompany(selected); WIP
+    setSelectedCompany(selected);
+
+    const isPersonalOnly = selected === "personal";
+
+    loadTransactionsChartData({
+      type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
+      companyId: isPersonalOnly ? "" : selected.id,
+    });
   };
 
   const getSelectedCompanyName = () => {
-    return selectedCompany == "personal"
-      ? "Personal Dashboard"
-      : selectedCompany.name;
+    return getSelectedCompany() == "personal"
+      ? "Personal Finances"
+      : (getSelectedCompany() as Company).name;
   };
 
-  const loadTransactionsChartData = () => {
+  const loadTransactionsChartData = (
+    variables: LoadTransactionsChartDataVariablesInterface
+  ) => {
     setLoading(true);
 
-    fetchGraphQL(CHART_TRANSACTION_DATA_QUERY)
+    fetchGraphQL(CHART_TRANSACTION_DATA_QUERY, variables)
       .then((data) => {
         setChartTransactionDataResponse(data);
         updateChartTransactionSeriesData();
@@ -145,7 +154,7 @@ export default function Index() {
           <li
             onClick={() => selectCompany("personal")}
             className={`p-2 cursor-pointer hover:bg-violet-950 rounded ${
-              selectedCompany == "personal"
+              getSelectedCompany() == "personal"
                 ? "bg-violet-600"
                 : "transition duration-300 ease-in-out"
             }`}
@@ -160,8 +169,8 @@ export default function Index() {
               onClick={() => selectCompany(company)}
               key={index}
               className={`p-2 my-2 cursor-pointer hover:bg-violet-950 rounded whitespace-nowrap overflow-hidden text-ellipsis ${
-                selectedCompany != "personal" &&
-                selectedCompany.id == company.id
+                getSelectedCompany() != "personal" &&
+                (getSelectedCompany() as Company).id == company.id
                   ? "bg-violet-600"
                   : "transition duration-300 ease-in-out"
               }`}
@@ -194,14 +203,16 @@ export default function Index() {
                 ></InputSelect>
                 <Chart
                   className="h-4/5"
-                  title={`Net Position for the year ${getYear()}`}
+                  title={`(${getSelectedCompanyName()}) Net Position for the year ${getYear()}`}
                   seriesData={getChartTransactionSeriesData()}
                   xAxisData={MONTH_NAMES}
                 ></Chart>
               </div>
             )}
             {!getChartTransactionData()?.availableYears.length && (
-              <span className="text-violet-950">There are no data yet</span>
+              <span className="text-violet-950">
+                There are no data yet for the selected company
+              </span>
             )}
           </Loader>
         </div>
