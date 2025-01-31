@@ -151,7 +151,11 @@ export default function Index() {
     <div className="flex h-full">
       <div className="w-2/12 bg-violet-900 text-white p-4 overflow-auto">
         <h2 className="text-xl font-bold mb-3 text-violet-200 tracking-wide flex items-center gap-2">
-          <Icon name="PieChart" size={20} className="text-violet-300"></Icon>
+          <Icon
+            name="PieChart"
+            size={20}
+            className="text-violet-300 flex-shrink-0"
+          ></Icon>
           Select View
         </h2>
 
@@ -166,12 +170,20 @@ export default function Index() {
                 : "transition duration-300 ease-in-out"
             }`}
           >
-            <Icon name="Home" size={18} className="text-violet-300"></Icon>
+            <Icon
+              name="Home"
+              size={18}
+              className="text-violet-300 flex-shrink-0"
+            ></Icon>
             Personal Finances
           </li>
 
           <h3 className="text-sm font-semibold mt-5 mb-1 text-violet-300 uppercase tracking-wide flex items-center gap-2">
-            <Icon name="Briefcase" size={16} className="text-violet-300"></Icon>
+            <Icon
+              name="Briefcase"
+              size={16}
+              className="text-violet-300 flex-shrink-0"
+            ></Icon>
             Companies
           </h3>
           <hr className="mb-2 border-violet-500" />
@@ -193,7 +205,7 @@ export default function Index() {
               <Icon
                 name="Briefcase"
                 size={18}
-                className="text-violet-300"
+                className="text-violet-300 flex-shrink-0"
               ></Icon>
               {company.name}
             </li>
