@@ -90,6 +90,22 @@ export async function accountRemoveValidator(
     };
   }
 
+  const hasTransactions = await prisma.transaction.findFirst({
+    where: {
+      account_id: accountId,
+    },
+  });
+
+  if (hasTransactions) {
+    return {
+      errorCode: 400,
+      message: "There are transactions using this account",
+      errors: {
+        hasTransactions: "This account is being used",
+      },
+    };
+  }
+
   return null;
 }
 

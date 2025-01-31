@@ -76,7 +76,7 @@ export async function remove(
   if (serverError) {
     return {
       serverError,
-      message: "There are some invalid params",
+      message: serverError.message || "There are some invalid params",
     };
   }
 
