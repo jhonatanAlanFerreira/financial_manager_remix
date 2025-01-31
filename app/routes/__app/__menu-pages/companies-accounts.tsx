@@ -180,7 +180,7 @@ export default function Companies() {
           text="Add Company"
         ></PrimaryButton>
       </div>
-      <div className="overflow-x-auto px-10">
+      <div className="overflow-x-auto px-0 md:px-10">
         <Accordion
           title="Personal Accounts"
           titleIcons={[

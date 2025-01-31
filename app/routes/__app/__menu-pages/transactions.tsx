@@ -313,31 +313,33 @@ export default function Transactions() {
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap">
           <div
             onClick={() => setOpenFilterModal(true)}
-            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110"
+            className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
             <Icon size={30} name="Filter"></Icon>
             Filters
           </div>
-          {TransactionFilterTagsConfig.map(
-            (config, index) =>
-              !!filterForm.values[config.fieldName] && (
-                <FilterTag
-                  fieldName={config.fieldName}
-                  closeBtn={config.closeBtn}
-                  onClose={(fieldName) => {
-                    filterForm.setFieldValue(fieldName, "");
-                    setReloadTransactions(true);
-                  }}
-                  className="ml-2 mb-2"
-                  label={config.label}
-                  value={config.getValue(filterForm.values[config.fieldName])}
-                  key={index}
-                ></FilterTag>
-              )
-          )}
+          <div className="flex flex-wrap">
+            {TransactionFilterTagsConfig.map(
+              (config, index) =>
+                !!filterForm.values[config.fieldName] && (
+                  <FilterTag
+                    fieldName={config.fieldName}
+                    closeBtn={config.closeBtn}
+                    onClose={(fieldName) => {
+                      filterForm.setFieldValue(fieldName, "");
+                      setReloadTransactions(true);
+                    }}
+                    className="ml-2 mb-2"
+                    label={config.label}
+                    value={config.getValue(filterForm.values[config.fieldName])}
+                    key={index}
+                  ></FilterTag>
+                )
+            )}
+          </div>
         </div>
         <PrimaryButton
           onClick={onClickAdd}

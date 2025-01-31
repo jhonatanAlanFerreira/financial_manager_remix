@@ -12,7 +12,7 @@ export function FilterTag({
     <div className="flex space-x-2">
       <div
         {...rest}
-        className={`flex items-center bg-violet-600 text-white text-sm font-semibold px-2 py-1 rounded-full ${rest.className}`}
+        className={`flex items-center bg-violet-600 text-white text-sm font-semibold px-2 py-1 rounded-full whitespace-nowrap ${rest.className}`}
       >
         <span className="text-violet-950 font-extrabold">
           {label}
