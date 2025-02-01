@@ -7,7 +7,7 @@ export interface ChartSerieInterface {
 }
 
 export interface ChartPropsInterface extends HTMLAttributes<HTMLDivElement> {
-  title: string;
+  title?: string;
   xAxisData: string[];
   seriesData: ChartSerieInterface[];
 }

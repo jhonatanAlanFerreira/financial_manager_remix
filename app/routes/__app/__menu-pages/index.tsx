@@ -9,7 +9,7 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
-import { MONTH_NAMES } from "~/utils/utilities";
+import { MONTH_NAMES, useIsMobile } from "~/utils/utilities";
 import { Chart } from "~/components/chart/chart";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { useFormik } from "formik";
@@ -21,6 +21,7 @@ import {
 import { Icon } from "~/components/icon/icon";
 
 export default function Index() {
+  const isMobile = useIsMobile();
   const initialized = useRef(false);
   const { setTitle } = useTitle();
   const { companyData } = useLoaderData<{
@@ -147,6 +148,13 @@ export default function Index() {
     updateChartTransactionSeriesData(year.value);
   };
 
+  const getChartTransactionTitle = () => {
+    const isPersonal = getSelectedCompany() == "personal";
+    return isPersonal
+      ? `Net Position for Personal Finances in ${getYear()}`
+      : `Net Position for the company (${getSelectedCompanyName()}) in ${getYear()}`;
+  };
+
   return (
     <div className="flex h-full">
       <div className="w-2/12 bg-violet-900 text-white p-4 overflow-auto">
@@ -233,9 +241,13 @@ export default function Index() {
                     (year, index) => ({ value: index, label: year })
                   )}
                 ></InputSelect>
+                <div>
+                  <h2 className="text-violet-950">
+                    {getChartTransactionTitle()}
+                  </h2>
+                </div>
                 <Chart
-                  className="h-4/5"
-                  title={`(${getSelectedCompanyName()}) Net Position for the year ${getYear()}`}
+                  className="h-3/4"
                   seriesData={getChartTransactionSeriesData()}
                   xAxisData={MONTH_NAMES}
                 ></Chart>
