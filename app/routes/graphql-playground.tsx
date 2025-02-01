@@ -19,9 +19,9 @@ export default function GraphqlPlayground() {
         sidebarOpen={sidebarOpen}
         updateSidebarOpen={updateSidebarOpen}
       ></Sidebar>
-      <div className="overflow-auto">
+      <div className="overflow-auto h-screen">
         <iframe
-          className="h-screen w-screen min-w-[64rem]"
+          className="h-full w-screen min-w-[64rem]"
           src="/api/graphql"
           title="GraphQL Playground"
         />
