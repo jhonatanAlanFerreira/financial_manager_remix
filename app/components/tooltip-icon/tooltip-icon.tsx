@@ -14,7 +14,7 @@ export function TooltipIcon({ message }: TooltipIconPropsInterface) {
       </a>
       <Tooltip
         id={tooltipId}
-        className="!bg-violet-800 break-words max-w-md"
+        className="!bg-violet-800 break-words md:max-w-md max-w-fit !opacity-100 z-10"
         classNameArrow="!bg-violet-900"
       />
     </div>
