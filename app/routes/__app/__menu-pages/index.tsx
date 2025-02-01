@@ -157,7 +157,7 @@ export default function Index() {
 
   return (
     <div className="flex h-full">
-      <div className="w-2/12 bg-violet-900 text-white p-4 overflow-auto">
+      <div className="w-2/12 min-w-[11rem] bg-violet-900 text-white p-4 overflow-auto">
         <h2 className="text-xl font-bold mb-3 text-violet-200 tracking-wide flex items-center gap-2">
           <Icon
             name="PieChart"
@@ -221,7 +221,7 @@ export default function Index() {
         </ul>
       </div>
 
-      <div className="flex flex-col w-full p-4 bg-white relative overflow-auto">
+      <div className="flex flex-col w-full p-4 bg-white relative overflow-auto min-w-[40rem]">
         <h1 className="text-2xl font-bold text-violet-950 relative">
           <span className="mr-2">{getSelectedCompanyName()}</span>
         </h1>
