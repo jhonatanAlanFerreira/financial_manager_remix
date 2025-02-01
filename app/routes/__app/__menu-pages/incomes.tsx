@@ -349,7 +349,7 @@ export default function Incomes() {
           iconName="PlusCircle"
         ></PrimaryButton>
       </div>
-      <div className="overflow-x-auto px-10">
+      <div className="overflow-x-auto px-10 pb-4">
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
           <thead>
             <tr className="bg-gray-100">
