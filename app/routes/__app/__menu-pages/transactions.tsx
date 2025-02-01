@@ -9,7 +9,7 @@ import { Icon } from "~/components/icon/icon";
 import {
   firstDayOfCurrentMonth,
   formatDate,
-  lastDayOfCurrentMonth,
+  getTimezoneFromClientCookies,
   queryParamsFromObject,
   todayFormatedDate,
 } from "~/utils/utilities";
@@ -540,7 +540,7 @@ export async function loader(request: LoaderFunctionArgs) {
       "merchant",
       "transaction_classifications",
     ],
-    date_after: firstDayOfCurrentMonth(),
+    date_after: firstDayOfCurrentMonth(getTimezoneFromClientCookies(request)),
     ...defaultSortKey,
   }).then((res) => res.json());
 

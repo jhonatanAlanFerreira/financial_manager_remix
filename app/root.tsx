@@ -13,6 +13,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -21,6 +22,13 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
+  useEffect(() => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!document.cookie.includes(`timezone=${timezone}`)) {
+      document.cookie = `timezone=${timezone}; path=/;`;
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>

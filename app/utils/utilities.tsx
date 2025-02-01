@@ -1,5 +1,7 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { parse } from "cookie";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
 export const MONTH_NAMES = [
   "January",
@@ -67,10 +69,10 @@ export function todayFormatedDate() {
   return moment().format("YYYY-MM-DD");
 }
 
-export function firstDayOfCurrentMonth() {
-  return moment().startOf("month").format("YYYY-MM-DD");
+export function firstDayOfCurrentMonth(timezone?: string) {
+  const currentMoment = timezone ? moment().tz(timezone) : moment();
+  return currentMoment.startOf("month").format("YYYY-MM-DD");
 }
-
 export function lastDayOfCurrentMonth() {
   return moment().endOf("month").format("YYYY-MM-DD");
 }
@@ -146,4 +148,10 @@ export function useIsMobile(breakpoint = 768) {
   }, [breakpoint]);
 
   return isMobile;
+}
+
+export function getTimezoneFromClientCookies({ request }: LoaderFunctionArgs) {
+  const cookieHeader = request.headers.get("Cookie") || "";
+  const cookies = parse(cookieHeader);
+  return cookies.timezone;
 }
