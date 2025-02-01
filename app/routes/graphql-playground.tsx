@@ -19,11 +19,13 @@ export default function GraphqlPlayground() {
         sidebarOpen={sidebarOpen}
         updateSidebarOpen={updateSidebarOpen}
       ></Sidebar>
-      <iframe
-        className="h-screen w-screen"
-        src="/api/graphql"
-        title="GraphQL Playground"
-      />
+      <div className="overflow-auto">
+        <iframe
+          className="h-screen w-screen min-w-[64rem]"
+          src="/api/graphql"
+          title="GraphQL Playground"
+        />
+      </div>
     </div>
   );
 }
