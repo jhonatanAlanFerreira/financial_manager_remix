@@ -1,0 +1,16 @@
+type Transaction {
+  id: ID!
+  name: String!
+  amount: Int!
+  date: String!
+  user_id: ID!
+  company_id: ID
+  transaction_classification_ids: [ID!]!
+  expense_id: ID
+  income_id: ID
+  account_id: ID!
+  is_personal: Boolean!
+  is_income: Boolean!
+  description: String
+  merchant_id: ID
+}
