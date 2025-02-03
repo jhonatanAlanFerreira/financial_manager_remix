@@ -1,4 +1,8 @@
 type Query {
   chartTransactionData: ChartTransactionData
-  transactions: [Transaction]
+  transactions(
+    name: String
+    is_personal_or_company: TransactionPersonalOrCompanyType!
+    is_income_or_expense: TransactionExpenseOrIncomeType!
+  ): [Transaction]
 }

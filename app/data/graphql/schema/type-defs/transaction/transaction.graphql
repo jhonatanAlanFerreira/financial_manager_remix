@@ -14,3 +14,15 @@ type Transaction {
   description: String
   merchant_id: ID
 }
+
+enum TransactionPersonalOrCompanyType {
+  PERSONAL_ONLY
+  COMPANY_ONLY
+  ALL
+}
+
+enum TransactionExpenseOrIncomeType {
+  EXPENSE_ONLY
+  INCOME_ONLY
+  ALL
+}
