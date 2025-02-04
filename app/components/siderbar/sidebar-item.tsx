@@ -11,7 +11,7 @@ export function SidebarItem({
 
   if (item.childrens) {
     return (
-      <div className={open ? "open" : ""}>
+      <div className={`${open ? "open" : ""} mb-1`}>
         <div
           className="flex cursor-pointer justify-between"
           onClick={() => setOpen(!open)}
@@ -49,7 +49,7 @@ export function SidebarItem({
       <Link
         onClick={() => updateSidebarOpen(false)}
         to={item.path}
-        className="flex gap-2 rounded transition duration-500 ease-in-out hover:underline"
+        className="flex gap-2 rounded transition duration-500 ease-in-out hover:underline mb-1"
       >
         <span className="flex gap-2">
           {item.icon && <Icon name={item.icon} width="1.2rem"></Icon>}
