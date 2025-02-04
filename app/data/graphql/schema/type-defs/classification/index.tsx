@@ -1,8 +1,8 @@
 import typeDefs from "~/data/graphql/schema/type-defs/classification/classification.graphql";
 import { SchemaDefInterface } from "~/data/graphql/schema/graphql-globals";
-import { listTransactions } from "~/data/graphql/schema/resolvers/transaction/list-transactions-resolver";
+import { listTransactionsByClassification } from "~/data/graphql/schema/resolvers/transaction/list-transactions-resolver";
 
-const Classification = { transactions: listTransactions };
+const Classification = { transactions: listTransactionsByClassification };
 
 const schemaDef: SchemaDefInterface = {
   typeDefs,

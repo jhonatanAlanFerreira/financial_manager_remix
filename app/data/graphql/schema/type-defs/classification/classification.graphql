@@ -5,5 +5,9 @@ type Classification {
   is_personal: Boolean!
   company_ids: [ID!]!
   is_income: Boolean!
-  transactions: [Transaction!]!
+  transactions(
+    name: String
+    is_personal_or_company: PersonalOrCompanyEnum
+    is_income_or_expense: ExpenseOrIncomeEnum
+  ): [Transaction!]!
 }
