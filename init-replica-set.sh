@@ -1,5 +1,4 @@
 #!/bin/bash
-# init-replica-set.sh
 
 wait_for_mongo() {
     local host="$1"
