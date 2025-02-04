@@ -1,7 +1,7 @@
 type Transaction {
   id: ID!
   name: String!
-  amount: Int!
+  amount: Float!
   date: String!
   user_id: ID!
   company_id: ID
@@ -13,16 +13,4 @@ type Transaction {
   is_income: Boolean!
   description: String
   merchant_id: ID
-}
-
-enum TransactionPersonalOrCompanyType {
-  PERSONAL_ONLY
-  COMPANY_ONLY
-  ALL
-}
-
-enum TransactionExpenseOrIncomeType {
-  EXPENSE_ONLY
-  INCOME_ONLY
-  ALL
 }

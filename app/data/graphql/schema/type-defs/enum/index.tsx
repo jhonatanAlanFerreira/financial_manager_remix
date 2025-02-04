@@ -1,4 +1,4 @@
-import typeDefs from "~/data/graphql/schema/type-defs/dashboard/chart-transaction-data.graphql";
+import typeDefs from "~/data/graphql/schema/type-defs/enum/enum.graphql";
 import { SchemaDefInterface } from "~/data/graphql/schema/graphql-globals";
 
 const schemaDef: SchemaDefInterface = {

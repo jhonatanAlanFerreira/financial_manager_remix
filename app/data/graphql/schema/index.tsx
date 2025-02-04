@@ -2,7 +2,7 @@ import { createYoga } from "graphql-yoga";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import models from "~/data/graphql/schema/models";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
-import { SchemaDefInterface } from "~/data/graphql/schema/schemaInterfaces";
+import { SchemaDefInterface } from "~/data/graphql/schema/graphql-globals";
 
 const generateSchema = (schemaParts: SchemaDefInterface[]) => {
   return makeExecutableSchema({

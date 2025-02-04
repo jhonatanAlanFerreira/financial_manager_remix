@@ -1,0 +1,9 @@
+type Classification {
+  id: ID!
+  name: String!
+  user_id: ID!
+  is_personal: Boolean!
+  company_ids: [ID!]!
+  is_income: Boolean!
+  transactions: [Transaction!]!
+}

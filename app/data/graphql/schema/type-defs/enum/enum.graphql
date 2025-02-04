@@ -1,0 +1,11 @@
+enum PersonalOrCompanyEnum {
+  PERSONAL_ONLY
+  COMPANY_ONLY
+  ALL
+}
+
+enum ExpenseOrIncomeEnum {
+  EXPENSE_ONLY
+  INCOME_ONLY
+  ALL
+}

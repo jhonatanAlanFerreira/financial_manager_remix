@@ -1,8 +1,13 @@
 type Query {
   chartTransactionData: ChartTransactionData
+  classifications(
+    name: String
+    is_personal_or_company: PersonalOrCompanyEnum
+    is_income_or_expense: ExpenseOrIncomeEnum
+  ): [Classification!]!
   transactions(
     name: String
-    is_personal_or_company: TransactionPersonalOrCompanyType!
-    is_income_or_expense: TransactionExpenseOrIncomeType!
-  ): [Transaction]
+    is_personal_or_company: PersonalOrCompanyEnum
+    is_income_or_expense: ExpenseOrIncomeEnum
+  ): [Transaction!]!
 }
