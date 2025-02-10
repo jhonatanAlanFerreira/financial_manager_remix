@@ -344,23 +344,23 @@ export default function Classifications() {
             Filters
           </div>
           <div className="flex flex-wrap">
-            {ClassificationFilterTagsConfig.map(
-              (config, index) =>
-                !!filterForm.values[config.fieldName] && (
-                  <FilterTag
-                    fieldName={config.fieldName}
-                    closeBtn={config.closeBtn}
-                    onClose={(fieldName) => {
-                      filterForm.setFieldValue(fieldName, "");
-                      setReloadClassification(true);
-                    }}
-                    className="ml-2 mb-2"
-                    label={config.label}
-                    value={config.getValue(filterForm.values[config.fieldName])}
-                    key={index}
-                  ></FilterTag>
-                )
-            )}
+            {ClassificationFilterTagsConfig.map((config, index) => (
+              <FilterTag
+                fieldName={config.fieldName}
+                fieldValue={filterForm.values[config.fieldName]}
+                defaultFieldValue={config.defaultFieldValue}
+                onClose={(fieldName, defaultValue) => {
+                  filterForm.setFieldValue(fieldName, defaultValue);
+                  setReloadClassification(true);
+                }}
+                className="ml-2 mb-2"
+                tagLabel={config.tagLabel}
+                tagValue={config.getTagValue(
+                  filterForm.values[config.fieldName]
+                )}
+                key={index}
+              ></FilterTag>
+            ))}
           </div>
         </div>
         <PrimaryButton

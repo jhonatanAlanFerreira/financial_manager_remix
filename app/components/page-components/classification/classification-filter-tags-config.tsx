@@ -5,26 +5,24 @@ export const ClassificationFilterTagsConfig: FilterTagsConfigInterface<Classific
   [
     {
       fieldName: "is_income_or_expense",
-      label: "Income/Expense",
-      closeBtn: false,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Income/Expense",
+      defaultFieldValue: "all",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "is_personal_or_company",
-      label: "Personal/Company",
-      closeBtn: false,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Personal/Company",
+      defaultFieldValue: "all",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "name",
-      label: "Name",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Name",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "has_company",
-      label: "Company",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue.name,
+      tagLabel: "Company",
+      getTagValue: (fieldValue: any) => fieldValue?.name,
     },
   ];

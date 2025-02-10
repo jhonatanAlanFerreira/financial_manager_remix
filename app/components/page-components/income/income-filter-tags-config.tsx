@@ -5,32 +5,28 @@ export const IncomeFilterTagsConfig: FilterTagsConfigInterface<IncomeFiltersForm
   [
     {
       fieldName: "is_personal_or_company",
-      label: "Personal/Company",
-      closeBtn: false,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Personal/Company",
+      defaultFieldValue: "all",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "name",
-      label: "Name",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Name",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "has_company",
-      label: "Company",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue.name,
+      tagLabel: "Company",
+      getTagValue: (fieldValue: any) => fieldValue?.name,
     },
     {
       fieldName: "amount_greater",
-      label: "Amount Greater",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Amount Greater",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "amount_less",
-      label: "Amount Less",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Amount Less",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
   ];

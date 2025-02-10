@@ -5,8 +5,7 @@ export const MerchantFilterTagsConfig: FilterTagsConfigInterface<MerchantFilters
   [
     {
       fieldName: "name",
-      label: "Name",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Name",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
   ];

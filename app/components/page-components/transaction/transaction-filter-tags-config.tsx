@@ -66,13 +66,11 @@ export const TransactionFilterTagsConfig: FilterTagsConfigInterface<TransactionF
     {
       fieldName: "amount_greater",
       tagLabel: "Amount Greater",
-      defaultFieldValue: 0,
       getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "amount_less",
       tagLabel: "Amount Less",
-      defaultFieldValue: 0,
       getTagValue: (fieldValue: any) => fieldValue,
     },
   ];

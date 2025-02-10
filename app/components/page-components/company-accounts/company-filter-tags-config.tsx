@@ -5,20 +5,17 @@ export const CompanyFilterTagsConfig: FilterTagsConfigInterface<CompanyFiltersFo
   [
     {
       fieldName: "name",
-      label: "Name",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Name",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "working_capital_greater",
-      label: "Working Capital Greater",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Working Capital Greater",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
     {
       fieldName: "working_capital_less",
-      label: "Working Capital Less",
-      closeBtn: true,
-      getValue: (fieldValue: any) => fieldValue,
+      tagLabel: "Working Capital Less",
+      getTagValue: (fieldValue: any) => fieldValue,
     },
   ];
