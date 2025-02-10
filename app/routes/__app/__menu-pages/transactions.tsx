@@ -322,23 +322,23 @@ export default function Transactions() {
             Filters
           </div>
           <div className="flex flex-wrap">
-            {TransactionFilterTagsConfig.map(
-              (config, index) =>
-                !!filterForm.values[config.fieldName] && (
-                  <FilterTag
-                    fieldName={config.fieldName}
-                    closeBtn={config.closeBtn}
-                    onClose={(fieldName) => {
-                      filterForm.setFieldValue(fieldName, "");
-                      setReloadTransactions(true);
-                    }}
-                    className="ml-2 mb-2"
-                    label={config.label}
-                    value={config.getValue(filterForm.values[config.fieldName])}
-                    key={index}
-                  ></FilterTag>
-                )
-            )}
+            {TransactionFilterTagsConfig.map((config, index) => (
+              <FilterTag
+                fieldName={config.fieldName}
+                fieldValue={filterForm.values[config.fieldName]}
+                defaultFieldValue={config.defaultFieldValue}
+                onClose={(fieldName, defaultFieldValue) => {
+                  filterForm.setFieldValue(fieldName, defaultFieldValue);
+                  setReloadTransactions(true);
+                }}
+                className="ml-2 mb-2"
+                tagLabel={config.tagLabel}
+                tagValue={config.getTagValue(
+                  filterForm.values[config.fieldName]
+                )}
+                key={index}
+              ></FilterTag>
+            ))}
           </div>
         </div>
         <PrimaryButton

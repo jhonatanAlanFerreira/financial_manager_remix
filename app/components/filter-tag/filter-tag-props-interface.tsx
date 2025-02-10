@@ -1,9 +1,11 @@
 import { HTMLAttributes } from "react";
 
-export interface FilterTagPropsInterface extends HTMLAttributes<HTMLDivElement> {
-  label: string;
+export interface FilterTagPropsInterface
+  extends HTMLAttributes<HTMLDivElement> {
+  tagLabel: string;
+  tagValue: string;
   fieldName: string;
-  value: string;
-  closeBtn: boolean;
-  onClose: (fieldName: string) => void;
+  fieldValue: any;
+  defaultFieldValue?: any;
+  onClose: (fieldName: string, defaultValue?: any) => void;
 }
