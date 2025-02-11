@@ -10,7 +10,7 @@ import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as incomeLoader } from "~/routes/api/income/index";
 import { Pagination } from "~/components/pagination/pagination";
-import { queryParamsFromObject } from "~/utils/utilities";
+import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { IncomeFilterTagsConfig } from "~/components/page-components/income/income-filter-tags-config";
 import { FilterTag } from "~/components/filter-tag/filter-tag";
@@ -34,6 +34,7 @@ import { ThSort } from "~/components/th-sort/th-sort";
 import { IncomesThSortConfig } from "~/components/page-components/income/incomes-th-sort-config";
 
 export default function Incomes() {
+  const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -402,7 +403,7 @@ export default function Incomes() {
           className="justify-center"
           currentPage={paginationState.page}
           totalPages={totalPages}
-          optionsAmount={10}
+          optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => {
             setPaginationState({ reload: true, page });
           }}

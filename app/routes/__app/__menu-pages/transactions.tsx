@@ -12,6 +12,7 @@ import {
   getTimezoneFromClientCookies,
   queryParamsFromObject,
   todayFormatedDate,
+  useIsMobile,
 } from "~/utils/utilities";
 import { useFormik } from "formik";
 import { Pagination } from "~/components/pagination/pagination";
@@ -46,6 +47,7 @@ const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
 };
 
 export default function Transactions() {
+  const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -447,7 +449,7 @@ export default function Transactions() {
           className="justify-center"
           currentPage={paginationState.page}
           totalPages={totalPages}
-          optionsAmount={10}
+          optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}

@@ -9,7 +9,7 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
-import { queryParamsFromObject } from "~/utils/utilities";
+import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { Pagination } from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
 import { ClassificationFilterTagsConfig } from "~/components/page-components/classification/classification-filter-tags-config";
@@ -34,6 +34,7 @@ import { ThSort } from "~/components/th-sort/th-sort";
 import { ClassificationThSortConfig } from "~/components/page-components/classification/classification-th-sort-config";
 
 export default function Classifications() {
+  const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -422,7 +423,7 @@ export default function Classifications() {
           className="justify-center"
           currentPage={paginationState.page}
           totalPages={totalPages}
-          optionsAmount={10}
+          optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => setPaginationState({ reload: true, page })}
         ></Pagination>
       )}

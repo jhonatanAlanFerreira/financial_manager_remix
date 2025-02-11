@@ -10,7 +10,7 @@ import { Company, Expense } from "@prisma/client";
 import { Icon } from "~/components/icon/icon";
 import { useFormik } from "formik";
 import { Pagination } from "~/components/pagination/pagination";
-import { queryParamsFromObject } from "~/utils/utilities";
+import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
 import { ExpenseFilterTagsConfig } from "~/components/page-components/expense/expense-filter-tags-config";
 import { FilterTag } from "~/components/filter-tag/filter-tag";
@@ -34,6 +34,7 @@ import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
 
 export default function Expenses() {
+  const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
@@ -401,7 +402,7 @@ export default function Expenses() {
           className="justify-center"
           currentPage={paginationState.page}
           totalPages={totalPages}
-          optionsAmount={10}
+          optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => {
             setPaginationState({ reload: true, page });
           }}

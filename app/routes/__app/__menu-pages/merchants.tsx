@@ -11,7 +11,7 @@ import {
   MerchantFormInterface,
 } from "~/components/page-components/merchants/merchant-interfaces";
 import { useTitle } from "~/components/top-bar/title-context";
-import { queryParamsFromObject } from "~/utils/utilities";
+import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { loader as merchantLoader } from "~/routes/api/merchant/index";
 import { Form, useLoaderData } from "@remix-run/react";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
@@ -30,6 +30,7 @@ import { ThSort } from "~/components/th-sort/th-sort";
 import { MerchantThSortConfig } from "~/components/page-components/merchants/merchant-th-sort-config";
 
 export default function Merchants() {
+  const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -344,7 +345,7 @@ export default function Merchants() {
           className="justify-center"
           currentPage={paginationState.page}
           totalPages={totalPages}
-          optionsAmount={10}
+          optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => {
             setPaginationState({ reload: true, page });
           }}
