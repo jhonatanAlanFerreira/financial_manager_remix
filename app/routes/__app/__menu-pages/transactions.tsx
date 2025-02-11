@@ -432,9 +432,9 @@ export default function Transactions() {
 
       <div
         title="Total incomes and expenses using the current filters"
-        className="w-100 text-right px-10 pt-2 text-violet-900 text-lg"
+        className="w-100 text-right px-10 pt-2 text-violet-900 text-lg whitespace-nowrap flex flex-col md:flex-row justify-end"
       >
-        <span className="mr-4">
+        <span className="mr-0 md:mr-4">
           Income Total: <span className="text-black">{totalIncomeValue}</span>
         </span>
         <span>
