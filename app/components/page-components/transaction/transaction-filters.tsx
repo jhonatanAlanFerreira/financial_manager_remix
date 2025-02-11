@@ -377,7 +377,7 @@ export function TransactionFilters({
             <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
               Income or Expense Transaction
             </span>
-            <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+            <div className="p-4 text-violet-950 flex flex-col xl:flex-row justify-between border-2 border-violet-950 border-opacity-50">
               <div>
                 <input
                   id="income_expense_all_filter"
@@ -430,7 +430,7 @@ export function TransactionFilters({
             <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
               Personal or Company Transaction
             </span>
-            <div className="p-4 text-violet-950 flex justify-between border-2 border-violet-950 border-opacity-50">
+            <div className="p-4 text-violet-950 flex flex-col xl:flex-row justify-between border-2 border-violet-950 border-opacity-50">
               <div>
                 <input
                   id="personal_company_all_filter"
