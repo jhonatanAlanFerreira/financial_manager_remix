@@ -32,10 +32,7 @@ const transactionByClassificationBatch = async (
     });
   });
 
-  return classificationIds.map((id) => {
-    const result = transactionMap[id];
-    return result;
-  });
+  return classificationIds.map((id) => transactionMap[id]);
 };
 
 const transactionLoader = new DataLoader(
