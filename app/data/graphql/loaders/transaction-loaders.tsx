@@ -4,7 +4,7 @@ import { buildTransactionWhereClause } from "~/data/graphql/query-builders/trans
 import { prisma } from "~/data/database/database.server";
 import { Transaction } from "@prisma/client";
 
-const listTransactionsByClassificationsLoader = (userId: string) => {
+export const listTransactionsByClassificationsLoader = (userId: string) => {
   return new DataLoader(
     async (
       keys: readonly {
