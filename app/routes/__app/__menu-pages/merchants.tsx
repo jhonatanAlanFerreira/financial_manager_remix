@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { FilterTag } from "~/components/filter-tag/filter-tag";
 import { Icon } from "~/components/icon/icon";
@@ -24,36 +24,39 @@ import {
   deleteMerchant,
   fetchMerchants,
 } from "~/data/frontend-services/merchant-service";
-import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { MerchantThSortConfig } from "~/components/page-components/merchants/merchant-th-sort-config";
+import { merchantStore } from "~/components/page-components/merchants/merchant-store";
 
 export default function Merchants() {
   const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [searchParams, setSearchParams] = useState<string>("");
-  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [reloadMerchants, setReloadMerchants] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
-  const [sortParams, setSortParams] = useState<string>("");
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [responseErrors, setResponseErrors] =
-    useState<ServerResponseErrorInterface>({});
-  const [merchants, setMerchants] = useState<
-    ServerResponseInterface<Merchant[]>
-  >({});
-  const [paginationState, setPaginationState] = useState<{
-    reload: boolean;
-    page: number;
-  }>({
-    reload: false,
-    page: 1,
-  });
+  const {
+    loading,
+    setLoading,
+    searchParams,
+    setSearchParams,
+    openFilterModal,
+    setOpenFilterModal,
+    openAddModal,
+    setOpenAddModal,
+    isSubmitting,
+    setIsSubmitting,
+    openRemoveModal,
+    setOpenRemoveModal,
+    sortParams,
+    setSortParams,
+    totalPages,
+    setTotalPages,
+    currentPage,
+    setCurrentPage,
+    responseErrors,
+    setResponseErrors,
+    merchants,
+    setMerchants,
+  } = merchantStore();
 
   const { merchantData } = useLoaderData<{
     merchantData: ServerResponseInterface<Merchant[]>;
@@ -101,30 +104,6 @@ export default function Merchants() {
     setLoading(false);
   }, [merchantData]);
 
-  useEffect(() => {
-    if (paginationState.reload) {
-      loadMerchants();
-    }
-  }, [paginationState]);
-
-  useEffect(() => {
-    buildSearchParamsUrl();
-  }, [filterForm.values]);
-
-  useEffect(() => {
-    if (reloadMerchants) {
-      setReloadMerchants(false);
-      loadMerchants();
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (reloadMerchants) {
-      setReloadMerchants(false);
-      loadMerchants();
-    }
-  }, [sortParams]);
-
   const onModalCancel = () => {
     mainForm.resetForm();
     setResponseErrors({});
@@ -138,18 +117,12 @@ export default function Merchants() {
       { paginationParams: paginationParams(), searchParams, sortParams },
       {
         onSuccess: (data) => {
-          setPaginationState({
-            reload: false,
-            page: data.pageInfo?.currentPage || 1,
-          });
+          setCurrentPage(data.pageInfo?.currentPage || 1);
           setTotalPages(data.pageInfo?.totalPages || 1);
           setMerchants(data);
 
           if (!data.data?.length) {
-            setPaginationState({
-              reload: false,
-              page: data.pageInfo?.totalPages || 1,
-            });
+            setTotalPages(data.pageInfo?.totalPages || 1);
           }
         },
         onError: () => {
@@ -184,7 +157,7 @@ export default function Merchants() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: paginationState.page,
+      page: currentPage,
       pageSize: 10,
     } as any).toString();
   };
@@ -211,10 +184,10 @@ export default function Merchants() {
     const { data } = merchants;
     const hasMinimalData = data && data?.length < 2;
 
-    if (paginationState.page == 1 || !hasMinimalData) {
+    if (currentPage == 1 || !hasMinimalData) {
       loadMerchants();
     } else {
-      setPaginationState({ reload: true, page: paginationState.page - 1 });
+      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -247,15 +220,14 @@ export default function Merchants() {
     event?.preventDefault();
 
     setOpenFilterModal(false);
-    if (paginationState.page == 1) {
+    if (currentPage == 1) {
       loadMerchants();
     } else {
-      setPaginationState({ reload: true, page: 1 });
+      setCurrentPage(1);
     }
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setReloadMerchants(true);
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
   };
 
@@ -278,7 +250,6 @@ export default function Merchants() {
                 defaultFieldValue={config.defaultFieldValue}
                 onClose={(fieldName, defaultValue) => {
                   filterForm.setFieldValue(fieldName, defaultValue);
-                  setReloadMerchants(true);
                 }}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
@@ -343,11 +314,11 @@ export default function Merchants() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={paginationState.page}
+          currentPage={currentPage}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
           onPageChange={(page) => {
-            setPaginationState({ reload: true, page });
+            setCurrentPage(page);
           }}
         ></Pagination>
       )}
