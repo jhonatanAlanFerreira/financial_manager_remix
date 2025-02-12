@@ -16,6 +16,7 @@ export interface MerchantStoreInterface {
   setLoading: (value: boolean) => void;
   searchParams: string;
   setSearchParams: (value: string) => void;
+  getSearchParams: () => string;
   openFilterModal: boolean;
   setOpenFilterModal: (value: boolean) => void;
   openAddModal: boolean;
@@ -30,6 +31,7 @@ export interface MerchantStoreInterface {
   setTotalPages: (value: number) => void;
   currentPage: number;
   setCurrentPage: (value: number) => void;
+  getCurrentPage: () => number;
   responseErrors: ServerResponseErrorInterface;
   setResponseErrors: (value: ServerResponseErrorInterface) => void;
   merchants: ServerResponseInterface<Merchant[]>;

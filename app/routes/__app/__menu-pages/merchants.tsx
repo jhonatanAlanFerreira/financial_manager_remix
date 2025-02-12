@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import { useEffect } from "react";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { FilterTag } from "~/components/filter-tag/filter-tag";
@@ -36,7 +36,7 @@ export default function Merchants() {
   const {
     loading,
     setLoading,
-    searchParams,
+    getSearchParams,
     setSearchParams,
     openFilterModal,
     setOpenFilterModal,
@@ -50,8 +50,8 @@ export default function Merchants() {
     setSortParams,
     totalPages,
     setTotalPages,
-    currentPage,
     setCurrentPage,
+    getCurrentPage,
     responseErrors,
     setResponseErrors,
     merchants,
@@ -77,11 +77,6 @@ export default function Merchants() {
     onSubmit: () => {},
   });
 
-  const onClickAdd = () => {
-    mainForm.resetForm();
-    setOpenAddModal(true);
-  };
-
   useEffect(() => {
     buildSearchParamsUrl();
     setTitle({
@@ -104,6 +99,11 @@ export default function Merchants() {
     setLoading(false);
   }, [merchantData]);
 
+  const onClickAdd = () => {
+    mainForm.resetForm();
+    setOpenAddModal(true);
+  };
+
   const onModalCancel = () => {
     mainForm.resetForm();
     setResponseErrors({});
@@ -112,9 +112,14 @@ export default function Merchants() {
 
   const loadMerchants = async () => {
     setLoading(true);
+    buildSearchParamsUrl();
 
     await fetchMerchants(
-      { paginationParams: paginationParams(), searchParams, sortParams },
+      {
+        paginationParams: paginationParams(),
+        searchParams: getSearchParams(),
+        sortParams,
+      },
       {
         onSuccess: (data) => {
           setCurrentPage(data.pageInfo?.currentPage || 1);
@@ -157,7 +162,7 @@ export default function Merchants() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: currentPage,
+      page: getCurrentPage(),
       pageSize: 10,
     } as any).toString();
   };
@@ -184,11 +189,10 @@ export default function Merchants() {
     const { data } = merchants;
     const hasMinimalData = data && data?.length < 2;
 
-    if (currentPage == 1 || !hasMinimalData) {
-      loadMerchants();
-    } else {
-      setCurrentPage(currentPage - 1);
+    if (hasMinimalData && getCurrentPage() != 1) {
+      setCurrentPage(getCurrentPage() - 1);
     }
+    loadMerchants();
   };
 
   const removeMerchant = async () => {
@@ -220,15 +224,22 @@ export default function Merchants() {
     event?.preventDefault();
 
     setOpenFilterModal(false);
-    if (currentPage == 1) {
-      loadMerchants();
-    } else {
-      setCurrentPage(1);
-    }
+    setCurrentPage(1);
+    loadMerchants();
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadMerchants();
+  };
+
+  const onFilterTagClose = (fieldName: string, defaultValue: any) => {
+    filterForm.setFieldValue(fieldName, defaultValue);
+    loadMerchants();
   };
 
   return (
@@ -248,9 +259,7 @@ export default function Merchants() {
                 fieldName={config.fieldName}
                 fieldValue={filterForm.values[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={(fieldName, defaultValue) => {
-                  filterForm.setFieldValue(fieldName, defaultValue);
-                }}
+                onClose={onFilterTagClose}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(
@@ -314,12 +323,10 @@ export default function Merchants() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={currentPage}
+          currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => {
-            setCurrentPage(page);
-          }}
+          onPageChange={(page) => onPageChange(page)}
         ></Pagination>
       )}
 
