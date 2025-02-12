@@ -3,6 +3,8 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import models from "~/data/graphql/schema/models";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { SchemaDefInterface } from "~/data/graphql/schema/graphql-globals";
+import { requireUserSession } from "~/data/auth/auth.server";
+import { createLoaders } from "~/data/graphql/loaders";
 
 const generateSchema = (schemaParts: SchemaDefInterface[]) => {
   return makeExecutableSchema({
@@ -13,9 +15,14 @@ const generateSchema = (schemaParts: SchemaDefInterface[]) => {
 
 const yoga = createYoga({
   schema: generateSchema(models),
-  context: ({ request }) => ({
-    request,
-  }),
+  context: async ({ request }) => {
+    const user = await requireUserSession(request);
+
+    return {
+      request,
+      loaders: createLoaders(user.id),
+    };
+  },
   graphiql: {
     disableTabs: true,
     defaultQuery: CHART_TRANSACTION_DATA_QUERY,

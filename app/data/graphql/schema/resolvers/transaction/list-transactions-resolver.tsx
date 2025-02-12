@@ -1,29 +1,8 @@
-import { Prisma } from "@prisma/client";
 import { requireUserSession } from "~/data/auth/auth.server";
 import { prisma } from "~/data/database/database.server";
+import { createLoaders } from "~/data/graphql/loaders";
+import { buildTransactionWhereClause } from "~/data/graphql/query-builders/transactions-query-builders";
 import { ListTransactionResolverParamsInterface } from "~/data/graphql/schema/resolvers/transaction/list-transactions-resolver-interfaces";
-
-const buildTransactionWhereClause = (
-  userId: string,
-  parentFilter: Prisma.TransactionWhereInput = {},
-  params: Partial<ListTransactionResolverParamsInterface> = {}
-): Prisma.TransactionWhereInput => {
-  return {
-    user_id: userId,
-    ...parentFilter,
-    ...(params.name && {
-      name: { contains: params.name, mode: "insensitive" },
-    }),
-    ...(params.is_personal_or_company &&
-      params.is_personal_or_company !== "ALL" && {
-        is_personal: params.is_personal_or_company === "PERSONAL_ONLY",
-      }),
-    ...(params.is_income_or_expense &&
-      params.is_income_or_expense !== "ALL" && {
-        is_income: params.is_income_or_expense === "INCOME_ONLY",
-      }),
-  };
-};
 
 export const listTransactions = async (
   parent: any,
@@ -39,14 +18,12 @@ export const listTransactions = async (
 export const listTransactionsByClassification = async (
   parent: { id: string },
   params: ListTransactionResolverParamsInterface,
-  context: { request: Request }
+  context: { request: Request; loaders: ReturnType<typeof createLoaders> }
 ) => {
-  const user = await requireUserSession(context.request);
-  const whereClause = buildTransactionWhereClause(
-    user.id,
-    { transaction_classification_ids: { has: parent.id } },
-    params
+  return context.loaders.transaction.listTransactionsByClassificationsLoader.load(
+    {
+      classificationId: parent.id,
+      filters: params,
+    }
   );
-
-  return await prisma.transaction.findMany({ where: whereClause });
 };
