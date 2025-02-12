@@ -11,7 +11,7 @@ export const listTransactionsByClassificationsLoader = (userId: string) => {
         classificationId: string;
         filters: Partial<ListTransactionResolverParamsInterface>;
       }[]
-    ) => {
+    ): Promise<Transaction[][]> => {
       const classificationIds = keys.map((k) => k.classificationId);
       const filters = keys[0].filters;
 
