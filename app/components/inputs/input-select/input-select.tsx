@@ -1,19 +1,34 @@
-import { useEffect, useId, useRef, useState } from "react";
-import Select, { StylesConfig } from "react-select";
-import { InputSelectPropsInterface } from "~/components/inputs/input-select/input-select-props-interface";
+import { forwardRef, useEffect, useId, useState } from "react";
+import ReactSelect, {
+  SelectInstance,
+  StylesConfig,
+  ActionMeta,
+  GroupBase,
+} from "react-select";
+import { InputSelectPropsInterface } from "./input-select-props-interface";
+import Select from "react-select/base";
 
-export function InputSelect({
-  dropdownPosition = "relative",
-  ...rest
-}: InputSelectPropsInterface) {
+export const InputSelect = forwardRef<
+  SelectInstance,
+  InputSelectPropsInterface
+>(({ dropdownPosition = "relative", onChange, ...rest }, ref) => {
   const inputId = useId();
   const [hasValue, setHasValue] = useState<boolean>(false);
-  const selectRef = useRef(null);
 
   useEffect(() => {
-    const select: any = selectRef.current;
-    setHasValue(select.getValue().length);
-  }, [(selectRef.current as any)?.getValue()]);
+    checkHasValue(rest.value);
+  }, [rest.value]);
+
+  const handleChange = (value: unknown, actionMeta: ActionMeta<unknown>) => {
+    checkHasValue(value);
+    if (onChange) {
+      onChange(value, actionMeta);
+    }
+  };
+
+  const checkHasValue = (value: unknown) => {
+    setHasValue(!!value && (Array.isArray(value) ? !!value.length : true));
+  };
 
   const styles: StylesConfig = {
     control: (styles) => ({
@@ -58,24 +73,25 @@ export function InputSelect({
   };
 
   return (
-    <>
-      <div className="relative float-label-input">
-        <Select
-          ref={selectRef}
-          inputId={inputId}
-          {...rest}
-          styles={styles}
-          placeholder=" "
-        />
-        <label
-          htmlFor={inputId}
-          className={`${
-            hasValue ? "has-value" : ""
-          } text-violet-950 opacity-50 absolute top-3 left-0 pointer-events-none transition duration-200 ease-in-outbg-white px-2 text-grey-darker`}
-        >
-          {rest.placeholder}
-        </label>
-      </div>
-    </>
+    <div className="relative float-label-input">
+      <ReactSelect
+        ref={ref as React.Ref<Select<unknown, boolean, GroupBase<unknown>>>}
+        inputId={inputId}
+        {...rest}
+        styles={styles}
+        onChange={handleChange}
+        placeholder=" "
+      />
+      <label
+        htmlFor={inputId}
+        className={`${
+          hasValue ? "has-value" : ""
+        } text-violet-950 opacity-50 absolute top-3 left-0 pointer-events-none transition duration-200 ease-in-out bg-white px-2 text-grey-darker`}
+      >
+        {rest.placeholder}
+      </label>
+    </div>
   );
-}
+});
+
+InputSelect.displayName = "InputSelect";
