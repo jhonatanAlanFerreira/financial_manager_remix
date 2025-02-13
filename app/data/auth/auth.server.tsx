@@ -71,7 +71,14 @@ export async function requireUserSession(request: Request): Promise<User> {
     throw redirect("/login");
   }
 
-  return await prisma.user.findFirstOrThrow({ where: { id: userId } });
+  const user = await prisma.user.findFirst({ where: { id: userId } });
+
+  if (!user) {
+    destroyUserSession(request);
+    throw redirect("/login");
+  }
+
+  return user;
 }
 
 export async function signup(
