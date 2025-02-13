@@ -86,7 +86,7 @@ export const InputSelect = forwardRef<
         htmlFor={inputId}
         className={`${
           hasValue ? "has-value" : ""
-        } text-violet-950 opacity-50 absolute top-3 left-0 pointer-events-none transition duration-200 ease-in-out bg-white px-2 text-grey-darker`}
+        } text-violet-950 opacity-50 absolute top-3 left-0 pointer-events-none transition duration-200 ease-in-out bg-white px-2 text-grey-darker ml-1`}
       >
         {rest.placeholder}
       </label>
