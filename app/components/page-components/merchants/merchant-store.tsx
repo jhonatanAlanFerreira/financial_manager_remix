@@ -1,30 +1,9 @@
 import { create } from "zustand";
 import { MerchantStoreInterface } from "~/components/page-components/merchants/merchant-interfaces";
+import { createBasePageStore } from "~/utils/utilities";
 
 export const merchantStore = create<MerchantStoreInterface>((set, get) => ({
-  loading: true,
-  setLoading: (value) => set({ loading: value }),
-  searchParams: "",
-  setSearchParams: (value) => set({ searchParams: value }),
-  getSearchParams: () => get().searchParams,
-  openFilterModal: false,
-  setOpenFilterModal: (value) => set({ openFilterModal: value }),
-  openAddModal: false,
-  setOpenAddModal: (value) => set({ openAddModal: value }),
-  isSubmitting: false,
-  setIsSubmitting: (value) => set({ isSubmitting: value }),
-  openRemoveModal: false,
-  setOpenRemoveModal: (value) => set({ openRemoveModal: value }),
-  sortParams: "",
-  setSortParams: (value) => set({ sortParams: value }),
-  getSortParams: () => get().sortParams,
-  totalPages: 0,
-  setTotalPages: (value) => set({ totalPages: value }),
-  currentPage: 1,
-  setCurrentPage: (value) => set({ currentPage: value }),
-  getCurrentPage: () => get().currentPage,
-  responseErrors: {},
-  setResponseErrors: (value) => set({ responseErrors: value }),
+  ...createBasePageStore(set, get),
   merchants: {},
   setMerchants: (value) => set({ merchants: value }),
 }));

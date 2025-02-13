@@ -1,4 +1,5 @@
 import { Merchant } from "@prisma/client";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
@@ -11,30 +12,7 @@ export interface MerchantFormInterface {
   name: string;
 }
 
-export interface MerchantStoreInterface {
-  loading: boolean;
-  setLoading: (value: boolean) => void;
-  searchParams: string;
-  setSearchParams: (value: string) => void;
-  getSearchParams: () => string;
-  openFilterModal: boolean;
-  setOpenFilterModal: (value: boolean) => void;
-  openAddModal: boolean;
-  setOpenAddModal: (value: boolean) => void;
-  isSubmitting: boolean;
-  setIsSubmitting: (value: boolean) => void;
-  openRemoveModal: boolean;
-  setOpenRemoveModal: (value: boolean) => void;
-  sortParams: string;
-  setSortParams: (value: string) => void;
-  getSortParams: () => string;
-  totalPages: number;
-  setTotalPages: (value: number) => void;
-  currentPage: number;
-  setCurrentPage: (value: number) => void;
-  getCurrentPage: () => number;
-  responseErrors: ServerResponseErrorInterface;
-  setResponseErrors: (value: ServerResponseErrorInterface) => void;
+export interface MerchantStoreInterface extends BasePageStoreInterface {
   merchants: ServerResponseInterface<Merchant[]>;
   setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
 }

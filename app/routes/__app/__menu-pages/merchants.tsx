@@ -42,14 +42,10 @@ export default function Merchants() {
     setLoading,
     getSearchParams,
     setSearchParams,
-    openFilterModal,
-    setOpenFilterModal,
-    openAddModal,
-    setOpenAddModal,
     isSubmitting,
     setIsSubmitting,
-    openRemoveModal,
-    setOpenRemoveModal,
+    modals,
+    setModals,
     getSortParams,
     setSortParams,
     totalPages,
@@ -112,13 +108,13 @@ export default function Merchants() {
 
   const onClickAdd = () => {
     resetMain(MAIN_FORM_DEFAULTS_VALUES);
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onModalCancel = () => {
     resetMain(MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
-    setOpenAddModal(false);
+    setModals(null);
   };
 
   const loadMerchants = async () => {
@@ -157,7 +153,7 @@ export default function Merchants() {
 
     await createOrUpdateMerchant(formData, {
       onSuccess: () => {
-        setOpenAddModal(false);
+        setModals(null);
         loadMerchants();
         setResponseErrors({});
       },
@@ -183,12 +179,12 @@ export default function Merchants() {
 
   const onClickUpdate = (merchant: Merchant) => {
     resetMain(merchant);
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickDelete = (merchant: Merchant) => {
     setMainValue("id", merchant.id);
-    setOpenRemoveModal(true);
+    setModals("remove");
   };
 
   const adjustPaginationBeforeReload = () => {
@@ -202,7 +198,7 @@ export default function Merchants() {
   };
 
   const removeMerchant = async () => {
-    setOpenRemoveModal(false);
+    setModals(null);
     setLoading(true);
 
     await deleteMerchant(getMainValues().id, {
@@ -219,7 +215,7 @@ export default function Merchants() {
   };
 
   const onFilterFormSubmit = async (data: MerchantFiltersFormInterface) => {
-    setOpenFilterModal(false);
+    setModals(null);
     setCurrentPage(1);
     loadMerchants();
   };
@@ -250,7 +246,7 @@ export default function Merchants() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex flex-wrap">
           <div
-            onClick={() => setOpenFilterModal(true)}
+            onClick={() => setModals("filter")}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
             <Icon size={30} name="Filter" />
@@ -331,8 +327,8 @@ export default function Merchants() {
         }}
         center
         showCloseIcon={false}
-        open={openRemoveModal}
-        onClose={() => setOpenRemoveModal(false)}
+        open={modals == "remove"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
@@ -341,10 +337,7 @@ export default function Merchants() {
           Do you really want to remove this merchant?
         </p>
         <div className="flex justify-between p-2 mt-10">
-          <PrimaryButton
-            text="Cancel"
-            onClick={() => setOpenRemoveModal(false)}
-          />
+          <PrimaryButton text="Cancel" onClick={() => setModals(null)} />
           <DangerButton
             disabled={loading}
             text="Remove"
@@ -360,8 +353,8 @@ export default function Merchants() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openAddModal}
-        onClose={() => setOpenAddModal(false)}
+        open={modals == "add"}
+        onClose={() => setModals(null)}
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
@@ -399,8 +392,8 @@ export default function Merchants() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openFilterModal}
-        onClose={() => setOpenFilterModal(false)}
+        open={modals == "filter"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Filters
