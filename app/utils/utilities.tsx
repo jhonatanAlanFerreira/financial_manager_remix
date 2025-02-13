@@ -2,6 +2,8 @@ import moment from "moment-timezone";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { parse } from "cookie";
 import { LoaderFunctionArgs } from "@remix-run/node";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 
 export const MONTH_NAMES = [
   "January",
@@ -169,3 +171,30 @@ export function getTimezoneFromClientCookies({ request }: LoaderFunctionArgs) {
   const cookies = parse(cookieHeader);
   return cookies.timezone;
 }
+
+export const createBasePageStore = (
+  set: any,
+  get: any
+): BasePageStoreInterface => ({
+  loading: true,
+  setLoading: (value: boolean) => set({ loading: value }),
+  searchParams: "",
+  setSearchParams: (value: string) => set({ searchParams: value }),
+  getSearchParams: () => get().searchParams,
+  isSubmitting: false,
+  setIsSubmitting: (value: boolean) => set({ isSubmitting: value }),
+  sortParams: "",
+  setSortParams: (value: string) => set({ sortParams: value }),
+  getSortParams: () => get().sortParams,
+  totalPages: 0,
+  setTotalPages: (value: number) => set({ totalPages: value }),
+  currentPage: 1,
+  setCurrentPage: (value: number) => set({ currentPage: value }),
+  getCurrentPage: () => get().currentPage,
+  responseErrors: {} as ServerResponseErrorInterface,
+  setResponseErrors: (value: ServerResponseErrorInterface) =>
+    set({ responseErrors: value }),
+  modals: null as "filter" | "add" | "remove" | null,
+  setModals: (value: "filter" | "add" | "remove" | null) =>
+    set({ modals: value }),
+});

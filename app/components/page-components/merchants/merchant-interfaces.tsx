@@ -1,3 +1,8 @@
+import { Merchant } from "@prisma/client";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
+import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
+
 export interface MerchantFiltersFormInterface {
   name: string;
 }
@@ -5,4 +10,9 @@ export interface MerchantFiltersFormInterface {
 export interface MerchantFormInterface {
   id: string;
   name: string;
+}
+
+export interface MerchantStoreInterface extends BasePageStoreInterface {
+  merchants: ServerResponseInterface<Merchant[]>;
+  setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
 }
