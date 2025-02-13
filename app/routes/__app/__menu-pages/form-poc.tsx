@@ -11,12 +11,22 @@ export default function poc() {
     console.log(getPocValue().example);
   };
 
+  const onReset = () => {
+    reset();
+    console.log(getPocValue().example);
+  };
+
   const {
     register,
     handleSubmit,
+    reset,
     setValue: setPocValue,
     getValues: getPocValue,
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    defaultValues: {
+      example: "",
+    },
+  });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
@@ -34,6 +44,9 @@ export default function poc() {
       <br />
       <br />
       <button onClick={() => onSetValue("Value Updated B")}>Set Value B</button>
+      <br />
+      <br />
+      <button onClick={onReset}>Reset</button>
     </>
   );
 }
