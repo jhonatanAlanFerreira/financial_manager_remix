@@ -28,3 +28,12 @@ export const merchantStore = create<MerchantStoreInterface>((set, get) => ({
   merchants: {},
   setMerchants: (value) => set({ merchants: value }),
 }));
+
+export const MAIN_FORM_DEFAULTS_VALUES = {
+  id: "",
+  name: "",
+};
+
+export const FILTER_FORM_DEFAULTS_VALUES = {
+  name: "",
+};

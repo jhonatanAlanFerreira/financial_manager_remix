@@ -27,7 +27,11 @@ import {
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { MerchantThSortConfig } from "~/components/page-components/merchants/merchant-th-sort-config";
-import { merchantStore } from "~/components/page-components/merchants/merchant-store";
+import {
+  FILTER_FORM_DEFAULTS_VALUES,
+  MAIN_FORM_DEFAULTS_VALUES,
+  merchantStore,
+} from "~/components/page-components/merchants/merchant-store";
 
 export default function Merchants() {
   const isMobile = useIsMobile();
@@ -71,10 +75,7 @@ export default function Merchants() {
     getValues: getMainValues,
     formState: { errors: mainErrors },
   } = useForm<MerchantFormInterface>({
-    defaultValues: {
-      id: "",
-      name: "",
-    },
+    defaultValues: MAIN_FORM_DEFAULTS_VALUES,
   });
 
   const {
@@ -84,9 +85,7 @@ export default function Merchants() {
     setValue: setFilterValue,
     getValues: getFilterValues,
   } = useForm<MerchantFiltersFormInterface>({
-    defaultValues: {
-      name: "",
-    },
+    defaultValues: FILTER_FORM_DEFAULTS_VALUES,
   });
 
   useEffect(() => {
@@ -112,12 +111,12 @@ export default function Merchants() {
   }, [merchantData]);
 
   const onClickAdd = () => {
-    resetMain();
+    resetMain(MAIN_FORM_DEFAULTS_VALUES);
     setOpenAddModal(true);
   };
 
   const onModalCancel = () => {
-    resetMain();
+    resetMain(MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
     setOpenAddModal(false);
   };
