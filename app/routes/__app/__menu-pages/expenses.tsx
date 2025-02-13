@@ -1,5 +1,5 @@
 import { Modal } from "react-responsive-modal";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -23,7 +23,6 @@ import {
   ExpenseFiltersFormInterface,
   ExpenseFormInterface,
 } from "~/components/page-components/expense/expense-interfaces";
-import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ExpenseWithRelationsInterface } from "~/data/expense/expense-types";
 import {
   createOrUpdateExpense,
@@ -32,35 +31,34 @@ import {
 } from "~/data/frontend-services/expense-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
+import { expenseStore } from "~/components/page-components/expense/expense.store";
 
 export default function Expenses() {
   const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
-  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [reloadExpenses, setReloadExpenses] = useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<string>("");
-  const [sortParams, setSortParams] = useState<string>("");
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [expenses, setExpenses] = useState<
-    ServerResponseInterface<ExpenseWithRelationsInterface[]>
-  >({});
-  const [companies, setCompanies] = useState<
-    ServerResponseInterface<Company[]>
-  >({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [responseErrors, setResponseErrors] =
-    useState<ServerResponseErrorInterface>({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [paginationState, setPaginationState] = useState<{
-    reload: boolean;
-    page: number;
-  }>({
-    reload: false,
-    page: 1,
-  });
+  const {
+    loading,
+    setLoading,
+    getSearchParams,
+    setSearchParams,
+    isSubmitting,
+    setIsSubmitting,
+    modals,
+    setModals,
+    getSortParams,
+    setSortParams,
+    totalPages,
+    setTotalPages,
+    setCurrentPage,
+    getCurrentPage,
+    responseErrors,
+    setResponseErrors,
+    companies,
+    setCompanies,
+    expenses,
+    setExpenses,
+  } = expenseStore();
 
   const { expenseData, companyData } = useLoaderData<{
     expenseData: ServerResponseInterface<ExpenseWithRelationsInterface[]>;
@@ -116,49 +114,19 @@ export default function Expenses() {
     setLoading(false);
   }, [expenseData, companyData]);
 
-  useEffect(() => {
-    if (paginationState.reload) {
-      loadExpenses();
-    }
-  }, [paginationState]);
-
-  useEffect(() => {
-    mainForm.setFieldValue("companies", null);
-  }, [mainForm.values.is_personal]);
-
-  useEffect(() => {
-    if (filterForm.values.is_personal_or_company === "personal") {
-      filterForm.setFieldValue("has_company", null);
-    }
-  }, [filterForm.values.is_personal_or_company]);
-
-  useEffect(() => {
-    buildSearchParamsUrl();
-  }, [filterForm.values]);
-
-  useEffect(() => {
-    if (reloadExpenses) {
-      setReloadExpenses(false);
-      loadExpenses();
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (reloadExpenses) {
-      setReloadExpenses(false);
-      loadExpenses();
-    }
-  }, [sortParams]);
-
   const loadExpenses = async () => {
+    setLoading(true);
+    buildSearchParamsUrl();
+
     await fetchExpenses(
-      { paginationParams: paginationParams(), searchParams, sortParams },
+      {
+        paginationParams: paginationParams(),
+        searchParams: getSearchParams(),
+        sortParams: getSortParams(),
+      },
       {
         onSuccess: (data) => {
-          setPaginationState({
-            reload: false,
-            page: data.pageInfo?.currentPage || 1,
-          });
+          setCurrentPage(data.pageInfo?.currentPage || 1);
           setTotalPages(data.pageInfo?.totalPages || 1);
           setExpenses(data);
         },
@@ -179,7 +147,7 @@ export default function Expenses() {
 
     createOrUpdateExpense(formData, {
       onSuccess: () => {
-        setOpenAddModal(false);
+        setModals(null);
         loadExpenses();
         setResponseErrors({});
       },
@@ -200,15 +168,14 @@ export default function Expenses() {
     const { data } = expenses;
     const hasMinimalData = data && data?.length < 2;
 
-    if (paginationState.page == 1 || !hasMinimalData) {
-      loadExpenses();
-    } else {
-      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
     }
+    loadExpenses();
   };
 
   const removeExpense = async () => {
-    setOpenRemoveModal(false);
+    setModals(null);
     setLoading(true);
 
     try {
@@ -238,23 +205,23 @@ export default function Expenses() {
 
   const onClickAdd = () => {
     mainForm.resetForm();
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickUpdate = (expense: ExpenseWithRelationsInterface) => {
     setFormValues(expense);
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickDelete = (expense: Expense) => {
     mainForm.setFieldValue("id", expense.id);
-    setOpenRemoveModal(true);
+    setModals("remove");
   };
 
   const onModalCancel = () => {
     mainForm.resetForm();
     setResponseErrors({});
-    setOpenAddModal(false);
+    setModals(null);
   };
 
   const onCompanyFilterChange = (company: Company) => {
@@ -262,12 +229,9 @@ export default function Expenses() {
   };
 
   const onFilterFormSubmit = async () => {
-    setOpenFilterModal(false);
-    if (paginationState.page == 1) {
-      loadExpenses();
-    } else {
-      setPaginationState({ reload: true, page: 1 });
-    }
+    setModals(null);
+    setCurrentPage(1);
+    loadExpenses();
   };
 
   const buildSearchParamsUrl = () => {
@@ -280,7 +244,7 @@ export default function Expenses() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: paginationState.page,
+      page: getCurrentPage(),
       pageSize: 10,
     } as any).toString();
   };
@@ -304,8 +268,13 @@ export default function Expenses() {
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setReloadExpenses(true);
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadExpenses();
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadExpenses();
   };
 
   return (
@@ -313,7 +282,7 @@ export default function Expenses() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex flex-wrap">
           <div
-            onClick={() => setOpenFilterModal(true)}
+            onClick={() => setModals("filter")}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
             <Icon size={30} name="Filter"></Icon>
@@ -327,7 +296,6 @@ export default function Expenses() {
                 defaultFieldValue={config.defaultFieldValue}
                 onClose={(fieldName, defaultValue) => {
                   filterForm.setFieldValue(fieldName, defaultValue);
-                  setReloadExpenses(true);
                 }}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
@@ -400,12 +368,10 @@ export default function Expenses() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={paginationState.page}
+          currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => {
-            setPaginationState({ reload: true, page });
-          }}
+          onPageChange={onPageChange}
         ></Pagination>
       )}
 
@@ -415,8 +381,8 @@ export default function Expenses() {
         }}
         center
         showCloseIcon={false}
-        open={openRemoveModal}
-        onClose={() => setOpenRemoveModal(false)}
+        open={modals == "remove"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
@@ -427,7 +393,7 @@ export default function Expenses() {
         <div className="flex justify-between p-2 mt-10">
           <PrimaryButton
             text="Cancel"
-            onClick={() => setOpenRemoveModal(false)}
+            onClick={() => setModals(null)}
           ></PrimaryButton>
           <DangerButton
             disabled={loading}
@@ -444,8 +410,8 @@ export default function Expenses() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openAddModal}
-        onClose={() => setOpenAddModal(false)}
+        open={modals == "add"}
+        onClose={() => setModals(null)}
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
@@ -523,8 +489,8 @@ export default function Expenses() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openFilterModal}
-        onClose={() => setOpenFilterModal(false)}
+        open={modals == "filter"}
+        onClose={() => setModals("filter")}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Filters

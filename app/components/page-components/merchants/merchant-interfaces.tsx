@@ -1,6 +1,5 @@
 import { Merchant } from "@prisma/client";
 import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
-import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 
 export interface MerchantFiltersFormInterface {
