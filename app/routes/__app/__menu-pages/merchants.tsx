@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Formik, useFormik } from "formik";
+import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { FilterTag } from "~/components/filter-tag/filter-tag";
@@ -13,7 +13,7 @@ import {
 import { useTitle } from "~/components/top-bar/title-context";
 import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { loader as merchantLoader } from "~/routes/api/merchant/index";
-import { Form, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { Merchant } from "@prisma/client";
 import { Pagination } from "~/components/pagination/pagination";
@@ -46,7 +46,7 @@ export default function Merchants() {
     setIsSubmitting,
     openRemoveModal,
     setOpenRemoveModal,
-    sortParams,
+    getSortParams,
     setSortParams,
     totalPages,
     setTotalPages,
@@ -62,19 +62,31 @@ export default function Merchants() {
     merchantData: ServerResponseInterface<Merchant[]>;
   }>();
 
-  const mainForm = useFormik<MerchantFormInterface>({
-    initialValues: {
+  const {
+    register: registerMain,
+    handleSubmit: handleSubmitMain,
+    reset: resetMain,
+    setValue: setMainValue,
+    watch: watchMain,
+    getValues: getMainValues,
+    formState: { errors: mainErrors },
+  } = useForm<MerchantFormInterface>({
+    defaultValues: {
       id: "",
       name: "",
     },
-    onSubmit: () => {},
   });
 
-  const filterForm = useFormik<MerchantFiltersFormInterface>({
-    initialValues: {
+  const {
+    register: registerFilter,
+    handleSubmit: handleSubmitFilter,
+    reset: resetFilter,
+    setValue: setFilterValue,
+    getValues: getFilterValues,
+  } = useForm<MerchantFiltersFormInterface>({
+    defaultValues: {
       name: "",
     },
-    onSubmit: () => {},
   });
 
   useEffect(() => {
@@ -100,12 +112,12 @@ export default function Merchants() {
   }, [merchantData]);
 
   const onClickAdd = () => {
-    mainForm.resetForm();
+    resetMain();
     setOpenAddModal(true);
   };
 
   const onModalCancel = () => {
-    mainForm.resetForm();
+    resetMain();
     setResponseErrors({});
     setOpenAddModal(false);
   };
@@ -118,7 +130,7 @@ export default function Merchants() {
       {
         paginationParams: paginationParams(),
         searchParams: getSearchParams(),
-        sortParams,
+        sortParams: getSortParams(),
       },
       {
         onSuccess: (data) => {
@@ -140,9 +152,11 @@ export default function Merchants() {
     );
   };
 
-  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = prepareFormData(event.currentTarget);
+  const onMainSubmit = async (data: MerchantFormInterface) => {
+    const formData = new FormData();
+    formData.set("id", data.id);
+    formData.set("name", data.name);
+
     setIsSubmitting(true);
 
     await createOrUpdateMerchant(formData, {
@@ -168,28 +182,24 @@ export default function Merchants() {
   };
 
   const buildSearchParamsUrl = () => {
-    setSearchParams(queryParamsFromObject(filterForm.values));
+    setSearchParams(queryParamsFromObject(getFilterValues()));
   };
 
   const onClickUpdate = (merchant: Merchant) => {
-    setFormValues(merchant);
+    resetMain(merchant);
     setOpenAddModal(true);
   };
 
   const onClickDelete = (merchant: Merchant) => {
-    mainForm.setFieldValue("id", merchant.id);
+    setMainValue("id", merchant.id);
     setOpenRemoveModal(true);
-  };
-
-  const setFormValues = (merchant: Merchant) => {
-    mainForm.setValues(merchant);
   };
 
   const adjustPaginationBeforeReload = () => {
     const { data } = merchants;
     const hasMinimalData = data && data?.length < 2;
 
-    if (hasMinimalData && getCurrentPage() != 1) {
+    if (hasMinimalData && getCurrentPage() !== 1) {
       setCurrentPage(getCurrentPage() - 1);
     }
     loadMerchants();
@@ -199,7 +209,7 @@ export default function Merchants() {
     setOpenRemoveModal(false);
     setLoading(true);
 
-    await deleteMerchant(mainForm.values.id, {
+    await deleteMerchant(getMainValues().id, {
       onSuccess: () => {
         adjustPaginationBeforeReload();
       },
@@ -212,17 +222,7 @@ export default function Merchants() {
     });
   };
 
-  const prepareFormData = (form: HTMLFormElement) => {
-    const formData = new FormData(form);
-    formData.set("id", mainForm.values.id);
-    return formData;
-  };
-
-  const onFilterFormSubmit = async (
-    event?: React.FormEvent<HTMLFormElement>
-  ) => {
-    event?.preventDefault();
-
+  const onFilterFormSubmit = async (data: MerchantFiltersFormInterface) => {
     setOpenFilterModal(false);
     setCurrentPage(1);
     loadMerchants();
@@ -230,6 +230,7 @@ export default function Merchants() {
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadMerchants();
   };
 
   const onPageChange = (page: number) => {
@@ -238,8 +239,8 @@ export default function Merchants() {
   };
 
   const onFilterTagClose = (fieldName: string, defaultValue: any) => {
-    filterForm.setFieldValue(fieldName, defaultValue);
-    loadMerchants();
+    setFilterValue("name", defaultValue);
+    onFilterFormSubmit(getFilterValues());
   };
 
   return (
@@ -250,31 +251,27 @@ export default function Merchants() {
             onClick={() => setOpenFilterModal(true)}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
-            <Icon size={30} name="Filter"></Icon>
+            <Icon size={30} name="Filter" />
             Filters
           </div>
           <div className="flex flex-wrap">
             {MerchantFilterTagsConfig.map((config, index) => (
               <FilterTag
+                key={index}
                 fieldName={config.fieldName}
-                fieldValue={filterForm.values[config.fieldName]}
+                fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
                 onClose={onFilterTagClose}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(
-                  filterForm.values[config.fieldName]
+                  getFilterValues()[config.fieldName]
                 )}
-                key={index}
-              ></FilterTag>
+              />
             ))}
           </div>
         </div>
-        <PrimaryButton
-          onClick={onClickAdd}
-          text="Add"
-          iconName="PlusCircle"
-        ></PrimaryButton>
+        <PrimaryButton onClick={onClickAdd} text="Add" iconName="PlusCircle" />
       </div>
       <div className="overflow-x-auto px-10 pb-4">
         <table className="min-w-full bg-white border border-gray-300 text-violet-900">
@@ -283,7 +280,7 @@ export default function Merchants() {
               <ThSort
                 thSortConfigs={MerchantThSortConfig.thSortConfigs}
                 onSortChange={onSortChange}
-              ></ThSort>
+              />
             </tr>
           </thead>
           <tbody>
@@ -299,20 +296,16 @@ export default function Merchants() {
                 <td className="py-2 px-4 border-b border-r">{merchant.name}</td>
                 <td className="flex justify-center gap-5 py-2 px-4 border-b">
                   <Icon
-                    onClick={() => {
-                      onClickUpdate(merchant);
-                    }}
+                    onClick={() => onClickUpdate(merchant)}
                     name="Edit"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                  ></Icon>{" "}
+                    className="cursor-pointer transition-transform transform hover:scale-110"
+                  />{" "}
                   <Icon
-                    onClick={() => {
-                      onClickDelete(merchant);
-                    }}
+                    onClick={() => onClickDelete(merchant)}
                     name="Trash"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
+                    className="cursor-pointer transition-transform transform hover:scale-110"
                     color="red"
-                  ></Icon>
+                  />
                 </td>
               </tr>
             ))}
@@ -326,8 +319,8 @@ export default function Merchants() {
           currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => onPageChange(page)}
-        ></Pagination>
+          onPageChange={onPageChange}
+        />
       )}
 
       <Modal
@@ -349,12 +342,12 @@ export default function Merchants() {
           <PrimaryButton
             text="Cancel"
             onClick={() => setOpenRemoveModal(false)}
-          ></PrimaryButton>
+          />
           <DangerButton
             disabled={loading}
             text="Remove"
             onClick={removeMerchant}
-          ></DangerButton>
+          />
         </div>
       </Modal>
 
@@ -370,30 +363,28 @@ export default function Merchants() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {mainForm.values.id ? "Update merchant" : "Add new merchant"}
+          {watchMain("id") ? "Update merchant" : "Add new merchant"}
         </h2>
         <div>
           <div className="p-4">
-            <Form method="post" id="merchant-form" onSubmit={formSubmit}>
+            <form id="merchant-form" onSubmit={handleSubmitMain(onMainSubmit)}>
               <InputText
                 label="Name *"
-                name="name"
                 required
                 errorMessage={responseErrors?.errors?.["name"]}
-                value={mainForm.values.name}
-                onChange={mainForm.handleChange}
-              ></InputText>
-            </Form>
+                {...registerMain("name", { required: true })}
+              />
+            </form>
           </div>
           <div className="flex justify-between p-2">
-            <DangerButton text="Cancel" onClick={onModalCancel}></DangerButton>
+            <DangerButton text="Cancel" onClick={onModalCancel} />
             <PrimaryButton
               text="Save"
               disabled={isSubmitting}
               form="merchant-form"
               type="submit"
-              className={`${isSubmitting ? "bg-violet-950/50" : ""}`}
-            ></PrimaryButton>
+              className={isSubmitting ? "bg-violet-950/50" : ""}
+            />
           </div>
         </div>
       </Modal>
@@ -413,25 +404,17 @@ export default function Merchants() {
           Filters
         </h2>
         <div className="p-4">
-          <form onSubmit={onFilterFormSubmit}>
+          <form onSubmit={handleSubmitFilter(onFilterFormSubmit)}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-              <span onClick={() => filterForm.resetForm()}>
-                Clear all filters
-              </span>
+              <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
-            <InputText
-              label="Name"
-              name="name"
-              onChange={filterForm.handleChange}
-              value={filterForm.values.name}
-            ></InputText>
-
+            <InputText label="Name" {...registerFilter("name")} />
             <div className="flex justify-end p-2 mt-10">
               <PrimaryButton
-                onClick={() => onFilterFormSubmit()}
+                onClick={handleSubmitFilter(onFilterFormSubmit)}
                 text="Done"
                 type="button"
-              ></PrimaryButton>
+              />
             </div>
           </form>
         </div>

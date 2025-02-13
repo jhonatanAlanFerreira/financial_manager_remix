@@ -17,6 +17,7 @@ export const merchantStore = create<MerchantStoreInterface>((set, get) => ({
   setOpenRemoveModal: (value) => set({ openRemoveModal: value }),
   sortParams: "",
   setSortParams: (value) => set({ sortParams: value }),
+  getSortParams: () => get().sortParams,
   totalPages: 0,
   setTotalPages: (value) => set({ totalPages: value }),
   currentPage: 1,

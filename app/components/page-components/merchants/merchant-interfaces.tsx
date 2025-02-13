@@ -27,6 +27,7 @@ export interface MerchantStoreInterface {
   setOpenRemoveModal: (value: boolean) => void;
   sortParams: string;
   setSortParams: (value: string) => void;
+  getSortParams: () => string;
   totalPages: number;
   setTotalPages: (value: number) => void;
   currentPage: number;
