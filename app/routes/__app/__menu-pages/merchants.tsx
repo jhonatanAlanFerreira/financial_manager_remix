@@ -152,10 +152,7 @@ export default function Merchants() {
   };
 
   const onMainSubmit = async (data: MerchantFormInterface) => {
-    const formData = new FormData();
-    formData.set("id", data.id);
-    formData.set("name", data.name);
-
+    const formData = prepareFormData(data);
     setIsSubmitting(true);
 
     await createOrUpdateMerchant(formData, {
@@ -240,6 +237,12 @@ export default function Merchants() {
   const onFilterTagClose = (fieldName: string, defaultValue: any) => {
     setFilterValue("name", defaultValue);
     onFilterFormSubmit(getFilterValues());
+  };
+
+  const prepareFormData = (data: MerchantFormInterface) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => formData.set(key, value));
+    return formData;
   };
 
   return (
