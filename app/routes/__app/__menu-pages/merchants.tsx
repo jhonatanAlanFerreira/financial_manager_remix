@@ -229,8 +229,11 @@ export default function Merchants() {
     loadMerchants();
   };
 
-  const onFilterTagClose = (fieldName: string, defaultValue: any) => {
-    setFilterValue("name", defaultValue);
+  const onFilterTagClose = (
+    fieldName: keyof MerchantFiltersFormInterface,
+    defaultValue: any
+  ) => {
+    setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit(getFilterValues());
   };
 
@@ -258,7 +261,12 @@ export default function Merchants() {
                 fieldName={config.fieldName}
                 fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={onFilterTagClose}
+                onClose={(fieldName, defaultValue) =>
+                  onFilterTagClose(
+                    fieldName as keyof MerchantFiltersFormInterface,
+                    defaultValue
+                  )
+                }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(

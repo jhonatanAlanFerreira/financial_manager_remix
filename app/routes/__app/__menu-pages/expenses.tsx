@@ -292,8 +292,11 @@ export default function Expenses() {
     loadExpenses();
   };
 
-  const onFilterTagClose = (fieldName: string, defaultValue: any) => {
-    setFilterValue("name", defaultValue);
+  const onFilterTagClose = (
+    fieldName: keyof ExpenseFiltersFormInterface,
+    defaultValue: any
+  ) => {
+    setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit(getFilterValues());
   };
 
@@ -314,7 +317,12 @@ export default function Expenses() {
                 fieldName={config.fieldName}
                 fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={onFilterTagClose}
+                onClose={(fieldName, defaultValue) =>
+                  onFilterTagClose(
+                    fieldName as keyof ExpenseFiltersFormInterface,
+                    defaultValue
+                  )
+                }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(
@@ -433,7 +441,7 @@ export default function Expenses() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {mainForm.values.id ? "Update expense" : "Add new expense"}
+          {watchMain("id") ? "Update expense" : "Add new expense"}
         </h2>
         <div>
           <div className="p-4">
@@ -443,8 +451,6 @@ export default function Expenses() {
                   className="relative top-1"
                   name="is_personal"
                   id="is_personal"
-                  checked={mainForm.values.is_personal}
-                  onChange={mainForm.handleChange}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -457,8 +463,6 @@ export default function Expenses() {
                 label="Name *"
                 name="name"
                 required
-                value={mainForm.values.name}
-                onChange={mainForm.handleChange}
                 errorMessage={responseErrors?.errors?.["name"]}
               ></InputText>
               <InputText
@@ -467,10 +471,8 @@ export default function Expenses() {
                 type="number"
                 step={0.01}
                 min={0}
-                value={mainForm.values.amount || 0}
-                onChange={mainForm.handleChange}
               ></InputText>
-              {!mainForm.values.is_personal && (
+              {!getMainValues().is_personal && (
                 <InputSelect
                   isMulti
                   isClearable
@@ -481,7 +483,7 @@ export default function Expenses() {
                   getOptionValue={getSelectCompanyOptionValue as any}
                   name="companies"
                   onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={mainForm.values.companies}
+                  value={getMainValues().companies}
                 ></InputSelect>
               )}
             </Form>
@@ -514,11 +516,9 @@ export default function Expenses() {
           Filters
         </h2>
         <div className="p-4">
-          <form>
+          <form onSubmit={handleSubmitFilter(onFilterFormSubmit)}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-              <span onClick={() => filterForm.resetForm()}>
-                Clear all filters
-              </span>
+              <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
             <div className="flex flex-col gap-2 mb-12">
               <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
@@ -532,7 +532,7 @@ export default function Expenses() {
                     name="is_personal_or_company"
                     value={"all"}
                     onChange={isPersonalOrCompanyChange}
-                    checked={filterForm.values.is_personal_or_company === "all"}
+                    checked={getFilterValues().is_personal_or_company === "all"}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -548,9 +548,6 @@ export default function Expenses() {
                     name="is_personal_or_company"
                     value={"personal"}
                     onChange={isPersonalOrCompanyChange}
-                    checked={
-                      filterForm.values.is_personal_or_company === "personal"
-                    }
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -566,9 +563,6 @@ export default function Expenses() {
                     name="is_personal_or_company"
                     value={"company"}
                     onChange={isPersonalOrCompanyChange}
-                    checked={
-                      filterForm.values.is_personal_or_company === "company"
-                    }
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -583,23 +577,14 @@ export default function Expenses() {
               type="number"
               label="Amount greater than"
               name="amount_greater"
-              value={filterForm.values.amount_greater}
-              onChange={filterForm.handleChange}
             ></InputText>
             <InputText
               type="number"
               label="Amount less than"
               name="amount_less"
-              value={filterForm.values.amount_less}
-              onChange={filterForm.handleChange}
             ></InputText>
-            <InputText
-              label="Name"
-              name="name"
-              onChange={filterForm.handleChange}
-              value={filterForm.values.name}
-            ></InputText>
-            {filterForm.values.is_personal_or_company != "personal" && (
+            <InputText label="Name" name="name"></InputText>
+            {getFilterValues().is_personal_or_company != "personal" && (
               <InputSelect
                 isClearable
                 className="mb-8"
@@ -609,13 +594,13 @@ export default function Expenses() {
                 getOptionValue={getSelectCompanyOptionValue as any}
                 name="has_company"
                 onChange={(event) => onCompanyFilterChange(event as Company)}
-                value={filterForm.values.has_company}
+                value={getFilterValues().has_company}
               ></InputSelect>
             )}
 
             <div className="flex justify-end p-2 mt-10">
               <PrimaryButton
-                onClick={onFilterFormSubmit}
+                onClick={handleSubmitFilter(onFilterFormSubmit)}
                 text="Done"
                 type="button"
               ></PrimaryButton>
