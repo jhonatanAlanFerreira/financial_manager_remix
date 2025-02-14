@@ -226,7 +226,7 @@ export default function Expenses() {
     setModals(null);
   };
 
-  const onFilterFormSubmit = async (data: ExpenseFiltersFormInterface) => {
+  const onFilterFormSubmit = () => {
     setModals(null);
     setCurrentPage(1);
     loadExpenses();
@@ -274,7 +274,7 @@ export default function Expenses() {
     defaultValue: any
   ) => {
     setFilterValue(fieldName, defaultValue);
-    onFilterFormSubmit(getFilterValues());
+    onFilterFormSubmit();
   };
 
   const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {

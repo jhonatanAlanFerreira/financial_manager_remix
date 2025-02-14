@@ -213,7 +213,7 @@ export default function Merchants() {
     });
   };
 
-  const onFilterFormSubmit = async (data: MerchantFiltersFormInterface) => {
+  const onFilterFormSubmit = () => {
     setModals(null);
     setCurrentPage(1);
     loadMerchants();
@@ -234,7 +234,7 @@ export default function Merchants() {
     defaultValue: any
   ) => {
     setFilterValue(fieldName, defaultValue);
-    onFilterFormSubmit(getFilterValues());
+    onFilterFormSubmit();
   };
 
   const prepareFormData = (data: MerchantFormInterface) => {
