@@ -30,9 +30,12 @@ import {
 } from "~/data/frontend-services/expense-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
-import { expenseStore } from "~/components/page-components/expense/expense.store";
+import {
+  expenseStore,
+  FILTER_FORM_DEFAULTS_VALUES,
+  MAIN_FORM_DEFAULTS_VALUES,
+} from "~/components/page-components/expense/expense.store";
 import { Controller, useForm } from "react-hook-form";
-import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export default function Expenses() {
   const isMobile = useIsMobile();
@@ -75,13 +78,7 @@ export default function Expenses() {
     getValues: getMainValues,
     control: mainControl,
   } = useForm<ExpenseFormInterface>({
-    defaultValues: {
-      id: "",
-      name: "",
-      amount: 0,
-      companies: [],
-      is_personal: false,
-    },
+    defaultValues: MAIN_FORM_DEFAULTS_VALUES,
   });
 
   const {
@@ -90,15 +87,10 @@ export default function Expenses() {
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
+    watch: watchFilter,
     control: filterControl,
   } = useForm<ExpenseFiltersFormInterface>({
-    defaultValues: {
-      name: "",
-      amount_greater: 0,
-      amount_less: 0,
-      has_company: null,
-      is_personal_or_company: "all",
-    },
+    defaultValues: FILTER_FORM_DEFAULTS_VALUES,
   });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
@@ -214,7 +206,7 @@ export default function Expenses() {
   };
 
   const onClickAdd = () => {
-    resetMain();
+    resetMain(MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
   };
 
@@ -229,7 +221,7 @@ export default function Expenses() {
   };
 
   const onModalCancel = () => {
-    resetMain();
+    resetMain(MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
     setModals(null);
   };
@@ -286,6 +278,16 @@ export default function Expenses() {
   };
 
   const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
+  };
+
+  const onFilterIsPersonalOrCompanyChange = (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const { checked } = event.target;
     setMainValue("is_personal", checked);
     if (checked) {
@@ -577,24 +579,22 @@ export default function Expenses() {
             <InputText
               type="number"
               label="Amount less than"
-              name="amount_less"
+              {...registerFilter("amount_less")}
             ></InputText>
-            <InputText label="Name" name="name"></InputText>
-            {getFilterValues().is_personal_or_company != "personal" && (
+            <InputText label="Name" {...registerFilter("name")}></InputText>
+            {watchFilter("is_personal_or_company") != "personal" && (
               <Controller
                 name="has_company"
                 control={filterControl}
                 render={({ field }) => (
                   <InputSelect
-                    isMulti
                     isClearable
                     className="mb-8"
-                    placeholder="Companies"
+                    placeholder="Company"
                     options={companies?.data}
                     getOptionLabel={getSelectCompanyOptionLabel as any}
                     getOptionValue={getSelectCompanyOptionValue as any}
-                    onChange={(company) => field.onChange(company)}
-                    value={field.value}
+                    {...field}
                   />
                 )}
               />
