@@ -146,9 +146,8 @@ export default function Expenses() {
     );
   };
 
-  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = prepareFormData(event.currentTarget);
+  const formSubmit = async (data: ExpenseFormInterface) => {
+    const formData = prepareFormData(data);
     setIsSubmitting(true);
 
     createOrUpdateExpense(formData, {
@@ -247,8 +246,10 @@ export default function Expenses() {
     } as any).toString();
   };
 
-  const prepareFormData = (form: HTMLFormElement) => {
-    const formData = new FormData(form);
+  const prepareFormData = (data: ExpenseFormInterface) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => formData.set(key, value));
+
     formData.set(
       "is_personal",
       formData.get("is_personal") == "on" ? "true" : "false"
@@ -430,7 +431,11 @@ export default function Expenses() {
         </h2>
         <div>
           <div className="p-4">
-            <Form method="post" id="expense-form" onSubmit={formSubmit}>
+            <Form
+              method="post"
+              id="expense-form"
+              onSubmit={handleSubmitMain(formSubmit)}
+            >
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
