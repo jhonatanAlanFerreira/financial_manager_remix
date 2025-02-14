@@ -69,7 +69,6 @@ export default function Merchants() {
     setValue: setMainValue,
     watch: watchMain,
     getValues: getMainValues,
-    formState: { errors: mainErrors },
   } = useForm<MerchantFormInterface>({
     defaultValues: MAIN_FORM_DEFAULTS_VALUES,
   });

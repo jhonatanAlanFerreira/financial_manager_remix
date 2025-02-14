@@ -8,7 +8,6 @@ import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as expenseLoader } from "~/routes/api/expense/index";
 import { Company, Expense } from "@prisma/client";
 import { Icon } from "~/components/icon/icon";
-import { useFormik } from "formik";
 import { Pagination } from "~/components/pagination/pagination";
 import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -32,6 +31,8 @@ import {
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
 import { expenseStore } from "~/components/page-components/expense/expense.store";
+import { useForm } from "react-hook-form";
+import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export default function Expenses() {
   const isMobile = useIsMobile();
@@ -65,26 +66,37 @@ export default function Expenses() {
     companyData: ServerResponseInterface<Company[]>;
   }>();
 
-  const mainForm = useFormik<ExpenseFormInterface>({
-    initialValues: {
+  const {
+    register: registerMain,
+    handleSubmit: handleSubmitMain,
+    reset: resetMain,
+    setValue: setMainValue,
+    watch: watchMain,
+    getValues: getMainValues,
+  } = useForm<ExpenseFormInterface>({
+    defaultValues: {
       id: "",
       name: "",
       amount: 0,
       companies: [],
       is_personal: false,
     },
-    onSubmit: () => {},
   });
 
-  const filterForm = useFormik<ExpenseFiltersFormInterface>({
-    initialValues: {
+  const {
+    register: registerFilter,
+    handleSubmit: handleSubmitFilter,
+    reset: resetFilter,
+    setValue: setFilterValue,
+    getValues: getFilterValues,
+  } = useForm<ExpenseFiltersFormInterface>({
+    defaultValues: {
       name: "",
       amount_greater: 0,
       amount_less: 0,
       has_company: null,
       is_personal_or_company: "all",
     },
-    onSubmit: () => {},
   });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
@@ -179,7 +191,7 @@ export default function Expenses() {
     setLoading(true);
 
     try {
-      await deleteExpense(mainForm.values.id, {
+      await deleteExpense(getMainValues().id, {
         onSuccess: () => {
           adjustPaginationBeforeReload();
           setLoading(false);
@@ -196,15 +208,15 @@ export default function Expenses() {
   };
 
   const setFormValues = (expense: ExpenseWithRelationsInterface) => {
-    mainForm.setValues(expense);
+    resetMain(expense);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
-    mainForm.setFieldValue("companies", companies);
+    setMainValue("companies", companies);
   };
 
   const onClickAdd = () => {
-    mainForm.resetForm();
+    resetMain();
     setModals("add");
   };
 
@@ -214,21 +226,21 @@ export default function Expenses() {
   };
 
   const onClickDelete = (expense: Expense) => {
-    mainForm.setFieldValue("id", expense.id);
+    setMainValue("id", expense.id);
     setModals("remove");
   };
 
   const onModalCancel = () => {
-    mainForm.resetForm();
+    resetMain();
     setResponseErrors({});
     setModals(null);
   };
 
   const onCompanyFilterChange = (company: Company) => {
-    filterForm.setFieldValue("has_company", company);
+    setFilterValue("has_company", company);
   };
 
-  const onFilterFormSubmit = async () => {
+  const onFilterFormSubmit = async (data: ExpenseFiltersFormInterface) => {
     setModals(null);
     setCurrentPage(1);
     loadExpenses();
@@ -236,7 +248,7 @@ export default function Expenses() {
 
   const buildSearchParamsUrl = () => {
     setSearchParams(
-      queryParamsFromObject(filterForm.values, {
+      queryParamsFromObject(getFilterValues(), {
         has_company: "id",
       })
     );
@@ -252,7 +264,10 @@ export default function Expenses() {
   const isPersonalOrCompanyChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+    setFilterValue(
+      "is_personal_or_company",
+      e.currentTarget.value as IsPersonalOrCompanyType
+    );
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
@@ -262,7 +277,7 @@ export default function Expenses() {
       formData.get("is_personal") == "on" ? "true" : "false"
     );
 
-    formData.set("id", mainForm.values.id);
+    formData.set("id", getMainValues().id);
 
     return formData;
   };
@@ -275,6 +290,11 @@ export default function Expenses() {
   const onPageChange = (page: number) => {
     setCurrentPage(page);
     loadExpenses();
+  };
+
+  const onFilterTagClose = (fieldName: string, defaultValue: any) => {
+    setFilterValue("name", defaultValue);
+    onFilterFormSubmit(getFilterValues());
   };
 
   return (
@@ -292,15 +312,13 @@ export default function Expenses() {
             {ExpenseFilterTagsConfig.map((config, index) => (
               <FilterTag
                 fieldName={config.fieldName}
-                fieldValue={filterForm.values[config.fieldName]}
+                fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={(fieldName, defaultValue) => {
-                  filterForm.setFieldValue(fieldName, defaultValue);
-                }}
+                onClose={onFilterTagClose}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(
-                  filterForm.values[config.fieldName]
+                  getFilterValues()[config.fieldName]
                 )}
                 key={index}
               ></FilterTag>
