@@ -1,5 +1,5 @@
 import { Modal } from "react-responsive-modal";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { Form, useLoaderData } from "@remix-run/react";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -213,10 +213,6 @@ export default function Expenses() {
     resetMain(expense);
   };
 
-  const onCompaniesChange = (companies: Company[]) => {
-    setMainValue("companies", companies);
-  };
-
   const onClickAdd = () => {
     resetMain();
     setModals("add");
@@ -259,15 +255,6 @@ export default function Expenses() {
     } as any).toString();
   };
 
-  const isPersonalOrCompanyChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFilterValue(
-      "is_personal_or_company",
-      e.currentTarget.value as IsPersonalOrCompanyType
-    );
-  };
-
   const prepareFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);
     formData.set(
@@ -296,6 +283,14 @@ export default function Expenses() {
   ) => {
     setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit(getFilterValues());
+  };
+
+  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
   };
 
   return (
@@ -449,6 +444,7 @@ export default function Expenses() {
                   className="relative top-1"
                   id="is_personal"
                   {...registerMain("is_personal")}
+                  onChange={onMainIsPersonalChange}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -470,7 +466,7 @@ export default function Expenses() {
                 step={0.01}
                 min={0}
               ></InputText>
-              {!getMainValues().is_personal && (
+              {!watchMain("is_personal") && (
                 <Controller
                   name="companies"
                   control={mainControl}
@@ -483,8 +479,7 @@ export default function Expenses() {
                       options={companies?.data}
                       getOptionLabel={getSelectCompanyOptionLabel as any}
                       getOptionValue={getSelectCompanyOptionValue as any}
-                      onChange={(selected) => field.onChange(selected)}
-                      value={field.value}
+                      {...field}
                     />
                   )}
                 />
