@@ -31,7 +31,7 @@ import {
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
 import { expenseStore } from "~/components/page-components/expense/expense.store";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export default function Expenses() {
@@ -73,6 +73,7 @@ export default function Expenses() {
     setValue: setMainValue,
     watch: watchMain,
     getValues: getMainValues,
+    control: mainControl,
   } = useForm<ExpenseFormInterface>({
     defaultValues: {
       id: "",
@@ -89,6 +90,7 @@ export default function Expenses() {
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
+    control: filterControl,
   } = useForm<ExpenseFiltersFormInterface>({
     defaultValues: {
       name: "",
@@ -234,10 +236,6 @@ export default function Expenses() {
     resetMain();
     setResponseErrors({});
     setModals(null);
-  };
-
-  const onCompanyFilterChange = (company: Company) => {
-    setFilterValue("has_company", company);
   };
 
   const onFilterFormSubmit = async (data: ExpenseFiltersFormInterface) => {
@@ -449,8 +447,8 @@ export default function Expenses() {
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
-                  name="is_personal"
                   id="is_personal"
+                  {...registerMain("is_personal")}
                 ></Checkbox>
                 <label
                   className="pl-3 text-violet-950 cursor-pointer"
@@ -461,30 +459,35 @@ export default function Expenses() {
               </div>
               <InputText
                 label="Name *"
-                name="name"
                 required
                 errorMessage={responseErrors?.errors?.["name"]}
+                {...registerMain("name")}
               ></InputText>
               <InputText
                 label="Amount"
-                name="amount"
+                {...registerMain("amount")}
                 type="number"
                 step={0.01}
                 min={0}
               ></InputText>
               {!getMainValues().is_personal && (
-                <InputSelect
-                  isMulti
-                  isClearable
-                  className="mb-8"
-                  placeholder="Companies"
-                  options={companies?.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
+                <Controller
                   name="companies"
-                  onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={getMainValues().companies}
-                ></InputSelect>
+                  control={mainControl}
+                  render={({ field }) => (
+                    <InputSelect
+                      isMulti
+                      isClearable
+                      className="mb-8"
+                      placeholder="Companies"
+                      options={companies?.data}
+                      getOptionLabel={getSelectCompanyOptionLabel as any}
+                      getOptionValue={getSelectCompanyOptionValue as any}
+                      onChange={(selected) => field.onChange(selected)}
+                      value={field.value}
+                    />
+                  )}
+                />
               )}
             </Form>
           </div>
@@ -529,11 +532,11 @@ export default function Expenses() {
                   <input
                     id="personal_company_all_filter"
                     type="radio"
-                    name="is_personal_or_company"
-                    value={"all"}
-                    onChange={isPersonalOrCompanyChange}
-                    checked={getFilterValues().is_personal_or_company === "all"}
-                  ></input>
+                    value="all"
+                    {...registerFilter("is_personal_or_company", {
+                      onChange: (e) => {},
+                    })}
+                  />
                   <label
                     className="cursor-pointer ml-2"
                     htmlFor="personal_company_all_filter"
@@ -545,10 +548,9 @@ export default function Expenses() {
                   <input
                     id="is_personal_filter"
                     type="radio"
-                    name="is_personal_or_company"
-                    value={"personal"}
-                    onChange={isPersonalOrCompanyChange}
-                  ></input>
+                    value="personal"
+                    {...registerFilter("is_personal_or_company")}
+                  />
                   <label
                     className="cursor-pointer ml-2"
                     htmlFor="is_personal_filter"
@@ -560,10 +562,9 @@ export default function Expenses() {
                   <input
                     id="is_company_filter"
                     type="radio"
-                    name="is_personal_or_company"
-                    value={"company"}
-                    onChange={isPersonalOrCompanyChange}
-                  ></input>
+                    value="company"
+                    {...registerFilter("is_personal_or_company")}
+                  />
                   <label
                     className="cursor-pointer ml-2"
                     htmlFor="is_company_filter"
@@ -576,7 +577,7 @@ export default function Expenses() {
             <InputText
               type="number"
               label="Amount greater than"
-              name="amount_greater"
+              {...registerFilter("amount_greater")}
             ></InputText>
             <InputText
               type="number"
@@ -585,17 +586,23 @@ export default function Expenses() {
             ></InputText>
             <InputText label="Name" name="name"></InputText>
             {getFilterValues().is_personal_or_company != "personal" && (
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Company"
-                options={companies.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
+              <Controller
                 name="has_company"
-                onChange={(event) => onCompanyFilterChange(event as Company)}
-                value={getFilterValues().has_company}
-              ></InputSelect>
+                control={filterControl}
+                render={({ field }) => (
+                  <InputSelect
+                    isMulti
+                    isClearable
+                    className="mb-8"
+                    placeholder="Companies"
+                    options={companies?.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    onChange={(company) => field.onChange(company)}
+                    value={field.value}
+                  />
+                )}
+              />
             )}
 
             <div className="flex justify-end p-2 mt-10">
