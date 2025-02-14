@@ -285,16 +285,6 @@ export default function Expenses() {
     }
   };
 
-  const onFilterIsPersonalOrCompanyChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const { checked } = event.target;
-    setMainValue("is_personal", checked);
-    if (checked) {
-      setMainValue("companies", []);
-    }
-  };
-
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
