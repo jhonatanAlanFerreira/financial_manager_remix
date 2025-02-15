@@ -141,6 +141,7 @@ export default function Incomes() {
 
   const loadIncomes = async () => {
     setLoading(true);
+    buildSearchParamsUrl();
 
     await fetchIncomes(
       {
@@ -259,8 +260,8 @@ export default function Incomes() {
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadIncomes();
   };
-
   const onFilterTagClose = (
     fieldName: keyof IncomeFiltersFormInterface,
     defaultValue: any
@@ -585,7 +586,7 @@ export default function Incomes() {
 
             <div className="flex justify-end p-2 mt-10">
               <PrimaryButton
-                onClick={onFilterFormSubmit}
+                onClick={handleSubmitFilter(onFilterFormSubmit)}
                 text="Done"
                 type="button"
               ></PrimaryButton>
