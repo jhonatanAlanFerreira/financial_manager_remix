@@ -283,6 +283,13 @@ export default function Incomes() {
     loadIncomes();
   };
 
+  const onFilterIsPersonalOrCompanyChange = () => {
+    const { is_personal_or_company } = getFilterValues();
+    if (is_personal_or_company == "personal") {
+      setFilterValue("has_company", null);
+    }
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -515,7 +522,7 @@ export default function Incomes() {
                     type="radio"
                     value="all"
                     {...registerFilter("is_personal_or_company", {
-                      onChange: (e) => {},
+                      onChange: onFilterIsPersonalOrCompanyChange,
                     })}
                   />
                   <label
