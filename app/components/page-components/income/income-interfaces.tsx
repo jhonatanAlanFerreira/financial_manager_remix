@@ -1,4 +1,7 @@
 import { Company } from "@prisma/client";
+import { IncomeWithRelationsInterface } from "~/data/income/income-types";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { IsPersonalOrCompanyType } from "~/shared/shared-types";
 
 export interface IncomeFiltersFormInterface {
@@ -15,4 +18,13 @@ export interface IncomeFormInterface {
   amount: number | null;
   companies: Company[];
   is_personal: boolean;
+}
+
+export interface IncomeStoreInterface extends BasePageStoreInterface {
+  incomes: ServerResponseInterface<IncomeWithRelationsInterface[]>;
+  setIncomes: (
+    value: ServerResponseInterface<IncomeWithRelationsInterface[]>
+  ) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
 }

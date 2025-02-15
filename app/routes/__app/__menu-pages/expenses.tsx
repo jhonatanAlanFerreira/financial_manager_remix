@@ -34,7 +34,7 @@ import {
   expenseStore,
   FILTER_FORM_DEFAULTS_VALUES,
   MAIN_FORM_DEFAULTS_VALUES,
-} from "~/components/page-components/expense/expense.store";
+} from "~/components/page-components/expense/expense-store";
 import { Controller, useForm } from "react-hook-form";
 
 export default function Expenses() {
