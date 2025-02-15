@@ -74,7 +74,6 @@ export default function Incomes() {
 
   const {
     register: registerMain,
-    handleSubmit: handleSubmitMain,
     reset: resetMain,
     setValue: setMainValue,
     watch: watchMain,
@@ -120,9 +119,9 @@ export default function Incomes() {
     setLoading(false);
   }, [companyData, incomeData]);
 
-  const formSubmit = async (data: IncomeFormInterface) => {
-    const formData = prepareFormData(data);
-
+  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
     await createOrUpdateIncome(formData, {
@@ -246,10 +245,8 @@ export default function Incomes() {
     );
   };
 
-  const prepareFormData = (data: IncomeFormInterface) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.set(key, value));
-
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
     formData.set(
       "is_personal",
       formData.get("is_personal") == "on" ? "true" : "false"
@@ -426,11 +423,7 @@ export default function Incomes() {
         </h2>
         <div>
           <div className="p-4">
-            <Form
-              method="post"
-              id="income-form"
-              onSubmit={handleSubmitMain(formSubmit)}
-            >
+            <Form method="post" id="income-form" onSubmit={formSubmit}>
               <div className="border-2 border-violet-950 border-opacity-50 p-4">
                 <Checkbox
                   className="relative top-1"
