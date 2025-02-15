@@ -31,7 +31,16 @@ import {
 } from "~/data/frontend-services/classification-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ClassificationThSortConfig } from "~/components/page-components/classification/classification-th-sort-config";
-import { classificationStore } from "~/components/page-components/classification/classification-store";
+import {
+  CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES,
+  CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES,
+  classificationStore,
+} from "~/components/page-components/classification/classification-store";
+import { Controller, useForm } from "react-hook-form";
+import {
+  IsIncomeOrExpenseType,
+  IsPersonalOrCompanyType,
+} from "~/shared/shared-types";
 
 export default function Classifications() {
   const isMobile = useIsMobile();
@@ -67,25 +76,27 @@ export default function Classifications() {
     >;
   }>();
 
-  const mainForm = useFormik<ClassificationFormInterface>({
-    initialValues: {
-      id: "",
-      name: "",
-      companies: [],
-      is_personal: false,
-      is_income: false,
-    },
-    onSubmit: () => {},
+  const {
+    register: registerMain,
+    reset: resetMain,
+    setValue: setMainValue,
+    watch: watchMain,
+    getValues: getMainValues,
+    control: mainControl,
+  } = useForm<ClassificationFormInterface>({
+    defaultValues: CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES,
   });
 
-  const filterForm = useFormik<ClassificationFiltersFormInterface>({
-    initialValues: {
-      name: "",
-      has_company: null,
-      is_personal_or_company: "all",
-      is_income_or_expense: "all",
-    },
-    onSubmit: () => {},
+  const {
+    register: registerFilter,
+    handleSubmit: handleSubmitFilter,
+    reset: resetFilter,
+    setValue: setFilterValue,
+    getValues: getFilterValues,
+    watch: watchFilter,
+    control: filterControl,
+  } = useForm<ClassificationFiltersFormInterface>({
+    defaultValues: CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES,
   });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
@@ -117,6 +128,7 @@ export default function Classifications() {
 
   const loadClassifications = async () => {
     setLoading(true);
+    buildSearchParamsUrl();
 
     await fetchClassifications(
       {
@@ -185,7 +197,7 @@ export default function Classifications() {
     setModals(null);
     setLoading(true);
 
-    await deleteClassification(mainForm.values.id as string, {
+    await deleteClassification(watchMain("id") as string, {
       onSuccess: () => {
         adjustPaginationBeforeReload();
       },
@@ -201,15 +213,15 @@ export default function Classifications() {
   const setFormValues = (
     classification: ClassificationWithRelationsInterface
   ) => {
-    mainForm.setValues(classification);
+    resetMain(classification);
   };
 
   const onCompaniesChange = (companies: Company[]) => {
-    mainForm.setFieldValue("companies", companies);
+    setMainValue("companies", companies);
   };
 
   const onClickAdd = () => {
-    mainForm.resetForm();
+    resetMain(CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
   };
 
@@ -221,18 +233,18 @@ export default function Classifications() {
   };
 
   const onClickDelete = (classification: TransactionClassification) => {
-    mainForm.setFieldValue("id", classification.id);
+    setMainValue("id", classification.id);
     setModals("remove");
   };
 
   const onModalCancel = () => {
-    mainForm.resetForm();
+    resetMain(CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
     setModals(null);
   };
 
   const onCompanyFilterChange = (company: Company) => {
-    filterForm.setFieldValue("has_company", company);
+    setFilterValue("has_company", company);
   };
 
   const onFilterFormSubmit = () => {
@@ -243,7 +255,7 @@ export default function Classifications() {
 
   const buildSearchParamsUrl = () => {
     setSearchParams(
-      queryParamsFromObject(filterForm.values, {
+      queryParamsFromObject(getFilterValues(), {
         has_company: "id",
       })
     );
@@ -257,13 +269,19 @@ export default function Classifications() {
   };
 
   const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    filterForm.setFieldValue("is_income_or_expense", e.currentTarget.value);
+    setFilterValue(
+      "is_income_or_expense",
+      e.currentTarget.value as IsIncomeOrExpenseType
+    );
   };
 
   const isPersonalOrCompanyChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    filterForm.setFieldValue("is_personal_or_company", e.currentTarget.value);
+    setFilterValue(
+      "is_personal_or_company",
+      e.currentTarget.value as IsPersonalOrCompanyType
+    );
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
@@ -277,13 +295,26 @@ export default function Classifications() {
       formData.get("is_income") == "on" ? "true" : "false"
     );
 
-    formData.set("id", mainForm.values.id);
+    formData.set("id", getMainValues().id);
 
     return formData;
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadClassifications();
+  };
+  const onFilterTagClose = (
+    fieldName: keyof ClassificationFiltersFormInterface,
+    defaultValue: any
+  ) => {
+    setFilterValue(fieldName, defaultValue);
+    onFilterFormSubmit();
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadClassifications();
   };
 
   return (
@@ -301,15 +332,18 @@ export default function Classifications() {
             {ClassificationFilterTagsConfig.map((config, index) => (
               <FilterTag
                 fieldName={config.fieldName}
-                fieldValue={filterForm.values[config.fieldName]}
+                fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={(fieldName, defaultValue) => {
-                  filterForm.setFieldValue(fieldName, defaultValue);
-                }}
+                onClose={(fieldName, defaultValue) =>
+                  onFilterTagClose(
+                    fieldName as keyof ClassificationFiltersFormInterface,
+                    defaultValue
+                  )
+                }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
                 tagValue={config.getTagValue(
-                  filterForm.values[config.fieldName]
+                  getFilterValues()[config.fieldName]
                 )}
                 key={index}
               ></FilterTag>
@@ -376,7 +410,7 @@ export default function Classifications() {
           currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={onPageChange}
         ></Pagination>
       )}
 
@@ -420,9 +454,7 @@ export default function Classifications() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {mainForm.values.id
-            ? "Update classification"
-            : "Add new classification"}
+          {watchMain("id") ? "Update classification" : "Add new classification"}
         </h2>
         <div>
           <div className="p-4">
@@ -430,11 +462,9 @@ export default function Classifications() {
               <div className="flex flex-col gap-2 border-2 border-violet-950 border-opacity-50 p-4 mb-6">
                 <div>
                   <Checkbox
-                    name="is_personal"
                     id="is_personal"
                     className="relative top-1"
-                    checked={mainForm.values.is_personal}
-                    onChange={mainForm.handleChange}
+                    {...registerMain("is_personal")}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
@@ -449,10 +479,8 @@ export default function Classifications() {
                   <input
                     id="is_not_income"
                     type="radio"
-                    name="is_income"
                     value={""}
-                    checked={!mainForm.values.is_income}
-                    onChange={mainForm.handleChange}
+                    {...registerMain("is_income")}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -465,10 +493,8 @@ export default function Classifications() {
                   <input
                     id="is_income"
                     type="radio"
-                    name="is_income"
                     value={"on"}
-                    checked={mainForm.values.is_income}
-                    onChange={mainForm.handleChange}
+                    {...registerMain("is_income")}
                   ></input>
                   <label className="cursor-pointer ml-2" htmlFor="is_income">
                     Income Classification
@@ -477,25 +503,27 @@ export default function Classifications() {
               </div>
               <InputText
                 label="Name *"
-                name="name"
                 required
-                value={mainForm.values.name}
-                onChange={mainForm.handleChange}
                 errorMessage={responseErrors?.errors?.["name"]}
+                {...registerMain("name")}
               ></InputText>
-              {!mainForm.values.is_personal && (
-                <InputSelect
-                  isClearable
-                  isMulti
-                  className="mb-8"
-                  placeholder="Companies"
-                  options={companies?.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
+              {!watchMain("is_personal") && (
+                <Controller
                   name="companies"
-                  onChange={(event) => onCompaniesChange(event as Company[])}
-                  value={mainForm.values.companies}
-                ></InputSelect>
+                  control={mainControl}
+                  render={({ field }) => (
+                    <InputSelect
+                      isMulti
+                      isClearable
+                      className="mb-8"
+                      placeholder="Companies"
+                      options={companies?.data}
+                      getOptionLabel={getSelectCompanyOptionLabel as any}
+                      getOptionValue={getSelectCompanyOptionValue as any}
+                      {...field}
+                    />
+                  )}
+                />
               )}
             </Form>
           </div>
@@ -529,7 +557,11 @@ export default function Classifications() {
         <div className="p-4">
           <form>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-              <span onClick={() => filterForm.resetForm()}>
+              <span
+                onClick={() =>
+                  resetFilter(CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES)
+                }
+              >
                 Clear all filters
               </span>
             </div>
@@ -542,10 +574,8 @@ export default function Classifications() {
                   <input
                     id="income_expense_all_filter"
                     type="radio"
-                    name="is_income_or_expense"
                     value={"all"}
-                    onChange={isIncomeOrExpenseChange}
-                    checked={filterForm.values.is_income_or_expense === "all"}
+                    {...registerFilter("is_income_or_expense")}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -558,12 +588,8 @@ export default function Classifications() {
                   <input
                     id="is_expense_filter"
                     type="radio"
-                    name="is_income_or_expense"
                     value={"expense"}
-                    onChange={isIncomeOrExpenseChange}
-                    checked={
-                      filterForm.values.is_income_or_expense === "expense"
-                    }
+                    {...registerFilter("is_income_or_expense")}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -576,12 +602,8 @@ export default function Classifications() {
                   <input
                     id="is_income_filter"
                     type="radio"
-                    name="is_income_or_expense"
                     value={"income"}
-                    onChange={isIncomeOrExpenseChange}
-                    checked={
-                      filterForm.values.is_income_or_expense === "income"
-                    }
+                    {...registerFilter("is_income_or_expense")}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -599,10 +621,9 @@ export default function Classifications() {
                   <input
                     id="personal_company_all_filter"
                     type="radio"
-                    name="is_personal_or_company"
+                    {...registerFilter("is_personal_or_company")}
                     value={"all"}
-                    onChange={isPersonalOrCompanyChange}
-                    checked={filterForm.values.is_personal_or_company === "all"}
+                    {...registerFilter("is_personal_or_company")}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -615,12 +636,8 @@ export default function Classifications() {
                   <input
                     id="is_personal_filter"
                     type="radio"
-                    name="is_personal_or_company"
+                    {...registerFilter("is_personal_or_company")}
                     value={"personal"}
-                    onChange={isPersonalOrCompanyChange}
-                    checked={
-                      filterForm.values.is_personal_or_company === "personal"
-                    }
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -633,12 +650,8 @@ export default function Classifications() {
                   <input
                     id="is_company_filter"
                     type="radio"
-                    name="is_personal_or_company"
+                    {...registerFilter("is_personal_or_company")}
                     value={"company"}
-                    onChange={isPersonalOrCompanyChange}
-                    checked={
-                      filterForm.values.is_personal_or_company === "company"
-                    }
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -649,24 +662,23 @@ export default function Classifications() {
                 </div>
               </div>
             </div>
-            <InputText
-              label="Name"
-              name="name"
-              onChange={filterForm.handleChange}
-              value={filterForm.values.name}
-            ></InputText>
-            {filterForm.values.is_personal_or_company != "personal" && (
-              <InputSelect
-                isClearable
-                className="mb-8"
-                placeholder="Company"
-                options={companies.data}
-                getOptionLabel={getSelectCompanyOptionLabel as any}
-                getOptionValue={getSelectCompanyOptionValue as any}
+            <InputText label="Name" {...registerFilter("name")}></InputText>
+            {watchFilter("is_personal_or_company") != "personal" && (
+              <Controller
                 name="has_company"
-                onChange={(event) => onCompanyFilterChange(event as Company)}
-                value={filterForm.values.has_company}
-              ></InputSelect>
+                control={filterControl}
+                render={({ field }) => (
+                  <InputSelect
+                    isClearable
+                    className="mb-8"
+                    placeholder="Company"
+                    options={companies?.data}
+                    getOptionLabel={getSelectCompanyOptionLabel as any}
+                    getOptionValue={getSelectCompanyOptionValue as any}
+                    {...field}
+                  />
+                )}
+              />
             )}
 
             <div className="flex justify-end p-2 mt-10">
