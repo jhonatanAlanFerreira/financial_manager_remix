@@ -1,7 +1,7 @@
 import { Company, TransactionClassification } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Modal } from "react-responsive-modal";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
@@ -23,7 +23,6 @@ import {
   ClassificationFiltersFormInterface,
   ClassificationFormInterface,
 } from "~/components/page-components/classification/classification-finterfaces";
-import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import { ClassificationWithRelationsInterface } from "~/data/classification/classification-types";
 import {
   createOrUpdateClassification,
@@ -32,36 +31,34 @@ import {
 } from "~/data/frontend-services/classification-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { ClassificationThSortConfig } from "~/components/page-components/classification/classification-th-sort-config";
+import { classificationStore } from "~/components/page-components/classification/classification-store";
 
 export default function Classifications() {
   const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
-  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [reloadClassification, setReloadClassification] =
-    useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<string>("");
-  const [sortParams, setSortParams] = useState<string>("");
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [responseErrors, setResponseErrors] =
-    useState<ServerResponseErrorInterface>({});
-  const [companies, setCompanies] = useState<
-    ServerResponseInterface<Company[]>
-  >({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [classifications, setClassifications] = useState<
-    ServerResponseInterface<ClassificationWithRelationsInterface[]>
-  >({});
-  const [paginationState, setPaginationState] = useState<{
-    reload: boolean;
-    page: number;
-  }>({
-    reload: false,
-    page: 1,
-  });
+  const {
+    loading,
+    setLoading,
+    getSearchParams,
+    setSearchParams,
+    isSubmitting,
+    setIsSubmitting,
+    modals,
+    setModals,
+    getSortParams,
+    setSortParams,
+    totalPages,
+    setTotalPages,
+    setCurrentPage,
+    getCurrentPage,
+    responseErrors,
+    setResponseErrors,
+    companies,
+    setCompanies,
+    classifications,
+    setClassifications,
+  } = classificationStore();
 
   const { companyData, classificationData } = useLoaderData<{
     companyData: ServerResponseInterface<Company[]>;
@@ -118,64 +115,24 @@ export default function Classifications() {
     setLoading(false);
   }, [companyData, classificationData]);
 
-  useEffect(() => {
-    if (paginationState.reload) {
-      loadClassifications();
-    }
-  }, [paginationState]);
-
-  useEffect(() => {
-    buildSearchParamsUrl();
-  }, [filterForm.values]);
-
-  useEffect(() => {
-    if (reloadClassification) {
-      setReloadClassification(false);
-      loadClassifications();
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    mainForm.setFieldValue("companies", null);
-  }, [mainForm.values.is_personal]);
-
-  useEffect(() => {
-    if (filterForm.values.is_personal_or_company === "personal") {
-      filterForm.setFieldValue("has_company", null);
-    }
-  }, [filterForm.values.is_personal_or_company]);
-
-  useEffect(() => {
-    if (reloadClassification) {
-      setReloadClassification(false);
-      loadClassifications();
-    }
-  }, [sortParams]);
-
   const loadClassifications = async () => {
     setLoading(true);
 
     await fetchClassifications(
       {
         paginationParams: paginationParams(),
-        searchParams,
-        sortParams,
+        searchParams: getSearchParams(),
+        sortParams: getSortParams(),
         extends: "companies",
       },
       {
         onSuccess: (data) => {
-          setPaginationState({
-            reload: false,
-            page: data.pageInfo?.currentPage || 1,
-          });
+          setCurrentPage(data.pageInfo?.currentPage || 1);
           setTotalPages(data.pageInfo?.totalPages || 1);
           setClassifications(data);
 
           if (!data.data?.length) {
-            setPaginationState({
-              reload: false,
-              page: data.pageInfo?.totalPages || 1,
-            });
+            setCurrentPage(data.pageInfo?.currentPage || 1);
           }
         },
         onError: () => {
@@ -195,7 +152,7 @@ export default function Classifications() {
 
     await createOrUpdateClassification(formData, {
       onSuccess: () => {
-        setOpenAddModal(false);
+        setModals(null);
         loadClassifications();
         setResponseErrors({});
       },
@@ -218,15 +175,14 @@ export default function Classifications() {
     const { data } = classifications;
     const hasMinimalData = data && data?.length < 2;
 
-    if (paginationState.page == 1 || !hasMinimalData) {
-      loadClassifications();
-    } else {
-      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
     }
+    loadClassifications();
   };
 
   const removeClassification = async () => {
-    setOpenRemoveModal(false);
+    setModals(null);
     setLoading(true);
 
     await deleteClassification(mainForm.values.id as string, {
@@ -254,39 +210,37 @@ export default function Classifications() {
 
   const onClickAdd = () => {
     mainForm.resetForm();
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickUpdate = (
     classification: ClassificationWithRelationsInterface
   ) => {
     setFormValues(classification);
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickDelete = (classification: TransactionClassification) => {
     mainForm.setFieldValue("id", classification.id);
-    setOpenRemoveModal(true);
+    setModals("remove");
   };
 
   const onModalCancel = () => {
     mainForm.resetForm();
     setResponseErrors({});
-    setOpenAddModal(false);
+    setModals(null);
   };
 
   const onCompanyFilterChange = (company: Company) => {
     filterForm.setFieldValue("has_company", company);
   };
 
-  const onFilterFormSubmit = async () => {
-    setOpenFilterModal(false);
-    if (paginationState.page == 1) {
-      loadClassifications();
-    } else {
-      setPaginationState({ reload: true, page: 1 });
-    }
+  const onFilterFormSubmit = () => {
+    setModals(null);
+    setCurrentPage(1);
+    loadClassifications();
   };
+
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -297,7 +251,7 @@ export default function Classifications() {
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: paginationState.page,
+      page: getCurrentPage(),
       pageSize: 10,
     } as any).toString();
   };
@@ -329,7 +283,6 @@ export default function Classifications() {
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setReloadClassification(true);
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
   };
 
@@ -338,7 +291,7 @@ export default function Classifications() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex flex-wrap">
           <div
-            onClick={() => setOpenFilterModal(true)}
+            onClick={() => setModals("filter")}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
             <Icon size={30} name="Filter"></Icon>
@@ -352,7 +305,6 @@ export default function Classifications() {
                 defaultFieldValue={config.defaultFieldValue}
                 onClose={(fieldName, defaultValue) => {
                   filterForm.setFieldValue(fieldName, defaultValue);
-                  setReloadClassification(true);
                 }}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
@@ -421,10 +373,10 @@ export default function Classifications() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={paginationState.page}
+          currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => setPaginationState({ reload: true, page })}
+          onPageChange={(page) => setCurrentPage(page)}
         ></Pagination>
       )}
 
@@ -434,8 +386,8 @@ export default function Classifications() {
         }}
         center
         showCloseIcon={false}
-        open={openRemoveModal}
-        onClose={() => setOpenRemoveModal(false)}
+        open={modals == "remove"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
@@ -446,7 +398,7 @@ export default function Classifications() {
         <div className="flex justify-between p-2 mt-10">
           <PrimaryButton
             text="Cancel"
-            onClick={() => setOpenRemoveModal(false)}
+            onClick={() => setModals(null)}
           ></PrimaryButton>
           <DangerButton
             disabled={loading}
@@ -463,8 +415,8 @@ export default function Classifications() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openAddModal}
-        onClose={() => setOpenAddModal(false)}
+        open={modals == "add"}
+        onClose={() => setModals(null)}
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
@@ -568,8 +520,8 @@ export default function Classifications() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openFilterModal}
-        onClose={() => setOpenFilterModal(false)}
+        open={modals == "filter"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Filters

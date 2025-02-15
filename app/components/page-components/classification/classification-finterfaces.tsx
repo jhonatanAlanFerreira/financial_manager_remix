@@ -1,4 +1,7 @@
 import { Company } from "@prisma/client";
+import { ClassificationWithRelationsInterface } from "~/data/classification/classification-types";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
@@ -17,4 +20,15 @@ export interface ClassificationFormInterface {
   companies: Company[];
   is_personal: boolean;
   is_income: boolean;
+}
+
+export interface ClassificationStoreInterface extends BasePageStoreInterface {
+  classifications: ServerResponseInterface<
+    ClassificationWithRelationsInterface[]
+  >;
+  setClassifications: (
+    value: ServerResponseInterface<ClassificationWithRelationsInterface[]>
+  ) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
 }
