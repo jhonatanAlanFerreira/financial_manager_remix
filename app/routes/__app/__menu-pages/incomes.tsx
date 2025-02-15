@@ -280,6 +280,11 @@ export default function Incomes() {
     }
   };
 
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadIncomes();
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -373,9 +378,7 @@ export default function Incomes() {
           currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => {
-            setCurrentPage(page);
-          }}
+          onPageChange={onPageChange}
         ></Pagination>
       )}
 
