@@ -32,8 +32,8 @@ import { ThSort } from "~/components/th-sort/th-sort";
 import { ExpenseThSortConfig } from "~/components/page-components/expense/expense-th-sort-config";
 import {
   expenseStore,
-  FILTER_FORM_DEFAULTS_VALUES,
-  MAIN_FORM_DEFAULTS_VALUES,
+  EXPENSE_FILTER_FORM_DEFAULTS_VALUES,
+  EXPENSE_MAIN_FORM_DEFAULTS_VALUES,
 } from "~/components/page-components/expense/expense-store";
 import { Controller, useForm } from "react-hook-form";
 
@@ -78,7 +78,7 @@ export default function Expenses() {
     getValues: getMainValues,
     control: mainControl,
   } = useForm<ExpenseFormInterface>({
-    defaultValues: MAIN_FORM_DEFAULTS_VALUES,
+    defaultValues: EXPENSE_MAIN_FORM_DEFAULTS_VALUES,
   });
 
   const {
@@ -90,7 +90,7 @@ export default function Expenses() {
     watch: watchFilter,
     control: filterControl,
   } = useForm<ExpenseFiltersFormInterface>({
-    defaultValues: FILTER_FORM_DEFAULTS_VALUES,
+    defaultValues: EXPENSE_FILTER_FORM_DEFAULTS_VALUES,
   });
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
@@ -205,7 +205,7 @@ export default function Expenses() {
   };
 
   const onClickAdd = () => {
-    resetMain(MAIN_FORM_DEFAULTS_VALUES);
+    resetMain(EXPENSE_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
   };
 
@@ -220,7 +220,7 @@ export default function Expenses() {
   };
 
   const onModalCancel = () => {
-    resetMain(MAIN_FORM_DEFAULTS_VALUES);
+    resetMain(EXPENSE_MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
     setModals(null);
   };

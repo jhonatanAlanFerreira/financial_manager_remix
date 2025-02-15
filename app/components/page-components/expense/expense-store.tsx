@@ -11,7 +11,7 @@ export const expenseStore = create<ExpenseStoreInterface>((set, get) => ({
   setExpenses: (value) => set({ expenses: value }),
 }));
 
-export const MAIN_FORM_DEFAULTS_VALUES = {
+export const EXPENSE_MAIN_FORM_DEFAULTS_VALUES = {
   id: "",
   name: "",
   amount: 0,
@@ -19,7 +19,7 @@ export const MAIN_FORM_DEFAULTS_VALUES = {
   is_personal: false,
 };
 
-export const FILTER_FORM_DEFAULTS_VALUES = {
+export const EXPENSE_FILTER_FORM_DEFAULTS_VALUES = {
   name: "",
   amount_greater: 0,
   amount_less: 0,

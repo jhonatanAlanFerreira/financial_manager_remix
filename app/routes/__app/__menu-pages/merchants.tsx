@@ -28,8 +28,8 @@ import { InputText } from "~/components/inputs/input-text/input-text";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { MerchantThSortConfig } from "~/components/page-components/merchants/merchant-th-sort-config";
 import {
-  FILTER_FORM_DEFAULTS_VALUES,
-  MAIN_FORM_DEFAULTS_VALUES,
+  MERCHANT_FILTER_FORM_DEFAULTS_VALUES,
+  MERCHANT_MAIN_FORM_DEFAULTS_VALUES,
   merchantStore,
 } from "~/components/page-components/merchants/merchant-store";
 
@@ -70,7 +70,7 @@ export default function Merchants() {
     watch: watchMain,
     getValues: getMainValues,
   } = useForm<MerchantFormInterface>({
-    defaultValues: MAIN_FORM_DEFAULTS_VALUES,
+    defaultValues: MERCHANT_MAIN_FORM_DEFAULTS_VALUES,
   });
 
   const {
@@ -80,7 +80,7 @@ export default function Merchants() {
     setValue: setFilterValue,
     getValues: getFilterValues,
   } = useForm<MerchantFiltersFormInterface>({
-    defaultValues: FILTER_FORM_DEFAULTS_VALUES,
+    defaultValues: MERCHANT_FILTER_FORM_DEFAULTS_VALUES,
   });
 
   useEffect(() => {
@@ -106,12 +106,12 @@ export default function Merchants() {
   }, [merchantData]);
 
   const onClickAdd = () => {
-    resetMain(MAIN_FORM_DEFAULTS_VALUES);
+    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
   };
 
   const onModalCancel = () => {
-    resetMain(MAIN_FORM_DEFAULTS_VALUES);
+    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
     setResponseErrors({});
     setModals(null);
   };

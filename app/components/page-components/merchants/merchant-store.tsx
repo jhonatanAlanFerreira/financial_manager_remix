@@ -8,11 +8,11 @@ export const merchantStore = create<MerchantStoreInterface>((set, get) => ({
   setMerchants: (value) => set({ merchants: value }),
 }));
 
-export const MAIN_FORM_DEFAULTS_VALUES = {
+export const MERCHANT_MAIN_FORM_DEFAULTS_VALUES = {
   id: "",
   name: "",
 };
 
-export const FILTER_FORM_DEFAULTS_VALUES = {
+export const MERCHANT_FILTER_FORM_DEFAULTS_VALUES = {
   name: "",
 };

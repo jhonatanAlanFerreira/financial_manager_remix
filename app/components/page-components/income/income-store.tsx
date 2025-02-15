@@ -11,7 +11,7 @@ export const incomeStore = create<IncomeStoreInterface>((set, get) => ({
   setIncomes: (value) => set({ incomes: value }),
 }));
 
-export const MAIN_FORM_DEFAULTS_VALUES = {
+export const INCOME_MAIN_FORM_DEFAULTS_VALUES = {
   id: "",
   name: "",
   amount: 0,
@@ -19,7 +19,7 @@ export const MAIN_FORM_DEFAULTS_VALUES = {
   is_personal: false,
 };
 
-export const FILTER_FORM_DEFAULTS_VALUES = {
+export const INCOME_FILTER_FORM_DEFAULTS_VALUES = {
   name: "",
   amount_greater: 0,
   amount_less: 0,
