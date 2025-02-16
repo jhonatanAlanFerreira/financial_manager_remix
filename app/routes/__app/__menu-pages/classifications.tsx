@@ -97,9 +97,6 @@ export default function Classifications() {
     defaultValues: CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES,
   });
 
-  watchFilter("is_income_or_expense");
-  watchFilter("has_company");
-
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
 
@@ -351,9 +348,7 @@ export default function Classifications() {
                 }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
-                tagValue={config.getTagValue(
-                  getFilterValues()[config.fieldName]
-                )}
+                tagValue={config.getTagValue(watchFilter(config.fieldName))}
                 key={index}
               ></FilterTag>
             ))}

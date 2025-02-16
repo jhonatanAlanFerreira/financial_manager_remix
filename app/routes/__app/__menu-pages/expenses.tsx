@@ -309,9 +309,7 @@ export default function Expenses() {
                 }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
-                tagValue={config.getTagValue(
-                  getFilterValues()[config.fieldName]
-                )}
+                tagValue={config.getTagValue(watchFilter(config.fieldName))}
                 key={index}
               ></FilterTag>
             ))}

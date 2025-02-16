@@ -79,6 +79,7 @@ export default function Merchants() {
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
+    watch: watchFilter,
   } = useForm<MerchantFiltersFormInterface>({
     defaultValues: MERCHANT_FILTER_FORM_DEFAULTS_VALUES,
   });
@@ -269,9 +270,7 @@ export default function Merchants() {
                 }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
-                tagValue={config.getTagValue(
-                  getFilterValues()[config.fieldName]
-                )}
+                tagValue={config.getTagValue(watchFilter(config.fieldName))}
               />
             ))}
           </div>
