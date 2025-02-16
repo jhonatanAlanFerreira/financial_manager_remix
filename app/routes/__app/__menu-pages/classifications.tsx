@@ -1,14 +1,13 @@
 import { Company, TransactionClassification } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { Modal } from "react-responsive-modal";
 import { Checkbox } from "~/components/inputs/checkbox/checkbox";
 import { Loader } from "~/components/loader/loader";
 import { loader as companyLoader } from "~/routes/api/company/index";
 import { loader as classificationLoader } from "~/routes/api/classification/index";
 import { Icon } from "~/components/icon/icon";
-import { useFormik } from "formik";
 import { queryParamsFromObject, useIsMobile } from "~/utils/utilities";
 import { Pagination } from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
@@ -89,7 +88,6 @@ export default function Classifications() {
 
   const {
     register: registerFilter,
-    handleSubmit: handleSubmitFilter,
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
@@ -98,6 +96,9 @@ export default function Classifications() {
   } = useForm<ClassificationFiltersFormInterface>({
     defaultValues: CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES,
   });
+
+  watchFilter("is_income_or_expense");
+  watchFilter("has_company");
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -243,10 +244,6 @@ export default function Classifications() {
     setModals(null);
   };
 
-  const onCompanyFilterChange = (company: Company) => {
-    setFilterValue("has_company", company);
-  };
-
   const onFilterFormSubmit = () => {
     setModals(null);
     setCurrentPage(1);
@@ -282,6 +279,10 @@ export default function Classifications() {
       "is_personal_or_company",
       e.currentTarget.value as IsPersonalOrCompanyType
     );
+
+    if (getFilterValues().is_personal_or_company == "personal") {
+      setFilterValue("has_company", null);
+    }
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
@@ -315,6 +316,14 @@ export default function Classifications() {
   const onPageChange = (page: number) => {
     setCurrentPage(page);
     loadClassifications();
+  };
+
+  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
   };
 
   return (
@@ -465,6 +474,7 @@ export default function Classifications() {
                     id="is_personal"
                     className="relative top-1"
                     {...registerMain("is_personal")}
+                    onChange={onMainIsPersonalChange}
                   ></Checkbox>
                   <label
                     className="pl-3 text-violet-950 cursor-pointer"
@@ -480,6 +490,7 @@ export default function Classifications() {
                     id="is_not_income"
                     type="radio"
                     value={""}
+                    checked={!watchMain("is_income")}
                     {...registerMain("is_income")}
                   ></input>
                   <label
@@ -494,6 +505,7 @@ export default function Classifications() {
                     id="is_income"
                     type="radio"
                     value={"on"}
+                    checked={watchMain("is_income")}
                     {...registerMain("is_income")}
                   ></input>
                   <label className="cursor-pointer ml-2" htmlFor="is_income">
@@ -576,6 +588,7 @@ export default function Classifications() {
                     type="radio"
                     value={"all"}
                     {...registerFilter("is_income_or_expense")}
+                    onChange={(event) => isIncomeOrExpenseChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -590,6 +603,7 @@ export default function Classifications() {
                     type="radio"
                     value={"expense"}
                     {...registerFilter("is_income_or_expense")}
+                    onChange={(event) => isIncomeOrExpenseChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -604,6 +618,7 @@ export default function Classifications() {
                     type="radio"
                     value={"income"}
                     {...registerFilter("is_income_or_expense")}
+                    onChange={(event) => isIncomeOrExpenseChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -623,7 +638,7 @@ export default function Classifications() {
                     type="radio"
                     {...registerFilter("is_personal_or_company")}
                     value={"all"}
-                    {...registerFilter("is_personal_or_company")}
+                    onChange={(event) => isPersonalOrCompanyChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -638,6 +653,7 @@ export default function Classifications() {
                     type="radio"
                     {...registerFilter("is_personal_or_company")}
                     value={"personal"}
+                    onChange={(event) => isPersonalOrCompanyChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
@@ -652,6 +668,7 @@ export default function Classifications() {
                     type="radio"
                     {...registerFilter("is_personal_or_company")}
                     value={"company"}
+                    onChange={(event) => isPersonalOrCompanyChange(event)}
                   ></input>
                   <label
                     className="cursor-pointer ml-2"
