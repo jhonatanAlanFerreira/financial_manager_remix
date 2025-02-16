@@ -85,7 +85,6 @@ export default function Incomes() {
 
   const {
     register: registerFilter,
-    handleSubmit: handleSubmitFilter,
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
@@ -591,7 +590,7 @@ export default function Incomes() {
 
             <div className="flex justify-end p-2 mt-10">
               <PrimaryButton
-                onClick={handleSubmitFilter(onFilterFormSubmit)}
+                onClick={onFilterFormSubmit}
                 text="Done"
                 type="button"
               ></PrimaryButton>

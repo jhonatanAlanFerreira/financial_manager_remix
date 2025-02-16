@@ -64,7 +64,6 @@ export default function Merchants() {
 
   const {
     register: registerMain,
-    handleSubmit: handleSubmitMain,
     reset: resetMain,
     setValue: setMainValue,
     watch: watchMain,
@@ -75,7 +74,6 @@ export default function Merchants() {
 
   const {
     register: registerFilter,
-    handleSubmit: handleSubmitFilter,
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
@@ -147,8 +145,9 @@ export default function Merchants() {
     );
   };
 
-  const onMainSubmit = async (data: MerchantFormInterface) => {
-    const formData = prepareFormData(data);
+  const onMainSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = prepareFormData(event.currentTarget);
     setIsSubmitting(true);
 
     await createOrUpdateMerchant(formData, {
@@ -214,7 +213,9 @@ export default function Merchants() {
     });
   };
 
-  const onFilterFormSubmit = () => {
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     setModals(null);
     setCurrentPage(1);
     loadMerchants();
@@ -238,9 +239,9 @@ export default function Merchants() {
     onFilterFormSubmit();
   };
 
-  const prepareFormData = (data: MerchantFormInterface) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.set(key, value));
+  const prepareFormData = (form: HTMLFormElement) => {
+    const formData = new FormData(form);
+    formData.set("id", getMainValues().id);
     return formData;
   };
 
@@ -368,7 +369,7 @@ export default function Merchants() {
         </h2>
         <div>
           <div className="p-4">
-            <form id="merchant-form" onSubmit={handleSubmitMain(onMainSubmit)}>
+            <form id="merchant-form" onSubmit={onMainSubmit}>
               <InputText
                 label="Name *"
                 required
@@ -405,17 +406,13 @@ export default function Merchants() {
           Filters
         </h2>
         <div className="p-4">
-          <form onSubmit={handleSubmitFilter(onFilterFormSubmit)}>
+          <form onSubmit={onFilterFormSubmit}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
               <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
             <InputText label="Name" {...registerFilter("name")} />
             <div className="flex justify-end p-2 mt-10">
-              <PrimaryButton
-                onClick={handleSubmitFilter(onFilterFormSubmit)}
-                text="Done"
-                type="button"
-              />
+              <PrimaryButton text="Done" type="submit" />
             </div>
           </form>
         </div>

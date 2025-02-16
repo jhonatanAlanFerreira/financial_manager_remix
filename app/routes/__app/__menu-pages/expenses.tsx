@@ -82,7 +82,6 @@ export default function Expenses() {
 
   const {
     register: registerFilter,
-    handleSubmit: handleSubmitFilter,
     reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
@@ -503,7 +502,7 @@ export default function Expenses() {
           Filters
         </h2>
         <div className="p-4">
-          <form onSubmit={handleSubmitFilter(onFilterFormSubmit)}>
+          <form>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
               <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
@@ -589,7 +588,7 @@ export default function Expenses() {
 
             <div className="flex justify-end p-2 mt-10">
               <PrimaryButton
-                onClick={handleSubmitFilter(onFilterFormSubmit)}
+                onClick={onFilterFormSubmit}
                 text="Done"
                 type="button"
               ></PrimaryButton>
