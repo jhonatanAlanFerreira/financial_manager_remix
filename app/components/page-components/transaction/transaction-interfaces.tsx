@@ -7,7 +7,10 @@ import {
   TransactionClassification,
 } from "@prisma/client";
 import { FormikProps } from "formik";
+import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
@@ -56,4 +59,15 @@ export interface TransactionAddPropsInterface {
 export interface TransactionFiltersPropsInterface {
   formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
+}
+
+export interface TransactionStoreInterface extends BasePageStoreInterface {
+  totalExpenseValue: number;
+  setTotalExpenseValue: (value: number) => void;
+  totalIncomeValue: number;
+  setTotalIncomeValue: (value: number) => void;
+  transactions: ServerResponseInterface<TransactionsWithTotalsInterface>;
+  setTransactions: (
+    value: ServerResponseInterface<TransactionsWithTotalsInterface>
+  ) => void;
 }

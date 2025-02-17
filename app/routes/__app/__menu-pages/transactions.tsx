@@ -1,7 +1,7 @@
 import { Transaction } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Modal } from "react-responsive-modal";
 import { Loader } from "~/components/loader/loader";
 import { loader as transactionLoader } from "~/routes/api/transaction/index";
@@ -40,6 +40,7 @@ import {
 } from "~/data/frontend-services/transactions-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
+import { transactionStore } from "~/components/page-components/transaction/transaction-store";
 
 const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
   sort_key: "date",
@@ -50,33 +51,30 @@ export default function Transactions() {
   const isMobile = useIsMobile();
   const { setTitle } = useTitle();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
-  const [openFilterModal, setOpenFilterModal] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [searchParams, setSearchParams] = useState<string>("");
-  const [sortParams, setSortParams] = useState<string>(
-    queryParamsFromObject(defaultSortKey)
-  );
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [reloadTransactions, setReloadTransactions] = useState<boolean>(false);
-  const [totalIncomeValue, setTotalIncomeValue] = useState<number>(0);
-  const [totalExpenseValue, setTotalExpenseValue] = useState<number>(0);
-  const [paginationState, setPaginationState] = useState<{
-    reload: boolean;
-    page: number;
-  }>({
-    reload: false,
-    page: 1,
-  });
-
-  const [transactions, setTransactions] = useState<
-    ServerResponseInterface<TransactionsWithTotalsInterface>
-  >({});
-
-  const [responseErrors, setResponseErrors] =
-    useState<ServerResponseErrorInterface>({});
+  const {
+    loading,
+    setLoading,
+    getSearchParams,
+    setSearchParams,
+    isSubmitting,
+    setIsSubmitting,
+    modals,
+    setModals,
+    getSortParams,
+    setSortParams,
+    totalPages,
+    setTotalPages,
+    setCurrentPage,
+    getCurrentPage,
+    responseErrors,
+    setResponseErrors,
+    transactions,
+    setTransactions,
+    totalExpenseValue,
+    setTotalExpenseValue,
+    totalIncomeValue,
+    setTotalIncomeValue,
+  } = transactionStore();
 
   const { transactionData } = useLoaderData<{
     transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
@@ -119,7 +117,7 @@ export default function Transactions() {
     },
     onSubmit: () => {
       loadTransactions();
-      setOpenFilterModal(false);
+      setModals(null);
     },
   });
 
@@ -146,30 +144,6 @@ export default function Transactions() {
     setLoading(false);
   }, [transactionData]);
 
-  useEffect(() => {
-    if (paginationState.reload) {
-      loadTransactions();
-    }
-  }, [paginationState]);
-
-  useEffect(() => {
-    buildSearchParamsUrl();
-  }, [filterForm.values]);
-
-  useEffect(() => {
-    if (reloadTransactions) {
-      setReloadTransactions(false);
-      loadTransactions();
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (reloadTransactions) {
-      setReloadTransactions(false);
-      loadTransactions();
-    }
-  }, [sortParams]);
-
   const buildSearchParamsUrl = () => {
     setSearchParams(
       queryParamsFromObject(filterForm.values, {
@@ -184,7 +158,6 @@ export default function Transactions() {
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setReloadTransactions(true);
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
   };
 
@@ -200,8 +173,10 @@ export default function Transactions() {
 
   const loadTransactions = async () => {
     setLoading(true);
+    buildSearchParamsUrl();
+
     await fetchTransactions(
-      `${paginationParams()}&${searchParams}&${sortParams}&extends=company,transaction_classifications,expense,income,account,merchant`,
+      `${paginationParams()}&${getSearchParams()}&${getSortParams()}&extends=company,transaction_classifications,expense,income,account,merchant`,
       {
         onSuccess: (data, totalPages) => {
           setTransactions(data);
@@ -209,10 +184,7 @@ export default function Transactions() {
           setTotalExpenseValue(data.data?.totalExpenseValue || 0);
           setTotalIncomeValue(data.data?.totalIncomeValue || 0);
           if (!data.data?.transactions.length) {
-            setPaginationState({
-              reload: false,
-              page: data.pageInfo?.totalPages || 1,
-            });
+            setCurrentPage(data.pageInfo?.totalPages || 1);
           }
         },
         onError: () => setLoading(false),
@@ -229,7 +201,7 @@ export default function Transactions() {
     createOrUpdateTransaction(formData, {
       onSuccess: () => {
         mainForm.resetForm();
-        setOpenAddModal(false);
+        setModals(null);
         loadTransactions();
         setResponseErrors({});
       },
@@ -242,38 +214,36 @@ export default function Transactions() {
     });
   };
 
-  const onFilterFormSubmit = async () => {
-    setOpenFilterModal(false);
-    if (paginationState.page == 1) {
-      loadTransactions();
-    } else {
-      setPaginationState({ reload: true, page: 1 });
-    }
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    setModals(null);
+    setCurrentPage(1);
+    loadTransactions();
   };
 
   const paginationParams = () => {
     return new URLSearchParams({
-      page: paginationState.page,
+      page: getCurrentPage(),
       pageSize: 10,
     } as any).toString();
   };
 
   const adjustPaginationBeforeReload = () => {
     const { data } = transactions;
-    const hasMinimalData = data?.transactions && data?.transactions.length < 2;
+    const hasMinimalData = data?.transactions && data?.transactions?.length < 2;
 
-    if (paginationState.page == 1 || !hasMinimalData) {
-      loadTransactions();
-    } else {
-      setPaginationState({ reload: true, page: paginationState.page - 1 });
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
     }
+    loadTransactions();
   };
 
   const removeTransaction = async () => {
     await deleteTransaction(mainForm.values.id, {
       onSuccess: () => {
         adjustPaginationBeforeReload();
-        setOpenRemoveModal(false);
+        setModals(null);
       },
       onError: () => setLoading(false),
       onFinally: () => setLoading(false),
@@ -282,17 +252,17 @@ export default function Transactions() {
 
   const onClickAdd = () => {
     mainForm.resetForm();
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickUpdate = (transaction: TransactionWithRelationsInterface) => {
     setFormValues(transaction);
-    setOpenAddModal(true);
+    setModals("add");
   };
 
   const onClickDelete = (transaction: Transaction) => {
     mainForm.setFieldValue("id", transaction.id);
-    setOpenRemoveModal(true);
+    setModals("remove");
   };
 
   const setFormValues = (transaction: TransactionWithRelationsInterface) => {
@@ -317,7 +287,7 @@ export default function Transactions() {
       <div className="flex items-center justify-between mb-2">
         <div className="flex flex-wrap">
           <div
-            onClick={() => setOpenFilterModal(true)}
+            onClick={() => setModals("filter")}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
             <Icon size={30} name="Filter"></Icon>
@@ -331,7 +301,6 @@ export default function Transactions() {
                 defaultFieldValue={config.defaultFieldValue}
                 onClose={(fieldName, defaultFieldValue) => {
                   filterForm.setFieldValue(fieldName, defaultFieldValue);
-                  setReloadTransactions(true);
                 }}
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
@@ -447,10 +416,10 @@ export default function Transactions() {
       {totalPages > 1 && (
         <Pagination
           className="justify-center"
-          currentPage={paginationState.page}
+          currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => setPaginationState({ reload: true, page })}
+          onPageChange={(page) => setCurrentPage(page)}
         ></Pagination>
       )}
 
@@ -460,8 +429,8 @@ export default function Transactions() {
         }}
         center
         showCloseIcon={false}
-        open={openRemoveModal}
-        onClose={() => setOpenRemoveModal(false)}
+        open={modals == "remove"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Atention
@@ -472,7 +441,7 @@ export default function Transactions() {
         <div className="flex justify-between p-2 mt-10">
           <PrimaryButton
             text="Cancel"
-            onClick={() => setOpenRemoveModal(false)}
+            onClick={() => setModals(null)}
           ></PrimaryButton>
           <DangerButton
             disabled={loading}
@@ -489,8 +458,8 @@ export default function Transactions() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openAddModal}
-        onClose={() => setOpenAddModal(false)}
+        open={modals == "add"}
+        onClose={() => setModals(null)}
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
@@ -498,7 +467,7 @@ export default function Transactions() {
         </h2>
         <TransactionAdd
           formik={mainForm}
-          onModalCancel={() => setOpenAddModal(false)}
+          onModalCancel={() => setModals(null)}
           isSubmitting={isSubmitting}
           onSubmit={formSubmit}
           responseErrors={responseErrors}
@@ -513,8 +482,8 @@ export default function Transactions() {
         closeOnEsc={false}
         closeOnOverlayClick={false}
         showCloseIcon={false}
-        open={openFilterModal}
-        onClose={() => setOpenFilterModal(false)}
+        open={modals == "filter"}
+        onClose={() => setModals(null)}
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Filters
