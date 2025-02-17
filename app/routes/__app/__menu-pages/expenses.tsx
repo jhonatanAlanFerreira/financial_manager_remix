@@ -224,7 +224,9 @@ export default function Expenses() {
     setModals(null);
   };
 
-  const onFilterFormSubmit = () => {
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     setModals(null);
     setCurrentPage(1);
     loadExpenses();
@@ -502,7 +504,7 @@ export default function Expenses() {
           Filters
         </h2>
         <div className="p-4">
-          <form>
+          <form onSubmit={onFilterFormSubmit}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
               <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
@@ -587,11 +589,7 @@ export default function Expenses() {
             )}
 
             <div className="flex justify-end p-2 mt-10">
-              <PrimaryButton
-                onClick={onFilterFormSubmit}
-                text="Done"
-                type="button"
-              ></PrimaryButton>
+              <PrimaryButton text="Done" type="submit"></PrimaryButton>
             </div>
           </form>
         </div>

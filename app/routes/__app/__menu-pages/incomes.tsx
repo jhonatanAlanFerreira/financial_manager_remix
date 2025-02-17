@@ -224,7 +224,9 @@ export default function Incomes() {
     resetMain(income);
   };
 
-  const onFilterFormSubmit = () => {
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
     setModals(null);
     setCurrentPage(1);
     loadIncomes();
@@ -504,7 +506,7 @@ export default function Incomes() {
           Filters
         </h2>
         <div className="p-4">
-          <form>
+          <form onSubmit={onFilterFormSubmit}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
               <span onClick={() => resetFilter()}>Clear all filters</span>
             </div>
@@ -589,11 +591,7 @@ export default function Incomes() {
             )}
 
             <div className="flex justify-end p-2 mt-10">
-              <PrimaryButton
-                onClick={onFilterFormSubmit}
-                text="Done"
-                type="button"
-              ></PrimaryButton>
+              <PrimaryButton text="Done" type="submit"></PrimaryButton>
             </div>
           </form>
         </div>
