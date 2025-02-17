@@ -28,7 +28,6 @@ import {
   TransactionFormInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
-import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
 import {
   TransactionsWithTotalsInterface,
   TransactionWithRelationsInterface,
