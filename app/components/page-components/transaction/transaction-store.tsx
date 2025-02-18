@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { create } from "zustand";
 import {
   TransactionFiltersFormInterface,
+  TransactionFilterStoreInterface,
   TransactionFormInterface,
   TransactionStoreInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
@@ -24,6 +25,50 @@ export const transactionStore = create<TransactionStoreInterface>(
     setTotalIncomeValue: (value) => set({ totalIncomeValue: value }),
     transactions: {},
     setTransactions: (value) => set({ transactions: value }),
+  })
+);
+
+export const transactionFilterStore = create<TransactionFilterStoreInterface>(
+  (set, get) => ({
+    loadingStates: {
+      isAccountLoading: false,
+      isClassificationLoading: false,
+      isCompanyLoading: false,
+      isExpenseLoading: false,
+      isIncomeLoading: false,
+      isMerchantLoading: false,
+    },
+    setAllLoadingState: (value) =>
+      set({
+        loadingStates: {
+          isAccountLoading: value,
+          isClassificationLoading: value,
+          isCompanyLoading: value,
+          isExpenseLoading: value,
+          isIncomeLoading: value,
+          isMerchantLoading: value,
+        },
+      }),
+    setLoading: (key, value) =>
+      set((prev) => ({
+        loadingStates: {
+          [key]: value,
+          ...prev.loadingStates,
+        },
+      })),
+    isLoading: Object.values(get().loadingStates).some((state) => state),
+    accounts: {},
+    setAccounts: (value) => set({ accounts: value }),
+    classifications: {},
+    setClassifications: (value) => set({ classifications: value }),
+    companies: {},
+    setCompanies: (value) => set({ companies: value }),
+    expenses: {},
+    setExpenses: (value) => set({ expenses: value }),
+    incomes: {},
+    setIncomes: (value) => set({ incomes: value }),
+    merchants: {},
+    setMerchants: (value) => set({ merchants: value }),
   })
 );
 

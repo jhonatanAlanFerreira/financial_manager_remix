@@ -6,7 +6,7 @@ import {
   Merchant,
   TransactionClassification,
 } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { InputText } from "~/components/inputs/input-text/input-text";
@@ -25,40 +25,32 @@ import { fetchIncomes } from "~/data/frontend-services/income-service";
 import { fetchMerchants } from "~/data/frontend-services/merchant-service";
 import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
-import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { useDebouncedCallback } from "~/utils/utilities";
+import { transactionFilterStore } from "~/components/page-components/transaction/transaction-store";
 
 export function TransactionFilters({
   onSubmit,
 }: TransactionFiltersPropsInterface) {
   const hasRun = useRef(false);
-  const [shouldFilter, setShouldFilter] = useState(false);
 
-  const [loadingStates, setLoadingStates] = useState({
-    isAccountLoading: false,
-    isCompanyLoading: false,
-    isExpenseLoading: false,
-    isClassificationLoading: false,
-    isIncomeLoading: false,
-    isMerchantLoading: false,
-  });
-
-  const [accounts, setAccounts] = useState<ServerResponseInterface<Account[]>>(
-    {}
-  );
-  const [companies, setCompanies] = useState<
-    ServerResponseInterface<Company[]>
-  >({});
-  const [expenses, setExpenses] = useState<ServerResponseInterface<Expense[]>>(
-    {}
-  );
-  const [classifications, setClassifications] = useState<
-    ServerResponseInterface<TransactionClassification[]>
-  >({});
-  const [incomes, setIncomes] = useState<ServerResponseInterface<Income[]>>({});
-  const [merchants, setMerchants] = useState<
-    ServerResponseInterface<Merchant[]>
-  >({});
+  const {
+    loadingStates,
+    setAllLoadingState,
+    setLoading,
+    isLoading,
+    accounts,
+    setAccounts,
+    classifications,
+    setClassifications,
+    companies,
+    setCompanies,
+    expenses,
+    setExpenses,
+    incomes,
+    setIncomes,
+    merchants,
+    setMerchants,
+  } = transactionFilterStore();
 
   const getSelectCompanyOptionValue = (option: Company) => option.id;
   const getSelectCompanyOptionLabel = (option: Company) => option.name;
@@ -78,14 +70,7 @@ export function TransactionFilters({
   ) => option.name;
 
   const loadData = () => {
-    setLoadingStates({
-      isAccountLoading: true,
-      isCompanyLoading: true,
-      isExpenseLoading: true,
-      isClassificationLoading: true,
-      isIncomeLoading: true,
-      isMerchantLoading: true,
-    });
+    setAllLoadingState(true);
 
     loadAccounts();
     loadCompanies();
@@ -95,8 +80,6 @@ export function TransactionFilters({
     loadMerchants();
   };
 
-  const loadingData = () => Object.values(loadingStates).some((state) => state);
-
   useEffect(() => {
     if (!hasRun.current) {
       loadData();
@@ -104,50 +87,7 @@ export function TransactionFilters({
     }
   }, []);
 
-  useEffect(() => {
-    if (shouldFilter) {
-      setShouldFilter(false);
-      formik.setFieldValue("company", null);
-      formik.setFieldValue("expense", null);
-      formik.setFieldValue("income", null);
-      formik.setFieldValue("has_classification", null);
-      formik.setFieldValue("account", null);
-      loadData();
-    }
-  }, [formik.values.is_personal_or_company]);
-
-  useEffect(() => {
-    if (shouldFilter) {
-      setShouldFilter(false);
-      formik.setFieldValue("expense", null);
-      formik.setFieldValue("income", null);
-      formik.setFieldValue("has_classification", null);
-      formik.setFieldValue("account", null);
-      loadData();
-    }
-  }, [formik.values.company]);
-
-  useEffect(() => {
-    if (shouldFilter) {
-      setShouldFilter(false);
-
-      if (formik.values.is_income_or_expense == "income") {
-        formik.setFieldValue("expense", null);
-      }
-
-      if (formik.values.is_income_or_expense == "expense") {
-        formik.setFieldValue("income", null);
-      }
-
-      formik.setFieldValue("company", null);
-      formik.setFieldValue("expense", null);
-      formik.setFieldValue("income", null);
-      loadData();
-    }
-  }, [formik.values.is_income_or_expense]);
-
   const onCompanyFilterChange = (company: Company) => {
-    setShouldFilter(true);
     formik.setFieldValue("company", company);
   };
 
@@ -169,18 +109,6 @@ export function TransactionFilters({
     formik.setFieldValue("has_classification", classification);
   };
 
-  const resetForm = () => {
-    formik.resetForm();
-    formik.setFieldValue("company", null);
-    formik.setFieldValue("expense", null);
-    formik.setFieldValue("income", null);
-    formik.setFieldValue("merchant", null);
-    formik.setFieldValue("has_classification", null);
-    formik.setFieldValue("account", null);
-    formik.setFieldValue("date_after", "");
-    formik.setFieldValue("date_before", "");
-  };
-
   const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     formik.setFieldValue("is_income_or_expense", e.currentTarget.value);
   };
@@ -188,7 +116,6 @@ export function TransactionFilters({
   const isPersonalOrCompanyChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setShouldFilter(true);
     formik.setFieldValue("is_personal_or_company", e.currentTarget.value);
   };
 

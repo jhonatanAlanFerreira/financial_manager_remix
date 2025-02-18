@@ -68,3 +68,33 @@ export interface TransactionStoreInterface extends BasePageStoreInterface {
     value: ServerResponseInterface<TransactionsWithTotalsInterface>
   ) => void;
 }
+
+export interface TransactionFilterStoreInterface {
+  loadingStates: LoadingStatesInterface;
+  setLoading: (key: keyof LoadingStatesInterface, value: boolean) => void;
+  isLoading: boolean;
+  setAllLoadingState: (value: boolean) => void;
+  accounts: ServerResponseInterface<Account[]>;
+  setAccounts: (value: ServerResponseInterface<Account[]>) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
+  expenses: ServerResponseInterface<Expense[]>;
+  setExpenses: (value: ServerResponseInterface<Expense[]>) => void;
+  incomes: ServerResponseInterface<Income[]>;
+  setIncomes: (value: ServerResponseInterface<Income[]>) => void;
+  merchants: ServerResponseInterface<Merchant[]>;
+  setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
+  classifications: ServerResponseInterface<TransactionClassification[]>;
+  setClassifications: (
+    value: ServerResponseInterface<TransactionClassification[]>
+  ) => void;
+}
+
+interface LoadingStatesInterface {
+  isAccountLoading: boolean;
+  isCompanyLoading: boolean;
+  isExpenseLoading: boolean;
+  isClassificationLoading: boolean;
+  isIncomeLoading: boolean;
+  isMerchantLoading: boolean;
+}
