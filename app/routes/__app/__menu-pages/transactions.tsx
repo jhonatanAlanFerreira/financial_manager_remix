@@ -14,7 +14,6 @@ import {
   todayFormatedDate,
   useIsMobile,
 } from "~/utils/utilities";
-import { useFormik } from "formik";
 import { Pagination } from "~/components/pagination/pagination";
 import { useTitle } from "~/components/top-bar/title-context";
 import { TransactionFilterTagsConfig } from "~/components/page-components/transaction/transaction-filter-tags-config";
@@ -23,10 +22,6 @@ import { PrimaryButton } from "~/components/buttons/primary-button/primary-butto
 import { DangerButton } from "~/components/buttons/danger-button/danger-button";
 import { TransactionAdd } from "~/components/page-components/transaction/transaction-add";
 import { TransactionFilters } from "~/components/page-components/transaction/transaction-filters";
-import {
-  TransactionFiltersFormInterface,
-  TransactionFormInterface,
-} from "~/components/page-components/transaction/transaction-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   TransactionsWithTotalsInterface,
@@ -39,7 +34,18 @@ import {
 } from "~/data/frontend-services/transactions-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
-import { transactionStore } from "~/components/page-components/transaction/transaction-store";
+import {
+  getFilterValues,
+  getMainValues,
+  resetMain,
+  setFilterValue,
+  setMainValue,
+  TRANSACTION_MAIN_FORM_DEFAULTS_VALUES,
+  transactionStore,
+  watchFilter,
+  watchMain,
+} from "~/components/page-components/transaction/transaction-store";
+import { TransactionFiltersFormInterface } from "~/components/page-components/transaction/transaction-interfaces";
 
 const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
   sort_key: "date",
@@ -79,47 +85,6 @@ export default function Transactions() {
     transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
   }>();
 
-  const mainForm = useFormik<TransactionFormInterface>({
-    initialValues: {
-      id: "",
-      is_income: false,
-      company: null,
-      expense: null,
-      account: null,
-      merchant: null,
-      date: todayFormatedDate(),
-      amount: 0,
-      transaction_classifications: [],
-      is_personal: false,
-      income: null,
-      name: "",
-      description: "",
-    },
-    onSubmit: () => {},
-  });
-
-  const filterForm = useFormik<TransactionFiltersFormInterface>({
-    initialValues: {
-      name: "",
-      is_personal_or_company: "all",
-      is_income_or_expense: "all",
-      company: null,
-      expense: null,
-      income: null,
-      merchant: null,
-      has_classification: null,
-      account: null,
-      date_after: firstDayOfCurrentMonth(),
-      date_before: "",
-      amount_greater: 0,
-      amount_less: 0,
-    },
-    onSubmit: () => {
-      loadTransactions();
-      setModals(null);
-    },
-  });
-
   useEffect(() => {
     setTitle({
       pageTitle: "Transactions",
@@ -145,7 +110,7 @@ export default function Transactions() {
 
   const buildSearchParamsUrl = () => {
     setSearchParams(
-      queryParamsFromObject(filterForm.values, {
+      queryParamsFromObject(getFilterValues(), {
         company: "id",
         expense: "id",
         income: "id",
@@ -199,7 +164,7 @@ export default function Transactions() {
 
     createOrUpdateTransaction(formData, {
       onSuccess: () => {
-        mainForm.resetForm();
+        resetMain(TRANSACTION_MAIN_FORM_DEFAULTS_VALUES);
         setModals(null);
         loadTransactions();
         setResponseErrors({});
@@ -239,7 +204,7 @@ export default function Transactions() {
   };
 
   const removeTransaction = async () => {
-    await deleteTransaction(mainForm.values.id, {
+    await deleteTransaction(getMainValues().id, {
       onSuccess: () => {
         adjustPaginationBeforeReload();
         setModals(null);
@@ -250,7 +215,7 @@ export default function Transactions() {
   };
 
   const onClickAdd = () => {
-    mainForm.resetForm();
+    resetMain(TRANSACTION_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
   };
 
@@ -260,25 +225,34 @@ export default function Transactions() {
   };
 
   const onClickDelete = (transaction: Transaction) => {
-    mainForm.setFieldValue("id", transaction.id);
+    setMainValue("id", transaction.id);
     setModals("remove");
   };
 
   const setFormValues = (transaction: TransactionWithRelationsInterface) => {
-    mainForm.setValues(transaction);
+    resetMain(transaction);
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);
+
     formData.set(
       "is_personal",
       formData.get("is_personal") == "on" ? "true" : "false"
     );
-    formData.set("is_income", mainForm.values.is_income ? "true" : "false");
+    formData.set("is_income", getMainValues().is_income ? "true" : "false");
 
-    formData.set("id", mainForm.values.id);
+    formData.set("id", getMainValues().id);
 
     return formData;
+  };
+
+  const onFilterTagClose = (
+    fieldName: keyof TransactionFiltersFormInterface,
+    defaultValue: any
+  ) => {
+    setFilterValue(fieldName, defaultValue);
+    onFilterFormSubmit();
   };
 
   return (
@@ -296,16 +270,17 @@ export default function Transactions() {
             {TransactionFilterTagsConfig.map((config, index) => (
               <FilterTag
                 fieldName={config.fieldName}
-                fieldValue={filterForm.values[config.fieldName]}
+                fieldValue={getFilterValues()[config.fieldName]}
                 defaultFieldValue={config.defaultFieldValue}
-                onClose={(fieldName, defaultFieldValue) => {
-                  filterForm.setFieldValue(fieldName, defaultFieldValue);
-                }}
+                onClose={(fieldName, defaultValue) =>
+                  onFilterTagClose(
+                    fieldName as keyof TransactionFiltersFormInterface,
+                    defaultValue
+                  )
+                }
                 className="ml-2 mb-2"
                 tagLabel={config.tagLabel}
-                tagValue={config.getTagValue(
-                  filterForm.values[config.fieldName]
-                )}
+                tagValue={config.getTagValue(watchFilter(config.fieldName))}
                 key={index}
               ></FilterTag>
             ))}
@@ -462,10 +437,9 @@ export default function Transactions() {
         center
       >
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
-          {mainForm.values.id ? "Update transaction" : "Add new transaction"}
+          {watchMain("id") ? "Update transaction" : "Add new transaction"}
         </h2>
         <TransactionAdd
-          formik={mainForm}
           onModalCancel={() => setModals(null)}
           isSubmitting={isSubmitting}
           onSubmit={formSubmit}
@@ -489,7 +463,6 @@ export default function Transactions() {
         </h2>
         <div className="p-4">
           <TransactionFilters
-            formik={filterForm}
             onSubmit={onFilterFormSubmit}
           ></TransactionFilters>
         </div>

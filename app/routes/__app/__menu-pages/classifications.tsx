@@ -304,6 +304,7 @@ export default function Classifications() {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
     loadClassifications();
   };
+  
   const onFilterTagClose = (
     fieldName: keyof ClassificationFiltersFormInterface,
     defaultValue: any

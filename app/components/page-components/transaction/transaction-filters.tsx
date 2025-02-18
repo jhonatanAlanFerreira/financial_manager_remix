@@ -29,7 +29,6 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { useDebouncedCallback } from "~/utils/utilities";
 
 export function TransactionFilters({
-  formik,
   onSubmit,
 }: TransactionFiltersPropsInterface) {
   const hasRun = useRef(false);

@@ -6,7 +6,6 @@ import {
   Merchant,
   TransactionClassification,
 } from "@prisma/client";
-import { FormikProps } from "formik";
 import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
 import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
@@ -51,13 +50,11 @@ export interface TransactionFormInterface {
 export interface TransactionAddPropsInterface {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onModalCancel: () => void;
-  formik: FormikProps<TransactionFormInterface>;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
 }
 
 export interface TransactionFiltersPropsInterface {
-  formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
 }
 

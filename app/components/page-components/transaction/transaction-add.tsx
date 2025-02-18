@@ -40,7 +40,6 @@ import { useDebouncedCallback } from "~/utils/utilities";
 export function TransactionAdd({
   responseErrors,
   isSubmitting,
-  formik,
   onSubmit,
   onModalCancel,
 }: TransactionAddPropsInterface) {
