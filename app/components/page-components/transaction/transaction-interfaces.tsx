@@ -6,6 +6,7 @@ import {
   Merchant,
   TransactionClassification,
 } from "@prisma/client";
+import { UseFormReturn } from "react-hook-form";
 import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
 import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
@@ -52,12 +53,12 @@ export interface TransactionAddPropsInterface {
   onModalCancel: () => void;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
-  form: any;
+  form: UseFormReturn<TransactionFormInterface>;
 }
 
 export interface TransactionFiltersPropsInterface {
   onSubmit: () => void;
-  form: any;
+  form: UseFormReturn<TransactionFiltersFormInterface>;
 }
 
 export interface TransactionStoreInterface extends BasePageStoreInterface {

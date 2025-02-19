@@ -162,6 +162,8 @@ export function TransactionFilters({
   };
 
   const loadAccounts = useDebouncedCallback(async () => {
+    setLoading("isAccountLoading", true);
+
     await fetchAccounts(
       {
         paginationParams: defaultPaginationQuery(),
@@ -178,6 +180,8 @@ export function TransactionFilters({
   });
 
   const loadExpenses = useDebouncedCallback(async () => {
+    setLoading("isExpenseLoading", true);
+
     await fetchExpenses(
       {
         paginationParams: defaultPaginationQuery(),
@@ -194,6 +198,8 @@ export function TransactionFilters({
   });
 
   const loadClassifications = useDebouncedCallback(async () => {
+    setLoading("isClassificationLoading", true);
+
     await fetchClassifications(
       {
         paginationParams: defaultPaginationQuery(),
@@ -210,6 +216,8 @@ export function TransactionFilters({
   });
 
   const loadIncomes = useDebouncedCallback(async () => {
+    setLoading("isIncomeLoading", true);
+
     await fetchIncomes(
       {
         paginationParams: defaultPaginationQuery(),
@@ -226,6 +234,8 @@ export function TransactionFilters({
   });
 
   const loadMerchants = useDebouncedCallback(async () => {
+    setLoading("isMerchantLoading", true);
+
     await fetchMerchants(
       {
         paginationParams: defaultPaginationQuery(),
@@ -242,6 +252,8 @@ export function TransactionFilters({
   });
 
   const loadCompanies = useDebouncedCallback(async () => {
+    setLoading("isCompanyLoading", true);
+
     const res = await fetchCompanies();
     if (res) {
       setCompanies(res);
@@ -254,6 +266,16 @@ export function TransactionFilters({
       "is_income_or_expense",
       e.currentTarget.value as IsIncomeOrExpenseType
     );
+
+    if (getFilterValues().is_income_or_expense == "expense") {
+      setFilterValue("income", null);
+    }
+
+    if (getFilterValues().is_income_or_expense == "income") {
+      setFilterValue("expense", null);
+    }
+
+    loadClassifications();
   };
 
   const isPersonalOrCompanyChange = (
@@ -267,6 +289,14 @@ export function TransactionFilters({
     if (getFilterValues().is_personal_or_company == "personal") {
       setFilterValue("company", null);
     }
+
+    setFilterValue("has_classification", null);
+    setFilterValue("income", null);
+    setFilterValue("expense", null);
+
+    loadClassifications();
+    loadExpenses();
+    loadIncomes();
   };
 
   return (
@@ -409,7 +439,6 @@ export function TransactionFilters({
               control={filterControl}
               render={({ field }) => (
                 <InputSelect
-                  isMulti
                   isClearable
                   className="mb-8"
                   placeholder="Company"
@@ -426,7 +455,6 @@ export function TransactionFilters({
             control={filterControl}
             render={({ field }) => (
               <InputSelect
-                isMulti
                 isClearable
                 className="mb-8"
                 placeholder="Account"
@@ -442,7 +470,6 @@ export function TransactionFilters({
             control={filterControl}
             render={({ field }) => (
               <InputSelect
-                isMulti
                 isClearable
                 className="mb-8"
                 placeholder="Merchant"
@@ -459,7 +486,6 @@ export function TransactionFilters({
               control={filterControl}
               render={({ field }) => (
                 <InputSelect
-                  isMulti
                   isClearable
                   className="mb-8"
                   placeholder="Expense"
@@ -477,7 +503,6 @@ export function TransactionFilters({
               control={filterControl}
               render={({ field }) => (
                 <InputSelect
-                  isMulti
                   isClearable
                   className="mb-8"
                   placeholder="Income"
@@ -494,7 +519,6 @@ export function TransactionFilters({
             control={filterControl}
             render={({ field }) => (
               <InputSelect
-                isMulti
                 isClearable
                 className="mb-8"
                 placeholder="Classification"
