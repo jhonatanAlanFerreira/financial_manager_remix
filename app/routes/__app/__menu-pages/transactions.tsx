@@ -141,6 +141,7 @@ export default function Transactions() {
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadTransactions();
   };
 
   const getPersonalCompanyType = (transaction: Transaction) => {
@@ -151,6 +152,11 @@ export default function Transactions() {
 
   const getIncomeExpenseType = (transaction: Transaction) => {
     return transaction.is_income ? "Income" : "Expense";
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadTransactions();
   };
 
   const loadTransactions = async () => {
@@ -411,7 +417,7 @@ export default function Transactions() {
           currentPage={getCurrentPage()}
           totalPages={totalPages}
           optionsAmount={isMobile ? 3 : 10}
-          onPageChange={(page) => setCurrentPage(page)}
+          onPageChange={onPageChange}
         ></Pagination>
       )}
 
