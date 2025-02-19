@@ -87,21 +87,16 @@ export default function Transactions() {
   });
 
   const {
-    register: registerMain,
     reset: resetMain,
     setValue: setMainValue,
     watch: watchMain,
     getValues: getMainValues,
-    control: mainControl,
   } = mainForm;
 
   const {
-    register: registerFilter,
-    reset: resetFilter,
     setValue: setFilterValue,
     getValues: getFilterValues,
     watch: watchFilter,
-    control: filterControl,
   } = filterForm;
 
   const { transactionData } = useLoaderData<{
