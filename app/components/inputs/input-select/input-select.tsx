@@ -34,7 +34,8 @@ export const InputSelect = forwardRef<
     control: (styles) => ({
       ...styles,
       border: "1px solid var(--primary-color) !important",
-      height: "3rem",
+      minHeight: "3rem",
+      height: "auto",
     }),
     singleValue: (styles) => ({
       ...styles,
