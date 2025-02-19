@@ -52,10 +52,12 @@ export interface TransactionAddPropsInterface {
   onModalCancel: () => void;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
+  form: any;
 }
 
 export interface TransactionFiltersPropsInterface {
   onSubmit: () => void;
+  form: any;
 }
 
 export interface TransactionStoreInterface extends BasePageStoreInterface {
@@ -69,10 +71,10 @@ export interface TransactionStoreInterface extends BasePageStoreInterface {
   ) => void;
 }
 
-export interface TransactionFilterStoreInterface {
+export interface TransactionFilterFormStoreInterface {
   loadingStates: LoadingStatesInterface;
   setLoading: (key: keyof LoadingStatesInterface, value: boolean) => void;
-  isLoading: boolean;
+  isLoading: () => boolean;
   setAllLoadingState: (value: boolean) => void;
   accounts: ServerResponseInterface<Account[]>;
   setAccounts: (value: ServerResponseInterface<Account[]>) => void;
@@ -90,7 +92,28 @@ export interface TransactionFilterStoreInterface {
   ) => void;
 }
 
-interface LoadingStatesInterface {
+export interface TransactionMainFormStore {
+  loadingStates: LoadingStatesInterface;
+  setLoading: (key: keyof LoadingStatesInterface, value: boolean) => void;
+  isLoading: () => boolean;
+  setAllLoadingState: (value: boolean) => void;
+  accounts: ServerResponseInterface<Account[]>;
+  setAccounts: (value: ServerResponseInterface<Account[]>) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
+  expenses: ServerResponseInterface<Expense[]>;
+  setExpenses: (value: ServerResponseInterface<Expense[]>) => void;
+  incomes: ServerResponseInterface<Income[]>;
+  setIncomes: (value: ServerResponseInterface<Income[]>) => void;
+  merchants: ServerResponseInterface<Merchant[]>;
+  setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
+  classifications: ServerResponseInterface<TransactionClassification[]>;
+  setClassifications: (
+    value: ServerResponseInterface<TransactionClassification[]>
+  ) => void;
+}
+
+export interface LoadingStatesInterface {
   isAccountLoading: boolean;
   isCompanyLoading: boolean;
   isExpenseLoading: boolean;

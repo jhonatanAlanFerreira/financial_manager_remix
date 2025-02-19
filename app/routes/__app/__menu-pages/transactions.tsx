@@ -11,7 +11,6 @@ import {
   formatDate,
   getTimezoneFromClientCookies,
   queryParamsFromObject,
-  todayFormatedDate,
   useIsMobile,
 } from "~/utils/utilities";
 import { Pagination } from "~/components/pagination/pagination";
@@ -35,17 +34,15 @@ import {
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
 import {
-  getFilterValues,
-  getMainValues,
-  resetMain,
-  setFilterValue,
-  setMainValue,
+  TRANSACTION_FILTER_FORM_DEFAULTS_VALUES,
   TRANSACTION_MAIN_FORM_DEFAULTS_VALUES,
   transactionStore,
-  watchFilter,
-  watchMain,
 } from "~/components/page-components/transaction/transaction-store";
-import { TransactionFiltersFormInterface } from "~/components/page-components/transaction/transaction-interfaces";
+import {
+  TransactionFiltersFormInterface,
+  TransactionFormInterface,
+} from "~/components/page-components/transaction/transaction-interfaces";
+import { useForm } from "react-hook-form";
 
 const defaultSortKey: { sort_key: string; sort_order: "desc" | "asc" } = {
   sort_key: "date",
@@ -80,6 +77,32 @@ export default function Transactions() {
     totalIncomeValue,
     setTotalIncomeValue,
   } = transactionStore();
+
+  const mainForm = useForm<TransactionFormInterface>({
+    defaultValues: TRANSACTION_MAIN_FORM_DEFAULTS_VALUES,
+  });
+
+  const filterForm = useForm<TransactionFiltersFormInterface>({
+    defaultValues: TRANSACTION_FILTER_FORM_DEFAULTS_VALUES,
+  });
+
+  const {
+    register: registerMain,
+    reset: resetMain,
+    setValue: setMainValue,
+    watch: watchMain,
+    getValues: getMainValues,
+    control: mainControl,
+  } = mainForm;
+
+  const {
+    register: registerFilter,
+    reset: resetFilter,
+    setValue: setFilterValue,
+    getValues: getFilterValues,
+    watch: watchFilter,
+    control: filterControl,
+  } = filterForm;
 
   const { transactionData } = useLoaderData<{
     transactionData: ServerResponseInterface<TransactionsWithTotalsInterface>;
@@ -444,6 +467,7 @@ export default function Transactions() {
           isSubmitting={isSubmitting}
           onSubmit={formSubmit}
           responseErrors={responseErrors}
+          form={mainForm}
         ></TransactionAdd>
       </Modal>
 
@@ -464,6 +488,7 @@ export default function Transactions() {
         <div className="p-4">
           <TransactionFilters
             onSubmit={onFilterFormSubmit}
+            form={filterForm}
           ></TransactionFilters>
         </div>
       </Modal>

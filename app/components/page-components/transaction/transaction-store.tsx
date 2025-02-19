@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 import { create } from "zustand";
 import {
-  TransactionFiltersFormInterface,
-  TransactionFilterStoreInterface,
-  TransactionFormInterface,
+  LoadingStatesInterface,
+  TransactionFilterFormStoreInterface,
+  TransactionMainFormStore,
   TransactionStoreInterface,
 } from "~/components/page-components/transaction/transaction-interfaces";
 import {
@@ -28,8 +28,8 @@ export const transactionStore = create<TransactionStoreInterface>(
   })
 );
 
-export const transactionFilterStore = create<TransactionFilterStoreInterface>(
-  (set, get) => ({
+const createLoadingState = (get: any, set: any) => {
+  return {
     loadingStates: {
       isAccountLoading: false,
       isClassificationLoading: false,
@@ -38,7 +38,7 @@ export const transactionFilterStore = create<TransactionFilterStoreInterface>(
       isIncomeLoading: false,
       isMerchantLoading: false,
     },
-    setAllLoadingState: (value) =>
+    setAllLoadingState: (value: boolean) =>
       set({
         loadingStates: {
           isAccountLoading: value,
@@ -49,14 +49,38 @@ export const transactionFilterStore = create<TransactionFilterStoreInterface>(
           isMerchantLoading: value,
         },
       }),
-    setLoading: (key, value) =>
-      set((prev) => ({
+    setLoading: (key: keyof LoadingStatesInterface, value: boolean) =>
+      set((prev: TransactionFilterFormStoreInterface) => ({
         loadingStates: {
-          [key]: value,
           ...prev.loadingStates,
+          [key]: value,
         },
       })),
-    isLoading: Object.values(get().loadingStates).some((state) => state),
+    isLoading: () =>
+      Object.values(get().loadingStates || {}).some((state) => state),
+  };
+};
+
+export const transactionFilterStore =
+  create<TransactionFilterFormStoreInterface>((set, get) => ({
+    ...createLoadingState(get, set),
+    accounts: {},
+    setAccounts: (value) => set({ accounts: value }),
+    classifications: {},
+    setClassifications: (value) => set({ classifications: value }),
+    companies: {},
+    setCompanies: (value) => set({ companies: value }),
+    expenses: {},
+    setExpenses: (value) => set({ expenses: value }),
+    incomes: {},
+    setIncomes: (value) => set({ incomes: value }),
+    merchants: {},
+    setMerchants: (value) => set({ merchants: value }),
+  }));
+
+export const transactionMainStore = create<TransactionMainFormStore>(
+  (set, get) => ({
+    ...createLoadingState(get, set),
     accounts: {},
     setAccounts: (value) => set({ accounts: value }),
     classifications: {},
@@ -103,25 +127,3 @@ export const TRANSACTION_FILTER_FORM_DEFAULTS_VALUES = {
   amount_greater: 0,
   amount_less: 0,
 };
-
-export const {
-  register: registerMain,
-  reset: resetMain,
-  setValue: setMainValue,
-  watch: watchMain,
-  getValues: getMainValues,
-  control: mainControl,
-} = useForm<TransactionFormInterface>({
-  defaultValues: TRANSACTION_MAIN_FORM_DEFAULTS_VALUES,
-});
-
-export const {
-  register: registerFilter,
-  reset: resetFilter,
-  setValue: setFilterValue,
-  getValues: getFilterValues,
-  watch: watchFilter,
-  control: filterControl,
-} = useForm<TransactionFiltersFormInterface>({
-  defaultValues: TRANSACTION_FILTER_FORM_DEFAULTS_VALUES,
-});

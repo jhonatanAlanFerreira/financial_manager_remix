@@ -214,10 +214,6 @@ export default function Classifications() {
     resetMain(classification);
   };
 
-  const onCompaniesChange = (companies: Company[]) => {
-    setMainValue("companies", companies);
-  };
-
   const onClickAdd = () => {
     resetMain(CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
