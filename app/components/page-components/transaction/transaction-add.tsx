@@ -70,7 +70,6 @@ export function TransactionAdd({
 
   const {
     register: registerMain,
-    reset: resetMain,
     setValue: setMainValue,
     watch: watchMain,
     getValues: getMainValues,
@@ -100,7 +99,12 @@ export function TransactionAdd({
   };
 
   const onCompanyChange = (company: Company) => {
-    resetMain(TRANSACTION_MAIN_FORM_DEFAULTS_VALUES);
+    setMainValue("company", company);
+
+    setMainValue("account", null);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
     loadData();
   };
 
@@ -220,6 +224,8 @@ export function TransactionAdd({
   };
 
   const loadAccounts = useDebouncedCallback(async () => {
+    setLoading("isAccountLoading", true);
+
     await fetchAccounts(
       {
         paginationParams: defaultPaginationQuery(),
@@ -238,6 +244,8 @@ export function TransactionAdd({
   });
 
   const loadExpenses = useDebouncedCallback(async () => {
+    setLoading("isExpenseLoading", true);
+
     await fetchExpenses(
       {
         paginationParams: defaultPaginationQuery(),
@@ -256,6 +264,8 @@ export function TransactionAdd({
   });
 
   const loadClassifications = useDebouncedCallback(async () => {
+    setLoading("isClassificationLoading", true);
+
     await fetchClassifications(
       {
         paginationParams: defaultPaginationQuery(),
@@ -274,6 +284,8 @@ export function TransactionAdd({
   });
 
   const loadIncomes = useDebouncedCallback(async () => {
+    setLoading("isIncomeLoading", true);
+
     await fetchIncomes(
       {
         paginationParams: defaultPaginationQuery(),
@@ -292,6 +304,8 @@ export function TransactionAdd({
   });
 
   const loadMerchants = useDebouncedCallback(async () => {
+    setLoading("isMerchantLoading", true);
+
     await fetchMerchants(
       {
         paginationParams: defaultPaginationQuery(),
@@ -382,7 +396,6 @@ export function TransactionAdd({
                     control={mainControl}
                     render={({ field }) => (
                       <InputSelect
-                        isMulti
                         isClearable
                         className="mb-8"
                         placeholder="Company"
@@ -390,6 +403,9 @@ export function TransactionAdd({
                         getOptionLabel={getSelectCompanyOptionLabel as any}
                         getOptionValue={getSelectCompanyOptionValue as any}
                         {...field}
+                        onChange={(company) =>
+                          onCompanyChange(company as Company)
+                        }
                       />
                     )}
                   />
@@ -399,7 +415,7 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
-                      isMulti
+                      required
                       isClearable
                       className="mb-8"
                       placeholder="Account *"
@@ -415,7 +431,6 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
-                      isMulti
                       isClearable
                       className="mb-8"
                       placeholder="Expense"
@@ -440,7 +455,6 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
-                      isMulti
                       isClearable
                       className="mb-8"
                       placeholder="Merchant"
@@ -517,6 +531,9 @@ export function TransactionAdd({
                         getOptionLabel={getSelectCompanyOptionLabel as any}
                         getOptionValue={getSelectCompanyOptionValue as any}
                         {...field}
+                        onChange={(company) =>
+                          onCompanyChange(company as Company)
+                        }
                       />
                     )}
                   />
@@ -526,6 +543,7 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
+                      required
                       isClearable
                       className="mb-8"
                       placeholder="Account *"
@@ -595,7 +613,6 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
-                      isMulti
                       isClearable
                       className="mb-8"
                       placeholder="Merchant"
