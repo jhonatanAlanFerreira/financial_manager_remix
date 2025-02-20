@@ -214,10 +214,6 @@ export default function Classifications() {
     resetMain(classification);
   };
 
-  const onCompaniesChange = (companies: Company[]) => {
-    setMainValue("companies", companies);
-  };
-
   const onClickAdd = () => {
     resetMain(CLASSIFICATION_MAIN_FORM_DEFAULTS_VALUES);
     setModals("add");
@@ -304,6 +300,7 @@ export default function Classifications() {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
     loadClassifications();
   };
+  
   const onFilterTagClose = (
     fieldName: keyof ClassificationFiltersFormInterface,
     defaultValue: any

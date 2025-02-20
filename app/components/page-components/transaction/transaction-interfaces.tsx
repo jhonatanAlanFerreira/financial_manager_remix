@@ -6,8 +6,11 @@ import {
   Merchant,
   TransactionClassification,
 } from "@prisma/client";
-import { FormikProps } from "formik";
+import { UseFormReturn } from "react-hook-form";
+import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
+import { BasePageStoreInterface } from "~/shared/base-page-store-interface";
 import { ServerResponseErrorInterface } from "~/shared/server-response-error-interface";
+import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   IsIncomeOrExpenseType,
   IsPersonalOrCompanyType,
@@ -48,12 +51,74 @@ export interface TransactionFormInterface {
 export interface TransactionAddPropsInterface {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onModalCancel: () => void;
-  formik: FormikProps<TransactionFormInterface>;
   isSubmitting: boolean;
   responseErrors: ServerResponseErrorInterface;
+  form: UseFormReturn<TransactionFormInterface>;
 }
 
 export interface TransactionFiltersPropsInterface {
-  formik: FormikProps<TransactionFiltersFormInterface>;
   onSubmit: () => void;
+  form: UseFormReturn<TransactionFiltersFormInterface>;
+}
+
+export interface TransactionStoreInterface extends BasePageStoreInterface {
+  totalExpenseValue: number;
+  setTotalExpenseValue: (value: number) => void;
+  totalIncomeValue: number;
+  setTotalIncomeValue: (value: number) => void;
+  transactions: ServerResponseInterface<TransactionsWithTotalsInterface>;
+  setTransactions: (
+    value: ServerResponseInterface<TransactionsWithTotalsInterface>
+  ) => void;
+}
+
+export interface TransactionFilterFormStoreInterface {
+  loadingStates: LoadingStatesInterface;
+  setLoading: (key: keyof LoadingStatesInterface, value: boolean) => void;
+  isLoading: () => boolean;
+  setAllLoadingState: (value: boolean) => void;
+  accounts: ServerResponseInterface<Account[]>;
+  setAccounts: (value: ServerResponseInterface<Account[]>) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
+  expenses: ServerResponseInterface<Expense[]>;
+  setExpenses: (value: ServerResponseInterface<Expense[]>) => void;
+  incomes: ServerResponseInterface<Income[]>;
+  setIncomes: (value: ServerResponseInterface<Income[]>) => void;
+  merchants: ServerResponseInterface<Merchant[]>;
+  setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
+  classifications: ServerResponseInterface<TransactionClassification[]>;
+  setClassifications: (
+    value: ServerResponseInterface<TransactionClassification[]>
+  ) => void;
+}
+
+export interface TransactionMainFormStore {
+  loadingStates: LoadingStatesInterface;
+  setLoading: (key: keyof LoadingStatesInterface, value: boolean) => void;
+  isLoading: () => boolean;
+  setAllLoadingState: (value: boolean) => void;
+  accounts: ServerResponseInterface<Account[]>;
+  setAccounts: (value: ServerResponseInterface<Account[]>) => void;
+  companies: ServerResponseInterface<Company[]>;
+  setCompanies: (value: ServerResponseInterface<Company[]>) => void;
+  expenses: ServerResponseInterface<Expense[]>;
+  setExpenses: (value: ServerResponseInterface<Expense[]>) => void;
+  incomes: ServerResponseInterface<Income[]>;
+  setIncomes: (value: ServerResponseInterface<Income[]>) => void;
+  merchants: ServerResponseInterface<Merchant[]>;
+  setMerchants: (value: ServerResponseInterface<Merchant[]>) => void;
+  classifications: ServerResponseInterface<TransactionClassification[]>;
+  setClassifications: (
+    value: ServerResponseInterface<TransactionClassification[]>
+  ) => void;
+}
+
+export interface LoadingStatesInterface {
+  isAccountLoading: boolean;
+  isCompanyLoading: boolean;
+  isExpenseLoading: boolean;
+  isClassificationLoading: boolean;
+  isIncomeLoading: boolean;
+  isMerchantLoading: boolean;
 }
