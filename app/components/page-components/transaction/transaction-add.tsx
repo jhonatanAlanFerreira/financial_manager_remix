@@ -105,6 +105,16 @@ export function TransactionAdd({
   };
 
   const onIsPersonalChange = (value: boolean) => {
+    setMainValue("is_personal", value);
+
+    if (value) {
+      setMainValue("company", null);
+    }
+
+    setMainValue("account", null);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
     loadData();
   };
 
