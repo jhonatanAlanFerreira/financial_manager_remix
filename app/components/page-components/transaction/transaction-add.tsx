@@ -35,10 +35,7 @@ import {
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
 import { useDebouncedCallback } from "~/utils/utilities";
-import {
-  TRANSACTION_MAIN_FORM_DEFAULTS_VALUES,
-  transactionMainStore,
-} from "./transaction-store";
+import { transactionMainStore } from "./transaction-store";
 import { Controller } from "react-hook-form";
 
 export function TransactionAdd({
@@ -96,6 +93,11 @@ export function TransactionAdd({
   const onTabSelect = (tabSelected: number) => {
     setMainValue("transaction_classifications", []);
     setMainValue("is_income", !!tabSelected);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
+
+    loadData();
   };
 
   const onCompanyChange = (company: Company) => {
@@ -331,6 +333,28 @@ export function TransactionAdd({
     }
   });
 
+  const onExpenseChange = (expense: Expense) => {
+    setMainValue("expense", expense);
+    const { name, amount } = getMainValues();
+    if (!name) {
+      setMainValue("name", expense.name);
+    }
+    if (!amount) {
+      setMainValue("amount", expense.amount || 0);
+    }
+  };
+
+  const onIncomeChange = (income: Income) => {
+    setMainValue("income", income);
+    const { name, amount } = getMainValues();
+    if (!name) {
+      setMainValue("name", income.name);
+    }
+    if (!amount) {
+      setMainValue("amount", income.amount || 0);
+    }
+  };
+
   return (
     <Loader loading={isLoading()}>
       <div className="p-2">
@@ -438,6 +462,9 @@ export function TransactionAdd({
                       getOptionLabel={getSelectExpenseOptionLabel as any}
                       getOptionValue={getSelectExpenseOptionValue as any}
                       {...field}
+                      onChange={(expense) =>
+                        onExpenseChange(expense as Expense)
+                      }
                     />
                   )}
                 />
@@ -566,6 +593,7 @@ export function TransactionAdd({
                       getOptionLabel={getSelectIncomeOptionLabel as any}
                       getOptionValue={getSelectIncomeOptionValue as any}
                       {...field}
+                      onChange={(income) => onIncomeChange(income as Income)}
                     />
                   )}
                 />
@@ -613,9 +641,10 @@ export function TransactionAdd({
                   control={mainControl}
                   render={({ field }) => (
                     <InputSelect
+                      isMulti
                       isClearable
                       className="mb-8"
-                      placeholder="Merchant"
+                      placeholder="Classification"
                       options={classifications.data}
                       getOptionLabel={getSelectClassificationOptionLabel as any}
                       getOptionValue={getSelectClassificationOptionValue as any}
