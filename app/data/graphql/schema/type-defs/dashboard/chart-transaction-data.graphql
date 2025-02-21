@@ -19,7 +19,11 @@ type ChartTransactionData {
 }
 
 type Query {
-  chartTransactionData(companyId: String, type: TransactionType!): ChartTransactionData!
+  chartTransactionData(
+    companyId: String
+    type: TransactionType!
+    classificationId: String
+  ): ChartTransactionData!
 }
 
 enum TransactionType {

@@ -1,3 +1,4 @@
+import { Company } from "@prisma/client";
 import { create } from "zustand";
 import { DashboardStoreInterface } from "~/components/page-components/dashboard/dashboard-interfaces";
 
@@ -6,7 +7,7 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   setLoading: (value) => set({ loading: value }),
   companies: {},
   setCompanies: (value) => set({ companies: value }),
-  selectedCompany: "personal",
+  selectedCompany: "personal" as Company | "personal",
   setSelectedCompany: (value) => set({ selectedCompany: value }),
   getSelectedCompany: () => get().selectedCompany,
   chartTransactionDataResponse: null,
@@ -20,4 +21,7 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   year: null,
   setYear: (value) => set({ year: value }),
   getYear: () => get().year,
+  classifications: [],
+  getClassifications: () => get().classifications,
+  setClassifications: (value) => set({ classifications: value }),
 }));

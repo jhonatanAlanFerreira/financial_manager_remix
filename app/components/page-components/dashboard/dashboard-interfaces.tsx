@@ -30,6 +30,7 @@ export interface ChartTransactionDataResponse {
 
 export interface DashboardFormInterface {
   yearIndex: YearIndexOptionInterface | null;
+  classification: StoreClassificationInterface | undefined;
 }
 
 export interface YearIndexOptionInterface {
@@ -40,6 +41,7 @@ export interface YearIndexOptionInterface {
 export interface LoadTransactionsChartDataVariablesInterface {
   type: TransactionsChartType;
   companyId?: string;
+  classificationId?: string;
 }
 
 export interface DashboardStoreInterface {
@@ -61,4 +63,12 @@ export interface DashboardStoreInterface {
   year: number | null;
   setYear: (value: number) => void;
   getYear: () => number | null;
+  classifications: StoreClassificationInterface[];
+  getClassifications: () => StoreClassificationInterface[];
+  setClassifications: (value: StoreClassificationInterface[]) => void;
+}
+
+export interface StoreClassificationInterface {
+  id: string;
+  name: string;
 }

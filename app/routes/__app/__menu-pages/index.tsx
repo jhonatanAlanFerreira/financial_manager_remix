@@ -16,6 +16,7 @@ import { useFormik } from "formik";
 import {
   DashboardFormInterface,
   LoadTransactionsChartDataVariablesInterface,
+  StoreClassificationInterface,
   YearIndexOptionInterface,
 } from "~/components/page-components/dashboard/dashboard-interfaces";
 import { Icon } from "~/components/icon/icon";
@@ -41,11 +42,14 @@ export default function Index() {
     setChartTransactionSeriesData,
     setYear,
     getYear,
+    setClassifications,
+    getClassifications,
   } = dashboardStore();
 
   const mainForm = useFormik<DashboardFormInterface>({
     initialValues: {
       yearIndex: null,
+      classification: undefined,
     },
     onSubmit: () => {},
   });
@@ -78,8 +82,19 @@ export default function Index() {
     loadTransactionsChartData({
       type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
       companyId: isPersonalOnly ? "" : selected.id,
+      classificationId: mainForm.values.classification?.id,
     });
   };
+
+  useEffect(() => {
+    const isPersonalOnly = getSelectedCompany() === "personal";
+
+    loadTransactionsChartData({
+      type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
+      companyId: isPersonalOnly ? "" : (getSelectedCompany() as Company).id,
+      classificationId: mainForm.values.classification?.id,
+    });
+  }, [mainForm.values.classification]);
 
   const getSelectedCompanyName = () => {
     return getSelectedCompany() == "personal"
@@ -95,6 +110,7 @@ export default function Index() {
     fetchGraphQL(CHART_TRANSACTION_DATA_QUERY, variables)
       .then((data) => {
         setChartTransactionDataResponse(data);
+        setClassifications(data.classifications);
         updateChartTransactionSeriesData();
       })
       .finally(() => {
@@ -146,6 +162,12 @@ export default function Index() {
   const onYearChange = (year: YearIndexOptionInterface) => {
     mainForm.setFieldValue("yearIndex", year);
     updateChartTransactionSeriesData(year.value);
+  };
+
+  const onClassificationChange = (
+    classification: StoreClassificationInterface
+  ) => {
+    mainForm.setFieldValue("classification", classification);
   };
 
   const getChartTransactionTitle = () => {
@@ -229,18 +251,38 @@ export default function Index() {
           <Loader loading={loading}>
             {!!getChartTransactionData()?.availableYears.length && (
               <div>
-                <InputSelect
-                  dropdownPosition="absolute"
-                  className="w-48 mb-18"
-                  placeholder="Select the year"
-                  value={mainForm.values.yearIndex}
-                  onChange={(year) =>
-                    onYearChange(year as YearIndexOptionInterface)
-                  }
-                  options={getChartTransactionData()?.availableYears.map(
-                    (year, index) => ({ value: index, label: year })
-                  )}
-                ></InputSelect>
+                <div className="flex gap-4">
+                  <InputSelect
+                    dropdownPosition="absolute"
+                    className="w-48 mb-18"
+                    placeholder="Select the year"
+                    value={mainForm.values.yearIndex}
+                    onChange={(year) =>
+                      onYearChange(year as YearIndexOptionInterface)
+                    }
+                    options={getChartTransactionData()?.availableYears.map(
+                      (year, index) => ({ value: index, label: year })
+                    )}
+                  ></InputSelect>
+                  <InputSelect
+                    dropdownPosition="absolute"
+                    className="w-64 mb-18"
+                    placeholder="Select the classification"
+                    value={mainForm.values.classification}
+                    getOptionLabel={(classification) =>
+                      (classification as { name: string }).name
+                    }
+                    getOptionValue={(classification) =>
+                      (classification as { id: string }).id
+                    }
+                    onChange={(classification) =>
+                      onClassificationChange(
+                        classification as StoreClassificationInterface
+                      )
+                    }
+                    options={getClassifications()}
+                  ></InputSelect>
+                </div>
                 <div>
                   <h2 className="text-violet-950">
                     {getChartTransactionTitle()}

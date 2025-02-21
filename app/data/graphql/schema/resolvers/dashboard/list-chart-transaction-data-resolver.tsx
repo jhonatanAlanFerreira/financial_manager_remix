@@ -5,7 +5,11 @@ import { MONTH_NAMES } from "~/utils/utilities";
 
 export const listChartTransactionData = async (
   parent: any,
-  args: { companyId?: string; type: TransactionsChartType },
+  args: {
+    companyId?: string;
+    classificationId?: string;
+    type: TransactionsChartType;
+  },
   context: { request: Request }
 ) => {
   const user = await requireUserSession(context.request);
@@ -24,6 +28,12 @@ export const listChartTransactionData = async (
       { is_personal: true },
       { is_personal: false, company_id: { $oid: args.companyId } },
     ];
+  }
+
+  if (args.classificationId) {
+    matchCondition.transaction_classification_ids = {
+      $in: [{ $oid: args.classificationId }],
+    };
   }
 
   const transactions = (await prisma.transaction.aggregateRaw({
