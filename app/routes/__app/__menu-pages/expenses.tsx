@@ -91,9 +91,6 @@ export default function Expenses() {
     defaultValues: EXPENSE_FILTER_FORM_DEFAULTS_VALUES,
   });
 
-  const getSelectCompanyOptionValue = (option: Company) => option.id;
-  const getSelectCompanyOptionLabel = (option: Company) => option.name;
-
   useEffect(() => {
     buildSearchParamsUrl();
     setTitle({
@@ -467,8 +464,8 @@ export default function Expenses() {
                       className="mb-8"
                       placeholder="Companies"
                       options={companies?.data}
-                      getOptionLabel={getSelectCompanyOptionLabel as any}
-                      getOptionValue={getSelectCompanyOptionValue as any}
+                      getOptionLabel={(company) => (company as Company).name}
+                      getOptionValue={(company) => (company as Company).id}
                       {...field}
                     />
                   )}
@@ -580,8 +577,8 @@ export default function Expenses() {
                     className="mb-8"
                     placeholder="Company"
                     options={companies?.data}
-                    getOptionLabel={getSelectCompanyOptionLabel as any}
-                    getOptionValue={getSelectCompanyOptionValue as any}
+                    getOptionLabel={(company) => (company as Company).name}
+                    getOptionValue={(company) => (company as Company).id}
                     {...field}
                   />
                 )}

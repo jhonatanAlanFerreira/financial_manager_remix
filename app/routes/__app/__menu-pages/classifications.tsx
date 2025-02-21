@@ -97,9 +97,6 @@ export default function Classifications() {
     defaultValues: CLASSIFICATION_FILTER_FORM_DEFAULTS_VALUES,
   });
 
-  const getSelectCompanyOptionValue = (option: Company) => option.id;
-  const getSelectCompanyOptionLabel = (option: Company) => option.name;
-
   useEffect(() => {
     buildSearchParamsUrl();
     setTitle({
@@ -300,7 +297,7 @@ export default function Classifications() {
     setSortParams(queryParamsFromObject({ sort_key, sort_order }));
     loadClassifications();
   };
-  
+
   const onFilterTagClose = (
     fieldName: keyof ClassificationFiltersFormInterface,
     defaultValue: any
@@ -524,8 +521,8 @@ export default function Classifications() {
                       className="mb-8"
                       placeholder="Companies"
                       options={companies?.data}
-                      getOptionLabel={getSelectCompanyOptionLabel as any}
-                      getOptionValue={getSelectCompanyOptionValue as any}
+                      getOptionLabel={(company) => (company as Company).name}
+                      getOptionValue={(company) => (company as Company).id}
                       {...field}
                     />
                   )}
@@ -684,8 +681,8 @@ export default function Classifications() {
                     className="mb-8"
                     placeholder="Company"
                     options={companies?.data}
-                    getOptionLabel={getSelectCompanyOptionLabel as any}
-                    getOptionValue={getSelectCompanyOptionValue as any}
+                    getOptionLabel={(company) => (company as Company).name}
+                    getOptionValue={(company) => (company as Company).id}
                     {...field}
                   />
                 )}

@@ -69,23 +69,6 @@ export function TransactionFilters({
     control: filterControl,
   } = form;
 
-  const getSelectCompanyOptionValue = (option: Company) => option.id;
-  const getSelectCompanyOptionLabel = (option: Company) => option.name;
-  const getSelectExpenseOptionValue = (option: Expense) => option.id;
-  const getSelectExpenseOptionLabel = (option: Expense) => option.name;
-  const getSelectIncomeOptionValue = (option: Income) => option.id;
-  const getSelectIncomeOptionLabel = (option: Income) => option.name;
-  const getSelectMerchantOptionValue = (option: Merchant) => option.id;
-  const getSelectMerchantOptionLabel = (option: Merchant) => option.name;
-  const getSelectAccountOptionValue = (option: Account) => option.id;
-  const getSelectAccountOptionLabel = (option: Account) => option.name;
-  const getSelectClassificationOptionValue = (
-    option: TransactionClassification
-  ) => option.id;
-  const getSelectClassificationOptionLabel = (
-    option: TransactionClassification
-  ) => option.name;
-
   const loadData = () => {
     setAllLoadingState(true);
 
@@ -443,8 +426,8 @@ export function TransactionFilters({
                   className="mb-8"
                   placeholder="Company"
                   options={companies.data}
-                  getOptionLabel={getSelectCompanyOptionLabel as any}
-                  getOptionValue={getSelectCompanyOptionValue as any}
+                  getOptionLabel={(company) => (company as Company).name}
+                  getOptionValue={(company) => (company as Company).id}
                   {...field}
                 />
               )}
@@ -459,8 +442,8 @@ export function TransactionFilters({
                 className="mb-8"
                 placeholder="Account"
                 options={accounts.data}
-                getOptionLabel={getSelectAccountOptionLabel as any}
-                getOptionValue={getSelectAccountOptionValue as any}
+                getOptionLabel={(account) => (account as Account).name}
+                getOptionValue={(account) => (account as Account).id}
                 {...field}
               />
             )}
@@ -474,8 +457,8 @@ export function TransactionFilters({
                 className="mb-8"
                 placeholder="Merchant"
                 options={merchants.data}
-                getOptionLabel={getSelectMerchantOptionLabel as any}
-                getOptionValue={getSelectMerchantOptionValue as any}
+                getOptionLabel={(merchant) => (merchant as Merchant).name}
+                getOptionValue={(merchant) => (merchant as Merchant).id}
                 {...field}
               />
             )}
@@ -490,8 +473,8 @@ export function TransactionFilters({
                   className="mb-8"
                   placeholder="Expense"
                   options={expenses.data}
-                  getOptionLabel={getSelectExpenseOptionLabel as any}
-                  getOptionValue={getSelectExpenseOptionValue as any}
+                  getOptionLabel={(expense) => (expense as Expense).name}
+                  getOptionValue={(expense) => (expense as Expense).id}
                   {...field}
                 />
               )}
@@ -507,8 +490,8 @@ export function TransactionFilters({
                   className="mb-8"
                   placeholder="Income"
                   options={incomes.data}
-                  getOptionLabel={getSelectIncomeOptionLabel as any}
-                  getOptionValue={getSelectIncomeOptionValue as any}
+                  getOptionLabel={(income) => (income as Income).name}
+                  getOptionValue={(income) => (income as Income).id}
                   {...field}
                 />
               )}
@@ -523,8 +506,12 @@ export function TransactionFilters({
                 className="mb-8"
                 placeholder="Classification"
                 options={classifications.data}
-                getOptionLabel={getSelectClassificationOptionLabel as any}
-                getOptionValue={getSelectClassificationOptionValue as any}
+                getOptionLabel={(classification) =>
+                  (classification as TransactionClassification).name
+                }
+                getOptionValue={(classification) =>
+                  (classification as TransactionClassification).id
+                }
                 {...field}
               />
             )}
