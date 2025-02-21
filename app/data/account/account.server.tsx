@@ -11,7 +11,7 @@ import {
   listAccountsValidator,
 } from "~/data/account/account-validator";
 import { prisma } from "~/data/database/database.server";
-import { AccountLoaderParamsInterface } from "./account-query-params-interfaces";
+import { AccountLoaderParamsInterface } from "~/data/account/account-query-params-interfaces";
 import { paginate } from "~/data/services/list.service";
 
 export async function create(

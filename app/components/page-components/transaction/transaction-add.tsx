@@ -35,7 +35,7 @@ import {
   IsPersonalOrCompanyType,
 } from "~/shared/shared-types";
 import { useDebouncedCallback } from "~/utils/utilities";
-import { transactionMainStore } from "./transaction-store";
+import { transactionMainStore } from "~/components/page-components/transaction/transaction-store";
 import { Controller } from "react-hook-form";
 
 export function TransactionAdd({

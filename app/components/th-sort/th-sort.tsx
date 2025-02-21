@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ThSortPropsInterface } from "./th-sort-props-interface";
-import { Icon } from "../icon/icon";
+import { ThSortPropsInterface } from "~/components/th-sort/th-sort-props-interface";
+import { Icon } from "~/components/icon/icon";
 
 export function ThSort({
   thSortConfigs,

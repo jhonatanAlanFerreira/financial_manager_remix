@@ -12,7 +12,7 @@ import {
   validateNumber,
   validatePaginationParams,
 } from "~/data/services/validators";
-import { IncomeLoaderParamsInterface } from "./income-query-params-interfaces";
+import { IncomeLoaderParamsInterface } from "~/data/income/income-query-params-interfaces";
 
 export async function incomeCreateValidator(
   data: IncomeCreateRequestInterface,

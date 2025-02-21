@@ -16,7 +16,7 @@ import { paginate } from "~/data/services/list.service";
 import {
   TransactionsWithTotalsInterface,
   TransactionWithRelationsInterface,
-} from "./transaction-types";
+} from "~/data/transaction/transaction-types";
 import { buildWhereClause } from "~/data/services/list.service";
 
 export async function list(

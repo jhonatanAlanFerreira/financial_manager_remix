@@ -5,7 +5,7 @@ import ReactSelect, {
   ActionMeta,
   GroupBase,
 } from "react-select";
-import { InputSelectPropsInterface } from "./input-select-props-interface";
+import { InputSelectPropsInterface } from "~/components/inputs/input-select/input-select-props-interface";
 import Select from "react-select/base";
 
 export const InputSelect = forwardRef<

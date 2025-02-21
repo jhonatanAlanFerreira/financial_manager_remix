@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import axios, { AxiosResponse, isAxiosError } from "axios";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { Account } from "@prisma/client";
-import { CompanyWithRelationsInterface } from "../company/company-types";
+import { CompanyWithRelationsInterface } from "~/data/company/company-types";
 
 export const createOrUpdateCompany = async (
   companyId: string | null,

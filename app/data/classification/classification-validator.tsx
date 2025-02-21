@@ -11,7 +11,7 @@ import {
   validateIdFormat,
   validatePaginationParams,
 } from "~/data/services/validators";
-import { ClassificationLoaderParamsInterface } from "./classification-query-params-interfaces";
+import { ClassificationLoaderParamsInterface } from "~/data/classification/classification-query-params-interfaces";
 
 export async function classificationCreateValidator(
   data: ClassificationCreateRequestInterface,
