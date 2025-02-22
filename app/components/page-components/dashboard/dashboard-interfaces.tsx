@@ -60,6 +60,9 @@ export interface DashboardStoreInterface {
   chartTransactionSeriesData: ChartSerieInterface[];
   setChartTransactionSeriesData: (value: ChartSerieInterface[]) => void;
   getChartTransactionSeriesData: () => ChartSerieInterface[];
+  chartTransactionBarSeriesData: ChartSerieInterface[];
+  setChartTransactionBarSeriesData: (value: ChartSerieInterface[]) => void;
+  getChartTransactionBarSeriesData: () => ChartSerieInterface[];
   year: number | null;
   setYear: (value: number) => void;
   getYear: () => number | null;
@@ -71,4 +74,5 @@ export interface DashboardStoreInterface {
 export interface StoreClassificationInterface {
   id: string;
   name: string;
+  is_income: boolean;
 }

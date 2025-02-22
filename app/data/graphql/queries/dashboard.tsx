@@ -17,7 +17,8 @@ query($type: TransactionType = ALL, $companyId: String = null, $classificationId
   },
   classifications{
     id,
-    name
+    name,
+    is_income
   }
 }
 `;

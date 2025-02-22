@@ -40,6 +40,8 @@ export default function Index() {
     getChartTransactionDataResponse,
     getChartTransactionSeriesData,
     setChartTransactionSeriesData,
+    setChartTransactionBarSeriesData,
+    getChartTransactionBarSeriesData,
     setYear,
     getYear,
     setClassifications,
@@ -143,23 +145,41 @@ export default function Index() {
         label: getYear(),
       });
 
-      setChartTransactionSeriesData([
-        {
-          name: "Income",
-          type: "line",
-          data: months.map((m) => m.income),
-        },
-        {
-          name: "Expense",
-          type: "line",
-          data: months.map((m) => m.expense),
-        },
-        {
-          name: "Net",
-          type: "line",
-          data: months.map((m) => m.net),
-        },
-      ]);
+      const { classification } = mainForm.values;
+
+      if (classification) {
+        setChartTransactionBarSeriesData([
+          {
+            name: `${classification.name} ${
+              classification.is_income ? "(Income)" : "(Expense)"
+            }`,
+            type: "bar",
+            data: months.map((m) =>
+              classification.is_income ? m.income : m.expense
+            ),
+          },
+        ]);
+        setChartTransactionSeriesData([]);
+      } else {
+        setChartTransactionSeriesData([
+          {
+            name: "Income",
+            type: "line",
+            data: months.map((m) => m.income),
+          },
+          {
+            name: "Expense",
+            type: "line",
+            data: months.map((m) => m.expense),
+          },
+          {
+            name: "Net",
+            type: "line",
+            data: months.map((m) => m.net),
+          },
+        ]);
+        setChartTransactionBarSeriesData([]);
+      }
     }
   };
 
@@ -176,6 +196,12 @@ export default function Index() {
 
   const getChartTransactionTitle = () => {
     const isPersonal = getSelectedCompany() == "personal";
+    const { classification } = mainForm.values;
+
+    if (classification) {
+      return `Yearly (${classification.name}) overview for ${getYear()}`;
+    }
+
     return isPersonal
       ? `Net Position for Personal Finances in ${getYear()}`
       : `Net Position for the company (${getSelectedCompanyName()}) in ${getYear()}`;
@@ -269,6 +295,7 @@ export default function Index() {
                     )}
                   ></InputSelect>
                   <InputSelect
+                    isClearable
                     dropdownPosition="absolute"
                     className="w-64 mb-18"
                     placeholder="Select the classification"
@@ -293,11 +320,20 @@ export default function Index() {
                     {getChartTransactionTitle()}
                   </h2>
                 </div>
-                <Chart
-                  className="h-3/4"
-                  seriesData={getChartTransactionSeriesData()}
-                  xAxisData={MONTH_NAMES}
-                ></Chart>
+                {!mainForm.values.classification && (
+                  <Chart
+                    className="h-3/4"
+                    seriesData={getChartTransactionSeriesData()}
+                    xAxisData={MONTH_NAMES}
+                  ></Chart>
+                )}
+                {mainForm.values.classification && (
+                  <Chart
+                    className="h-3/4"
+                    seriesData={getChartTransactionBarSeriesData()}
+                    xAxisData={MONTH_NAMES}
+                  ></Chart>
+                )}
               </div>
             )}
             {!getChartTransactionData()?.availableYears.length && (
