@@ -58,6 +58,7 @@ export default function Index() {
 
   useEffect(() => {
     setTitle({ pageTitle: "Dashboard" });
+    setSelectedCompany("personal");
 
     if (!initialized.current) {
       initialized.current = true;
