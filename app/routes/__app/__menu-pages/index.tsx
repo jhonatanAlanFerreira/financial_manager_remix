@@ -59,14 +59,6 @@ export default function Index() {
     setTitle({ pageTitle: "Dashboard" });
     setSelectedCompany("personal");
 
-    if (!initialized.current) {
-      initialized.current = true;
-      loadTransactionsChartData({
-        type: "PERSONAL_ONLY",
-        classificationType: "PERSONAL_ONLY",
-      });
-    }
-
     return () => {
       setTitle({ pageTitle: "" });
     };
@@ -97,6 +89,11 @@ export default function Index() {
   };
 
   useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      return;
+    }
+
     const isPersonalOnly = getSelectedCompany() === "personal";
 
     loadTransactionsChartData({
