@@ -77,12 +77,16 @@ export default function Index() {
   const selectCompany = (selected: Company | "personal") => {
     setSelectedCompany(selected);
 
+    if (mainForm.values.classification != undefined) {
+      mainForm.setFieldValue("classification", null);
+      return;
+    }
+
     const isPersonalOnly = selected === "personal";
 
     loadTransactionsChartData({
       type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
       companyId: isPersonalOnly ? "" : selected.id,
-      classificationId: mainForm.values.classification?.id,
     });
   };
 
@@ -268,6 +272,7 @@ export default function Index() {
                     dropdownPosition="absolute"
                     className="w-64 mb-18"
                     placeholder="Select the classification"
+                    name="classification"
                     value={mainForm.values.classification}
                     getOptionLabel={(classification) =>
                       (classification as { name: string }).name
@@ -298,6 +303,23 @@ export default function Index() {
             {!getChartTransactionData()?.availableYears.length && (
               <span className="text-violet-950">
                 There are no data yet for the selected company
+                {mainForm.values.classification && (
+                  <span>
+                    {" "}
+                    with the classification{" "}
+                    <b>
+                      ({mainForm.values.classification?.name}) {"  "}
+                    </b>
+                    <span
+                      onClick={() =>
+                        mainForm.setFieldValue("classification", null)
+                      }
+                      className="!text-red-700 underline cursor-pointer"
+                    >
+                      clear filters
+                    </span>
+                  </span>
+                )}
               </span>
             )}
           </Loader>
