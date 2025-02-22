@@ -327,7 +327,7 @@ export default function Classifications() {
             onClick={() => setModals("filter")}
             className="flex cursor-pointer text-violet-950 transform transition-transform duration-300 hover:scale-110 mb-2"
           >
-            <Icon size={30} name="Filter"></Icon>
+            <Icon size={20} name="Filter"></Icon>
             Filters
           </div>
           <div className="flex flex-wrap">
