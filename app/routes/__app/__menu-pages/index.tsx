@@ -9,7 +9,7 @@ import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { fetchGraphQL } from "~/data/frontend-services/graphql-service";
 import { CHART_TRANSACTION_DATA_QUERY } from "~/data/graphql/queries/dashboard";
 import { Loader } from "~/components/loader/loader";
-import { MONTH_NAMES, useIsMobile } from "~/utils/utilities";
+import { MONTH_NAMES } from "~/utils/utilities";
 import { Chart } from "~/components/chart/chart";
 import { InputSelect } from "~/components/inputs/input-select/input-select";
 import { useFormik } from "formik";
@@ -22,7 +22,6 @@ import {
 import { Icon } from "~/components/icon/icon";
 
 export default function Index() {
-  const isMobile = useIsMobile();
   const initialized = useRef(false);
   const { setTitle } = useTitle();
   const { companyData } = useLoaderData<{
