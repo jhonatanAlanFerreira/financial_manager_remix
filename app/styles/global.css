@@ -2,6 +2,10 @@
   --primary-color: #2e1065;
 }
 
+html {
+  font-size: 0.8rem;
+}
+
 .float-label-input {
   margin: 32px 0;
 }
