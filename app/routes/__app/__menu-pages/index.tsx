@@ -61,7 +61,10 @@ export default function Index() {
 
     if (!initialized.current) {
       initialized.current = true;
-      loadTransactionsChartData({ type: "PERSONAL_ONLY" });
+      loadTransactionsChartData({
+        type: "PERSONAL_ONLY",
+        classificationType: "PERSONAL_ONLY",
+      });
     }
 
     return () => {
@@ -89,6 +92,7 @@ export default function Index() {
     loadTransactionsChartData({
       type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
       companyId: isPersonalOnly ? "" : selected.id,
+      classificationType: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
     });
   };
 
@@ -99,6 +103,7 @@ export default function Index() {
       type: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
       companyId: isPersonalOnly ? "" : (getSelectedCompany() as Company).id,
       classificationId: mainForm.values.classification?.id,
+      classificationType: isPersonalOnly ? "PERSONAL_ONLY" : "COMPANY_ONLY",
     });
   }, [mainForm.values.classification]);
 

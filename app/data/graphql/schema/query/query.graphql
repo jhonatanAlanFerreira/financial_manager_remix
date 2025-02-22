@@ -4,6 +4,7 @@ type Query {
     name: String
     is_personal_or_company: PersonalOrCompanyEnum
     is_income_or_expense: ExpenseOrIncomeEnum
+    company_id: String
   ): [Classification!]!
   transactions(
     name: String

@@ -1,6 +1,7 @@
 import { Company } from "@prisma/client";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { ChartSerieInterface } from "~/components/chart/chart-props-interface";
+import { IsPersonalOrCompanyGraphqlType } from "~/data/graphql/schema/graphql-globals";
 
 export type TransactionsChartType = "PERSONAL_ONLY" | "COMPANY_ONLY" | "ALL";
 
@@ -42,6 +43,7 @@ export interface LoadTransactionsChartDataVariablesInterface {
   type: TransactionsChartType;
   companyId?: string;
   classificationId?: string;
+  classificationType?: IsPersonalOrCompanyGraphqlType;
 }
 
 export interface DashboardStoreInterface {

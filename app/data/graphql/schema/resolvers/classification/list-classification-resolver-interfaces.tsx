@@ -5,6 +5,7 @@ import {
 
 export interface ListClassificationResolverParamsInterface {
   name: string;
+  company_id: string;
   is_personal_or_company: IsPersonalOrCompanyGraphqlType;
   is_income_or_expense: IsIncomeOrExpenseGraphqlType;
 }
