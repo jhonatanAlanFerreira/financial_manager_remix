@@ -245,6 +245,10 @@ export default function Merchants() {
     onFilterFormSubmit();
   };
 
+  const onFiltersClear = () => {
+    resetFilter();
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -408,7 +412,7 @@ export default function Merchants() {
         <div className="p-4">
           <form onSubmit={onFilterFormSubmit}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-              <span onClick={() => resetFilter()}>Clear all filters</span>
+              <span onClick={onFiltersClear}>Clear all filters</span>
             </div>
             <InputText label="Name" {...registerFilter("name")} />
             <div className="flex justify-end p-2 mt-10">

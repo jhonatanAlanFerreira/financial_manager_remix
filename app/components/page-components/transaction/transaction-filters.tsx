@@ -292,15 +292,16 @@ export function TransactionFilters({
     return new URLSearchParams(paginationParamsInterface).toString();
   };
 
+  const onFiltersClear = () => {
+    resetFilter(TRANSACTION_FILTER_FORM_DEFAULTS_VALUES);
+    loadData();
+  };
+
   return (
     <Loader loading={isLoading()}>
       <form>
         <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-          <span
-            onClick={() => resetFilter(TRANSACTION_FILTER_FORM_DEFAULTS_VALUES)}
-          >
-            Clear all filters
-          </span>
+          <span onClick={onFiltersClear}>Clear all filters</span>
         </div>
         <div className="overflow-auto max-h-[calc(100vh_-_16rem)]">
           <div className="flex flex-col gap-2 mb-12">

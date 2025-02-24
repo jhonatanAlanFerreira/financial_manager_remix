@@ -282,6 +282,10 @@ export default function Expenses() {
     onFilterFormSubmit();
   };
 
+  const onFiltersClear = () => {
+    resetFilter();
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -503,7 +507,7 @@ export default function Expenses() {
         <div className="p-4">
           <form onSubmit={onFilterFormSubmit}>
             <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
-              <span onClick={() => resetFilter()}>Clear all filters</span>
+              <span onClick={onFiltersClear}>Clear all filters</span>
             </div>
             <div className="flex flex-col gap-2 mb-12">
               <span className="relative bg-white w-auto self-center top-6 text-violet-950 px-2">
