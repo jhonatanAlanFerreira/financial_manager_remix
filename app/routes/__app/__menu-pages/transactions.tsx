@@ -408,10 +408,12 @@ export default function Transactions() {
         className="w-100 text-right px-10 pt-2 text-violet-900 text-lg whitespace-nowrap flex flex-col md:flex-row justify-end"
       >
         <span className="mr-0 md:mr-4">
-          Income Total: <span className="text-black">{totalIncomeValue}</span>
+          Income Total Amount:{" "}
+          <span className="text-black">{totalIncomeValue}</span>
         </span>
         <span>
-          Expense Total: <span className="text-black">{totalExpenseValue}</span>
+          Expense Total Amount:{" "}
+          <span className="text-black">{totalExpenseValue}</span>
         </span>
       </div>
 
