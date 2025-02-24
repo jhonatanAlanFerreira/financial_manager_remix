@@ -270,6 +270,16 @@ export function TransactionFilters({
     loadIncomes();
   };
 
+  const onCompanyChange = (company: Company) => {
+    setFilterValue("company", company);
+
+    setFilterValue("account", null);
+    setFilterValue("expense", null);
+    setFilterValue("income", null);
+    setFilterValue("has_classification", null);
+    loadData();
+  };
+
   const defaultPaginationQuery = () => {
     let paginationParamsInterface: Record<
       keyof PaginationParamsInterface,
@@ -429,6 +439,7 @@ export function TransactionFilters({
                   getOptionLabel={(company) => (company as Company).name}
                   getOptionValue={(company) => (company as Company).id}
                   {...field}
+                  onChange={(company) => onCompanyChange(company as Company)}
                 />
               )}
             />
