@@ -142,18 +142,22 @@ export function AccountDropdown({
                 <td className="py-2 px-4 border-b border-r">
                   {account.balance}
                 </td>
-                <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                  <Icon
-                    onClick={() => onUpdate(account)}
-                    name="Edit"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                  ></Icon>{" "}
-                  <Icon
-                    name="Trash"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                    color="red"
-                    onClick={() => onClickDelete(account)}
-                  ></Icon>
+                <td className="border-b">
+                  <div className="h-full flex justify-center gap-5 py-2 px-4">
+                    <Icon
+                      onClick={() => onUpdate(account)}
+                      name="Edit"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                    ></Icon>{" "}
+                    <Icon
+                      name="Trash"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                      color="red"
+                      onClick={() => onClickDelete(account)}
+                    ></Icon>
+                  </div>
                 </td>
               </tr>
             ))}

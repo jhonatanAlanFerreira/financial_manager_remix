@@ -389,18 +389,22 @@ export default function Classifications() {
                 <td className="py-2 px-4 border-b border-r">
                   {classification.is_income ? "Income" : "Expense"}
                 </td>
-                <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                  <Icon
-                    onClick={() => onClickUpdate(classification)}
-                    name="Edit"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                  ></Icon>{" "}
-                  <Icon
-                    onClick={() => onClickDelete(classification)}
-                    name="Trash"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                    color="red"
-                  ></Icon>
+                <td className="border-b">
+                  <div className="h-full flex justify-center gap-5 py-2 px-4">
+                    <Icon
+                      onClick={() => onClickUpdate(classification)}
+                      name="Edit"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                    ></Icon>{" "}
+                    <Icon
+                      onClick={() => onClickDelete(classification)}
+                      name="Trash"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                      color="red"
+                    ></Icon>
+                  </div>
                 </td>
               </tr>
             ))}

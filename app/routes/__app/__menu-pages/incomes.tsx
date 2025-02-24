@@ -354,23 +354,27 @@ export default function Incomes() {
                 <td className="py-2 px-4 border-b border-r">{income.amount}</td>
                 <td className="py-2 px-4 border-b border-r">
                   {getIncomeType(income)}
-                </td>
-                <td className="flex justify-center gap-5 py-2 px-4 border-b">
-                  <Icon
-                    onClick={() => {
-                      onClickUpdate(income);
-                    }}
-                    name="Edit"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                  ></Icon>{" "}
-                  <Icon
-                    onClick={() => {
-                      onClickDelete(income);
-                    }}
-                    name="Trash"
-                    className="cursor-pointer transition-transform  transform hover:scale-110"
-                    color="red"
-                  ></Icon>
+                </td>{" "}
+                <td className="border-b">
+                  <div className="h-full flex justify-center gap-5 py-2 px-4">
+                    <Icon
+                      onClick={() => {
+                        onClickUpdate(income);
+                      }}
+                      name="Edit"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                    ></Icon>{" "}
+                    <Icon
+                      onClick={() => {
+                        onClickDelete(income);
+                      }}
+                      name="Trash"
+                      size={17}
+                      className="cursor-pointer transition-transform  transform hover:scale-110"
+                      color="red"
+                    ></Icon>
+                  </div>
                 </td>
               </tr>
             ))}

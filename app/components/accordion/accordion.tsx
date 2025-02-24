@@ -33,6 +33,7 @@ export function Accordion({
                     e.stopPropagation();
                   }}
                   name={icon.iconName}
+                  size={17}
                   color={icon.iconColor}
                   onClickCapture={icon.onClick}
                 ></Icon>
