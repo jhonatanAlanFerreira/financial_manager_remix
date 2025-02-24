@@ -69,6 +69,13 @@ export function TransactionFilters({
     control: filterControl,
   } = form;
 
+  useEffect(() => {
+    if (!hasRun.current) {
+      loadData();
+      hasRun.current = true;
+    }
+  }, []);
+
   const loadData = () => {
     setAllLoadingState(true);
 
@@ -78,70 +85,6 @@ export function TransactionFilters({
     loadClassifications();
     loadIncomes();
     loadMerchants();
-  };
-
-  useEffect(() => {
-    if (!hasRun.current) {
-      loadData();
-      hasRun.current = true;
-    }
-  }, []);
-
-  const defaultPaginationQuery = () => {
-    let paginationParamsInterface: Record<
-      keyof PaginationParamsInterface,
-      string
-    > = {
-      page: "1",
-      pageSize: "all",
-    };
-
-    return new URLSearchParams(paginationParamsInterface).toString();
-  };
-
-  const filterAccountsParams = () => {
-    const accountLoaderParamsInterface: Partial<
-      Record<keyof AccountLoaderParamsInterface, string>
-    > = {
-      company: getFilterValues().company?.id || "",
-      is_personal_or_company: getFilterValues().is_personal_or_company,
-    };
-
-    return new URLSearchParams(accountLoaderParamsInterface).toString();
-  };
-
-  const filterExpensesParams = () => {
-    const expenseLoaderParamsInterface: Partial<
-      Record<keyof ExpenseLoaderParamsInterface, string>
-    > = {
-      has_company: getFilterValues().company?.id || "",
-      is_personal_or_company: getFilterValues().is_personal_or_company,
-    };
-
-    return new URLSearchParams(expenseLoaderParamsInterface).toString();
-  };
-
-  const filterClassificationsParams = () => {
-    const classificationLoaderParamsInterface: Partial<
-      Record<keyof ClassificationLoaderParamsInterface, string>
-    > = {
-      has_company: getFilterValues().company?.id || "",
-      is_income_or_expense: getFilterValues().is_income_or_expense,
-      is_personal_or_company: getFilterValues().is_personal_or_company,
-    };
-
-    return new URLSearchParams(classificationLoaderParamsInterface).toString();
-  };
-
-  const filterIncomesParams = () => {
-    const incomeLoaderParamsInterface: Partial<
-      Record<keyof IncomeLoaderParamsInterface, string>
-    > = {
-      has_company: getFilterValues().company?.id || "",
-      is_personal_or_company: getFilterValues().is_personal_or_company,
-    };
-
-    return new URLSearchParams(incomeLoaderParamsInterface).toString();
   };
 
   const loadAccounts = useDebouncedCallback(async () => {
@@ -244,6 +187,51 @@ export function TransactionFilters({
     }
   });
 
+  const filterAccountsParams = () => {
+    const accountLoaderParamsInterface: Partial<
+      Record<keyof AccountLoaderParamsInterface, string>
+    > = {
+      company: getFilterValues().company?.id || "",
+      is_personal_or_company: getFilterValues().is_personal_or_company,
+    };
+
+    return new URLSearchParams(accountLoaderParamsInterface).toString();
+  };
+
+  const filterExpensesParams = () => {
+    const expenseLoaderParamsInterface: Partial<
+      Record<keyof ExpenseLoaderParamsInterface, string>
+    > = {
+      has_company: getFilterValues().company?.id || "",
+      is_personal_or_company: getFilterValues().is_personal_or_company,
+    };
+
+    return new URLSearchParams(expenseLoaderParamsInterface).toString();
+  };
+
+  const filterClassificationsParams = () => {
+    const classificationLoaderParamsInterface: Partial<
+      Record<keyof ClassificationLoaderParamsInterface, string>
+    > = {
+      has_company: getFilterValues().company?.id || "",
+      is_income_or_expense: getFilterValues().is_income_or_expense,
+      is_personal_or_company: getFilterValues().is_personal_or_company,
+    };
+
+    return new URLSearchParams(classificationLoaderParamsInterface).toString();
+  };
+
+  const filterIncomesParams = () => {
+    const incomeLoaderParamsInterface: Partial<
+      Record<keyof IncomeLoaderParamsInterface, string>
+    > = {
+      has_company: getFilterValues().company?.id || "",
+      is_personal_or_company: getFilterValues().is_personal_or_company,
+    };
+
+    return new URLSearchParams(incomeLoaderParamsInterface).toString();
+  };
+
   const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(
       "is_income_or_expense",
@@ -280,6 +268,18 @@ export function TransactionFilters({
     loadClassifications();
     loadExpenses();
     loadIncomes();
+  };
+
+  const defaultPaginationQuery = () => {
+    let paginationParamsInterface: Record<
+      keyof PaginationParamsInterface,
+      string
+    > = {
+      page: "1",
+      pageSize: "all",
+    };
+
+    return new URLSearchParams(paginationParamsInterface).toString();
   };
 
   return (

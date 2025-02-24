@@ -172,19 +172,11 @@ export default function Classifications() {
     });
   };
 
-  const getClassificationType = (classification: TransactionClassification) => {
-    return classification.is_personal
-      ? "Personal Transaction Classification"
-      : "Company Transaction Classification";
-  };
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
 
-  const adjustPaginationBeforeReload = () => {
-    const { data } = classifications;
-    const hasMinimalData = data && data?.length < 2;
-
-    if (hasMinimalData && getCurrentPage() !== 1) {
-      setCurrentPage(getCurrentPage() - 1);
-    }
+    setModals(null);
+    setCurrentPage(1);
     loadClassifications();
   };
 
@@ -205,10 +197,45 @@ export default function Classifications() {
     });
   };
 
-  const setFormValues = (
-    classification: ClassificationWithRelationsInterface
-  ) => {
-    resetMain(classification);
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(getFilterValues(), {
+        has_company: "id",
+      })
+    );
+  };
+
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadClassifications();
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadClassifications();
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: getCurrentPage(),
+      pageSize: 10,
+    } as any).toString();
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = classifications;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
+    }
+    loadClassifications();
+  };
+
+  const getClassificationType = (classification: TransactionClassification) => {
+    return classification.is_personal
+      ? "Personal Transaction Classification"
+      : "Company Transaction Classification";
   };
 
   const onClickAdd = () => {
@@ -234,29 +261,6 @@ export default function Classifications() {
     setModals(null);
   };
 
-  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    setModals(null);
-    setCurrentPage(1);
-    loadClassifications();
-  };
-
-  const buildSearchParamsUrl = () => {
-    setSearchParams(
-      queryParamsFromObject(getFilterValues(), {
-        has_company: "id",
-      })
-    );
-  };
-
-  const paginationParams = () => {
-    return new URLSearchParams({
-      page: getCurrentPage(),
-      pageSize: 10,
-    } as any).toString();
-  };
-
   const isIncomeOrExpenseChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(
       "is_income_or_expense",
@@ -277,6 +281,20 @@ export default function Classifications() {
     }
   };
 
+  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
+  };
+
+  const setFormValues = (
+    classification: ClassificationWithRelationsInterface
+  ) => {
+    resetMain(classification);
+  };
+
   const prepareFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);
     formData.set(
@@ -293,30 +311,12 @@ export default function Classifications() {
     return formData;
   };
 
-  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
-    loadClassifications();
-  };
-
   const onFilterTagClose = (
     fieldName: keyof ClassificationFiltersFormInterface,
     defaultValue: any
   ) => {
     setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit();
-  };
-
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
-    loadClassifications();
-  };
-
-  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setMainValue("is_personal", checked);
-    if (checked) {
-      setMainValue("companies", []);
-    }
   };
 
   return (

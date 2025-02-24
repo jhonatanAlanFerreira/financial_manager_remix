@@ -126,39 +126,6 @@ export default function Transactions() {
     setLoading(false);
   }, [transactionData]);
 
-  const buildSearchParamsUrl = () => {
-    setSearchParams(
-      queryParamsFromObject(getFilterValues(), {
-        company: "id",
-        expense: "id",
-        income: "id",
-        account: "id",
-        merchant: "id",
-        has_classification: "id",
-      })
-    );
-  };
-
-  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
-    loadTransactions();
-  };
-
-  const getPersonalCompanyType = (transaction: Transaction) => {
-    return transaction.is_personal
-      ? "Personal Transaction"
-      : "Company Transaction";
-  };
-
-  const getIncomeExpenseType = (transaction: Transaction) => {
-    return transaction.is_income ? "Income" : "Expense";
-  };
-
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
-    loadTransactions();
-  };
-
   const loadTransactions = async () => {
     setLoading(true);
     buildSearchParamsUrl();
@@ -210,6 +177,40 @@ export default function Transactions() {
     loadTransactions();
   };
 
+  const removeTransaction = async () => {
+    await deleteTransaction(getMainValues().id, {
+      onSuccess: () => {
+        adjustPaginationBeforeReload();
+        setModals(null);
+      },
+      onError: () => setLoading(false),
+      onFinally: () => setLoading(false),
+    });
+  };
+
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(getFilterValues(), {
+        company: "id",
+        expense: "id",
+        income: "id",
+        account: "id",
+        merchant: "id",
+        has_classification: "id",
+      })
+    );
+  };
+
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadTransactions();
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadTransactions();
+  };
+
   const paginationParams = () => {
     return new URLSearchParams({
       page: getCurrentPage(),
@@ -227,15 +228,14 @@ export default function Transactions() {
     loadTransactions();
   };
 
-  const removeTransaction = async () => {
-    await deleteTransaction(getMainValues().id, {
-      onSuccess: () => {
-        adjustPaginationBeforeReload();
-        setModals(null);
-      },
-      onError: () => setLoading(false),
-      onFinally: () => setLoading(false),
-    });
+  const getPersonalCompanyType = (transaction: Transaction) => {
+    return transaction.is_personal
+      ? "Personal Transaction"
+      : "Company Transaction";
+  };
+
+  const getIncomeExpenseType = (transaction: Transaction) => {
+    return transaction.is_income ? "Income" : "Expense";
   };
 
   const onClickAdd = () => {

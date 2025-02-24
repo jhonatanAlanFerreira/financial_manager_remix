@@ -115,26 +115,6 @@ export default function Incomes() {
     setLoading(false);
   }, [companyData, incomeData]);
 
-  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = prepareFormData(event.currentTarget);
-    setIsSubmitting(true);
-
-    await createOrUpdateIncome(formData, {
-      onSuccess: () => {
-        setModals(null);
-        loadIncomes();
-        setResponseErrors({});
-      },
-      onError: (errors) => {
-        setResponseErrors(errors);
-      },
-      onFinally: () => {
-        setTimeout(() => setIsSubmitting(false), 500);
-      },
-    });
-  };
-
   const loadIncomes = async () => {
     setLoading(true);
     buildSearchParamsUrl();
@@ -165,13 +145,31 @@ export default function Incomes() {
     );
   };
 
-  const adjustPaginationBeforeReload = () => {
-    const { data } = incomes;
-    const hasMinimalData = data && data?.length < 2;
+  const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = prepareFormData(event.currentTarget);
+    setIsSubmitting(true);
 
-    if (hasMinimalData && getCurrentPage() !== 1) {
-      setCurrentPage(getCurrentPage() - 1);
-    }
+    await createOrUpdateIncome(formData, {
+      onSuccess: () => {
+        setModals(null);
+        loadIncomes();
+        setResponseErrors({});
+      },
+      onError: (errors) => {
+        setResponseErrors(errors);
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
+  };
+
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+
+    setModals(null);
+    setCurrentPage(1);
     loadIncomes();
   };
 
@@ -192,40 +190,21 @@ export default function Incomes() {
     });
   };
 
-  const getIncomeType = (income: Income) => {
-    return income.is_personal ? "Personal Income" : "Company Income";
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(getFilterValues(), {
+        has_company: "id",
+      })
+    );
   };
 
-  const onClickAdd = () => {
-    resetMain(INCOME_MAIN_FORM_DEFAULTS_VALUES);
-    setModals("add");
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadIncomes();
   };
 
-  const onModalCancel = () => {
-    resetMain(INCOME_MAIN_FORM_DEFAULTS_VALUES);
-    setResponseErrors({});
-    setModals(null);
-  };
-
-  const onClickDelete = (income: Income) => {
-    setMainValue("id", income.id);
-    setModals("remove");
-  };
-
-  const onClickUpdate = (income: IncomeWithRelationsInterface) => {
-    setFormValues(income);
-    setModals("add");
-  };
-
-  const setFormValues = (income: IncomeWithRelationsInterface) => {
-    resetMain(income);
-  };
-
-  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    setModals(null);
-    setCurrentPage(1);
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
     loadIncomes();
   };
 
@@ -236,12 +215,58 @@ export default function Incomes() {
     } as any).toString();
   };
 
-  const buildSearchParamsUrl = () => {
-    setSearchParams(
-      queryParamsFromObject(getFilterValues(), {
-        has_company: "id",
-      })
-    );
+  const adjustPaginationBeforeReload = () => {
+    const { data } = incomes;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
+    }
+    loadIncomes();
+  };
+
+  const onClickAdd = () => {
+    resetMain(INCOME_MAIN_FORM_DEFAULTS_VALUES);
+    setModals("add");
+  };
+
+  const onClickUpdate = (income: IncomeWithRelationsInterface) => {
+    setFormValues(income);
+    setModals("add");
+  };
+
+  const onClickDelete = (income: Income) => {
+    setMainValue("id", income.id);
+    setModals("remove");
+  };
+
+  const onModalCancel = () => {
+    resetMain(INCOME_MAIN_FORM_DEFAULTS_VALUES);
+    setResponseErrors({});
+    setModals(null);
+  };
+
+  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
+  };
+
+  const onFilterIsPersonalOrCompanyChange = () => {
+    const { is_personal_or_company } = getFilterValues();
+    if (is_personal_or_company == "personal") {
+      setFilterValue("has_company", null);
+    }
+  };
+
+  const getIncomeType = (income: Income) => {
+    return income.is_personal ? "Personal Income" : "Company Income";
+  };
+
+  const setFormValues = (income: IncomeWithRelationsInterface) => {
+    resetMain(income);
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
@@ -256,36 +281,12 @@ export default function Incomes() {
     return formData;
   };
 
-  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
-    loadIncomes();
-  };
   const onFilterTagClose = (
     fieldName: keyof IncomeFiltersFormInterface,
     defaultValue: any
   ) => {
     setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit();
-  };
-
-  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setMainValue("is_personal", checked);
-    if (checked) {
-      setMainValue("companies", []);
-    }
-  };
-
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
-    loadIncomes();
-  };
-
-  const onFilterIsPersonalOrCompanyChange = () => {
-    const { is_personal_or_company } = getFilterValues();
-    if (is_personal_or_company == "personal") {
-      setFilterValue("has_company", null);
-    }
   };
 
   return (

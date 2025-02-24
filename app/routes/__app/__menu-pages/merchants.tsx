@@ -104,17 +104,6 @@ export default function Merchants() {
     setLoading(false);
   }, [merchantData]);
 
-  const onClickAdd = () => {
-    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
-    setModals("add");
-  };
-
-  const onModalCancel = () => {
-    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
-    setResponseErrors({});
-    setModals(null);
-  };
-
   const loadMerchants = async () => {
     setLoading(true);
     buildSearchParamsUrl();
@@ -165,34 +154,11 @@ export default function Merchants() {
     });
   };
 
-  const paginationParams = () => {
-    return new URLSearchParams({
-      page: getCurrentPage(),
-      pageSize: 10,
-    } as any).toString();
-  };
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
 
-  const buildSearchParamsUrl = () => {
-    setSearchParams(queryParamsFromObject(getFilterValues()));
-  };
-
-  const onClickUpdate = (merchant: Merchant) => {
-    resetMain(merchant);
-    setModals("add");
-  };
-
-  const onClickDelete = (merchant: Merchant) => {
-    setMainValue("id", merchant.id);
-    setModals("remove");
-  };
-
-  const adjustPaginationBeforeReload = () => {
-    const { data } = merchants;
-    const hasMinimalData = data && data?.length < 2;
-
-    if (hasMinimalData && getCurrentPage() !== 1) {
-      setCurrentPage(getCurrentPage() - 1);
-    }
+    setModals(null);
+    setCurrentPage(1);
     loadMerchants();
   };
 
@@ -213,12 +179,8 @@ export default function Merchants() {
     });
   };
 
-  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    setModals(null);
-    setCurrentPage(1);
-    loadMerchants();
+  const buildSearchParamsUrl = () => {
+    setSearchParams(queryParamsFromObject(getFilterValues()));
   };
 
   const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
@@ -231,18 +193,56 @@ export default function Merchants() {
     loadMerchants();
   };
 
-  const onFilterTagClose = (
-    fieldName: keyof MerchantFiltersFormInterface,
-    defaultValue: any
-  ) => {
-    setFilterValue(fieldName, defaultValue);
-    onFilterFormSubmit();
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: getCurrentPage(),
+      pageSize: 10,
+    } as any).toString();
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = merchants;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
+    }
+    loadMerchants();
+  };
+
+  const onClickAdd = () => {
+    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
+    setModals("add");
+  };
+
+  const onClickUpdate = (merchant: Merchant) => {
+    resetMain(merchant);
+    setModals("add");
+  };
+
+  const onClickDelete = (merchant: Merchant) => {
+    setMainValue("id", merchant.id);
+    setModals("remove");
+  };
+
+  const onModalCancel = () => {
+    resetMain(MERCHANT_MAIN_FORM_DEFAULTS_VALUES);
+    setResponseErrors({});
+    setModals(null);
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);
     formData.set("id", getMainValues().id);
     return formData;
+  };
+
+  const onFilterTagClose = (
+    fieldName: keyof MerchantFiltersFormInterface,
+    defaultValue: any
+  ) => {
+    setFilterValue(fieldName, defaultValue);
+    onFilterFormSubmit();
   };
 
   return (

@@ -161,17 +161,11 @@ export default function Expenses() {
     });
   };
 
-  const getExpenseType = (expense: Expense) => {
-    return expense.is_personal ? "Personal Expense" : "Company Expense";
-  };
+  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
 
-  const adjustPaginationBeforeReload = () => {
-    const { data } = expenses;
-    const hasMinimalData = data && data?.length < 2;
-
-    if (hasMinimalData && getCurrentPage() !== 1) {
-      setCurrentPage(getCurrentPage() - 1);
-    }
+    setModals(null);
+    setCurrentPage(1);
     loadExpenses();
   };
 
@@ -196,8 +190,39 @@ export default function Expenses() {
     }
   };
 
-  const setFormValues = (expense: ExpenseWithRelationsInterface) => {
-    resetMain(expense);
+  const buildSearchParamsUrl = () => {
+    setSearchParams(
+      queryParamsFromObject(getFilterValues(), {
+        has_company: "id",
+      })
+    );
+  };
+
+  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
+    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
+    loadExpenses();
+  };
+
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+    loadExpenses();
+  };
+
+  const paginationParams = () => {
+    return new URLSearchParams({
+      page: getCurrentPage(),
+      pageSize: 10,
+    } as any).toString();
+  };
+
+  const adjustPaginationBeforeReload = () => {
+    const { data } = expenses;
+    const hasMinimalData = data && data?.length < 2;
+
+    if (hasMinimalData && getCurrentPage() !== 1) {
+      setCurrentPage(getCurrentPage() - 1);
+    }
+    loadExpenses();
   };
 
   const onClickAdd = () => {
@@ -221,27 +246,20 @@ export default function Expenses() {
     setModals(null);
   };
 
-  const onFilterFormSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
-
-    setModals(null);
-    setCurrentPage(1);
-    loadExpenses();
+  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked } = event.target;
+    setMainValue("is_personal", checked);
+    if (checked) {
+      setMainValue("companies", []);
+    }
   };
 
-  const buildSearchParamsUrl = () => {
-    setSearchParams(
-      queryParamsFromObject(getFilterValues(), {
-        has_company: "id",
-      })
-    );
+  const getExpenseType = (expense: Expense) => {
+    return expense.is_personal ? "Personal Expense" : "Company Expense";
   };
 
-  const paginationParams = () => {
-    return new URLSearchParams({
-      page: getCurrentPage(),
-      pageSize: 10,
-    } as any).toString();
+  const setFormValues = (expense: ExpenseWithRelationsInterface) => {
+    resetMain(expense);
   };
 
   const prepareFormData = (form: HTMLFormElement) => {
@@ -256,30 +274,12 @@ export default function Expenses() {
     return formData;
   };
 
-  const onSortChange = (sort_key: string, sort_order: "asc" | "desc") => {
-    setSortParams(queryParamsFromObject({ sort_key, sort_order }));
-    loadExpenses();
-  };
-
-  const onPageChange = (page: number) => {
-    setCurrentPage(page);
-    loadExpenses();
-  };
-
   const onFilterTagClose = (
     fieldName: keyof ExpenseFiltersFormInterface,
     defaultValue: any
   ) => {
     setFilterValue(fieldName, defaultValue);
     onFilterFormSubmit();
-  };
-
-  const onMainIsPersonalChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setMainValue("is_personal", checked);
-    if (checked) {
-      setMainValue("companies", []);
-    }
   };
 
   return (

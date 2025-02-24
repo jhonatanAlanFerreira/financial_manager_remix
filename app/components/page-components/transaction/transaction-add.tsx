@@ -73,39 +73,12 @@ export function TransactionAdd({
     control: mainControl,
   } = form;
 
-  const onTabSelect = (tabSelected: number) => {
-    setMainValue("transaction_classifications", []);
-    setMainValue("is_income", !!tabSelected);
-    setMainValue("expense", null);
-    setMainValue("income", null);
-    setMainValue("transaction_classifications", []);
-
-    loadData();
-  };
-
-  const onCompanyChange = (company: Company) => {
-    setMainValue("company", company);
-
-    setMainValue("account", null);
-    setMainValue("expense", null);
-    setMainValue("income", null);
-    setMainValue("transaction_classifications", []);
-    loadData();
-  };
-
-  const onIsPersonalChange = (value: boolean) => {
-    setMainValue("is_personal", value);
-
-    if (value) {
-      setMainValue("company", null);
+  useEffect(() => {
+    if (!hasRun.current) {
+      loadData();
+      hasRun.current = true;
     }
-
-    setMainValue("account", null);
-    setMainValue("expense", null);
-    setMainValue("income", null);
-    setMainValue("transaction_classifications", []);
-    loadData();
-  };
+  }, []);
 
   const loadData = () => {
     setAllLoadingState(true);
@@ -116,96 +89,6 @@ export function TransactionAdd({
     loadClassifications();
     loadIncomes();
     loadMerchants();
-  };
-
-  useEffect(() => {
-    if (!hasRun.current) {
-      loadData();
-      hasRun.current = true;
-    }
-  }, []);
-
-  const defaultPaginationQuery = () => {
-    let paginationParamsInterface: Record<
-      keyof PaginationParamsInterface,
-      string
-    > = {
-      page: "1",
-      pageSize: "all",
-    };
-
-    return new URLSearchParams(paginationParamsInterface).toString();
-  };
-
-  const filterAccountsParams = () => {
-    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
-      .is_personal
-      ? "personal"
-      : "company";
-
-    const accountLoaderParamsInterface: Partial<
-      Record<keyof AccountLoaderParamsInterface, string>
-    > = {
-      company: getMainValues().company?.id || "",
-      is_personal_or_company: isPersonalOrCompanyType,
-    };
-
-    return new URLSearchParams(accountLoaderParamsInterface).toString();
-  };
-
-  const filterExpensesParams = () => {
-    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
-      .is_personal
-      ? "personal"
-      : "company";
-
-    const expenseLoaderParamsInterface: Partial<
-      Record<keyof ExpenseLoaderParamsInterface, string>
-    > = {
-      has_company: getMainValues().company?.id || "",
-      is_personal_or_company: isPersonalOrCompanyType,
-    };
-
-    return new URLSearchParams(expenseLoaderParamsInterface).toString();
-  };
-
-  const filterClassificationsParams = () => {
-    const isIncomeOrExpenseType: IsIncomeOrExpenseType = getMainValues()
-      .is_income
-      ? "income"
-      : "expense";
-    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
-      .is_personal
-      ? "personal"
-      : getMainValues().company
-      ? "company"
-      : "all";
-
-    const classificationLoaderParamsInterface: Partial<
-      Record<keyof ClassificationLoaderParamsInterface, string>
-    > = {
-      has_company: getMainValues().company?.id || "",
-      is_income_or_expense: isIncomeOrExpenseType,
-      is_personal_or_company: isPersonalOrCompanyType,
-    };
-
-    return new URLSearchParams(classificationLoaderParamsInterface).toString();
-  };
-
-  const filterIncomesParams = () => {
-    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
-      .is_personal
-      ? "personal"
-      : "company";
-
-    const incomeLoaderParamsInterface: Partial<
-      Record<keyof IncomeLoaderParamsInterface, string>
-    > = {
-      has_company: getMainValues().company?.id || "",
-      is_personal_or_company: isPersonalOrCompanyType,
-    };
-
-    return new URLSearchParams(incomeLoaderParamsInterface).toString();
   };
 
   const loadAccounts = useDebouncedCallback(async () => {
@@ -316,6 +199,111 @@ export function TransactionAdd({
     }
   });
 
+  const filterAccountsParams = () => {
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const accountLoaderParamsInterface: Partial<
+      Record<keyof AccountLoaderParamsInterface, string>
+    > = {
+      company: getMainValues().company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(accountLoaderParamsInterface).toString();
+  };
+
+  const filterExpensesParams = () => {
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const expenseLoaderParamsInterface: Partial<
+      Record<keyof ExpenseLoaderParamsInterface, string>
+    > = {
+      has_company: getMainValues().company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(expenseLoaderParamsInterface).toString();
+  };
+
+  const filterClassificationsParams = () => {
+    const isIncomeOrExpenseType: IsIncomeOrExpenseType = getMainValues()
+      .is_income
+      ? "income"
+      : "expense";
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
+      .is_personal
+      ? "personal"
+      : getMainValues().company
+      ? "company"
+      : "all";
+
+    const classificationLoaderParamsInterface: Partial<
+      Record<keyof ClassificationLoaderParamsInterface, string>
+    > = {
+      has_company: getMainValues().company?.id || "",
+      is_income_or_expense: isIncomeOrExpenseType,
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(classificationLoaderParamsInterface).toString();
+  };
+
+  const filterIncomesParams = () => {
+    const isPersonalOrCompanyType: IsPersonalOrCompanyType = getMainValues()
+      .is_personal
+      ? "personal"
+      : "company";
+
+    const incomeLoaderParamsInterface: Partial<
+      Record<keyof IncomeLoaderParamsInterface, string>
+    > = {
+      has_company: getMainValues().company?.id || "",
+      is_personal_or_company: isPersonalOrCompanyType,
+    };
+
+    return new URLSearchParams(incomeLoaderParamsInterface).toString();
+  };
+
+  const onTabSelect = (tabSelected: number) => {
+    setMainValue("transaction_classifications", []);
+    setMainValue("is_income", !!tabSelected);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
+
+    loadData();
+  };
+
+  const onCompanyChange = (company: Company) => {
+    setMainValue("company", company);
+
+    setMainValue("account", null);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
+    loadData();
+  };
+
+  const onIsPersonalChange = (value: boolean) => {
+    setMainValue("is_personal", value);
+
+    if (value) {
+      setMainValue("company", null);
+    }
+
+    setMainValue("account", null);
+    setMainValue("expense", null);
+    setMainValue("income", null);
+    setMainValue("transaction_classifications", []);
+    loadData();
+  };
+
   const onExpenseChange = (expense: Expense) => {
     setMainValue("expense", expense);
     const { name, amount } = getMainValues();
@@ -336,6 +324,18 @@ export function TransactionAdd({
     if (!amount) {
       setMainValue("amount", income.amount || 0);
     }
+  };
+
+  const defaultPaginationQuery = () => {
+    let paginationParamsInterface: Record<
+      keyof PaginationParamsInterface,
+      string
+    > = {
+      page: "1",
+      pageSize: "all",
+    };
+
+    return new URLSearchParams(paginationParamsInterface).toString();
   };
 
   return (
