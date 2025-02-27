@@ -299,7 +299,7 @@ export function TransactionFilters({
 
   return (
     <Loader loading={isLoading()}>
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="flex justify-end mb-5 underline decoration-red-700 text-red-700 cursor-pointer">
           <span onClick={onFiltersClear}>Clear all filters</span>
         </div>
@@ -530,11 +530,7 @@ export function TransactionFilters({
           />
         </div>
         <div className="flex justify-end p-2 mt-7">
-          <PrimaryButton
-            onClick={onSubmit}
-            text="Done"
-            type="button"
-          ></PrimaryButton>
+          <PrimaryButton text="Done" type="submit"></PrimaryButton>
         </div>
       </form>
     </Loader>
