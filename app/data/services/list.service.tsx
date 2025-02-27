@@ -6,82 +6,64 @@ import {
   WhereInputs,
 } from "~/data/services/list-service-interfaces";
 import { PaginationParamsInterface } from "~/shared/pagination-params-interface";
+
 export function buildWhereClause(
   params?: Partial<WhereParamsInterface>
 ): Record<string, any> {
-  const whereClause: Record<string, any> = {};
+  if (!params) return {};
 
-  if (params) {
-    if (params.name) {
-      whereClause.name = { contains: params.name, mode: "insensitive" };
-    }
+  const {
+    name,
+    income,
+    account,
+    classification,
+    expense,
+    merchant,
+    company,
+    has_company,
+    has_classification,
+    is_personal_or_company,
+    is_income_or_expense,
+    amount_greater,
+    amount_less,
+    date_after,
+    date_before,
+  } = params;
 
-    if (params.income) {
-      whereClause.income_id = params.income;
-    }
+  const whereClause: Record<string, any> = {
+    ...(name && { name: { contains: name, mode: "insensitive" } }),
+    ...(income && { income_id: income }),
+    ...(account && { account_id: account }),
+    ...(classification && { transaction_classification: classification }),
+    ...(expense && { expense_id: expense }),
+    ...(merchant && { merchant_id: merchant }),
+    ...(company && { company_id: company }),
+    ...(has_company && { company_ids: { has: has_company } }),
+    ...(has_classification && {
+      transaction_classification_ids: { has: has_classification },
+    }),
+    ...(is_personal_or_company &&
+      is_personal_or_company !== "all" && {
+        is_personal: is_personal_or_company === "personal",
+      }),
+    ...(is_income_or_expense &&
+      is_income_or_expense !== "all" && {
+        is_income: is_income_or_expense === "income",
+      }),
+  };
 
-    if (params.account) {
-      whereClause.account_id = params.account;
-    }
+  if (amount_greater || amount_less) {
+    whereClause.amount = {
+      ...(amount_greater && { gte: amount_greater }),
+      ...(amount_less && { lte: amount_less }),
+    };
+  }
 
-    if (params.classification) {
-      whereClause.transaction_classification = params.classification;
-    }
-
-    if (params.expense) {
-      whereClause.expense_id = params.expense;
-    }
-
-    if (params.merchant) {
-      whereClause.merchant_id = params.merchant;
-    }
-
-    if (params.company) {
-      whereClause.company_id = params.company;
-    }
-
-    if (params.has_company) {
-      whereClause.company_ids = { has: params.has_company };
-    }
-
-    if (params.has_classification) {
-      whereClause.transaction_classification_ids = {
-        has: params.has_classification,
-      };
-    }
-
-    if (
-      params.is_personal_or_company &&
-      params.is_personal_or_company !== "all"
-    ) {
-      whereClause.is_personal =
-        params.is_personal_or_company === "personal" ? true : false;
-    }
-
-    if (params.is_income_or_expense && params.is_income_or_expense !== "all") {
-      whereClause.is_income =
-        params.is_income_or_expense === "income" ? true : false;
-    }
-
-    if (params.amount_greater || params.amount_less) {
-      whereClause.amount = {};
-      if (params.amount_greater) {
-        whereClause.amount.gte = params.amount_greater;
-      }
-      if (params.amount_less) {
-        whereClause.amount.lte = params.amount_less;
-      }
-    }
-
-    if (params.date_after || params.date_before) {
-      whereClause.date = {};
-      if (params.date_after) {
-        whereClause.date.gte = params.date_after;
-      }
-      if (params.date_before) {
-        whereClause.date.lte = params.date_before;
-      }
-    }
+  if (date_after || date_before) {
+    whereClause.date = {
+      ...(date_after && { gte: date_after }),
+      ...(date_before && { lte: date_before }),
+    };
   }
 
   return whereClause;
