@@ -99,20 +99,28 @@ function buildOrderByQuery(sortParams: {
 
   const orderBy: Record<string, any>[] = [{ id: order }];
 
-  if (column === "company") {
-    orderBy.unshift({ company: { name: order } });
-  } else if (column === "expense") {
-    orderBy.unshift({ expense: { name: order } });
-  } else if (column === "income") {
-    orderBy.unshift({ income: { name: order } });
-  } else if (column === "merchant") {
-    orderBy.unshift({ merchant: { name: order } });
-  } else if (column === "is_personal_or_company") {
-    orderBy.unshift({ is_personal: order });
-  } else if (column === "is_income_or_expense") {
-    orderBy.unshift({ is_income: order });
-  } else {
-    orderBy.unshift({ [column]: order });
+  switch (column) {
+    case "company":
+      orderBy.unshift({ company: { name: order } });
+      break;
+    case "expense":
+      orderBy.unshift({ expense: { name: order } });
+      break;
+    case "income":
+      orderBy.unshift({ income: { name: order } });
+      break;
+    case "merchant":
+      orderBy.unshift({ merchant: { name: order } });
+      break;
+    case "is_personal_or_company":
+      orderBy.unshift({ is_personal: order });
+      break;
+    case "is_income_or_expense":
+      orderBy.unshift({ is_income: order });
+      break;
+    default:
+      orderBy.unshift({ [column]: order });
+      break;
   }
 
   return orderBy;
