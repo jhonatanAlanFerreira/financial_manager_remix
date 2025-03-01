@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   mongo_financial_manager:
@@ -35,6 +35,7 @@ services:
       - host.docker.internal:host-gateway
 
   financial_manager_app:
+    container_name: inancial_manager_app
     build: .
     command: bash -c "npx prisma generate && npm run dev"
     volumes:
