@@ -8,7 +8,7 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 - [About This Project 📚](#about-this-project-📚)
 - [Development 🛠](#development-🛠)
-- [Deployment 🚀](#deployment-🚀)
+- [Docker Deployment 🚀](#docker-deployment-🚀)
 - [Prisma Commands 🗄](#prisma-commands-🗄)
 - [Testing 🧪](#testing-🧪)
 
@@ -18,7 +18,7 @@ This project is created as a learning exercise to dive into Remix with React. Th
 
 ## Development 🛠
 
-To start the app in development mode, run:
+To start the app in development mode outside of Docker, run:
 
 ```sh
 npm run dev
@@ -26,61 +26,95 @@ npm run dev
 
 This command launches the application and automatically rebuilds assets when files change.
 
-## Deployment 🚀
+## Docker Deployment 🚀
 
-### Production Build
+Follow these steps to set up and run the application using Docker Compose:
 
-1. **Build the Project:**
+1. **Clone the Repository:**
 
-    ```sh
-    npm run build
-    ```
+   ```sh
+   git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
+   cd financial_manager_remix
+   ```
 
-2. **Start the Production Server:**
+2. **Set Up Environment Variables:**
 
-    ```sh
-    npm start
-    ```
+   Copy the example environment file and modify it as needed (for example, to change port settings):
 
-Choose a hosting provider to deploy your app. For DIY deployments, the built-in Remix app server is production-ready. Make sure to deploy the outputs from the `remix build`:
+   ```sh
+   cp .env.example .env
+   ```
 
-- `build/`
-- `public/build/`
+3. **Start the Containers:**
+
+   Run the following command to start all containers in detached mode:
+
+   ```sh
+   docker-compose up -d
+   ```
+
+4. **Check the Front-End Build Logs:**
+
+   To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
+
+   ```sh
+   docker-compose logs financial_manager_app
+   ```
+
+   You should see log messages similar to:
+
+   ```
+   [info] building...
+   [info] built (34.1s)
+   [remix-serve] http://localhost:3000
+   ```
+
+   Wait until you see the "built" message along with the URL before accessing the app in your browser.
+
+> **Note:** If you're new to Docker or Docker Compose, please refer to the [Docker Documentation](https://docs.docker.com) for more details on how Docker works and how to troubleshoot common issues.
 
 ## Prisma Commands 🗄
 
-Manage your database with Prisma using the following commands:
+Since the application is running inside Docker containers, you should run these commands within the appropriate container. For example, to execute a command in the `financial_manager_app` container, use:
+
+```sh
+docker-compose exec financial_manager_app npx prisma db seed
+```
+
+Below are some common Prisma commands to manage your database:
 
 - **Seed Database:**
 
-    ```sh
-    npx prisma db seed
-    ```
+  ```sh
+  docker-compose exec financial_manager_app npx prisma db seed
+  ```
 
 - **Sync Database Schema:**
 
-    ```sh
-    npx prisma db push
-    ```
+  ```sh
+  docker-compose exec financial_manager_app npx prisma db push
+  ```
 
 - **Generate Prisma Client:**
 
-    ```sh
-    npx prisma generate
-    ```
+  ```sh
+  docker-compose exec financial_manager_app npx prisma generate
+  ```
 
 ## Testing 🧪
 
-Ensure code quality with these commands:
+Similarly, to run tests or type checking within the Docker container, execute the commands inside the container. For example:
 
 - **Type Checking:**
 
-    ```sh
-    npm run typecheck
-    ```
+  ```sh
+  docker-compose exec financial_manager_app npm run typecheck
+  ```
 
 - **Unit and Feature Testing:**
 
-    ```sh
-    npm run test
-    ```
+  ```sh
+  docker-compose exec financial_manager_app npm run test
+  ```
+
+---
