@@ -6,11 +6,11 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 ## Table of Contents
 
-- [About This Project 📚](#about-this-project-📚)
-- [Development 🛠](#development-🛠)
-- [Docker Deployment 🚀](#docker-deployment-🚀)
-- [Prisma Commands 🗄](#prisma-commands-🗄)
-- [Testing 🧪](#testing-🧪)
+- [About This Project](#about-this-project)
+- [Development](#development)
+- [Docker Deployment](#docker-deployment)
+- [Prisma Commands](#prisma-commands)
+- [Testing](#testing)
 
 ## About This Project 📚
 
