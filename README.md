@@ -1,72 +1,120 @@
-# Welcome to Remix!
+# Learning Remix with React 🚀
 
-- [Remix Docs](https://remix.run/docs)
+This project was created as a hands-on learning exercise to explore Remix with React. The goal is to understand the core concepts of Remix and apply them to build a functional web application.
 
-## Development
+[![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
 
-From your terminal:
+## Table of Contents
+
+- [About This Project 📚](#about-this-project-📚)
+- [Development 🛠](#development-🛠)
+- [Docker Deployment 🚀](#docker-deployment-🚀)
+- [Prisma Commands 🗄](#prisma-commands-🗄)
+- [Testing 🧪](#testing-🧪)
+
+## About This Project 📚
+
+This project is created as a learning exercise to dive into Remix with React. The goal is to understand Remix’s core concepts while building a functional web application, which will eventually serve as a portfolio piece.
+
+## Development 🛠
+
+To start the app in development mode outside of Docker, run:
 
 ```sh
 npm run dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+This command launches the application and automatically rebuilds assets when files change.
 
-## Deployment
+## Docker Deployment 🚀
 
-First, build your app for production:
+Follow these steps to set up and run the application using Docker Compose:
 
-```sh
-npm run build
-```
+1. **Clone the Repository:**
 
-Then run the app in production mode:
+   ```sh
+   git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
+   cd financial_manager_remix
+   ```
 
-```sh
-npm start
-```
+2. **Set Up Environment Variables:**
 
-Now you'll need to pick a host to deploy it to.
+   Copy the example environment file and modify it as needed (for example, to change port settings):
 
-### DIY
+   ```sh
+   cp .env.example .env
+   ```
 
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
+3. **Start the Containers:**
 
-Make sure to deploy the output of `remix build`
+   Run the following command to start all containers in detached mode:
 
-- `build/`
-- `public/build/`
+   ```sh
+   docker-compose up -d
+   ```
 
-## Prisma Commands
+4. **Check the Front-End Build Logs:**
 
-Run seeders:
+   To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
 
-```sh
-npx prisma db seed
-```
+   ```sh
+   docker-compose logs financial_manager_app
+   ```
 
-Sync database schema:
+   You should see log messages similar to:
 
-```sh
-npx prisma db push
-```
+   ```
+   [info] building...
+   [info] built (34.1s)
+   [remix-serve] http://localhost:3000
+   ```
 
-Generate Prisma Client:
+   Wait until you see the "built" message along with the URL before accessing the app in your browser.
 
-```sh
-npx prisma generate
-```
+> **Note:** If you're new to Docker or Docker Compose, please refer to the [Docker Documentation](https://docs.docker.com) for more details on how Docker works and how to troubleshoot common issues.
 
-## Testing
+## Prisma Commands 🗄
 
-Code Validation
-
-```sh
-npm run typecheck
-```
-
-Unit and Feature Tests
+Since the application is running inside Docker containers, you should run these commands within the appropriate container. For example, to execute a command in the `financial_manager_app` container, use:
 
 ```sh
-npm run test
+docker-compose exec financial_manager_app npx prisma db seed
 ```
+
+Below are some common Prisma commands to manage your database:
+
+- **Seed Database:**
+
+  ```sh
+  docker-compose exec financial_manager_app npx prisma db seed
+  ```
+
+- **Sync Database Schema:**
+
+  ```sh
+  docker-compose exec financial_manager_app npx prisma db push
+  ```
+
+- **Generate Prisma Client:**
+
+  ```sh
+  docker-compose exec financial_manager_app npx prisma generate
+  ```
+
+## Testing 🧪
+
+Similarly, to run tests or type checking within the Docker container, execute the commands inside the container. For example:
+
+- **Type Checking:**
+
+  ```sh
+  docker-compose exec financial_manager_app npm run typecheck
+  ```
+
+- **Unit and Feature Testing:**
+
+  ```sh
+  docker-compose exec financial_manager_app npm run test
+  ```
+
+---
