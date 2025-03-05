@@ -31,6 +31,7 @@ export function Sidebar({
             updateSidebarOpen={updateSidebarOpen}
             key={index}
             item={item}
+            className={item.className}
           />
         </div>
       ))}

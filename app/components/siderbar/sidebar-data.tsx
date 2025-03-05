@@ -28,6 +28,7 @@ export const items: SidebarItemType[] = [
   },
   {
     title: "Inco./Expe. Classifications",
+    className: "menu-classificatio-step",
     icon: "List",
     path: "/classifications",
   },

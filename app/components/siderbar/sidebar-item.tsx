@@ -6,12 +6,13 @@ import { SidebarItemPropsInterface } from "~/components/siderbar/sidebar-item-pr
 export function SidebarItem({
   item,
   updateSidebarOpen,
+  ...rest
 }: SidebarItemPropsInterface) {
   const [open, setOpen] = useState<boolean>(false);
 
   if (item.childrens) {
     return (
-      <div className={`${open ? "open" : ""} mb-1`}>
+      <div className={`${open ? "open" : ""} ${rest.className} mb-1`}>
         <div
           className="flex cursor-pointer justify-between"
           onClick={() => setOpen(!open)}
@@ -49,7 +50,7 @@ export function SidebarItem({
       <Link
         onClick={() => updateSidebarOpen(false)}
         to={item.path}
-        className="flex gap-2 rounded transition duration-500 ease-in-out hover:underline mb-1"
+        className={`flex gap-2 rounded transition duration-500 ease-in-out hover:underline mb-1 ${rest.className}`}
       >
         <span className="flex gap-2 items-center">
           {item.icon && <Icon name={item.icon} width="1.2rem"></Icon>}

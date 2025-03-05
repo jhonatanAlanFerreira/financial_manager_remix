@@ -5,4 +5,5 @@ export type SidebarItemType = {
   icon: IconNameType;
   path: string;
   childrens?: SidebarItemType[];
+  className?: string;
 };
