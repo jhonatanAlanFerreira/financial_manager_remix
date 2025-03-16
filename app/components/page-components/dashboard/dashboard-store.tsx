@@ -28,4 +28,6 @@ export const dashboardStore = create<DashboardStoreInterface>((set, get) => ({
   classifications: [],
   getClassifications: () => get().classifications,
   setClassifications: (value) => set({ classifications: value }),
+  openGuideModal: false,
+  setOpenGuideModal: (value) => set({ openGuideModal: value }),
 }));

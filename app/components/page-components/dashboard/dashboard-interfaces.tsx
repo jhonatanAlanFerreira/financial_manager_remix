@@ -68,9 +68,12 @@ export interface DashboardStoreInterface {
   year: number | null;
   setYear: (value: number) => void;
   getYear: () => number | null;
+
   classifications: StoreClassificationInterface[];
   getClassifications: () => StoreClassificationInterface[];
   setClassifications: (value: StoreClassificationInterface[]) => void;
+  openGuideModal: boolean;
+  setOpenGuideModal: (value: boolean) => void;
 }
 
 export interface StoreClassificationInterface {

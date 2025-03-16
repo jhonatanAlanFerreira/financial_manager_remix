@@ -20,6 +20,8 @@ import {
   YearIndexOptionInterface,
 } from "~/components/page-components/dashboard/dashboard-interfaces";
 import { Icon } from "~/components/icon/icon";
+import { Modal } from "react-responsive-modal";
+import { PrimaryButton } from "~/components/buttons/primary-button/primary-button";
 
 export default function Index() {
   const initialized = useRef(false);
@@ -45,6 +47,8 @@ export default function Index() {
     getYear,
     setClassifications,
     getClassifications,
+    openGuideModal,
+    setOpenGuideModal,
   } = dashboardStore();
 
   const mainForm = useFormik<DashboardFormInterface>({
@@ -274,11 +278,19 @@ export default function Index() {
           ))}
         </ul>
       </div>
-
       <div className="flex flex-col w-full p-4 bg-white relative overflow-auto min-w-[40rem]">
-        <h1 className="text-2xl font-bold text-violet-950 relative">
-          <span className="mr-2">{getSelectedCompanyName()}</span>
-        </h1>
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-bold text-violet-950 relative">
+            <span className="mr-2">{getSelectedCompanyName()}</span>
+          </h1>
+          <span
+            onClick={() => setOpenGuideModal(true)}
+            className="flex text-violet-950 cursor-pointer gap-1 items-center"
+            title="Click for a step-by-step guide on adding your first expense."
+          >
+            <Icon name="Info"></Icon> Get Started
+          </span>
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-1 h-full">
           <Loader loading={loading}>
             {!!getChartTransactionData()?.availableYears.length && (
@@ -363,6 +375,183 @@ export default function Index() {
           </Loader>
         </div>
       </div>
+      <Modal
+        classNames={{
+          modal: "p-0 m-0 w-full sm:w-1/3",
+        }}
+        center
+        showCloseIcon={false}
+        open={openGuideModal}
+        onClose={() => setOpenGuideModal(false)}
+      >
+        <h2 className="text-white text-xl bg-violet-950 text-center p-2">
+          Get Started: Record Your First Company Expense
+        </h2>
+        <div className="p-6 space-y-6 text-gray-700 overflow-auto max-h-[95vh]">
+          <p className="text-gray-800">
+            Follow these steps to create a company, add a classification, record
+            an expense, and then see it in your dashboard.
+          </p>
+          <ol className="space-y-6">
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                1
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Create or Select Your Company
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Open the{" "}
+                  <span className="inline-flex items-center space-x-1 font-semibold">
+                    <span>Menu</span>
+                    <Icon name="Menu" size={15} />
+                  </span>
+                  , then go to <span className="font-semibold">Company</span>.
+                  If you haven’t created a company yet, add one (e.g., “Acme
+                  Inc.”) and set up at least one account (like “Main Checking”).
+                  This account will be used to track your company transactions.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 1: Company list or creation page ]
+                </div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                2
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Add an Expense Classification (<em>Office Supplies</em>)
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Open the{" "}
+                  <span className="inline-flex items-center space-x-1 font-semibold">
+                    <span>Menu</span>
+                    <Icon name="Menu" size={15} />
+                  </span>{" "}
+                  and select{" "}
+                  <span className="font-semibold">
+                    Inco./Expe. Classifications
+                  </span>
+                  . Click <em>Add</em>, enter{" "}
+                  <span className="font-semibold">Office Supplies</span> as the
+                  classification name, choose{" "}
+                  <span className="font-semibold">Expense</span> as the
+                  category, then save.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 2: Classification form with "Office Supplies" ]
+                </div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                3
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Navigate to <span className="text-violet-600">Expense</span>{" "}
+                  and Add <em>Printer Paper</em>
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  From the{" "}
+                  <span className="inline-flex items-center space-x-1 font-semibold">
+                    <span>Menu</span>
+                    <Icon name="Menu" size={15} />
+                  </span>
+                  , select <span className="font-semibold">Expense</span>. Click{" "}
+                  <em>Add Expense</em>, then fill in details for “Printer
+                  Paper.” Choose{" "}
+                  <span className="font-semibold">Office Supplies</span> as the
+                  classification. Save when finished.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 3: Adding "Printer Paper" under "Office Supplies"
+                  ]
+                </div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                4
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Add a Transaction for “Printer Paper”
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Go to{" "}
+                  <span className="inline-flex items-center space-x-1 font-semibold">
+                    <span>Menu</span>
+                    <Icon name="Menu" size={15} />
+                  </span>{" "}
+                  &gt; <span className="font-semibold">Transactions</span>, then
+                  click <em>Add Transaction</em>. Enter the amount, date, and
+                  classification as{" "}
+                  <span className="font-semibold">Office Supplies</span>.
+                  Because this is a company expense, select the appropriate{" "}
+                  <span className="font-semibold">company account</span> you
+                  created. Finally, save the transaction.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 4: Transaction form selecting "Office Supplies"
+                  and the company's account ]
+                </div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                5
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  View Your Data in the{" "}
+                  <span className="text-violet-600">Dashboard</span>
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Go to the{" "}
+                  <span className="inline-flex items-center space-x-1 font-semibold">
+                    <span>Menu</span>
+                    <Icon name="Menu" size={15} />
+                  </span>{" "}
+                  and choose <span className="font-semibold">Dashboard</span>.
+                  Look for the Overall Net chart (or a similar net view) to see
+                  your newly added company expense reflected.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 5: Dashboard view showing Overall Net chart ]
+                </div>
+              </div>
+            </li>
+            <li className="flex items-start gap-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
+                6
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Filter by{" "}
+                  <span className="text-violet-600">Office Supplies</span>
+                </h3>
+                <p className="mt-1 text-gray-600">
+                  Use the filter option in the dashboard to select{" "}
+                  <span className="font-semibold">Office Supplies</span>. You'll
+                  see how much has been spent on “Printer Paper” (or any other
+                  expense under the same classification) by month.
+                </p>
+                <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
+                  [ Screenshot 6: Dashboard chart filtered to "Office Supplies"
+                  ]
+                </div>
+              </div>
+            </li>
+          </ol>
+          <div className="flex justify-end">
+            <PrimaryButton text="Ok" onClick={() => setOpenGuideModal(false)} />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
