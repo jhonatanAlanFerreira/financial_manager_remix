@@ -377,7 +377,7 @@ export default function Index() {
       </div>
       <Modal
         classNames={{
-          modal: "p-0 m-0 w-full sm:w-1/3",
+          modal: "p-0 m-0 w-full",
         }}
         center
         showCloseIcon={false}
@@ -387,11 +387,13 @@ export default function Index() {
         <h2 className="text-white text-xl bg-violet-950 text-center p-2">
           Get Started: Record Your First Company Expense
         </h2>
+
         <div className="p-6 space-y-6 text-gray-700 overflow-auto max-h-[95vh]">
           <p className="text-gray-800">
             Follow these steps to create a company, add a classification, record
             an expense, and then see it in your dashboard.
           </p>
+
           <ol className="space-y-6">
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
@@ -399,7 +401,7 @@ export default function Index() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Create or Select Your Company
+                  Create Your Company
                 </h3>
                 <p className="mt-1 text-gray-600">
                   Open the{" "}
@@ -407,16 +409,21 @@ export default function Index() {
                     <span>Menu</span>
                     <Icon name="Menu" size={15} />
                   </span>
-                  , then go to <span className="font-semibold">Company</span>.
-                  If you haven’t created a company yet, add one (e.g., “Acme
-                  Inc.”) and set up at least one account (like “Main Checking”).
-                  This account will be used to track your company transactions.
+                  , then go to{" "}
+                  <span className="font-semibold">Companies and Accounts</span>.
+                  Add one (for example, “Acme Inc.”) and set up at least one
+                  account (like “Main Checking”). This account will be used to
+                  track your company transactions.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 1: Company list or creation page ]
+                  <img
+                    src="screenshots/add_company_and_account.png"
+                    alt="Add Company and Account"
+                  />
                 </div>
               </div>
             </li>
+
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
                 2
@@ -438,21 +445,27 @@ export default function Index() {
                   . Click <em>Add</em>, enter{" "}
                   <span className="font-semibold">Office Supplies</span> as the
                   classification name, choose{" "}
-                  <span className="font-semibold">Expense</span> as the
-                  category, then save.
+                  <span className="font-semibold">Expense Classification</span>,
+                  and select the <span className="font-semibold">Company</span>,
+                  then save.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 2: Classification form with "Office Supplies" ]
+                  <img
+                    src="screenshots/add_classification.png"
+                    alt="Add Classification"
+                  />
                 </div>
               </div>
             </li>
+
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
                 3
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Navigate to <span className="text-violet-600">Expense</span>{" "}
+                  Navigate to{" "}
+                  <span className="text-violet-600">Expense Categories</span>{" "}
                   and Add <em>Printer Paper</em>
                 </h3>
                 <p className="mt-1 text-gray-600">
@@ -461,18 +474,20 @@ export default function Index() {
                     <span>Menu</span>
                     <Icon name="Menu" size={15} />
                   </span>
-                  , select <span className="font-semibold">Expense</span>. Click{" "}
-                  <em>Add Expense</em>, then fill in details for “Printer
-                  Paper.” Choose{" "}
-                  <span className="font-semibold">Office Supplies</span> as the
-                  classification. Save when finished.
+                  , select{" "}
+                  <span className="font-semibold">Expenses Categories</span>.
+                  Click
+                  <em> Add</em>, enter “Printer Paper” as the expense name,
+                  optionally set an amount to automatically populate the amount
+                  in the transaction page later (or leave it at 0), select your{" "}
+                  <span className="font-semibold">Company</span>, then save.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 3: Adding "Printer Paper" under "Office Supplies"
-                  ]
+                  <img src="screenshots/add_expense.png" alt="Add Expense" />
                 </div>
               </div>
             </li>
+
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
                 4
@@ -488,19 +503,23 @@ export default function Index() {
                     <Icon name="Menu" size={15} />
                   </span>{" "}
                   &gt; <span className="font-semibold">Transactions</span>, then
-                  click <em>Add Transaction</em>. Enter the amount, date, and
-                  classification as{" "}
-                  <span className="font-semibold">Office Supplies</span>.
-                  Because this is a company expense, select the appropriate{" "}
-                  <span className="font-semibold">company account</span> you
-                  created. Finally, save the transaction.
+                  click <em>Add</em>. Select the company, the account, and the
+                  expense. If you set an amount earlier, it will be
+                  automatically populated, but you can change it if needed.
+                  Optionally select a merchant, or leave it as is. Finally,
+                  choose the{" "}
+                  <span className="font-semibold">classification</span> and
+                  save.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 4: Transaction form selecting "Office Supplies"
-                  and the company's account ]
+                  <img
+                    src="screenshots/add_transaction.png"
+                    alt="Add Transaction"
+                  />
                 </div>
               </div>
             </li>
+
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
                 5
@@ -517,14 +536,18 @@ export default function Index() {
                     <Icon name="Menu" size={15} />
                   </span>{" "}
                   and choose <span className="font-semibold">Dashboard</span>.
-                  Look for the Overall Net chart (or a similar net view) to see
-                  your newly added company expense reflected.
+                  Select your company. Look for the Overall Net chart (or a
+                  similar net view) to see your newly added expense.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 5: Dashboard view showing Overall Net chart ]
+                  <img
+                    src="screenshots/dashboard_net.png"
+                    alt="Dashboard Net"
+                  />
                 </div>
               </div>
             </li>
+
             <li className="flex items-start gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white font-bold shrink-0">
                 6
@@ -541,12 +564,15 @@ export default function Index() {
                   expense under the same classification) by month.
                 </p>
                 <div className="mt-2 border border-dashed border-gray-300 p-4 text-center text-gray-500 text-sm italic">
-                  [ Screenshot 6: Dashboard chart filtered to "Office Supplies"
-                  ]
+                  <img
+                    src="screenshots/dashboard_classification.png"
+                    alt="Dashboard Classification"
+                  />
                 </div>
               </div>
             </li>
           </ol>
+
           <div className="flex justify-end">
             <PrimaryButton text="Ok" onClick={() => setOpenGuideModal(false)} />
           </div>
