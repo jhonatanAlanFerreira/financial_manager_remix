@@ -388,7 +388,7 @@ export default function Index() {
           Get Started: Record Your First Company Expense
         </h2>
 
-        <div className="p-6 space-y-6 text-gray-700 overflow-auto max-h-[95vh]">
+        <div className="p-6 space-y-6 text-gray-700 overflow-auto max-h-[85vh]">
           <p className="text-gray-800">
             Follow these steps to create a company, add a classification, record
             an expense, and then see it in your dashboard.
@@ -572,10 +572,9 @@ export default function Index() {
               </div>
             </li>
           </ol>
-
-          <div className="flex justify-end">
-            <PrimaryButton text="Ok" onClick={() => setOpenGuideModal(false)} />
-          </div>
+        </div>
+        <div className="flex justify-end">
+          <PrimaryButton text="Ok" onClick={() => setOpenGuideModal(false)} />
         </div>
       </Modal>
     </div>
