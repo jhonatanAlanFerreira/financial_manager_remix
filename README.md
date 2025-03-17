@@ -4,6 +4,8 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 [![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
 
+![Demo GIF showing the app in action](public/screenshots/main.gif)
+
 ## About This Project 📚
 
 This project is created as a learning exercise to dive into Remix with React. The goal is to understand Remix’s core concepts while building a functional web application, which will eventually serve as a portfolio piece.
