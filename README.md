@@ -6,6 +6,8 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 ![Demo GIF showing the app in action](public/screenshots/main.gif)
 
+![Demo GIF showing the app in action](public/screenshots/login_and_docs.gif)
+
 ## About This Project 📚
 
 This project is created as a learning exercise to dive into Remix with React. The goal is to understand Remix’s core concepts while building a functional web application, which will eventually serve as a portfolio piece.
