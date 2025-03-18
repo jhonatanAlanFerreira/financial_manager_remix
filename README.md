@@ -12,6 +12,27 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 This project is created as a learning exercise to dive into Remix with React. The goal is to understand Remix’s core concepts while building a functional web application, which will eventually serve as a portfolio piece.
 
+## Tech Stack
+
+### Core
+
+- **Remix** – Full-stack React framework
+- **React** – Frontend library
+- **TypeScript** – Typed JavaScript
+- **MongoDB** – NoSQL database
+- **Docker** – Containerized environment
+- **Tailwind CSS** – Utility-first CSS framework
+- **Swagger** – API documentation
+- **GraphQL** – Query language for APIs
+- **Prisma** – A modern ORM providing type-safe database access and streamlined migrations
+
+### Additional Libraries
+
+- **Zustand** – State management
+- **DataLoader** – Batch and cache DB requests
+- **react-feather** – Icon set
+- **react-responsive-modal** – Modal component
+
 ## Development 🛠
 
 To start the app in development mode outside of Docker, run:
