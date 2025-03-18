@@ -1,4 +1,4 @@
-# Learning Remix with React 🚀
+# Learning Remix with React 📚
 
 This project was created as a hands-on learning exercise to explore Remix with React. The goal is to understand the core concepts of Remix and apply them to build a functional web application.
 
@@ -8,7 +8,7 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 ![Demo GIF showing the app in action](public/screenshots/login_and_docs.gif)
 
-## Tech Stack
+## Tech Stack 💻
 
 ### Core
 
