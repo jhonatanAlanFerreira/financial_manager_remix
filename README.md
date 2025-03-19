@@ -78,7 +78,7 @@ Follow these steps to set up and run the application using Docker Compose:
 
 Once the Docker containers are running (assuming default port `3000`):
 
-- **Swagger UI**: Visit [http://localhost:3000/docs](http://localhost:3000/docs) for auto-generated API documentation.
+- **Swagger UI**: Visit [http://localhost:3000/docs](http://localhost:3000/docs) for API documentation.
 - **GraphQL Playground**: Access [http://localhost:3000/graphql-playground](http://localhost:3000/graphql-playground) to explore and test your GraphQL queries.
 
 ## Prisma Commands 🗄
