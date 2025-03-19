@@ -31,11 +31,9 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 ## Development 🛠
 
-To start the app in development mode outside of Docker, run:
+To start the app in development mode (outside of Docker), run:
 
-```sh
-npm run dev
-```
+    npm run dev
 
 This command launches the application and automatically rebuilds assets when files change.
 
@@ -43,91 +41,74 @@ This command launches the application and automatically rebuilds assets when fil
 
 Follow these steps to set up and run the application using Docker Compose:
 
-1. **Clone the Repository:**
+1.  **Clone the Repository:**
 
-   ```sh
-   git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
-   cd financial_manager_remix
-   ```
+    git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
+    cd financial_manager_remix
 
-2. **Set Up Environment Variables:**
+2.  **Set Up Environment Variables:**
 
-   Copy the example environment file and modify it as needed (for example, to change port settings):
+    Copy the example environment file and modify it as needed (for example, to change port settings):
 
-   ```sh
-   cp .env.example .env
-   ```
+        cp .env.example .env
 
-3. **Start the Containers:**
+3.  **Start the Containers:**
 
-   Run the following command to start all containers in detached mode:
+    Run the following command to start all containers in detached mode:
 
-   ```sh
-   docker-compose up -d
-   ```
+        docker-compose up -d
 
-4. **Check the Front-End Build Logs:**
+4.  **Check the Front-End Build Logs:**
 
-   To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
+    To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
 
-   ```sh
-   docker-compose logs financial_manager_app
-   ```
+        docker-compose logs financial_manager_app
 
-   You should see log messages similar to:
+    You should see log messages similar to:
 
-   ```
-   [info] building...
-   [info] built (34.1s)
-   [remix-serve] http://localhost:3000
-   ```
+        [info] building...
+        [info] built (34.1s)
+        [remix-serve] http://localhost:3000
 
-   Wait until you see the "built" message along with the URL before accessing the app in your browser.
+    Wait until you see the “built” message along with the URL before accessing the app in your browser.
 
 > **Note:** If you're new to Docker or Docker Compose, please refer to the [Docker Documentation](https://docs.docker.com) for more details on how Docker works and how to troubleshoot common issues.
 
+## Additional Endpoints
+
+Once the Docker containers are running (assuming default port `3000`):
+
+- **Swagger UI**: Visit [http://localhost:3000/docs](http://localhost:3000/docs) for auto-generated API documentation.
+- **GraphQL Playground**: Access [http://localhost:3000/graphql-playground](http://localhost:3000/graphql-playground) to explore and test your GraphQL queries.
+
 ## Prisma Commands 🗄
 
-Since the application is running inside Docker containers, you should run these commands within the appropriate container. For example, to execute a command in the `financial_manager_app` container, use:
-
-```sh
-docker-compose exec financial_manager_app npx prisma db seed
-```
-
-Below are some common Prisma commands to manage your database:
+Since the application is running inside Docker containers, run these commands within the `financial_manager_app` container:
 
 - **Seed Database:**
 
-  ```sh
-  docker-compose exec financial_manager_app npx prisma db seed
-  ```
+      docker-compose exec financial_manager_app npx prisma db seed
 
 - **Sync Database Schema:**
 
-  ```sh
-  docker-compose exec financial_manager_app npx prisma db push
-  ```
+      docker-compose exec financial_manager_app npx prisma db push
 
 - **Generate Prisma Client:**
 
-  ```sh
-  docker-compose exec financial_manager_app npx prisma generate
-  ```
+      docker-compose exec financial_manager_app npx prisma generate
 
 ## Testing 🧪
 
-Similarly, to run tests or type checking within the Docker container, execute the commands inside the container. For example:
+To run tests or type checking within the Docker container:
 
 - **Type Checking:**
 
-  ```sh
-  docker-compose exec financial_manager_app npm run typecheck
-  ```
+      docker-compose exec financial_manager_app npm run typecheck
 
 - **Unit and Feature Testing:**
 
-  ```sh
-  docker-compose exec financial_manager_app npm run test
-  ```
+      docker-compose exec financial_manager_app npm run test
 
 ---
+
+For more in-depth notes on architecture decisions, state management, and other considerations, see our [Learnings](./LEARNINGS.md).
