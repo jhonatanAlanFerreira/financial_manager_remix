@@ -90,13 +90,32 @@ I originally came from an Angular background, where much of the state management
 ### 5.2 Future Improvements
 
 - **Auto-Documentation**  
-  I’m exploring tools and frameworks that can help automate Swagger generation. Ideally, I’d like to generate the OpenAPI spec based on annotations or definitions in the code, removing the need for manual YAML/JSON documentation. 
+  I’m exploring tools and frameworks that can help automate Swagger generation. Ideally, I’d like to generate the OpenAPI spec based on annotations or definitions in the code, removing the need for manual YAML/JSON documentation.
 - **Next Steps**  
   I plan to prototype an auto-documentation setup to see if it’s flexible enough to cover all custom endpoints and reduce manual effort.
 
 ---
 
-## 6. Final Thoughts / Next Steps
+## 6. Routing & Database Decisions
+
+### 6.1 Routing Convention
+
+- **Use of @remix-run/v1-route-convention**  
+  I installed the `@remix-run/v1-route-convention` package because it allows for a more structured file-based routing system. Unlike previous approaches that scattered routes as individual files in one folder, the v1 convention supports using folders to group related routes. This means I can better organize my route files and keep page components in a separate folder.
+- **Benefits**
+  - Cleaner project structure by grouping routes into folders.
+  - Easier maintenance and scalability as the number of routes grows.
+
+### 6.2 Choice of MongoDB
+
+- **Why MongoDB?**  
+  Although a SQL database might be more appropriate for a real-world project given its structured data and relational capabilities, I chose MongoDB for this project.
+- **Rationale**  
+  MongoDB was easier to deploy online using free tools like Atlas. Its flexible schema also allowed for rapid prototyping and iterative development during this learning phase.
+
+---
+
+## 7. Final Thoughts / Next Steps
 
 - **Continue Learning**  
   Although I’ve made significant progress with React, Remix, Zustand, React Hook Form, and GraphQL, there’s still more to learn—especially around advanced optimizations and documentation best practices.
