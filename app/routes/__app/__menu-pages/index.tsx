@@ -93,7 +93,7 @@ export default function Index() {
   };
 
   useEffect(() => {
-    if (!initialized.current) {
+    if (!initialized.current && process.env.NODE_ENV !== "production") {
       initialized.current = true;
       return;
     }
