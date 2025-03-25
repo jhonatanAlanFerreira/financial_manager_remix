@@ -1,5 +1,7 @@
 # Learning Remix with React 📚
 
+[**Live Online Demo**](https://financial-manager.click/)
+
 This project was created as a hands-on learning exercise to explore Remix with React. The goal is to understand the core concepts of Remix and apply them to build a functional web application.
 
 [![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
@@ -33,7 +35,9 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 To start the app in development mode (outside of Docker), run:
 
-    npm run dev
+```bash
+npm run dev
+```
 
 This command launches the application and automatically rebuilds assets when files change.
 
@@ -41,36 +45,46 @@ This command launches the application and automatically rebuilds assets when fil
 
 Follow these steps to set up and run the application using Docker Compose:
 
-1.  **Clone the Repository:**
+1. **Clone the Repository:**
 
-    git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
-    cd financial_manager_remix
+   ```bash
+   git clone git@github.com:jhonatanAlanFerreira/financial_manager_remix.git
+   cd financial_manager_remix
+   ```
 
-2.  **Set Up Environment Variables:**
+2. **Set Up Environment Variables:**
 
-    Copy the example environment file and modify it as needed (for example, to change port settings):
+   Copy the example environment file and modify it as needed (for example, to change port settings):
 
-        cp .env.example .env
+   ```bash
+   cp .env.example .env
+   ```
 
-3.  **Start the Containers:**
+3. **Start the Containers:**
 
-    Run the following command to start all containers in detached mode:
+   Run the following command to start all containers in detached mode:
 
-        docker-compose up -d
+   ```bash
+   docker-compose up -d
+   ```
 
-4.  **Check the Front-End Build Logs:**
+4. **Check the Front-End Build Logs:**
 
-    To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
+   To confirm that the front-end has built successfully, check the logs for the `financial_manager_app` container:
 
-        docker-compose logs financial_manager_app
+   ```bash
+   docker-compose logs financial_manager_app
+   ```
 
-    You should see log messages similar to:
+   You should see log messages similar to:
 
-        [info] building...
-        [info] built (34.1s)
-        [remix-serve] http://localhost:3000
+   ```
+   [info] building...
+   [info] built (34.1s)
+   [remix-serve] http://localhost:3000
+   ```
 
-    Wait until you see the “built” message along with the URL before accessing the app in your browser.
+   Wait until you see the “built” message along with the URL before accessing the app in your browser.
 
 > **Note:** If you're new to Docker or Docker Compose, please refer to the [Docker Documentation](https://docs.docker.com) for more details on how Docker works and how to troubleshoot common issues.
 
@@ -87,15 +101,21 @@ Since the application is running inside Docker containers, run these commands wi
 
 - **Seed Database:**
 
-      docker-compose exec financial_manager_app npx prisma db seed
+  ```bash
+  docker-compose exec financial_manager_app npx prisma db seed
+  ```
 
 - **Sync Database Schema:**
 
-      docker-compose exec financial_manager_app npx prisma db push
+  ```bash
+  docker-compose exec financial_manager_app npx prisma db push
+  ```
 
 - **Generate Prisma Client:**
 
-      docker-compose exec financial_manager_app npx prisma generate
+  ```bash
+  docker-compose exec financial_manager_app npx prisma generate
+  ```
 
 ## Testing 🧪
 
@@ -103,11 +123,15 @@ To run tests or type checking within the Docker container:
 
 - **Type Checking:**
 
-      docker-compose exec financial_manager_app npm run typecheck
+  ```bash
+  docker-compose exec financial_manager_app npm run typecheck
+  ```
 
 - **Unit and Feature Testing:**
 
-      docker-compose exec financial_manager_app npm run test
+  ```bash
+  docker-compose exec financial_manager_app npm run test
+  ```
 
 ---
 
