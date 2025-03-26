@@ -5,7 +5,8 @@ import { Icon } from "~/components/icon/icon";
 import { InputPassword } from "~/components/inputs/input-password/input-password";
 import { InputText } from "~/components/inputs/input-text/input-text";
 import { NavigationLoader } from "~/components/navigation-loader/navigation-loader";
-import { login } from "~/data/frontend-services/auth-service";
+import { login, signupAsGuest } from "~/data/frontend-services/auth-service";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -19,6 +20,22 @@ export default function Login() {
     await login(formData, {
       onSuccess: () => {
         navigate("/");
+      },
+      onFinally: () => {
+        setTimeout(() => setIsSubmitting(false), 500);
+      },
+    });
+  };
+
+  const createGuest = async () => {
+    setIsSubmitting(true);
+
+    await signupAsGuest({
+      onSuccess: () => {
+        navigate("/");
+      },
+      onError: (errors) => {
+        toast.error(errors);
       },
       onFinally: () => {
         setTimeout(() => setIsSubmitting(false), 500);
@@ -62,6 +79,12 @@ export default function Login() {
                   isSubmitting ? "bg-violet-950/50" : ""
                 }`}
                 disabled={isSubmitting}
+              ></PrimaryButton>
+
+              <PrimaryButton
+                onClick={() => createGuest()}
+                text="Enter as Guest"
+                className="!bg-orange-500 hover:bg-orange-600 float-right"
               ></PrimaryButton>
             </div>
           </div>

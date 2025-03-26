@@ -93,31 +93,13 @@ export async function signup(
     };
   }
 
-  const passwordHash = await hash(data.password, 12);
+  return createUserAndAccount(data);
+}
 
-  const user = await prisma.user.create({
-    data: {
-      name: data.name,
-      login: data.login,
-      password: passwordHash,
-    },
-  });
-
-  await prisma.account.create({
-    data: {
-      name: "Personal Account",
-      user_id: user.id,
-      balance: 0,
-      is_personal: true,
-    },
-  });
-
-  const userWithoutPass = exclude(user, ["password"]);
-
-  return {
-    data: userWithoutPass,
-    message: "Your user and default account were created successfully",
-  };
+export async function signupAsGuest(
+  data: SignupRequestInterface
+): Promise<ServerResponseInterface> {
+  return createUserAndAccount(data);
 }
 
 export async function destroyUserSession(request: Request) {
@@ -190,5 +172,35 @@ export async function login(
   return {
     data: userWithoutPass,
     message: "OK",
+  };
+}
+
+async function createUserAndAccount(
+  data: SignupRequestInterface
+): Promise<ServerResponseInterface> {
+  const passwordHash = await hash(data.password, 12);
+
+  const user = await prisma.user.create({
+    data: {
+      name: data.name,
+      login: data.login,
+      password: passwordHash,
+    },
+  });
+
+  await prisma.account.create({
+    data: {
+      name: "Personal Account",
+      user_id: user.id,
+      balance: 0,
+      is_personal: true,
+    },
+  });
+
+  const userWithoutPass = exclude(user, ["password"]);
+
+  return {
+    data: userWithoutPass,
+    message: "Your user and default account were created successfully",
   };
 }
