@@ -6,9 +6,9 @@ This project was created as a hands-on learning exercise to explore Remix with R
 
 [![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
 
-![Demo GIF showing the app in action](public/screenshots/main.gif)
-
 ![Demo GIF showing the app in action](public/screenshots/login_and_docs.gif)
+
+![Demo GIF showing the app in action](public/screenshots/main.gif)
 
 ## Tech Stack 💻
 
