@@ -1,7 +1,5 @@
 # Learning Remix with React 📚
 
-[**Live Online Demo**](https://financial-manager.click/)
-
 This project was created as a hands-on learning exercise to explore Remix with React. The goal is to understand the core concepts of Remix and apply them to build a functional web application.
 
 [![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
