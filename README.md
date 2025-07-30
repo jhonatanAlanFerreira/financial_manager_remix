@@ -133,4 +133,4 @@ To run tests or type checking within the Docker container:
 
 ---
 
-For more in-depth notes on architecture decisions, state management, and other considerations, see our [Learnings](./LEARNINGS.md).
+For more in-depth notes on architecture decisions, state management, and other considerations, see the [Project Notes](./LEARNINGS.md).
