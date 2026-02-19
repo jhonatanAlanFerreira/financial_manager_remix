@@ -1,12 +1,16 @@
 import { Prisma, Transaction, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
-import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
+import {
+  TransactionCSVExportLoaderParamsInterface,
+  TransactionLoaderParamsInterface,
+} from "~/data/transaction/transaction-query-params-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
 } from "~/data/transaction/transaction-request-interfaces";
 import {
+  transactionCSVExportValidator,
   transactionCreateValidator,
   transactionDeleteValidator,
   transactionListValidator,
@@ -249,4 +253,32 @@ async function calculateTotals(
     totalExpenseValue,
     totalIncomeValue,
   };
+}
+
+export async function exportCSV(
+  user: User,
+  params: TransactionCSVExportLoaderParamsInterface
+): Promise<ServerResponseInterface<Transaction[]>> {
+  const serverError = await transactionCSVExportValidator(params);
+
+  if (serverError) {
+    return {
+      serverError,
+      message: "There are some invalid params",
+    };
+  }
+
+  const transactions = await paginate<
+    Transaction,
+    Prisma.TransactionFindManyArgs,
+    Prisma.TransactionCountArgs
+  >(
+    prisma.transaction.findMany,
+    prisma.transaction.count,
+    { page: 1, pageSize: "all" },
+    params,
+    { user_id: user.id }
+  );
+
+  return transactions;
 }

@@ -12,7 +12,10 @@ import {
   validateMultipleIdsFormat,
   validateNumber,
 } from "~/data/services/validators";
-import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
+import {
+  TransactionCSVExportLoaderParamsInterface,
+  TransactionLoaderParamsInterface,
+} from "~/data/transaction/transaction-query-params-interfaces";
 
 export async function transactionCreateValidator(
   data: TransactionCreateRequestInterface,
@@ -524,6 +527,57 @@ export async function transactionListValidator(
       errorCode: 400,
       errors: {
         sort_key: `${params.sort_key} is not a valid key`,
+      },
+    };
+  }
+
+  return null;
+}
+
+export async function transactionCSVExportValidator(
+  params: TransactionCSVExportLoaderParamsInterface
+): Promise<ServerResponseErrorInterface | null> {
+  if (!validateIdFormat(params.account)) {
+    return {
+      errorCode: 400,
+      errors: {
+        account: "Invalid Account ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.company)) {
+    return {
+      errorCode: 400,
+      errors: {
+        company: "Invalid company ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.expense)) {
+    return {
+      errorCode: 400,
+      errors: {
+        expense: "Invalid expense ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.merchant)) {
+    return {
+      errorCode: 400,
+      errors: {
+        merchant: "Invalid merchant ID format",
+      },
+    };
+  }
+
+  if (!validateIdFormat(params.has_classification)) {
+    return {
+      errorCode: 400,
+      errors: {
+        classification: "Invalid classification ID format",
       },
     };
   }
