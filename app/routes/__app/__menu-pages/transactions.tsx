@@ -30,6 +30,7 @@ import {
   createOrUpdateTransaction,
   deleteTransaction,
   fetchTransactions,
+  fetchTransactionsCSV,
 } from "~/data/frontend-services/transactions-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
@@ -146,6 +147,19 @@ export default function Transactions() {
         onFinally: () => setLoading(false),
       }
     );
+  };
+
+  const exportCSVTransactions = async () => {
+    setLoading(true);
+    buildSearchParamsUrl();
+
+    await fetchTransactionsCSV(`${getSearchParams()}`, {
+      onSuccess: (data) => {
+        console.log(data);
+      },
+      onError: () => setLoading(false),
+      onFinally: () => setLoading(false),
+    });
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -401,6 +415,21 @@ export default function Transactions() {
             ))}
           </tbody>
         </table>
+        {transactions.data?.transactions.length && (
+          <div className="w-full flex justify-end mt-2">
+            <button
+              onClick={exportCSVTransactions}
+              className="bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2"
+            >
+              CSV
+              <Icon
+                name="Download"
+                size={17}
+                className="cursor-pointer transition-transform transform hover:scale-110"
+              />
+            </button>
+          </div>
+        )}
       </div>
 
       <div
