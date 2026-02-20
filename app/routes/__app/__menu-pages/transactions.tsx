@@ -415,23 +415,22 @@ export default function Transactions() {
             ))}
           </tbody>
         </table>
-        {transactions.data?.transactions.length && (
-          <div className="w-full flex justify-end mt-2">
-            <button
-              onClick={exportCSVTransactions}
-              className="bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2"
-            >
-              CSV
-              <Icon
-                name="Download"
-                size={17}
-                className="cursor-pointer transition-transform transform hover:scale-110"
-              />
-            </button>
-          </div>
-        )}
       </div>
-
+      {!!transactions.data?.transactions.length && (
+        <div className="w-full flex justify-end mt-2 mb-1 pr-10">
+          <button
+            onClick={exportCSVTransactions}
+            className="bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2"
+          >
+            CSV
+            <Icon
+              name="Download"
+              size={17}
+              className="cursor-pointer transition-transform transform hover:scale-110"
+            />
+          </button>
+        </div>
+      )}
       <div
         title="Total incomes and expenses using the current filters"
         className="w-100 text-right px-10 pt-2 text-violet-900 text-lg whitespace-nowrap flex flex-col md:flex-row justify-end"
