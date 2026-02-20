@@ -155,7 +155,7 @@ export default function Transactions() {
 
     await fetchTransactionsCSV(`${getSearchParams()}`, {
       onSuccess: (data) => {
-        console.log(data);
+        console.log(data.data);
       },
       onError: () => setLoading(false),
       onFinally: () => setLoading(false),

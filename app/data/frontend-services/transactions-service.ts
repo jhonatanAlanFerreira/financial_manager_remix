@@ -2,7 +2,6 @@ import axios, { AxiosResponse, isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import { TransactionsWithTotalsInterface } from "~/data/transaction/transaction-types";
-import { Transaction } from "@prisma/client";
 
 export const createOrUpdateTransaction = async (
   formData: FormData,
@@ -10,7 +9,7 @@ export const createOrUpdateTransaction = async (
     onSuccess: () => void;
     onError: (errors: Record<string, unknown>) => void;
     onFinally: () => void;
-  },
+  }
 ): Promise<void> => {
   const { onSuccess, onError, onFinally } = callbacks;
 
@@ -46,7 +45,7 @@ export const createOrUpdateTransaction = async (
           }
           return "Sorry, unexpected error. Be back soon";
         },
-      },
+      }
     )
     .finally(onFinally);
 };
@@ -56,11 +55,11 @@ export const fetchTransactions = async (
   callbacks: {
     onSuccess: (
       data: ServerResponseInterface<TransactionsWithTotalsInterface>,
-      totalPages: number,
+      totalPages: number
     ) => void;
     onError: () => void;
     onFinally: () => void;
-  },
+  }
 ): Promise<void> => {
   const { onSuccess, onError, onFinally } = callbacks;
 
@@ -74,7 +73,7 @@ export const fetchTransactions = async (
   } catch (error) {
     if (isAxiosError(error)) {
       toast.error(
-        error.response?.data.message || "Sorry, unexpected error. Be back soon",
+        error.response?.data.message || "Sorry, unexpected error. Be back soon"
       );
     } else {
       toast.error("Sorry, unexpected error. Be back soon");
@@ -88,16 +87,16 @@ export const fetchTransactions = async (
 export const fetchTransactionsCSV = async (
   params: string,
   callbacks: {
-    onSuccess: (data: ServerResponseInterface<Transaction[]>) => void;
+    onSuccess: (data: ServerResponseInterface<string>) => void;
     onError: () => void;
     onFinally: () => void;
-  },
+  }
 ): Promise<void> => {
   const { onSuccess, onError, onFinally } = callbacks;
 
   try {
-    const res = await axios.get<ServerResponseInterface<Transaction[]>>(
-      `/api/transaction/export?${params}`,
+    const res = await axios.get<ServerResponseInterface<string>>(
+      `/api/transaction/export?${params}`
     );
     const { data } = res;
 
@@ -105,7 +104,7 @@ export const fetchTransactionsCSV = async (
   } catch (error) {
     if (isAxiosError(error)) {
       toast.error(
-        error.response?.data.message || "Sorry, unexpected error. Be back soon",
+        error.response?.data.message || "Sorry, unexpected error. Be back soon"
       );
     } else {
       toast.error("Sorry, unexpected error. Be back soon");
@@ -122,7 +121,7 @@ export const deleteTransaction = async (
     onSuccess: () => void;
     onError: () => void;
     onFinally: () => void;
-  },
+  }
 ): Promise<void> => {
   const { onSuccess, onError, onFinally } = callbacks;
 
@@ -130,7 +129,7 @@ export const deleteTransaction = async (
     .promise(axios.delete(`/api/transaction?transactionId=${transactionId}`), {
       loading: "Deleting transaction",
       success: (res: AxiosResponse<ServerResponseInterface>) => {
-        onSuccess(); 
+        onSuccess();
         return res.data.message as string;
       },
       error: (error) => {

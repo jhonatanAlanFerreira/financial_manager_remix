@@ -258,7 +258,7 @@ async function calculateTotals(
 export async function exportCSV(
   user: User,
   params: TransactionCSVExportLoaderParamsInterface
-): Promise<ServerResponseInterface<Transaction[]>> {
+): Promise<ServerResponseInterface<string>> {
   const serverError = await transactionCSVExportValidator(params);
 
   if (serverError) {
@@ -268,7 +268,7 @@ export async function exportCSV(
     };
   }
 
-  const transactions = await paginate<
+  const result = await paginate<
     Transaction,
     Prisma.TransactionFindManyArgs,
     Prisma.TransactionCountArgs
@@ -277,8 +277,55 @@ export async function exportCSV(
     prisma.transaction.count,
     { page: 1, pageSize: "all" },
     params,
-    { user_id: user.id }
+    { user_id: user.id },
+    ["company", "account", "expense", "income", "merchant"],
+    { column: "date", order: "asc" }
   );
 
-  return transactions;
+  const transactions = result.data as TransactionWithRelationsInterface[];
+
+  const isCompany = params.is_personal_or_company === "company";
+
+  const header = [
+    "Date",
+    "Type",
+    "Expense",
+    "Income",
+    ...(isCompany ? ["Company"] : []),
+    "Merchant",
+    "Bank Account",
+    "Description",
+    "Value",
+  ];
+
+  const rows = transactions.map((t) => {
+    const baseRow = [
+      t.date,
+      t.is_income ? "Income" : "Expense",
+      t.expense?.name ?? "",
+      t.income?.name ?? "",
+    ];
+
+    const companyColumn = isCompany ? [t.company?.name ?? ""] : [];
+
+    const finalRow = [
+      ...baseRow,
+      ...companyColumn,
+      t.merchant?.name ?? "",
+      t.account?.name ?? "",
+      t.description ?? t.name ?? "",
+      Math.abs(t.amount).toFixed(2),
+    ];
+
+    return finalRow
+      .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+      .join(",");
+  });
+
+  const csv = [header.join(","), ...rows].join("\n");
+
+  return {
+    data: csv,
+    message: "CSV generated successfully",
+  };
 }
