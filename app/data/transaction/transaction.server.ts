@@ -320,9 +320,7 @@ export async function exportCSV(
       Math.abs(t.amount).toFixed(2),
     ];
 
-    return finalRow
-      .map((value) => `"${String(value).replace(/"/g, '""')}"`)
-      .join(",");
+    return finalRow.map((value) => `"${sanitizeCSVValue(value)}"`).join(",");
   });
 
   const csv = [header.join(","), ...rows].join("\n");
@@ -331,14 +329,13 @@ export async function exportCSV(
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename="${getFileName(
-        isCompany,
-        transactions[0].company.name
+        transactions[0].company?.name
       )}"`,
     },
   });
 }
 
-function getFileName(isCompany: boolean, companyName: string) {
+function getFileName(companyName: string) {
   const today = new Date().toISOString().slice(0, 10);
 
   function slugify(value: string) {
@@ -353,9 +350,15 @@ function getFileName(isCompany: boolean, companyName: string) {
 
   let contextName = "personal";
 
-  if (isCompany) {
+  if (companyName) {
     contextName = slugify(companyName);
   }
 
   return `transactions_${today}_${contextName}.csv`;
+}
+
+function sanitizeCSVValue(value: unknown) {
+  return String(value ?? "")
+    .replace(/\r?\n|\r/g, " ")
+    .replace(/"/g, '""');
 }

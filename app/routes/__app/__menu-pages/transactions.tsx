@@ -302,6 +302,14 @@ export default function Transactions() {
     onFilterFormSubmit();
   };
 
+  const csvDisabled = () => {
+    const filterValues = getFilterValues();
+    const isPersonal = filterValues.is_personal_or_company == "personal";
+    const hasCompany = !!filterValues.company;
+
+    return !isPersonal && !hasCompany;
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -429,13 +437,21 @@ export default function Transactions() {
         <div className="w-full flex justify-end mt-2 mb-1 pr-10">
           <button
             onClick={exportCSVTransactions}
-            className="bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2"
+            disabled={csvDisabled()}
+            title={
+              csvDisabled()
+                ? "You must filter by a company or by personal transactions before exporting."
+                : ""
+            }
+            className={`bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2 ${
+              csvDisabled() ? "cursor-not-allowed opacity-50" : ""
+            }`}
           >
             CSV
             <Icon
               name="Download"
               size={17}
-              className="cursor-pointer transition-transform transform hover:scale-110"
+              className="transition-transform transform hover:scale-110"
             />
           </button>
         </div>
