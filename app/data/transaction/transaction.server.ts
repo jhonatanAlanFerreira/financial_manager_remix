@@ -1,12 +1,16 @@
 import { Prisma, Transaction, User } from "@prisma/client";
 import { prisma } from "~/data/database/database.server";
-import { TransactionLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
+import {
+  TransactionCSVExportLoaderParamsInterface,
+  TransactionLoaderParamsInterface,
+} from "~/data/transaction/transaction-query-params-interfaces";
 import { ServerResponseInterface } from "~/shared/server-response-interface";
 import {
   TransactionCreateRequestInterface,
   TransactionUpdateRequestInterface,
 } from "~/data/transaction/transaction-request-interfaces";
 import {
+  transactionCSVExportValidator,
   transactionCreateValidator,
   transactionDeleteValidator,
   transactionListValidator,
@@ -18,6 +22,7 @@ import {
   TransactionWithRelationsInterface,
 } from "~/data/transaction/transaction-types";
 import { buildWhereClause } from "~/data/services/list.service";
+import { json } from "@remix-run/node";
 
 export async function list(
   user: User,
@@ -249,4 +254,111 @@ async function calculateTotals(
     totalExpenseValue,
     totalIncomeValue,
   };
+}
+
+export async function exportCSV(
+  user: User,
+  params: TransactionCSVExportLoaderParamsInterface
+): Promise<Response> {
+  const serverError = await transactionCSVExportValidator(params);
+
+  if (serverError) {
+    return json(
+      {
+        message: "There are some invalid params",
+        error: serverError,
+      },
+      { status: 400 }
+    );
+  }
+  const result = await paginate<
+    Transaction,
+    Prisma.TransactionFindManyArgs,
+    Prisma.TransactionCountArgs
+  >(
+    prisma.transaction.findMany,
+    prisma.transaction.count,
+    { page: 1, pageSize: "all" },
+    params,
+    { user_id: user.id },
+    ["company", "account", "expense", "income", "merchant"],
+    { column: "date", order: "asc" }
+  );
+
+  const transactions = result.data as TransactionWithRelationsInterface[];
+
+  const isCompany = params.is_personal_or_company === "company";
+
+  const header = [
+    "Date",
+    "Type",
+    "Expense",
+    "Income",
+    ...(isCompany ? ["Company"] : []),
+    "Merchant",
+    "Bank Account",
+    "Description",
+    "Value",
+  ];
+
+  const rows = transactions.map((t) => {
+    const baseRow = [
+      t.date,
+      t.is_income ? "Income" : "Expense",
+      t.expense?.name ?? "",
+      t.income?.name ?? "",
+    ];
+
+    const companyColumn = isCompany ? [t.company?.name ?? ""] : [];
+
+    const finalRow = [
+      ...baseRow,
+      ...companyColumn,
+      t.merchant?.name ?? "",
+      t.account?.name ?? "",
+      t.description ?? t.name ?? "",
+      Math.abs(t.amount).toFixed(2),
+    ];
+
+    return finalRow.map((value) => `"${sanitizeCSVValue(value)}"`).join(",");
+  });
+
+  const csv = [header.join(","), ...rows].join("\n");
+
+  return new Response(csv, {
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${getFileName(
+        transactions[0].company?.name
+      )}"`,
+    },
+  });
+}
+
+function getFileName(companyName: string) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  function slugify(value: string) {
+    return value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]/g, "-")
+      .toLowerCase()
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  let contextName = "personal";
+
+  if (companyName) {
+    contextName = slugify(companyName);
+  }
+
+  return `transactions_${today}_${contextName}.csv`;
+}
+
+function sanitizeCSVValue(value: unknown) {
+  return String(value ?? "")
+    .replace(/\r?\n|\r/g, " ")
+    .replace(/"/g, '""');
 }

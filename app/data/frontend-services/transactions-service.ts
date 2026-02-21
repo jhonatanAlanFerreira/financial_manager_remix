@@ -84,6 +84,47 @@ export const fetchTransactions = async (
   }
 };
 
+export const fetchTransactionsCSV = async (
+  params: string,
+  callbacks: {
+    onSuccess: (filename: string, data: Blob) => void;
+    onError: () => void;
+    onFinally: () => void;
+  }
+): Promise<void> => {
+  const { onSuccess, onError, onFinally } = callbacks;
+
+  try {
+    const res: AxiosResponse<Blob> = await axios.get(
+      `/api/transaction/export?${params}`,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const contentDisposition = res.headers["content-disposition"];
+    let filename = "transactions.csv";
+
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match?.[1]) {
+        filename = match[1];
+      }
+    }
+
+    onSuccess(filename, res.data);
+  } catch (error) {
+    if (isAxiosError(error)) {
+      toast.error("Sorry, unexpected error. Be back soon");
+    } else {
+      toast.error("Sorry, unexpected error. Be back soon");
+    }
+    onError();
+  } finally {
+    onFinally();
+  }
+};
+
 export const deleteTransaction = async (
   transactionId: string,
   callbacks: {
