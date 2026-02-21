@@ -22,6 +22,7 @@ import {
   TransactionWithRelationsInterface,
 } from "~/data/transaction/transaction-types";
 import { buildWhereClause } from "~/data/services/list.service";
+import { json } from "@remix-run/node";
 
 export async function list(
   user: User,
@@ -258,16 +259,18 @@ async function calculateTotals(
 export async function exportCSV(
   user: User,
   params: TransactionCSVExportLoaderParamsInterface
-): Promise<ServerResponseInterface<string>> {
+): Promise<Response> {
   const serverError = await transactionCSVExportValidator(params);
 
   if (serverError) {
-    return {
-      serverError,
-      message: "There are some invalid params",
-    };
+    return json(
+      {
+        message: "There are some invalid params",
+        error: serverError,
+      },
+      { status: 400 }
+    );
   }
-
   const result = await paginate<
     Transaction,
     Prisma.TransactionFindManyArgs,
@@ -324,8 +327,35 @@ export async function exportCSV(
 
   const csv = [header.join(","), ...rows].join("\n");
 
-  return {
-    data: csv,
-    message: "CSV generated successfully",
-  };
+  return new Response(csv, {
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${getFileName(
+        isCompany,
+        transactions[0].company.name
+      )}"`,
+    },
+  });
+}
+
+function getFileName(isCompany: boolean, companyName: string) {
+  const today = new Date().toISOString().slice(0, 10);
+
+  function slugify(value: string) {
+    return value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]/g, "-")
+      .toLowerCase()
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  let contextName = "personal";
+
+  if (isCompany) {
+    contextName = slugify(companyName);
+  }
+
+  return `transactions_${today}_${contextName}.csv`;
 }

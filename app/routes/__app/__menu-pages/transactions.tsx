@@ -154,8 +154,17 @@ export default function Transactions() {
     buildSearchParamsUrl();
 
     await fetchTransactionsCSV(`${getSearchParams()}`, {
-      onSuccess: (data) => {
-        console.log(data.data);
+      onSuccess: (filename, data) => {
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+        window.URL.revokeObjectURL(url);
       },
       onError: () => setLoading(false),
       onFinally: () => setLoading(false),

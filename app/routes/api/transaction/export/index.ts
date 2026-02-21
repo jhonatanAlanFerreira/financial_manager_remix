@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { requireUserSession } from "~/data/auth/auth.server";
-import { sendResponse } from "~/data/services/responses";
 import { TransactionCSVExportLoaderParamsInterface } from "~/data/transaction/transaction-query-params-interfaces";
 import { exportCSV } from "~/data/transaction/transaction.server";
 import {
@@ -34,5 +33,5 @@ export let loader = async ({ request }: LoaderFunctionArgs) => {
       ) as IsPersonalOrCompanyType) || "all",
   };
 
-  return sendResponse(await exportCSV(user, params));
+  return await exportCSV(user, params);
 };
