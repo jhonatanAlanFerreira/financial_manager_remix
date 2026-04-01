@@ -30,6 +30,7 @@ import {
   createOrUpdateTransaction,
   deleteTransaction,
   fetchTransactions,
+  fetchTransactionsCSV,
 } from "~/data/frontend-services/transactions-service";
 import { ThSort } from "~/components/th-sort/th-sort";
 import { TransactionThSortConfig } from "~/components/page-components/transaction/transaction-th-sort-config";
@@ -146,6 +147,28 @@ export default function Transactions() {
         onFinally: () => setLoading(false),
       }
     );
+  };
+
+  const exportCSVTransactions = async () => {
+    setLoading(true);
+    buildSearchParamsUrl();
+
+    await fetchTransactionsCSV(`${getSearchParams()}`, {
+      onSuccess: (filename, data) => {
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      },
+      onError: () => setLoading(false),
+      onFinally: () => setLoading(false),
+    });
   };
 
   const formSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -279,6 +302,14 @@ export default function Transactions() {
     onFilterFormSubmit();
   };
 
+  const csvDisabled = () => {
+    const filterValues = getFilterValues();
+    const isPersonal = filterValues.is_personal_or_company == "personal";
+    const hasCompany = !!filterValues.company;
+
+    return !isPersonal && !hasCompany;
+  };
+
   return (
     <Loader loading={loading}>
       <div className="flex items-center justify-between mb-2">
@@ -402,7 +433,29 @@ export default function Transactions() {
           </tbody>
         </table>
       </div>
-
+      {!!transactions.data?.transactions.length && (
+        <div className="w-full flex justify-end mt-2 mb-1 pr-10">
+          <button
+            onClick={exportCSVTransactions}
+            disabled={csvDisabled()}
+            title={
+              csvDisabled()
+                ? "You must filter by a company or by personal transactions before exporting."
+                : ""
+            }
+            className={`bg-violet-950 text-white font-semibold px-3 py-1 rounded-lg shadow hover:scale-110 transition-colors duration-200 flex items-center gap-2 ${
+              csvDisabled() ? "cursor-not-allowed opacity-50" : ""
+            }`}
+          >
+            CSV
+            <Icon
+              name="Download"
+              size={17}
+              className="transition-transform transform hover:scale-110"
+            />
+          </button>
+        </div>
+      )}
       <div
         title="Total incomes and expenses using the current filters"
         className="w-100 text-right px-10 pt-2 text-violet-900 text-lg whitespace-nowrap flex flex-col md:flex-row justify-end"
