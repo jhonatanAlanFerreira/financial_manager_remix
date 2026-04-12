@@ -18,14 +18,6 @@ type ChartTransactionData {
   data: [YearData!]!
 }
 
-type Query {
-  chartTransactionData(
-    companyId: String
-    type: TransactionType!
-    classificationId: String
-  ): ChartTransactionData!
-}
-
 enum TransactionType {
   PERSONAL_ONLY
   COMPANY_ONLY
