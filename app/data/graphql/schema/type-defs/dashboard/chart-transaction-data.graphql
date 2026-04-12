@@ -1,8 +1,15 @@
+type ClassificationBreakdown {
+  name: String!
+  amount: Float!
+}
+
 type MonthData {
   month: String!
   income: Float!
   expense: Float!
   net: Float!
+  monthlyExpenses: [ClassificationBreakdown!]!
+  monthlyIncomes: [ClassificationBreakdown!]!
 }
 
 type YearData {
