@@ -46,4 +46,4 @@ jobs:
 
             npm ci --omit=dev
 
-            pm2 restart financial-manager
+            pm2 restart financial_manager
