@@ -18,6 +18,9 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: ls -la
+      - run: ls -la build
+      - run: ls -la public
 
       - run: tar -czf release.tar.gz \
           build \
