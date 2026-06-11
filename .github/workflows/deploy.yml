@@ -22,11 +22,7 @@ jobs:
       - run: ls -la build
       - run: ls -la public
 
-      - run: tar -czf release.tar.gz \
-          build \
-          public \
-          package.json \
-          package-lock.json
+      - run: tar -czf release.tar.gz build public package.json package-lock.json
 
       - uses: appleboy/scp-action@v0.1.7
         with:
