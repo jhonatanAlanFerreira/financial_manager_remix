@@ -22,7 +22,7 @@ export const items: SidebarItemType[] = [
     path: "/incomes",
   },
   {
-    title: "Expenses Categories",
+    title: "Expense Categories",
     icon: "DollarSign",
     path: "/expenses",
   },

@@ -94,7 +94,7 @@ export default function Expenses() {
   useEffect(() => {
     buildSearchParamsUrl();
     setTitle({
-      pageTitle: "Expenses Categories",
+      pageTitle: "Expense Categories",
       pageTooltipMessage:
         "Add types of expenses here, such as 'Rent' or 'Utilities'. Record individual expense transactions on the transaction screen.",
     });
