@@ -40,6 +40,7 @@ services:
     command: bash -c "npx prisma generate && npm run dev"
     volumes:
       - .:/app
+      - /app/node_modules
     ports:
       - "${APP_PORT}:3000"
       - "3001:3001"
