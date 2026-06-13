@@ -1,8 +1,8 @@
-# Learning Remix with React 📚
+# Personal Finance Manager
 
-This project was created as a hands-on learning exercise to explore Remix with React. The goal is to understand the core concepts of Remix and apply them to build a functional web application.
+A personal finance management application built with Remix and React. Users can track income and expenses, organize transactions, and monitor their financial activity through a simple and intuitive interface.
 
-[![Remix Docs](https://img.shields.io/badge/Remix-Docs-blue)](https://remix.run/docs)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-success)](https://financial-manager.jhonatanferreira.dev)
 
 ![Demo GIF showing the app in action](public/screenshots/login_and_docs.gif)
 
