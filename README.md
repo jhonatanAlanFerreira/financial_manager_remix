@@ -2,8 +2,6 @@
 
 A personal finance management application built with Remix and React. Users can track income and expenses, organize transactions, and monitor their financial activity through a simple and intuitive interface.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-success)](https://financial-manager.jhonatanferreira.dev)
-
 ![Demo GIF showing the app in action](public/screenshots/login_and_docs.gif)
 
 ![Demo GIF showing the app in action](public/screenshots/main.gif)
